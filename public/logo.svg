@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="320" height="100" viewBox="0 0 320 100" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="18" width="64" height="64" rx="8" fill="#0d1117"/>
+  <rect x="16" y="24" width="52" height="52" rx="4" fill="none" stroke="#22c55e" stroke-width="1" opacity="0.3"/>
+  <path d="M 32 32 L 32 58 Q 32 66 40 66 Q 48 66 48 58"
+        stroke="#22c55e"
+        stroke-width="6"
+        stroke-linecap="round"
+        fill="none"/>
+  <circle cx="48" cy="58" r="3" fill="#22c55e"/>
+  <rect x="54" y="32" width="2" height="14" fill="#22c55e"/>
+  <text x="90" y="58" font-family="Inter, system-ui, sans-serif" font-size="42" font-weight="800" fill="#22c55e" letter-spacing="-1">JcHub</text>
+  <text x="92" y="78" font-family="Inter, system-ui, sans-serif" font-size="9" font-weight="700" fill="#64748b" letter-spacing="3">SMART LEARNING</text>
+</svg>

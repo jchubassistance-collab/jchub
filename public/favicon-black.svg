@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Style 1: Pure Black - Minimaliste pur -->
+  <rect x="0" y="0" width="64" height="64" rx="12" fill="#0a0a0a"/>
+  <path d="M 22 14 L 22 40 Q 22 48 30 48 Q 38 48 38 40"
+        stroke="white"
+        stroke-width="6"
+        stroke-linecap="round"
+        fill="none"/>
+  <circle cx="38" cy="40" r="3" fill="white"/>
+  <line x1="46" y1="18" x2="46" y2="46" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+</svg>

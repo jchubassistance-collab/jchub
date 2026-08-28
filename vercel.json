@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-audiobooks",
+      "schedule": "0 3 * * 0"
+    },
+    {
+      "path": "/api/cron/publish-scheduled",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/check-subscriptions",
+      "schedule": "30 7 * * *"
+    }
+  ]
+}

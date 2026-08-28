@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sunsetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+  </defs>
+  <!-- Style 4: Sunset - Chaud et distinctif -->
+  <rect x="0" y="0" width="64" height="64" rx="18" fill="url(#sunsetGrad)"/>
+  <path d="M 22 14 L 22 40 Q 22 48 30 48 Q 38 48 38 40"
+        stroke="white"
+        stroke-width="6"
+        stroke-linecap="round"
+        fill="none"/>
+  <circle cx="38" cy="40" r="3" fill="white"/>
+  <!-- Petit soleil en haut -->
+  <circle cx="48" cy="16" r="4" fill="white" opacity="0.4"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">GitHub</title>
+  <desc id="desc">Logo GitHub bleu sur fond blanc</desc>
+  <rect width="512" height="512" rx="128" fill="#fff"/>
+  <rect x="45" y="45" width="422" height="422" rx="112" transform="rotate(45 256 256)" fill="#6f9ff1"/>
+  <g fill="none" stroke="#06245b" stroke-linecap="round" stroke-linejoin="round" stroke-width="48">
+    <path d="M174 247 350 134"/>
+    <path d="M174 283 350 424"/>
+  </g>
+  <circle cx="151" cy="265" r="55" fill="#06245b"/>
+  <circle cx="365" cy="118" r="55" fill="#06245b"/>
+  <circle cx="365" cy="424" r="55" fill="#06245b"/>
+  <circle cx="365" cy="118" r="25" fill="#6f9ff1"/>
+</svg>
