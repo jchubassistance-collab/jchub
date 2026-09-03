@@ -2,7 +2,7 @@
 title: "QR Code : comment en créer un pour ton WiFi, vCard ou paiement mobile"
 description: "Le QR code c'est plus juste pour les menus de resto. Voici 5 usages pratiques pour les devs, avec des générateurs gratuits."
 slug: creer-qr-code-wifi-paiement
-keywords: ["qr code generator", "qr code wifi", "qr code vcard", "qr code paiement", "cinetpay qr", "mobile money qr"]
+keywords: ["qr code generator", "qr code wifi", "qr code vcard", "qr code paiement", "mobile money qr"]
 author: Jessy Ngnambongo
 date: 2026-08-25
 category: Productivité
@@ -72,9 +72,9 @@ En Afrique, le mobile money (MTN MoMo, Airtel Money) est **massif**. Et beaucoup
 
 Tu peux générer un QR code qui contient ce code USSD. Le client scanne → l'app de paiement s'ouvre avec le numéro + montant pré-remplis.
 
-### Avec CinetPay (ma recommandation pour le Congo)
+### Avec un service de paiement mobile
 
-CinetPay permet de générer des QR codes de paiement directement. Tu crées un "payment link", tu obtiens un QR code, tu l'imprimes, tes clients scannent et paient.
+Un service de paiement mobile peut générer des QR codes de paiement directement. Tu crées un lien de paiement, tu obtiens un QR code, tu l'imprimes, tes clients scannent et paient.
 
 **Avantage** : pas besoin que le client tape le numéro, c'est pré-rempli.
 
@@ -169,14 +169,14 @@ Si tu mets 3000 caractères, le QR code devient très dense et dur à scanner. L
 **Statique** : le contenu est gravé dans le QR code. Si tu changes l'URL, faut tout réimprimer.
 **Dynamique** : le QR code pointe vers un service qui redirige. Tu peux changer la destination sans réimprimer.
 
-Services dynamiques : bit.ly, qr-code-generator.com (version pro), CinetPay pour les paiements.
+Services dynamiques : bit.ly, qr-code-generator.com (version pro) et les plateformes de paiement mobile.
 
 ## TL;DR
 
 - **5 usages** : WiFi, vCard, paiement, événement, offline
 - **Format WiFi** : `WIFI:T:WPA;S:Nom;P:Password;;`
 - **Format vCard** : `BEGIN:VCARD...END:VCARD`
-- **Mobile money** : USSD pré-rempli ou CinetPay
+- **Mobile money** : USSD pré-rempli ou lien de paiement
 - **Limites** : 3000 chars max, 2cm de large minimum
 - **Outil gratuit** : [jchub.io/outils/qr-code-generator](https://jchub.io/outils/qr-code-generator)
 

@@ -1,5 +1,0 @@
-import { redirect } from 'next/navigation';
-
-export default function BooksPage() {
-  redirect('/livres/pdf');
-}

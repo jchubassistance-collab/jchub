@@ -139,36 +139,36 @@ export function MarkdownPreview() {
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between text-sm text-gray-500">
+    <div className="space-y-3 text-slate-100">
+      <div className="flex items-center justify-between text-sm text-slate-400">
         <span>{input.length} caractères · {input.split('\n').length} lignes</span>
-        <button onClick={copyHtml} className="text-brand-600 font-semibold flex items-center gap-1">
+        <button onClick={copyHtml} className="font-semibold flex items-center gap-1 text-[#9ccbff] hover:text-white transition">
           {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
           {copied ? 'Copié !' : 'Copier en HTML'}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden">
-          <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 flex items-center gap-2 text-sm font-bold text-gray-700">
-            <Edit3 className="w-4 h-4" />
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <div className="overflow-hidden rounded-2xl border border-[#9ccbff]/20 bg-[#0b1830]/80 shadow-[0_12px_28px_rgba(7,19,40,0.28)]">
+          <div className="flex items-center gap-2 border-b border-[#9ccbff]/15 bg-[#071526]/90 px-4 py-2 text-sm font-bold text-slate-200">
+            <Edit3 className="w-4 h-4 text-[#9ccbff]" />
             Markdown
           </div>
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="w-full p-4 font-mono text-sm focus:outline-none resize-none bg-white"
+            className="w-full resize-none bg-[#071526] p-4 font-mono text-sm text-slate-100 focus:outline-none"
             rows={20}
           />
         </div>
 
-        <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden">
-          <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 flex items-center gap-2 text-sm font-bold text-gray-700">
-            <Eye className="w-4 h-4" />
+        <div className="overflow-hidden rounded-2xl border border-[#9ccbff]/20 bg-[#0b1830]/80 shadow-[0_12px_28px_rgba(7,19,40,0.28)]">
+          <div className="flex items-center gap-2 border-b border-[#9ccbff]/15 bg-[#071526]/90 px-4 py-2 text-sm font-bold text-slate-200">
+            <Eye className="w-4 h-4 text-[#9ccbff]" />
             Preview
           </div>
           <div
-            className="p-4 prose prose-sm max-w-none overflow-auto"
+            className="prose prose-sm prose-invert max-w-none overflow-auto p-4"
             style={{ maxHeight: '500px' }}
             dangerouslySetInnerHTML={{ __html: html }}
           />

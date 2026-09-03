@@ -55,48 +55,48 @@ export function RegexTester() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-slate-100">
       <div className="grid grid-cols-3 gap-2">
         <input
           type="text"
           value={pattern}
           onChange={(e) => setPattern(e.target.value)}
           placeholder="[a-z]+"
-          className="col-span-2 px-4 py-2.5 border-2 border-gray-200 rounded-xl font-mono focus:outline-none focus:border-brand-500"
+          className="col-span-2 rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-4 py-2.5 font-mono text-white focus:outline-none focus:border-[#9ccbff]/60"
         />
         <input
           type="text"
           value={flags}
           onChange={(e) => setFlags(e.target.value)}
           placeholder="g"
-          className="px-4 py-2.5 border-2 border-gray-200 rounded-xl font-mono focus:outline-none focus:border-brand-500"
+          className="rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-4 py-2.5 font-mono text-white focus:outline-none focus:border-[#9ccbff]/60"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-semibold mb-2">Texte à tester</label>
+        <label className="mb-2 block text-sm font-semibold text-slate-200">Texte à tester</label>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={6}
           placeholder="Colle ton texte ici..."
-          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-mono text-sm focus:outline-none focus:border-brand-500 resize-y"
+          className="w-full resize-y rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-4 py-3 font-mono text-sm text-white focus:outline-none focus:border-[#9ccbff]/60"
         />
       </div>
 
-      <div className="flex justify-between items-center">
-        <span className="text-sm text-gray-500">
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-slate-400">
           {matches.length > 0 && `${matches.length} match${matches.length > 1 ? 's' : ''} trouvé${matches.length > 1 ? 's' : ''}`}
         </span>
-        <button onClick={clear} className="px-3 py-1.5 text-sm bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-medium transition flex items-center gap-1">
+        <button onClick={clear} className="flex items-center gap-1 rounded-lg bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-200 transition hover:bg-red-500/20">
           <Trash2 className="w-3.5 h-3.5" />
           Reset
         </button>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border-2 border-red-200 rounded-xl text-sm text-red-700 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -104,26 +104,26 @@ export function RegexTester() {
       {matches.length > 0 && (
         <>
           <div>
-            <label className="block text-sm font-semibold mb-2">Résultat surligné</label>
+            <label className="mb-2 block text-sm font-semibold text-slate-200">Résultat surligné</label>
             <div
-              className="p-4 border-2 border-gray-200 rounded-xl bg-gray-50 font-mono text-sm whitespace-pre-wrap break-all min-h-[100px]"
+              className="min-h-[100px] whitespace-pre-wrap break-all rounded-xl border border-[#9ccbff]/20 bg-[#071526] p-4 font-mono text-sm text-slate-100"
               dangerouslySetInnerHTML={{ __html: highlighted }}
             />
           </div>
 
           <div className="space-y-1.5">
             {matches.slice(0, 10).map((m, i) => (
-              <div key={i} className="text-sm p-2.5 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div key={i} className="rounded-lg border border-yellow-400/30 bg-yellow-500/10 p-2.5 text-sm text-yellow-100">
                 <div className="font-semibold">#{i + 1} : <span className="font-mono">"{m.match}"</span> à l'index {m.index}</div>
                 {m.groups.length > 0 && (
-                  <div className="text-xs text-gray-600 mt-1">
+                  <div className="mt-1 text-xs text-slate-300">
                     Groupes : <span className="font-mono">{m.groups.join(', ')}</span>
                   </div>
                 )}
               </div>
             ))}
             {matches.length > 10 && (
-              <p className="text-xs text-gray-500 text-center">+ {matches.length - 10} autres matches</p>
+              <p className="text-center text-xs text-slate-400">+ {matches.length - 10} autres matches</p>
             )}
           </div>
         </>

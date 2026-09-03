@@ -104,15 +104,15 @@ export function HashGenerator() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-slate-100">
       <div>
-        <label className="block text-sm font-semibold mb-2">Texte à hasher</label>
+        <label className="block text-sm font-semibold mb-2 text-slate-200">Texte à hasher</label>
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           rows={4}
           placeholder="Tape ou colle ton texte ici..."
-          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-mono text-sm focus:outline-none focus:border-brand-500 resize-y"
+          className="w-full px-4 py-3 rounded-xl border border-[#9ccbff]/20 bg-[#071526] text-white font-mono text-sm focus:outline-none focus:border-[#9ccbff]/60 resize-y"
         />
       </div>
 
@@ -129,20 +129,20 @@ export function HashGenerator() {
             { name: 'SHA-256', value: hashes.sha256, algo: '✅ Recommandé' },
             { name: 'SHA-512', value: hashes.sha512, algo: '✅ Très sécurisé' },
           ].map((h) => (
-            <div key={h.name} className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
-              <div className="flex items-center justify-between p-3 bg-gray-50 border-b border-gray-200">
+            <div key={h.name} className="overflow-hidden rounded-xl border border-[#9ccbff]/20 bg-[#0b1830]/80 shadow-[0_12px_28px_rgba(7,19,40,0.28)]">
+              <div className="flex items-center justify-between border-b border-[#9ccbff]/15 bg-[#071526]/90 p-3">
                 <div>
-                  <div className="font-bold text-sm flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-sm font-bold text-white">
                     {h.name}
-                    <span className="text-xs font-normal text-gray-500">{h.algo}</span>
+                    <span className="text-xs font-normal text-slate-400">{h.algo}</span>
                   </div>
                 </div>
-                <button onClick={() => copy(h.value, h.name)} className="text-xs text-brand-600 font-semibold flex items-center gap-1">
+                <button onClick={() => copy(h.value, h.name)} className="text-xs text-[#9ccbff] font-semibold flex items-center gap-1 hover:text-white transition">
                   {copied === h.name ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                   {copied === h.name ? 'Copié' : 'Copier'}
                 </button>
               </div>
-              <pre className="p-3 text-xs font-mono overflow-x-auto break-all">{h.value}</pre>
+              <pre className="overflow-x-auto break-all p-3 text-xs font-mono text-slate-100">{h.value}</pre>
             </div>
           ))}
         </div>

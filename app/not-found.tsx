@@ -40,7 +40,7 @@ export default function NotFound() {
         </div>
 
         <div className="mt-12 text-sm text-gray-500">
-          <Link href="/livres" className="hover:text-brand-600 mx-2">Livres</Link>·
+          <Link href="/outils" className="hover:text-brand-600 mx-2">Outils</Link>·
           <Link href="/a-propos" className="hover:text-brand-600 mx-2">À propos</Link>·
           <Link href="/contact" className="hover:text-brand-600 mx-2">Contact</Link>
         </div>

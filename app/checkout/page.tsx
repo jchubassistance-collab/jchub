@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { AlertCircle, ArrowLeft, Check, Clock3, CreditCard, Lock, Sparkles } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Check, Clock3, Lock, Sparkles } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { plans, formatXAF } from '@/lib/pricing';
 
@@ -17,7 +17,7 @@ export default function CheckoutPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'MTN_MOMO' | 'AIRTEL_MONEY' | 'CARD' | 'PAYPAL'>('MTN_MOMO');
+  const paymentMethod = 'MTN_MOMO' as const;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -44,7 +44,7 @@ export default function CheckoutPage() {
     }
 
     const normalizedPhone = phone.replace(/\s+/g, '');
-    if ((paymentMethod === 'MTN_MOMO' || paymentMethod === 'AIRTEL_MONEY') && !phoneRegex.test(normalizedPhone)) {
+    if (!phoneRegex.test(normalizedPhone)) {
       setError('Numéro Congo invalide. Format attendu : 242XXXXXXXX');
       return;
     }
@@ -71,7 +71,6 @@ export default function CheckoutPage() {
           customerName: name.trim(),
           customerEmail: email.trim(),
           customerPhone: normalizedPhone || undefined,
-          userId: currentUser.uid,
         }),
       });
 
@@ -158,7 +157,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">Numéro Mobile Money {paymentMethod !== 'MTN_MOMO' && paymentMethod !== 'AIRTEL_MONEY' ? '(facultatif)' : ''}</label>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">Numéro MTN MoMo</label>
                   <input
                     type="tel"
                     value={phone}
@@ -166,56 +165,15 @@ export default function CheckoutPage() {
                     className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
                     placeholder="242XXXXXXXX"
                   />
-                  <p className="mt-2 text-xs text-slate-500">Obligatoire pour MTN MoMo et Airtel Money. Format : 242XXXXXXXX</p>
+                  <p className="mt-2 text-xs text-slate-500">Format : 242XXXXXXXX</p>
                 </div>
               </div>
 
               <div>
                 <label className="mb-3 block text-sm font-semibold text-slate-700">Méthode de paiement</label>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('MTN_MOMO')}
-                    className={`rounded-2xl border p-3 text-left transition-all ${
-                      paymentMethod === 'MTN_MOMO'
-                        ? 'border-yellow-300 bg-yellow-50 ring-2 ring-yellow-100'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="text-sm font-bold text-yellow-700">MTN MoMo</div>
-                    <div className="text-xs text-slate-500">Paiement mobile</div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('CARD')}
-                    className={`rounded-2xl border p-3 text-left transition-all ${paymentMethod === 'CARD' ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-100' : 'border-slate-200 bg-white hover:border-slate-300'}`}
-                  >
-                    <div className="flex items-center gap-2 text-sm font-bold text-blue-700"><CreditCard className="h-4 w-4" /> Carte bancaire</div>
-                    <div className="text-xs text-slate-500">Visa et Mastercard</div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('PAYPAL')}
-                    className={`rounded-2xl border p-3 text-left transition-all ${paymentMethod === 'PAYPAL' ? 'border-sky-300 bg-sky-50 ring-2 ring-sky-100' : 'border-slate-200 bg-white hover:border-slate-300'}`}
-                  >
-                    <div className="text-sm font-bold text-sky-700">PayPal</div>
-                    <div className="text-xs text-slate-500">Paiement international</div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('AIRTEL_MONEY')}
-                    className={`rounded-2xl border p-3 text-left transition-all ${
-                      paymentMethod === 'AIRTEL_MONEY'
-                        ? 'border-red-300 bg-red-50 ring-2 ring-red-100'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="text-sm font-bold text-red-700">Airtel Money</div>
-                    <div className="text-xs text-slate-500">Paiement mobile</div>
-                  </button>
+                <div className="rounded-2xl border border-yellow-300 bg-yellow-50 p-3">
+                  <div className="text-sm font-bold text-yellow-700">MTN MoMo</div>
+                  <div className="text-xs text-slate-500">Paiement mobile</div>
                 </div>
               </div>
 
@@ -268,7 +226,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <span>Mode</span>
-                    <span className="font-semibold text-white">{paymentMethod === 'MTN_MOMO' ? 'MTN MoMo' : paymentMethod === 'AIRTEL_MONEY' ? 'Airtel Money' : paymentMethod === 'CARD' ? 'Carte bancaire' : 'PayPal'}</span>
+                    <span className="font-semibold text-white">MTN MoMo</span>
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <span>Accès</span>
@@ -283,7 +241,7 @@ export default function CheckoutPage() {
                   Paiement sécurisé
                 </div>
                 <p className="mt-2 text-emerald-100/90">
-                  Tu recevras une confirmation sur ton téléphone puis le paiement est vérifié directement par CinetPay.
+                  Tu recevras une confirmation sur ton téléphone puis le paiement sera vérifié automatiquement.
                 </p>
               </div>
 

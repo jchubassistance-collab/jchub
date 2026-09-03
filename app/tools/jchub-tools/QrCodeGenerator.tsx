@@ -58,39 +58,39 @@ export function QrCodeGenerator() {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-slate-100">
       <div>
-        <label className="block text-sm font-semibold mb-2">Texte ou URL à encoder</label>
+        <label className="mb-2 block text-sm font-semibold text-slate-200">Texte ou URL à encoder</label>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={3}
           placeholder="https://jchub.io ou un texte..."
-          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-500 resize-y"
+          className="w-full resize-y rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-4 py-3 text-sm text-white focus:outline-none focus:border-[#9ccbff]/60"
         />
-        <div className="flex items-center justify-between mt-2">
-          <span className="text-xs text-gray-500">{text.length} caractères</span>
-          <button onClick={copy} className="text-xs text-brand-600 font-semibold flex items-center gap-1">
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-xs text-slate-400">{text.length} caractères</span>
+          <button onClick={copy} className="flex items-center gap-1 text-xs font-semibold text-[#9ccbff] hover:text-white transition">
             {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
             {copied ? 'Copié !' : 'Copier le texte'}
           </button>
         </div>
       </div>
 
-      {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
+      {error && <p className="text-sm text-red-300" role="alert">{error}</p>}
 
       {/* Presets */}
       <div>
-        <div className="text-xs font-bold text-gray-500 uppercase mb-2">Préréglages</div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Préréglages</div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {presets.map((p) => (
             <button
               key={p.label}
               onClick={() => setText(p.value)}
-              className="p-2.5 border-2 border-gray-200 rounded-xl hover:border-brand-300 hover:bg-brand-50 transition"
+              className="rounded-xl border border-[#9ccbff]/20 bg-[#0b1830]/80 p-2.5 transition hover:border-[#9ccbff]/50 hover:bg-[#0f2140]"
             >
-              <div className="text-2xl mb-1">{p.icon}</div>
-              <div className="text-xs font-semibold">{p.label}</div>
+              <div className="mb-1 text-2xl">{p.icon}</div>
+              <div className="text-xs font-semibold text-slate-100">{p.label}</div>
             </button>
           ))}
         </div>
@@ -99,11 +99,11 @@ export function QrCodeGenerator() {
       {/* Options */}
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Taille</label>
+          <label className="mb-1 block text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Taille</label>
           <select
             value={size}
             onChange={(e) => setSize(Number(e.target.value))}
-            className="w-full px-2 py-2 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand-500"
+            className="w-full rounded-lg border border-[#9ccbff]/20 bg-[#071526] px-2 py-2 text-sm text-white focus:outline-none focus:border-[#9ccbff]/60"
           >
             <option value={128}>128px</option>
             <option value={256}>256px</option>
@@ -112,38 +112,38 @@ export function QrCodeGenerator() {
           </select>
         </div>
         <div>
-          <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">QR</label>
+          <label className="mb-1 block text-xs font-bold uppercase tracking-[0.18em] text-slate-400">QR</label>
           <input
             type="color"
             value={fgColor}
             onChange={(e) => setFgColor(e.target.value)}
-            className="w-full h-10 border-2 border-gray-200 rounded-lg cursor-pointer"
+            className="h-10 w-full cursor-pointer rounded-lg border border-[#9ccbff]/20 bg-[#071526]"
           />
         </div>
         <div>
-          <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Fond</label>
+          <label className="mb-1 block text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Fond</label>
           <input
             type="color"
             value={bgColor}
             onChange={(e) => setBgColor(e.target.value)}
-            className="w-full h-10 border-2 border-gray-200 rounded-lg cursor-pointer"
+            className="h-10 w-full cursor-pointer rounded-lg border border-[#9ccbff]/20 bg-[#071526]"
           />
         </div>
       </div>
 
       {/* Preview */}
-      <div className="bg-white border-2 border-gray-200 rounded-2xl p-4 flex flex-col items-center">
-        <div className="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
-          <QrIcon className="w-4 h-4" />
+      <div className="flex flex-col items-center rounded-2xl border border-[#9ccbff]/20 bg-[#0b1830]/80 p-4 shadow-[0_12px_28px_rgba(7,19,40,0.28)]">
+        <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+          <QrIcon className="h-4 w-4 text-[#9ccbff]" />
           Aperçu
         </div>
-        <div className="p-2 bg-white rounded-xl shadow-inner">
-          <canvas ref={canvasRef} className="max-w-full h-auto" />
+        <div className="rounded-xl bg-white p-2 shadow-inner">
+          <canvas ref={canvasRef} className="h-auto max-w-full" />
         </div>
       </div>
 
       {dataUrl && (
-        <button onClick={download} className="w-full py-3 bg-gradient-to-r from-brand-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition flex items-center justify-center gap-2">
+        <button onClick={download} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-purple-600 py-3 font-semibold text-white transition hover:shadow-lg">
           <Download className="w-4 h-4" />
           Télécharger en PNG
         </button>

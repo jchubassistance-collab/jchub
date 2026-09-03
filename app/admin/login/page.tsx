@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, CheckCircle2, LockKeyhole, Mail, QrCode, ShieldCheck } from 'lucide-react';
 import QRCode from 'qrcode';
@@ -73,6 +73,27 @@ export default function AdminLoginPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (loading || code.length !== 6 || (!factorId && step !== 'totp' && step !== 'enrollment')) return;
+    if (!factorId || !challengeId) return;
+
+    const verifyCodeAutomatically = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const { error: verifyError } = await createSupabaseBrowserClient().auth.mfa.verify({ factorId, challengeId, code });
+        if (verifyError) throw verifyError;
+        router.replace('/admin');
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : 'Code invalide.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void verifyCodeAutomatically();
+  }, [challengeId, code, factorId, loading, router, step]);
 
   return (
     <div className="grid min-h-screen place-items-center bg-slate-950 px-4 py-10 text-slate-900">

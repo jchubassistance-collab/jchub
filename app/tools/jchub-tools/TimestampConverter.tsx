@@ -57,11 +57,11 @@ export function TimestampConverter() {
   const copy = (text: string) => navigator.clipboard.writeText(text);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 text-slate-100">
       {/* Now display */}
-      <div className="bg-gradient-to-r from-brand-500 to-purple-600 text-white rounded-2xl p-4 text-center">
-        <div className="text-xs uppercase tracking-wide opacity-80 mb-1">Timestamp actuel (Unix)</div>
-        <div className="text-3xl font-black font-mono mb-1">{now}</div>
+      <div className="rounded-2xl bg-gradient-to-r from-brand-500 to-purple-600 p-4 text-center text-white">
+        <div className="mb-1 text-xs uppercase tracking-wide opacity-80">Timestamp actuel (Unix)</div>
+        <div className="mb-1 font-mono text-3xl font-black">{now}</div>
         <div className="text-xs opacity-80">{formatDate(new Date(now * 1000))}</div>
         <button onClick={() => setTimestamp(String(now))} className="mt-2 text-xs underline opacity-80 hover:opacity-100">
           Utiliser cette valeur
@@ -69,9 +69,9 @@ export function TimestampConverter() {
       </div>
 
       {/* Timestamp → Date */}
-      <div className="bg-white border-2 border-gray-200 rounded-2xl p-4">
-        <h3 className="font-bold text-sm mb-3 flex items-center gap-2">
-          <Clock className="w-4 h-4 text-brand-600" />
+      <div className="rounded-2xl border border-[#9ccbff]/20 bg-[#0b1830]/80 p-4 shadow-[0_12px_28px_rgba(7,19,40,0.28)]">
+        <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-white">
+          <Clock className="h-4 w-4 text-[#9ccbff]" />
           Timestamp → Date
         </h3>
         <div className="space-y-3">
@@ -80,30 +80,30 @@ export function TimestampConverter() {
             value={timestamp}
             onChange={(e) => setTimestamp(e.target.value)}
             placeholder="1724678400"
-            className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg font-mono focus:outline-none focus:border-brand-500"
+            className="w-full rounded-lg border border-[#9ccbff]/20 bg-[#071526] px-3 py-2 font-mono text-white focus:outline-none focus:border-[#9ccbff]/60"
           />
           {currentDate && (
             <div className="space-y-2 text-sm">
-              <div className="p-2.5 bg-gray-50 rounded-lg flex justify-between items-center">
+              <div className="flex items-center justify-between rounded-lg bg-[#071526]/90 p-2.5">
                 <div>
-                  <div className="text-xs text-gray-500">Local (FR)</div>
-                  <div className="font-medium">{formatDate(currentDate)}</div>
+                  <div className="text-xs text-slate-400">Local (FR)</div>
+                  <div className="font-medium text-white">{formatDate(currentDate)}</div>
                 </div>
-                <button onClick={() => copy(formatDate(currentDate))} className="text-xs text-brand-600 font-semibold">Copier</button>
+                <button onClick={() => copy(formatDate(currentDate))} className="text-xs font-semibold text-[#9ccbff] hover:text-white">Copier</button>
               </div>
-              <div className="p-2.5 bg-gray-50 rounded-lg flex justify-between items-center">
+              <div className="flex items-center justify-between rounded-lg bg-[#071526]/90 p-2.5">
                 <div>
-                  <div className="text-xs text-gray-500">ISO 8601</div>
-                  <div className="font-mono text-xs">{formatISO(currentDate)}</div>
+                  <div className="text-xs text-slate-400">ISO 8601</div>
+                  <div className="font-mono text-xs text-slate-100">{formatISO(currentDate)}</div>
                 </div>
-                <button onClick={() => copy(formatISO(currentDate))} className="text-xs text-brand-600 font-semibold">Copier</button>
+                <button onClick={() => copy(formatISO(currentDate))} className="text-xs font-semibold text-[#9ccbff] hover:text-white">Copier</button>
               </div>
-              <div className="p-2.5 bg-gray-50 rounded-lg flex justify-between items-center">
+              <div className="flex items-center justify-between rounded-lg bg-[#071526]/90 p-2.5">
                 <div>
-                  <div className="text-xs text-gray-500">UTC</div>
-                  <div className="font-mono text-xs">{formatUTC(currentDate)}</div>
+                  <div className="text-xs text-slate-400">UTC</div>
+                  <div className="font-mono text-xs text-slate-100">{formatUTC(currentDate)}</div>
                 </div>
-                <button onClick={() => copy(formatUTC(currentDate))} className="text-xs text-brand-600 font-semibold">Copier</button>
+                <button onClick={() => copy(formatUTC(currentDate))} className="text-xs font-semibold text-[#9ccbff] hover:text-white">Copier</button>
               </div>
             </div>
           )}
@@ -111,27 +111,27 @@ export function TimestampConverter() {
       </div>
 
       {/* Date → Timestamp */}
-      <div className="bg-white border-2 border-gray-200 rounded-2xl p-4">
-        <h3 className="font-bold text-sm mb-3 flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-brand-600" />
+      <div className="rounded-2xl border border-[#9ccbff]/20 bg-[#0b1830]/80 p-4 shadow-[0_12px_28px_rgba(7,19,40,0.28)]">
+        <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-white">
+          <Calendar className="h-4 w-4 text-[#9ccbff]" />
           Date → Timestamp
         </h3>
         <input
           type="datetime-local"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-brand-500"
+          className="w-full rounded-lg border border-[#9ccbff]/20 bg-[#071526] px-3 py-2 text-white focus:outline-none focus:border-[#9ccbff]/60"
         />
         {currentTs !== null && date && (
           <div className="mt-3 space-y-2">
-            <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg flex justify-between items-center">
+            <div className="flex items-center justify-between rounded-lg border border-emerald-400/30 bg-emerald-500/10 p-2.5">
               <div>
-                <div className="text-xs text-emerald-700">Unix timestamp</div>
-                <div className="font-mono font-bold">{currentTs}</div>
+                <div className="text-xs text-emerald-200">Unix timestamp</div>
+                <div className="font-mono font-bold text-white">{currentTs}</div>
               </div>
-              <button onClick={() => copy(String(currentTs))} className="text-xs text-emerald-700 font-semibold">Copier</button>
+              <button onClick={() => copy(String(currentTs))} className="text-xs font-semibold text-emerald-200 hover:text-white">Copier</button>
             </div>
-            <div className="p-2.5 bg-gray-50 rounded-lg text-xs text-gray-600">
+            <div className="rounded-lg bg-[#071526]/90 p-2.5 text-xs text-slate-300">
               ⏱ {formatRelative(currentTs)}
             </div>
           </div>

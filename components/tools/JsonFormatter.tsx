@@ -40,24 +40,24 @@ export function JsonFormatter() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-slate-100">
       <div>
-        <label className="block text-sm font-semibold mb-2">Coller ton JSON</label>
+        <label className="mb-2 block text-sm font-semibold text-slate-200">Coller ton JSON</label>
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder='{"exemple": "coller ton JSON ici"}'
           rows={8}
-          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-mono text-sm focus:outline-none focus:border-brand-500 resize-y"
+          className="w-full resize-y rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-4 py-3 font-mono text-sm text-white focus:outline-none focus:border-[#9ccbff]/60"
         />
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap">
-        <label className="text-sm font-semibold">Indentation :</label>
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="text-sm font-semibold text-slate-200">Indentation :</label>
         <select
           value={indent}
           onChange={(e) => setIndent(Number(e.target.value))}
-          className="px-3 py-1.5 border-2 border-gray-200 rounded-lg text-sm font-medium focus:outline-none focus:border-brand-500"
+          className="rounded-lg border border-[#9ccbff]/20 bg-[#071526] px-3 py-1.5 text-sm font-medium text-white focus:outline-none focus:border-[#9ccbff]/60"
         >
           <option value={2}>2 espaces</option>
           <option value={4}>4 espaces</option>
@@ -65,37 +65,37 @@ export function JsonFormatter() {
         </select>
       </div>
 
-      <div className="flex gap-2 flex-wrap">
-        <button onClick={() => format(false)} className="flex-1 min-w-[120px] py-2.5 bg-gradient-to-r from-brand-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition">
+      <div className="flex flex-wrap gap-2">
+        <button onClick={() => format(false)} className="min-w-[120px] flex-1 rounded-xl bg-gradient-to-r from-brand-600 to-purple-600 py-2.5 font-semibold text-white transition hover:shadow-lg">
           ✨ Formater
         </button>
-        <button onClick={() => format(true)} className="flex-1 min-w-[120px] py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold transition">
+        <button onClick={() => format(true)} className="min-w-[120px] flex-1 rounded-xl border border-[#9ccbff]/20 bg-[#0b1830]/80 py-2.5 font-semibold text-slate-200 transition hover:border-[#9ccbff]/40">
           📦 Minifier
         </button>
-        <button onClick={clear} className="px-4 py-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl font-semibold transition flex items-center gap-1.5">
+        <button onClick={clear} className="flex items-center gap-1.5 rounded-xl bg-red-500/10 px-4 py-2.5 font-semibold text-red-200 transition hover:bg-red-500/20">
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border-2 border-red-200 rounded-xl text-sm text-red-700 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {output && (
         <div>
-          <label className="block text-sm font-semibold mb-2">Résultat</label>
+          <label className="mb-2 block text-sm font-semibold text-slate-200">Résultat</label>
           <textarea
             readOnly
             value={output}
             rows={8}
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-mono text-sm bg-gray-50"
+            className="w-full rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-4 py-3 font-mono text-sm text-white"
           />
           <button
             onClick={copy}
-            className="mt-2 px-4 py-2 bg-gradient-to-r from-brand-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition flex items-center gap-1.5 text-sm"
+            className="mt-2 flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-brand-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:shadow-lg"
           >
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             {copied ? 'Copié !' : 'Copier'}

@@ -30,7 +30,7 @@
 - `lib/tools.ts` : catalogue et normalisation des outils.
 - `lib/blog.ts` : lecture des articles Firestore avec fallback Markdown.
 - `lib/pricing.ts` : source unique des tarifs.
-- `lib/payment.ts` : intégration CinetPay.
+- `lib/mtn.ts` : intégration MTN MoMo.
 - `lib/subscription.ts` : droits et expiration des abonnements.
 - `lib/firebase.ts` : Firebase côté navigateur.
 - `lib/firebase-admin.ts` : Firebase côté serveur.
@@ -39,7 +39,7 @@
 ## API
 
 - `app/api/checkout/` : création d'un paiement.
-- `app/api/webhooks/cinetpay/` : confirmation des paiements.
+- `app/api/webhooks/mtn/` : confirmation des paiements.
 - `app/api/newsletter/` : inscription à la newsletter.
 - `app/api/contact/` : réception des messages contact.
 - `app/api/cron/` : tâches planifiées Vercel.

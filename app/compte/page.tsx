@@ -103,7 +103,7 @@ export default function AccountPage() {
 
           <div className="relative z-10 space-y-4">
             {[
-              'Accès à la bibliothèque',
+              'Accès aux ressources',
               'Suivi des achats et abonnements',
               'Progression personnalisée',
             ].map((item) => (

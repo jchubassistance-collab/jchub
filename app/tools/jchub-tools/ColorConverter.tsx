@@ -100,28 +100,28 @@ export function ColorConverter() {
   return (
     <div className="space-y-4">
       {/* Aperçu visuel */}
-      <div className="flex items-center gap-4 p-4 bg-white border-2 border-gray-200 rounded-2xl">
+      <div className="flex items-center gap-4 p-4 rounded-2xl border border-[#9ccbff]/20 bg-[#071526]/90 shadow-[0_16px_32px_rgba(6,13,25,0.45)]">
         <div
-          className="w-20 h-20 rounded-2xl shadow-lg border-2 border-white flex-shrink-0"
+          className="w-20 h-20 rounded-2xl shadow-[0_16px_28px_rgba(99,102,241,0.35)] border border-white/20 flex-shrink-0"
           style={{ background: hex }}
         />
         <div className="flex-1 min-w-0">
-          <div className="text-xs text-gray-500 mb-1">Aperçu</div>
-          <div className="font-mono text-2xl font-black">{hex}</div>
+          <div className="text-[10px] uppercase tracking-[0.18em] text-slate-400 mb-1">Aperçu</div>
+          <div className="font-mono text-2xl font-black text-white">{hex}</div>
         </div>
         <input
           type="color"
           value={hex}
           onChange={(e) => setHex(e.target.value.toUpperCase())}
-          className="w-12 h-12 rounded-xl cursor-pointer border-2 border-gray-200"
+          className="w-14 h-14 rounded-xl cursor-pointer border border-white/10 bg-transparent shadow-inner"
         />
       </div>
 
       {/* HEX */}
-      <div className="bg-white border-2 border-gray-200 rounded-xl p-4">
+      <div className="rounded-xl border border-[#9ccbff]/20 bg-[#0b1830]/80 p-4 shadow-[0_12px_28px_rgba(7,19,40,0.28)]">
         <div className="flex items-center justify-between mb-2">
-          <label className="text-xs font-bold text-gray-500 uppercase">HEX</label>
-          <button onClick={() => copy(hex, 'hex')} className="text-xs text-brand-600 font-semibold flex items-center gap-1">
+          <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">HEX</label>
+          <button onClick={() => copy(hex, 'hex')} className="text-xs text-[#9ccbff] font-semibold flex items-center gap-1 hover:text-white transition">
             {copied === 'hex' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
             {copied === 'hex' ? 'Copié' : 'Copier'}
           </button>
@@ -130,15 +130,15 @@ export function ColorConverter() {
           type="text"
           value={hex}
           onChange={(e) => setHex(e.target.value)}
-          className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-lg font-mono text-lg focus:outline-none focus:border-brand-500"
+          className="w-full px-3 py-2.5 rounded-lg border border-[#9ccbff]/20 bg-[#0b1830] font-mono text-lg text-white focus:outline-none focus:border-[#9ccbff]/60"
         />
       </div>
 
       {/* RGB */}
-      <div className="bg-white border-2 border-gray-200 rounded-xl p-4">
+      <div className="rounded-xl border border-[#9ccbff]/20 bg-[#0b1830]/80 p-4 shadow-[0_12px_28px_rgba(7,19,40,0.28)]">
         <div className="flex items-center justify-between mb-3">
-          <label className="text-xs font-bold text-gray-500 uppercase">RGB</label>
-          <button onClick={() => copy(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`, 'rgb')} className="text-xs text-brand-600 font-semibold flex items-center gap-1">
+          <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">RGB</label>
+          <button onClick={() => copy(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`, 'rgb')} className="text-xs text-[#9ccbff] font-semibold flex items-center gap-1 hover:text-white transition">
             {copied === 'rgb' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
             {copied === 'rgb' ? 'Copié' : 'Copier'}
           </button>
@@ -146,14 +146,14 @@ export function ColorConverter() {
         <div className="grid grid-cols-3 gap-2">
           {(['r', 'g', 'b'] as const).map((k) => (
             <div key={k}>
-              <label className="text-xs font-bold text-red-500 uppercase mb-1 block">{k}</label>
+              <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1 block">{k}</label>
               <input
                 type="number"
                 min="0"
                 max="255"
                 value={rgb[k]}
                 onChange={(e) => updateRgb(k, Number(e.target.value))}
-                className="w-full px-2 py-2 border-2 border-gray-200 rounded-lg font-mono text-center focus:outline-none focus:border-brand-500"
+                className="w-full px-2 py-2 rounded-lg border border-[#9ccbff]/20 bg-[#0b1830] font-mono text-center text-white focus:outline-none focus:border-[#9ccbff]/60"
               />
             </div>
           ))}
@@ -161,10 +161,10 @@ export function ColorConverter() {
       </div>
 
       {/* HSL */}
-      <div className="bg-white border-2 border-gray-200 rounded-xl p-4">
+      <div className="rounded-xl border border-[#9ccbff]/20 bg-[#0b1830]/80 p-4 shadow-[0_12px_28px_rgba(7,19,40,0.28)]">
         <div className="flex items-center justify-between mb-3">
-          <label className="text-xs font-bold text-gray-500 uppercase">HSL</label>
-          <button onClick={() => copy(`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`, 'hsl')} className="text-xs text-brand-600 font-semibold flex items-center gap-1">
+          <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">HSL</label>
+          <button onClick={() => copy(`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`, 'hsl')} className="text-xs text-[#9ccbff] font-semibold flex items-center gap-1 hover:text-white transition">
             {copied === 'hsl' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
             {copied === 'hsl' ? 'Copié' : 'Copier'}
           </button>
@@ -172,14 +172,14 @@ export function ColorConverter() {
         <div className="grid grid-cols-3 gap-2">
           {(['h', 's', 'l'] as const).map((k) => (
             <div key={k}>
-              <label className="text-xs font-bold text-blue-500 uppercase mb-1 block">{k}</label>
+              <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1 block">{k}</label>
               <input
                 type="number"
                 min="0"
                 max={k === 'h' ? 360 : 100}
                 value={hsl[k]}
                 onChange={(e) => updateHsl(k, Number(e.target.value))}
-                className="w-full px-2 py-2 border-2 border-gray-200 rounded-lg font-mono text-center focus:outline-none focus:border-brand-500"
+                className="w-full px-2 py-2 rounded-lg border border-[#9ccbff]/20 bg-[#0b1830] font-mono text-center text-white focus:outline-none focus:border-[#9ccbff]/60"
               />
             </div>
           ))}

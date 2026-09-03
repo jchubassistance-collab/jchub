@@ -34,24 +34,24 @@ export function Base64Tool() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-slate-100">
       <div className="grid grid-cols-2 gap-2">
         <button
           onClick={() => { setMode('encode'); setOutput(''); setError(''); }}
-          className={`py-3 rounded-xl font-semibold transition ${mode === 'encode' ? 'bg-gradient-to-r from-brand-600 to-purple-600 text-white shadow-lg' : 'bg-gray-100 hover:bg-gray-200'}`}
+          className={`rounded-xl py-3 font-semibold transition ${mode === 'encode' ? 'bg-gradient-to-r from-brand-600 to-purple-600 text-white shadow-lg' : 'border border-[#9ccbff]/20 bg-[#0b1830]/80 text-slate-200 hover:border-[#9ccbff]/40'}`}
         >
           🔒 Encoder
         </button>
         <button
           onClick={() => { setMode('decode'); setOutput(''); setError(''); }}
-          className={`py-3 rounded-xl font-semibold transition ${mode === 'decode' ? 'bg-gradient-to-r from-brand-600 to-purple-600 text-white shadow-lg' : 'bg-gray-100 hover:bg-gray-200'}`}
+          className={`rounded-xl py-3 font-semibold transition ${mode === 'decode' ? 'bg-gradient-to-r from-brand-600 to-purple-600 text-white shadow-lg' : 'border border-[#9ccbff]/20 bg-[#0b1830]/80 text-slate-200 hover:border-[#9ccbff]/40'}`}
         >
           🔓 Décoder
         </button>
       </div>
 
       <div>
-        <label className="block text-sm font-semibold mb-2">
+        <label className="mb-2 block text-sm font-semibold text-slate-200">
           {mode === 'encode' ? 'Texte à encoder' : 'Base64 à décoder'}
         </label>
         <textarea
@@ -59,33 +59,33 @@ export function Base64Tool() {
           onChange={(e) => setInput(e.target.value)}
           rows={6}
           placeholder={mode === 'encode' ? 'Tape ton texte ici...' : 'Colle ton Base64 ici...'}
-          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-mono text-sm focus:outline-none focus:border-brand-500 resize-y"
+          className="w-full resize-y rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-4 py-3 font-mono text-sm text-white focus:outline-none focus:border-[#9ccbff]/60"
         />
       </div>
 
-      <button onClick={process} className="w-full py-3 bg-gradient-to-r from-brand-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition">
+      <button onClick={process} className="w-full rounded-xl bg-gradient-to-r from-brand-600 to-purple-600 py-3 font-semibold text-white transition hover:shadow-lg">
         {mode === 'encode' ? '🔒 Encoder en Base64' : '🔓 Décoder le Base64'}
       </button>
 
       {error && (
-        <div className="p-3 bg-red-50 border-2 border-red-200 rounded-xl text-sm text-red-700 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {output && (
         <div>
-          <label className="block text-sm font-semibold mb-2">Résultat</label>
+          <label className="mb-2 block text-sm font-semibold text-slate-200">Résultat</label>
           <textarea
             readOnly
             value={output}
             rows={6}
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-mono text-sm bg-gray-50"
+            className="w-full rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-4 py-3 font-mono text-sm text-white"
           />
           <button
             onClick={copy}
-            className="mt-2 px-4 py-2 bg-gradient-to-r from-brand-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition flex items-center gap-1.5 text-sm"
+            className="mt-2 flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-brand-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:shadow-lg"
           >
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             {copied ? 'Copié !' : 'Copier'}

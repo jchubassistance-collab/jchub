@@ -5,10 +5,10 @@
 @tailwind utilities;
 
 :root {
-  --gradient-primary: linear-gradient(135deg, #f97316 0%, #ef4444 52%, #be123c 100%);
-  --gradient-secondary: linear-gradient(135deg, #fb923c 0%, #f43f5e 100%);
-  --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-  --gradient-cool: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  --gradient-primary: linear-gradient(135deg, #0a1f4d 0%, #123f8c 38%, #4a74d6 100%);
+  --gradient-secondary: linear-gradient(135deg, #0d2a63 0%, #5e8ae6 100%);
+  --gradient-warm: linear-gradient(135deg, #9ccbff 0%, #4a74d6 100%);
+  --gradient-cool: linear-gradient(135deg, #081426 0%, #123f8c 100%);
 }
 
 * {
@@ -21,11 +21,13 @@
   inset: 0;
   z-index: 100;
   min-height: 100dvh;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 28px;
-  background: radial-gradient(circle at 50% 40%, #fff7ed 0%, #fff 52%, #fff1f2 100%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 34vh;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(74, 116, 214, 0.28), transparent 30%),
+    linear-gradient(180deg, #040b16 0%, #091a32 28%, #0a1425 100%);
 }
 
 /* Le loader Next est enfant de main, alors que le chrome public est son voisin. */
@@ -36,49 +38,37 @@ body:has(.loading-screen) footer {
 
 .loading-mark {
   position: relative;
-  display: grid;
-  place-items: center;
-  width: 190px;
-  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
   animation: loading-rise 700ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
 .loading-logo {
   position: relative;
   z-index: 1;
-  width: 170px;
+  width: 82px;
   height: auto;
+  filter: drop-shadow(0 18px 28px rgba(80, 128, 255, 0.38));
 }
 
 .loading-ring {
   position: absolute;
-  left: 8px;
-  width: 76px;
-  height: 76px;
-  border: 1px solid rgba(249, 115, 22, .35);
-  border-radius: 24px;
+  left: 50%;
+  top: 50%;
+  width: 120px;
+  height: 120px;
+  border: 1px solid rgba(146, 184, 255, 0.5);
+  border-radius: 32px;
+  transform: translate(-50%, -50%);
   animation: loading-pulse 1.8s ease-out infinite;
+  box-shadow: 0 0 28px rgba(74, 116, 214, 0.18);
 }
 
 .loading-ring-two {
   animation-delay: 900ms;
-}
-
-.loading-track {
-  width: 150px;
-  height: 3px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #fed7aa;
-}
-
-.loading-track span {
-  display: block;
-  width: 45%;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #f97316, #dc2626);
-  animation: loading-progress 1.2s ease-in-out infinite;
 }
 
 @keyframes loading-rise {
@@ -87,13 +77,8 @@ body:has(.loading-screen) footer {
 }
 
 @keyframes loading-pulse {
-  0% { opacity: .7; transform: scale(.8); }
-  70%, 100% { opacity: 0; transform: scale(1.7); }
-}
-
-@keyframes loading-progress {
-  from { transform: translateX(-120%); }
-  to { transform: translateX(340%); }
+  0% { opacity: .75; transform: translate(-50%, -50%) scale(.82); }
+  70%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
 }
 
 html {
@@ -101,7 +86,7 @@ html {
 }
 
 body {
-  @apply bg-orange-50/20 text-gray-900;
+  @apply bg-[#020b1a] text-white;
   font-feature-settings: 'cv11', 'ss01', 'ss03';
   text-rendering: optimizeLegibility;
 }

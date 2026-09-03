@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowUpRight, Mail, MapPin, Sparkles } from 'lucide-react';
 
 const groups = [
-  { title: 'Plateforme', links: [['Outils', '/outils'], ['Bibliothèque', '/livres'], ['Abonnements', '/pricing'], ['Mon compte', '/compte']] },
+  { title: 'Plateforme', links: [['Outils', '/outils']] },
   { title: 'JcHub', links: [['À propos', '/a-propos'], ['Contact', '/contact'], ['Blog', '/blog']] },
   { title: 'Légal', links: [['Conditions d’utilisation', '/cgu'], ['Conditions de vente', '/cgv'], ['Confidentialité', '/confidentialite'], ['Mentions légales', '/mentions-legales']] },
 ];
@@ -32,7 +32,8 @@ export function Footer() {
         <div className="grid gap-10 py-12 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:py-14">
           <div>
             <Link href="/" className="group inline-flex items-center" aria-label="JcHub, accueil">
-              <img src="/logo-sunset.svg" alt="JcHub" className="h-14 w-auto transition duration-300 group-hover:scale-[1.04]" />
+              <img src="/icone.svg" alt="JcHub" className="h-10 w-auto transition duration-300 group-hover:scale-[1.04] md:hidden" />
+              <img src="/logo-blue.svg" alt="JcHub" className="hidden h-14 w-auto transition duration-300 group-hover:scale-[1.04] md:block" />
             </Link>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-slate-300">Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques.</p>
             <div className="mt-6 space-y-3 text-sm">
@@ -63,7 +64,6 @@ export function Footer() {
       <div className="border-t border-white/10 bg-[#0c2135]/70">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-xs text-slate-400 sm:flex-row sm:justify-between sm:px-6">
           <span>© {new Date().getFullYear()} JcHub. Tous droits réservés.</span>
-          <span className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden="true" />Paiements sécurisés via CinetPay</span>
         </div>
       </div>
     </footer>

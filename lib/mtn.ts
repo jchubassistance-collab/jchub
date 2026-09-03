@@ -1,9 +1,13 @@
 export type MtnEnvironment = 'sandbox' | 'production';
 
+export function generateTransactionId(prefix = 'JCH'): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+}
+
 export type MtnConfig = {
   baseUrl: string;
-  clientId: string;
-  clientSecret: string;
+  apiUser: string;
+  apiKey: string;
   subscriptionKey: string;
   callbackUrl: string;
   environment: MtnEnvironment;
@@ -11,20 +15,20 @@ export type MtnConfig = {
 
 export function getMtnConfig(): MtnConfig | null {
   const baseUrl = process.env.MTN_BASE_URL?.trim();
-  const clientId = process.env.MTN_CLIENT_ID?.trim();
-  const clientSecret = process.env.MTN_CLIENT_SECRET?.trim();
+  const apiUser = (process.env.MTN_API_USER || process.env.MTN_CLIENT_ID)?.trim();
+  const apiKey = (process.env.MTN_API_KEY || process.env.MTN_CLIENT_SECRET)?.trim();
   const subscriptionKey = process.env.MTN_SUBSCRIPTION_KEY?.trim();
   const callbackUrl = process.env.MTN_CALLBACK_URL?.trim() || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev'}/api/webhooks/mtn`;
   const environment = (process.env.MTN_ENV || 'sandbox').toLowerCase() === 'production' ? 'production' : 'sandbox';
 
-  if (!baseUrl || !clientId || !clientSecret || !subscriptionKey) {
+  if (!baseUrl || !apiUser || !apiKey || !subscriptionKey) {
     return null;
   }
 
   return {
     baseUrl: baseUrl.replace(/\/$/, ''),
-    clientId,
-    clientSecret,
+    apiUser,
+    apiKey,
     subscriptionKey,
     callbackUrl,
     environment,
@@ -36,11 +40,12 @@ export async function getMtnAccessToken(): Promise<string | null> {
   if (!config) return null;
 
   try {
-    const authValue = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
+    const authValue = Buffer.from(`${config.apiUser}:${config.apiKey}`).toString('base64');
     const response = await fetch(`${config.baseUrl}/collection/token`, {
       method: 'POST',
       headers: {
         Authorization: `Basic ${authValue}`,
+        'Ocp-Apim-Subscription-Key': config.subscriptionKey,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({ grant_type: 'client_credentials' }).toString(),
@@ -48,14 +53,14 @@ export async function getMtnAccessToken(): Promise<string | null> {
 
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(`MTN token error ${response.status}: ${text}`);
+      throw new Error(`MTN token error ${response.status}: ${text || 'Vérifie API User, API Key et Subscription Key'}`);
     }
 
     const data = await response.json();
     return data.access_token || null;
   } catch (error) {
     console.error('[MTN] token request failed:', error);
-    return null;
+    throw error;
   }
 }
 

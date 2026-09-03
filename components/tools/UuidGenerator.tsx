@@ -51,14 +51,14 @@ export function UuidGenerator() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-slate-100">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-semibold mb-1.5">Version UUID</label>
+          <label className="mb-1.5 block text-sm font-semibold text-slate-200">Version UUID</label>
           <select
             value={version}
             onChange={(e) => setVersion(e.target.value as any)}
-            className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl font-medium focus:outline-none focus:border-brand-500"
+            className="w-full rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-3 py-2.5 font-medium text-white focus:outline-none focus:border-[#9ccbff]/60"
           >
             <option value="v4">v4 (aléatoire)</option>
             <option value="v1">v1 (timestamp)</option>
@@ -66,42 +66,42 @@ export function UuidGenerator() {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-semibold mb-1.5">Nombre</label>
+          <label className="mb-1.5 block text-sm font-semibold text-slate-200">Nombre</label>
           <input
             type="number"
             min="1"
             max="100"
             value={count}
             onChange={(e) => setCount(Math.max(1, Math.min(100, Number(e.target.value))))}
-            className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl font-medium focus:outline-none focus:border-brand-500"
+            className="w-full rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-3 py-2.5 font-medium text-white focus:outline-none focus:border-[#9ccbff]/60"
           />
         </div>
       </div>
 
-      <button onClick={generate} className="w-full py-3 bg-gradient-to-r from-brand-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition flex items-center justify-center gap-2">
+      <button onClick={generate} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-purple-600 py-3 font-semibold text-white transition hover:shadow-lg">
         <RefreshCw className="w-4 h-4" />
         Générer {count} UUID{count > 1 ? 's' : ''}
       </button>
 
       {uuids.length > 0 && (
         <div>
-          <div className="flex justify-between items-center mb-2">
-            <label className="text-sm font-semibold flex items-center gap-1.5">
-              <Hash className="w-3.5 h-3.5" />
+          <div className="mb-2 flex items-center justify-between">
+            <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-200">
+              <Hash className="h-3.5 w-3.5 text-[#9ccbff]" />
               UUIDs générés
             </label>
-            <button onClick={copyAll} className="text-sm text-brand-600 font-semibold hover:underline flex items-center gap-1">
+            <button onClick={copyAll} className="flex items-center gap-1 text-sm font-semibold text-[#9ccbff] hover:text-white transition">
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               {copied ? 'Copié !' : 'Tout copier'}
             </button>
           </div>
-          <div className="space-y-1.5 max-h-96 overflow-y-auto">
+          <div className="max-h-96 space-y-1.5 overflow-y-auto">
             {uuids.map((u, i) => (
-              <div key={i} className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg hover:border-brand-300 transition group">
-                <span className="flex-1 font-mono text-sm break-all">{u}</span>
+              <div key={i} className="group flex items-center gap-2 rounded-lg border border-[#9ccbff]/20 bg-[#071526] p-3 transition hover:border-[#9ccbff]/40">
+                <span className="flex-1 break-all font-mono text-sm text-slate-100">{u}</span>
                 <button
                   onClick={() => copyOne(u)}
-                  className="text-gray-400 hover:text-brand-600 transition opacity-0 group-hover:opacity-100"
+                  className="text-slate-400 opacity-0 transition hover:text-[#9ccbff] group-hover:opacity-100"
                 >
                   <Copy className="w-4 h-4" />
                 </button>

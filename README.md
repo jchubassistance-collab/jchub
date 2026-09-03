@@ -21,11 +21,11 @@ Pour activer les commentaires Giscus, configure `NEXT_PUBLIC_GISCUS_REPOSITORY`,
 
 > L'écosystème d'apprentissage intelligent pour les développeurs.
 
-Stack : Next.js 14 · TypeScript · Tailwind · Firebase · **CinetPay (MTN MoMo + Airtel Money)** · Azure TTS
+Stack : Next.js 14 · TypeScript · Tailwind · Firebase · **MTN MoMo** · Azure TTS
 
 ## 🇨🇬 Adapté pour le Congo Brazzaville
 
-- **Paiements** : CinetPay (MTN Mobile Money + Airtel Money) au lieu de Stripe
+- **Paiements** : MTN Mobile Money
 - **Devise** : FCFA (XAF) au lieu d'euros
 - **Numéros** : format 242XXXXXXXX
 
@@ -37,7 +37,7 @@ npm install
 
 # 2. Copier le fichier d'environnement
 cp .env.exemple .env.local
-# Remplir les variables Firebase + CinetPay
+# Remplir les variables Firebase + MTN MoMo
 
 # 3. Lancer en dev
 npm run dev
@@ -46,12 +46,11 @@ npm run dev
 open http://localhost:3000
 ```
 
-## 💳 Configuration CinetPay
+## 💳 Configuration MTN MoMo
 
-1. Crée un compte sur [cinetpay.com](https://cinetpay.com)
-2. Récupère ton `API_KEY`, `SITE_ID` et `SECRET_KEY` (sandbox d'abord)
-3. Mets-les dans `.env.local`
-4. Teste avec un numéro sandbox avant de passer en production
+1. Crée une application dans le portail développeur MTN
+2. Récupère les identifiants sandbox et renseigne les variables `MTN_*`
+3. Teste avec un numéro sandbox avant de passer en production
 
 ## 📁 Structure
 
@@ -68,9 +67,9 @@ jchub-starter/
 │   ├── pricing/               # Tarifs (FCFA)
 │   ├── compte/                # Login/Register
 │   └── api/
-│       ├── checkout/          # Initie paiement CinetPay
+│       ├── checkout/          # Initie paiement MTN MoMo
 │       └── webhooks/
-│           └── cinetpay/      # Webhook notifications
+│           └── mtn/            # Webhook notifications
 │
 ├── components/
 │   └── layout/Header.tsx + Footer.tsx
@@ -79,7 +78,7 @@ jchub-starter/
 │   ├── books.ts               # Catalogue (8 livres issus de ta liste)
 │   ├── tools.ts               # 5 outils
 │   ├── pricing.ts             # Tarifs en FCFA
-│   ├── payment.ts             # Wrapper CinetPay
+│   ├── mtn.ts                 # Wrapper MTN MoMo
 │   ├── firebase.ts            # Client Firebase
 │   └── firebase-admin.ts      # Admin SDK
 │
@@ -119,7 +118,7 @@ jchub-starter/
 ## 🔜 Prochaines étapes
 
 - [ ] Setup Firebase (Auth + Firestore)
-- [ ] Créer compte CinetPay (sandbox)
+- [ ] Créer une application MTN MoMo (sandbox)
 - [ ] Tester un paiement test MTN MoMo
 - [ ] Implémenter les 5 outils
 - [ ] Setup conversion PDF → Audio
@@ -129,3 +128,7 @@ jchub-starter/
 ## 📞 Support
 
 Questions → `tech@jchub.dev`
+
+```bash
+npm run build
+```

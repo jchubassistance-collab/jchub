@@ -40,7 +40,6 @@ const contactMethods = [
 
 const subjects = [
   { value: 'support', label: 'Support technique' },
-  { value: 'billing', label: 'Question sur un paiement' },
   { value: 'partnership', label: 'Partenariat / Auteur' },
   { value: 'press', label: 'Presse / Média' },
   { value: 'feedback', label: 'Suggestion / Feedback' },
@@ -80,51 +79,96 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="contact-page overflow-hidden bg-[#f5f7f5]">
+    <div className="min-h-screen overflow-hidden bg-[#020b1a] text-white">
       {/* HERO */}
-      <section className="contact-hero relative overflow-hidden bg-[#f7f8fa] py-20 text-slate-900">
-        <div className="contact-grid absolute inset-0 opacity-25" />
-        <div className="contact-glow contact-glow-one" />
-        <div className="contact-glow contact-glow-two" />
+      <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(89,126,255,0.30),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(94,138,230,0.20),_transparent_35%),linear-gradient(135deg,_#020b1a_0%,_#091b3d_32%,_#123f8c_100%)]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.08),_transparent_55%)]" />
+        <div className="absolute -left-28 bottom-[-80px] h-80 w-80 rounded-full border border-white/10 bg-[#3a68d9]/15 blur-3xl" />
+        <div className="absolute right-[-60px] top-[-40px] h-72 w-72 rounded-full border border-white/10 bg-[#96c7ff]/15 blur-3xl" />
 
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-white border border-orange-300/30 rounded-full px-4 py-1.5 text-sm font-semibold text-orange-700 mb-6 shadow-sm">
-            <Sparkles className="w-4 h-4 text-amber-500" />
-            On te répond vite 🚀
+        <div className="relative mx-auto max-w-7xl px-5 pb-20 pt-8 sm:px-8 lg:min-h-[920px] lg:pb-28 lg:pt-10">
+          <div className="flex items-center justify-end" aria-hidden="true" />
+
+          <div className="mt-10 grid items-center gap-10 lg:mt-16 lg:grid-cols-[1.08fr_0.92fr]" style={{ transform: 'perspective(1200px) rotateX(1.5deg) rotateY(-2deg)' }}>
+            <div className="max-w-xl">
+              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.28em] text-[#b6d6ff]">On te répond vite</p>
+              <h1 className="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+                Une question ?
+                <span className="mt-2 block text-[#9ccbff]">Parlons-en ensemble.</span>
+              </h1>
+              <p className="mt-5 max-w-lg text-base leading-relaxed text-slate-200 sm:text-lg">
+                Notre équipe est basée à <strong className="text-white">Brazzaville</strong> et répond à tous
+                tes messages. Que ce soit pour un bug, un partenariat ou juste dire bonjour.
+              </p>
+
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <a
+                  href="#contact-form"
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#0b1730] transition hover:scale-[1.02] hover:bg-[#eaf3ff]"
+                >
+                  Écrire à JcHub <ArrowRight className="h-4 w-4" />
+                </a>
+                <a
+                  href="mailto:hello@jchub.dev"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10"
+                >
+                  hello@jchub.dev
+                </a>
+              </div>
+
+              <div className="mt-8 flex flex-wrap gap-5 text-sm text-slate-200">
+                <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#9ccbff]" /> Réponse sous 24h</span>
+                <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#9ccbff]" /> Support local</span>
+                <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#9ccbff]" /> Équipe disponible</span>
+              </div>
+            </div>
+
+            <div className="relative mx-auto ml-auto w-full max-w-[560px]">
+              <div className="absolute -left-8 top-10 h-36 w-36 rounded-full bg-[#a9d0ff]/20 blur-3xl" />
+              <div className="absolute -right-8 bottom-6 h-32 w-32 rounded-full bg-[#dfeeff]/10 blur-3xl" />
+
+              <div className="relative overflow-hidden rounded-[2rem] border border-[#9ccbff]/20 bg-white/5 p-3 shadow-[0_35px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm" style={{ transform: 'perspective(1200px) rotateX(4deg) rotateY(-5deg)' }}>
+                <img
+                  src="/tel.png"
+                  alt="Une équipe qui échange"
+                  className="h-[520px] w-full rounded-[1.5rem] object-contain bg-[#0d1c38] sm:h-[560px] lg:h-[640px]"
+                />
+              </div>
+
+              <div className="absolute -left-4 bottom-8 rounded-2xl border border-white/10 bg-[#0d1c38]/90 px-4 py-3 shadow-[0_20px_40px_rgba(5,12,25,0.4)] backdrop-blur-md">
+                <div className="text-xs uppercase tracking-[0.2em] text-[#9ccbff]">Support</div>
+                <div className="mt-2 text-2xl font-black text-white">24h</div>
+                <div className="text-xs text-slate-300">réponse max</div>
+              </div>
+
+              <div className="absolute -right-3 top-8 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 shadow-[0_20px_40px_rgba(11,20,40,0.35)] backdrop-blur-md">
+                <div className="text-xs uppercase tracking-[0.2em] text-[#dfeeff]">Local</div>
+                <div className="mt-2 text-sm font-semibold text-white">Brazzaville, Congo</div>
+              </div>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight tracking-tight">
-            Une question ?
-            <br />
-            <span className="text-orange-600">Parlons-en ensemble.</span>
-          </h1>
-          <p className="text-lg leading-relaxed text-slate-600 max-w-2xl mx-auto">
-            Notre équipe est basée à <strong className="text-slate-900">Brazzaville</strong> et répond à tous
-            tes messages. Que ce soit pour un bug, un partenariat, ou juste dire bonjour.
-          </p>
         </div>
       </section>
 
-      <div className="relative z-10 mx-auto -mt-6 max-w-5xl px-4 sm:px-6 lg:px-8"><div className="contact-image-box relative overflow-hidden rounded-3xl border-4 border-white shadow-2xl"><img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=85" alt="Une équipe qui échange" className="h-64 w-full object-cover sm:h-80" /><div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" /><p className="absolute bottom-5 left-6 text-sm font-bold text-white">Une équipe disponible pour t'accompagner</p></div></div>
-
       {/* CONTACT METHODS */}
-      <section className="contact-methods-section py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="contact-methods-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <section className="py-16 bg-[#020b1a]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {contactMethods.map((method, index) => (
               <a
                 key={method.title}
                 href={method.link}
-                style={{ animationDelay: `${index * 65}ms` }}
-                className="contact-method-card group relative bg-white border border-gray-100 rounded-2xl p-6 hover:-translate-y-1.5 hover:shadow-xl transition-all overflow-hidden"
+                style={{ animationDelay: `${index * 65}ms`, transform: 'perspective(1200px) rotateX(4deg) rotateY(-4deg)' }}
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[rgba(13,28,52,0.72)] p-6 shadow-[0_18px_40px_rgba(7,19,40,0.24)] backdrop-blur-sm transition-all hover:-translate-y-1.5 hover:border-[#9ccbff]/40 hover:shadow-[0_20px_50px_rgba(70,103,182,0.24)]"
               >
-                <div className={`absolute -top-12 -right-12 w-32 h-32 rounded-full bg-gradient-to-br ${method.gradient} opacity-10 group-hover:opacity-20 transition blur-2xl`} />
+                <div className={`absolute -top-12 -right-12 h-32 w-32 rounded-full bg-gradient-to-br ${method.gradient} opacity-10 transition blur-2xl group-hover:opacity-20`} />
                 <div className="relative">
-                  <div className={`contact-method-icon w-12 h-12 rounded-xl bg-gradient-to-br ${method.gradient} flex items-center justify-center mb-3 shadow-lg transition`}>
-                    <method.icon className="w-6 h-6 text-white" />
+                  <div className={`mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${method.gradient} shadow-lg`}>
+                    <method.icon className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="font-bold text-gray-900 mb-1">{method.title}</h3>
-                  <p className="text-sm font-semibold text-brand-600 mb-1">{method.value}</p>
-                  <p className="text-xs text-gray-500">{method.description}</p>
+                  <h3 className="mb-1 font-bold text-white">{method.title}</h3>
+                  <p className="mb-1 text-sm font-semibold text-[#9ccbff]">{method.value}</p>
+                  <p className="text-xs text-slate-300">{method.description}</p>
                 </div>
               </a>
             ))}
@@ -133,159 +177,154 @@ export default function ContactPage() {
       </section>
 
       {/* FORM + SIDEBAR */}
-      <section className="contact-form-section py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Form */}
+      <section className="py-20 bg-[#020b1a]">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <div className="contact-form-card bg-white border border-gray-100 rounded-3xl p-8 shadow-sm backdrop-blur-sm">
+              <div className="rounded-3xl border border-[#9ccbff]/20 bg-[rgba(13,28,52,0.8)] p-8 shadow-[0_18px_40px_rgba(7,19,40,0.24)] backdrop-blur-sm" style={{ transform: 'perspective(1200px) rotateX(3deg) rotateY(-3deg)' }}>
                 {sent ? (
-                  <div className="text-center py-12">
-                    <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-3xl flex items-center justify-center shadow-lg">
-                      <Check className="w-10 h-10 text-white" />
+                  <div className="py-12 text-center">
+                    <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg">
+                      <Check className="h-10 w-10 text-white" />
                     </div>
-                    <h2 className="text-3xl font-black mb-3">Message envoyé ! 🎉</h2>
-                    <p className="text-gray-600 mb-6">On revient vers toi sous 24h ouvrées maximum.</p>
-                    {error && <p className="mb-6 text-sm font-medium text-amber-700" role="status">{error}</p>}
+                    <h2 className="mb-3 text-3xl font-black text-white">Message envoyé ! 🎉</h2>
+                    <p className="mb-6 text-slate-300">On revient vers toi sous 24h ouvrées maximum.</p>
+                    {error && <p className="mb-6 text-sm font-medium text-amber-300" role="status">{error}</p>}
                     <button
                       onClick={() => {
                         setSent(false);
                         setForm({ name: '', email: '', subject: 'support', message: '' });
                       }}
-                      className="text-brand-600 font-semibold hover:underline"
+                      className="font-semibold text-[#9ccbff] hover:underline"
                     >
                       Envoyer un autre message →
                     </button>
                   </div>
                 ) : (
                   <>
-                    <h2 className="text-2xl font-black mb-2">Envoie-nous un message</h2>
-                    <p className="text-gray-600 mb-6">Tous les champs marqués * sont obligatoires.</p>
+                    <h2 className="mb-2 text-2xl font-black text-white">Envoie-nous un message</h2>
+                    <p className="mb-6 text-slate-300">Tous les champs marqués * sont obligatoires.</p>
 
-                    <form onSubmit={handleSubmit} className="contact-form-content space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="contact-form-group">
-                          <label className="block text-sm font-semibold mb-1.5 text-slate-700">Nom complet *</label>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className="mb-1.5 block text-sm font-semibold text-slate-200">Nom complet *</label>
                           <input
                             type="text"
                             required
                             value={form.name}
                             onChange={(e) => setForm({ ...form, name: e.target.value })}
                             placeholder="Jessy Ngnambongo"
-                            className="contact-form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+                            className="w-full rounded-xl border border-white/10 bg-[#071427] px-4 py-3 text-white placeholder:text-slate-400 focus:border-[#9ccbff] focus:outline-none focus:ring-2 focus:ring-[#9ccbff]/30 transition"
                           />
                         </div>
-                        <div className="contact-form-group">
-                          <label className="block text-sm font-semibold mb-1.5 text-slate-700">Email *</label>
+                        <div>
+                          <label className="mb-1.5 block text-sm font-semibold text-slate-200">Email *</label>
                           <input
                             type="email"
                             required
                             value={form.email}
                             onChange={(e) => setForm({ ...form, email: e.target.value })}
                             placeholder="toi@email.com"
-                            className="contact-form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+                            className="w-full rounded-xl border border-white/10 bg-[#071427] px-4 py-3 text-white placeholder:text-slate-400 focus:border-[#9ccbff] focus:outline-none focus:ring-2 focus:ring-[#9ccbff]/30 transition"
                           />
                         </div>
                       </div>
 
-                      <div className="contact-form-group">
-                        <label className="block text-sm font-semibold mb-1.5 text-slate-700">Sujet *</label>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-semibold text-slate-200">Sujet *</label>
                         <select
                           required
                           value={form.subject}
                           onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                          className="contact-form-select w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white transition"
+                          className="w-full rounded-xl border border-white/10 bg-[#071427] px-4 py-3 text-white focus:border-[#9ccbff] focus:outline-none focus:ring-2 focus:ring-[#9ccbff]/30 transition"
                         >
                           {subjects.map((s) => (
-                            <option key={s.value} value={s.value}>
+                            <option key={s.value} value={s.value} className="bg-[#071427] text-white">
                               {s.label}
                             </option>
                           ))}
                         </select>
                       </div>
 
-                      <div className="contact-form-group">
-                        <label className="block text-sm font-semibold mb-1.5 text-slate-700">Message *</label>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-semibold text-slate-200">Message *</label>
                         <textarea
                           required
                           value={form.message}
                           onChange={(e) => setForm({ ...form, message: e.target.value })}
                           rows={6}
                           placeholder="Décris ta question ou ton projet..."
-                          className="contact-form-textarea w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition"
+                          className="w-full resize-none rounded-xl border border-white/10 bg-[#071427] px-4 py-3 text-white placeholder:text-slate-400 focus:border-[#9ccbff] focus:outline-none focus:ring-2 focus:ring-[#9ccbff]/30 transition"
                         />
                       </div>
 
                       <button
                         type="submit"
                         disabled={loading}
-                        className="contact-submit-btn w-full bg-gradient-to-r from-orange-600 to-orange-700 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:shadow-orange-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#4a74d6] py-3.5 font-semibold text-white transition hover:bg-[#6fa3ff] disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {loading ? (
                           <>Envoi en cours...</>
                         ) : (
                           <>
                             Envoyer le message
-                            <Send className="w-4 h-4" />
+                            <Send className="h-4 w-4" />
                           </>
                         )}
                       </button>
-                      {error && <p className="text-sm font-medium text-red-600" role="alert">{error}</p>}
+                      {error && <p className="text-sm font-medium text-red-300" role="alert">{error}</p>}
                     </form>
                   </>
                 )}
               </div>
             </div>
 
-            {/* Sidebar */}
-            <div className="contact-sidebar space-y-5">
-              {/* FAQ Card */}
-              <div className="contact-faq-card bg-gradient-to-br from-orange-600 via-orange-700 to-orange-800 rounded-3xl p-6 text-white">
-                <Sparkles className="w-8 h-8 mb-3" />
-                <h3 className="font-black text-xl mb-2">Besoin d'une réponse rapide ?</h3>
-                <p className="text-white/90 text-sm mb-4">Consulte notre centre d'aide, tu y trouveras peut-être ta réponse.</p>
+            <div className="space-y-5">
+              <div className="rounded-3xl bg-gradient-to-br from-[#4a74d6] via-[#3c60b4] to-[#2d4a8f] p-6 text-white shadow-[0_22px_55px_rgba(10,20,40,0.45)] ring-1 ring-white/10" style={{ transform: 'perspective(1200px) rotateX(4deg) rotateY(-4deg)' }}>
+                <Sparkles className="mb-3 h-8 w-8" />
+                <h3 className="mb-2 text-xl font-black">Besoin d'une réponse rapide ?</h3>
+                <p className="mb-4 text-sm text-slate-100">Consulte notre centre d'aide, tu y trouveras peut-être ta réponse.</p>
                 <a
                   href="/aide"
-                  className="inline-flex items-center gap-1 text-sm font-semibold bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition"
+                  className="inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1.5 text-sm font-semibold transition hover:bg-white/30"
                 >
                   Centre d'aide
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </a>
               </div>
 
-              {/* Hours */}
-              <div className="bg-white border border-gray-100 rounded-2xl p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Clock className="w-5 h-5 text-brand-600" />
-                  <h3 className="font-bold">Heures de support</h3>
+              <div className="rounded-2xl border border-white/10 bg-[rgba(13,28,52,0.8)] p-6 shadow-[0_18px_40px_rgba(7,19,40,0.24)] backdrop-blur-sm" style={{ transform: 'perspective(1200px) rotateX(2deg) rotateY(-2deg)' }}>
+                <div className="mb-4 flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-[#9ccbff]" />
+                  <h3 className="font-bold text-white">Heures de support</h3>
                 </div>
-                <ul className="space-y-2 text-sm">
+                <ul className="space-y-2 text-sm text-slate-300">
                   <li className="flex justify-between">
-                    <span className="text-gray-600">Lundi - Vendredi</span>
-                    <span className="font-semibold">9h - 18h</span>
+                    <span>Lundi - Vendredi</span>
+                    <span className="font-semibold text-white">9h - 18h</span>
                   </li>
                   <li className="flex justify-between">
-                    <span className="text-gray-600">Samedi</span>
-                    <span className="font-semibold">10h - 15h</span>
+                    <span>Samedi</span>
+                    <span className="font-semibold text-white">10h - 15h</span>
                   </li>
                   <li className="flex justify-between">
-                    <span className="text-gray-600">Dimanche</span>
-                    <span className="text-gray-400">Fermé</span>
+                    <span>Dimanche</span>
+                    <span className="text-slate-400">Fermé</span>
                   </li>
                 </ul>
-                <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
+                <div className="mt-4 border-t border-white/10 pt-4 text-xs text-slate-400">
                   ⏰ Réponse email sous 24h ouvrées
                 </div>
               </div>
 
-              {/* Localisation */}
-              <div className="bg-white border border-gray-100 rounded-2xl p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <MapPin className="w-5 h-5 text-pink-500" />
-                  <h3 className="font-bold">On est où ?</h3>
+              <div className="rounded-2xl border border-white/10 bg-[rgba(13,28,52,0.8)] p-6 shadow-[0_18px_40px_rgba(7,19,40,0.24)] backdrop-blur-sm" style={{ transform: 'perspective(1200px) rotateX(2deg) rotateY(-2deg)' }}>
+                <div className="mb-3 flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-pink-400" />
+                  <h3 className="font-bold text-white">On est où ?</h3>
                 </div>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  JcHub est une startup 100% <strong>Made in Congo Brazzaville 🇨🇬</strong>.
+                <p className="text-sm leading-relaxed text-slate-300">
+                  JcHub est une startup 100% <strong className="text-white">Made in Congo Brazzaville 🇨🇬</strong>.
                   Notre équipe travaille depuis Brazzaville.
                 </p>
               </div>

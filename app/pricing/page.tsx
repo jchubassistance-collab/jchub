@@ -128,7 +128,7 @@ export default function PricingPage() {
               <tbody>
                 {[
                   ['Outils gratuits', true, true, true, true, true],
-                  ['Livres premium', false, true, true, true, true],
+                  ['Ressources premium', false, true, true, true, true],
                   ['Assistant IA', false, true, true, true, true],
                   ['Support prioritaire', false, false, true, true, true],
                   ['Accès anticipé', false, false, false, true, true],

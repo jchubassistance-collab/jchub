@@ -39,14 +39,14 @@ export function ToolsCatalog({ tools }: ToolsCatalogProps) {
 
   return (
     <>
-      <div className="mb-6 grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:grid-cols-[1fr_auto] sm:p-4">
+      <div className="mb-6 grid gap-3 rounded-[1.5rem] border border-white/10 bg-[rgba(13,28,52,0.8)] p-3 shadow-[0_18px_40px_rgba(7,19,40,0.24)] backdrop-blur-sm sm:grid-cols-[1fr_auto] sm:p-4" style={{ transform: 'perspective(1200px) rotateX(2deg) rotateY(-2deg)' }}>
         <label className="relative block">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-          <input value={query} onChange={(event) => updateQuery(event.target.value)} placeholder="Rechercher un outil..." className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-10 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100" aria-label="Rechercher un outil" />
-          {query && <button type="button" onClick={() => updateQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700" aria-label="Effacer la recherche"><X className="h-4 w-4" /></button>}
+          <input value={query} onChange={(event) => updateQuery(event.target.value)} placeholder="Rechercher un outil..." className="w-full rounded-xl border border-white/10 bg-[#071427] py-3 pl-10 pr-10 text-sm text-white outline-none transition placeholder:text-slate-400 focus:border-[#9ccbff] focus:ring-2 focus:ring-[#9ccbff]/20" aria-label="Rechercher un outil" />
+          {query && <button type="button" onClick={() => updateQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200" aria-label="Effacer la recherche"><X className="h-4 w-4" /></button>}
         </label>
         <div className="flex gap-2 overflow-x-auto pb-1 sm:max-w-xl sm:justify-end sm:pb-0" aria-label="Filtrer par catégorie">
-          {categories.map((item) => <button key={item} type="button" onClick={() => { setCategory(item); setPage(1); }} className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-bold transition ${category === item ? 'bg-[#17324d] text-white' : 'bg-white text-slate-600 hover:bg-orange-50 hover:text-orange-700'}`}>{item}</button>)}
+          {categories.map((item) => <button key={item} type="button" onClick={() => { setCategory(item); setPage(1); }} className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-bold transition ${category === item ? 'bg-[#4a74d6] text-white' : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'}`}>{item}</button>)}
         </div>
       </div>
 
@@ -69,28 +69,28 @@ export function ToolsCatalog({ tools }: ToolsCatalogProps) {
           <Link
             key={tool.slug}
             href={`/outils/${tool.slug}`}
-            style={{ animationDelay: `${index * 55}ms` }}
-            className="tool-card group flex min-h-[218px] flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1.5 hover:border-teal-300 hover:shadow-[0_20px_40px_-24px_rgba(15,118,110,.55)]"
+            style={{ animationDelay: `${index * 55}ms`, transform: 'perspective(1200px) rotateX(2deg) rotateY(-2deg)' }}
+            className="tool-card group flex min-h-[218px] flex-col rounded-[1.5rem] border border-white/10 bg-[rgba(13,28,52,0.8)] p-4 shadow-[0_18px_40px_rgba(7,19,40,0.24)] transition duration-300 hover:-translate-y-1.5 hover:border-[#9ccbff]/40 hover:shadow-[0_20px_50px_rgba(70,103,182,0.24)] backdrop-blur-sm"
           >
             <div className="mb-3 flex items-start justify-between gap-3">
-              <div className="tool-icon flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-2xl transition duration-300 group-hover:rotate-3 group-hover:scale-110" aria-label={tool.name}>
+              <div className="tool-icon flex h-11 w-11 items-center justify-center rounded-xl bg-[#9ccbff]/10 text-2xl transition duration-300 group-hover:rotate-3 group-hover:scale-110" aria-label={tool.name}>
                 {tool.icon}
               </div>
-              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-600">
+              <span className="rounded-full bg-white/5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-300">
                 {tool.category}
               </span>
             </div>
-            <h2 className="mb-2 text-base font-bold leading-snug text-slate-900 group-hover:text-orange-600">
+            <h2 className="mb-2 text-base font-bold leading-snug text-white group-hover:text-[#9ccbff]">
               {tool.name}
             </h2>
-            <p className="flex-1 text-sm leading-5 text-slate-600">{tool.description}</p>
-            <span className="mt-4 inline-flex items-center text-sm font-semibold text-orange-600">
+            <p className="flex-1 text-sm leading-5 text-slate-300">{tool.description}</p>
+            <span className="mt-4 inline-flex items-center text-sm font-semibold text-[#9ccbff]">
               Utiliser l&apos;outil
               <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </span>
           </Link>
         ))}
-      </div> : <div className="rounded-2xl border border-dashed border-slate-300 px-6 py-16 text-center"><Search className="mx-auto h-8 w-8 text-slate-300" /><h2 className="mt-3 font-black text-slate-800">Aucun outil trouvé</h2><p className="mt-1 text-sm text-slate-500">Essaie un autre mot-clé ou une autre catégorie.</p></div>}
+      </div> : <div className="rounded-[1.5rem] border border-dashed border-white/10 bg-[rgba(13,28,52,0.8)] px-6 py-16 text-center"><Search className="mx-auto h-8 w-8 text-slate-300" /><h2 className="mt-3 font-black text-white">Aucun outil trouvé</h2><p className="mt-1 text-sm text-slate-400">Essaie un autre mot-clé ou une autre catégorie.</p></div>}
 
       {pageCount > 1 && (
         <nav className="mt-8 flex items-center justify-center gap-2" aria-label="Pagination des outils">

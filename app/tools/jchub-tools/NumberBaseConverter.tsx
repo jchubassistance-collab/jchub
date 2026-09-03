@@ -51,14 +51,14 @@ export function NumberBaseConverter() {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-slate-100">
       <div>
-        <label className="block text-sm font-semibold mb-2">Nombre à convertir</label>
+        <label className="mb-2 block text-sm font-semibold text-slate-200">Nombre à convertir</label>
         <div className="flex gap-2">
           <select
             value={base}
             onChange={(e) => setBase(Number(e.target.value) as Base)}
-            className="px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-brand-500"
+            className="rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-3 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-[#9ccbff]/60"
           >
             <option value={2}>BIN (base 2)</option>
             <option value={8}>OCT (base 8)</option>
@@ -70,11 +70,11 @@ export function NumberBaseConverter() {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder={base === 2 ? '101010' : base === 8 ? '52' : base === 16 ? '2A' : '42'}
-            className="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-xl font-mono focus:outline-none focus:border-brand-500"
+            className="flex-1 rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-4 py-2.5 font-mono text-white focus:outline-none focus:border-[#9ccbff]/60"
           />
         </div>
         {!isValid(value, base) && value && (
-          <p className="text-xs text-red-600 mt-1.5">
+          <p className="mt-1.5 text-xs text-red-300">
             ❌ Format invalide pour la base {base}. Exemple : {base === 2 ? '1010' : base === 8 ? '52' : base === 16 ? '2A' : '42'}
           </p>
         )}
@@ -85,30 +85,30 @@ export function NumberBaseConverter() {
         {conversions.map((c) => (
           <div
             key={c.base}
-            className={`bg-white border-2 rounded-xl p-3 ${
-              c.base === base ? 'border-brand-500 bg-brand-50/30' : 'border-gray-200'
+            className={`rounded-xl border p-3 ${
+              c.base === base ? 'border-[#9ccbff]/60 bg-[#9ccbff]/10' : 'border-[#9ccbff]/20 bg-[#0b1830]/80'
             }`}
           >
-            <div className="flex items-center justify-between mb-1">
+            <div className="mb-1 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Hash className="w-4 h-4 text-brand-600" />
-                <span className="font-bold text-sm">{c.label}</span>
-                {c.base === base && <span className="text-xs px-2 py-0.5 bg-brand-500 text-white rounded-full">Source</span>}
+                <Hash className="h-4 w-4 text-[#9ccbff]" />
+                <span className="text-sm font-bold text-white">{c.label}</span>
+                {c.base === base && <span className="rounded-full bg-[#9ccbff] px-2 py-0.5 text-[10px] font-semibold text-slate-900">Source</span>}
               </div>
               <button
                 onClick={() => copy(c.value, `b${c.base}`)}
                 disabled={!c.value}
-                className="text-xs text-brand-600 font-semibold flex items-center gap-1 disabled:opacity-30"
+                className="flex items-center gap-1 text-xs font-semibold text-[#9ccbff] disabled:opacity-30 hover:text-white transition"
               >
                 {copied === `b${c.base}` ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                 {copied === `b${c.base}` ? 'Copié' : 'Copier'}
               </button>
             </div>
-            <div className="font-mono text-lg font-bold break-all">
-              {c.value || <span className="text-gray-300">—</span>}
+            <div className="break-all font-mono text-lg font-bold text-white">
+              {c.value || <span className="text-slate-400">—</span>}
             </div>
             {c.value && (
-              <div className="text-xs text-gray-500 mt-1 font-mono">
+              <div className="mt-1 font-mono text-xs text-slate-400">
                 {c.prefix}{c.value}
               </div>
             )}
@@ -118,13 +118,13 @@ export function NumberBaseConverter() {
 
       {/* Presets */}
       <div>
-        <div className="text-xs font-bold text-gray-500 uppercase mb-2">Valeurs courantes</div>
+        <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Valeurs courantes</div>
         <div className="flex flex-wrap gap-2">
           {presets.map((p) => (
             <button
               key={p.label}
               onClick={() => { setValue(String(p.dec)); setBase(10); }}
-              className="px-3 py-1.5 border-2 border-gray-200 rounded-full text-xs font-semibold hover:border-brand-300 hover:bg-brand-50 transition"
+              className="rounded-full border border-[#9ccbff]/20 bg-[#0b1830]/80 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-[#9ccbff]/50 hover:text-white"
             >
               {p.label}
             </button>

@@ -87,7 +87,7 @@ Tu peux les remplacer par des visuels custom plus tard si tu veux.
 Chaque article a été écrit avec :
 - **Ton décontracté** : "du coup", "en vrai", "bref", "genre"
 - **Anecdotes perso** : histoires vécues par l'auteur (avec dates, contexte)
-- **Contexte africain** : Brazzaville, Congo, mobile money (CinetPay)
+- **Contexte africain** : Brazzaville, Congo, mobile money
 - **Code blocks** avec exemples concrets et commentés
 - **Cas d'usage réels** : OAuth qui marche pas, debug API, fuite de données
 - **CTAs contextuels** vers le bon outil JcHub pour chaque sujet

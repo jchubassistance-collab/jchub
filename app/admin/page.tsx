@@ -216,9 +216,9 @@ export default function AdminPage() {
                   color: 'from-blue-500 to-cyan-500',
                 },
                 {
-                  label: 'Livres',
+                  label: 'Ressources',
                   value: stats.totalBooks,
-                  icon: BookOpen,
+                  icon: Wrench,
                   color: 'from-purple-500 to-pink-500',
                 },
                 {
@@ -234,7 +234,7 @@ export default function AdminPage() {
                   color: 'from-amber-500 to-orange-500',
                 },
                 {
-                  label: 'Vues des livres',
+                  label: 'Vues des ressources',
                   value: stats.totalViews.toLocaleString('fr-FR'),
                   icon: Eye,
                   color: 'from-violet-500 to-fuchsia-500',
@@ -275,21 +275,6 @@ export default function AdminPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
 
               <Link
-                href="/admin/upload"
-                className="bg-gradient-to-br from-brand-500 to-purple-600 text-white rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition group"
-              >
-                <Upload className="w-6 h-6 mb-2 group-hover:scale-110 transition" />
-
-                <div className="font-bold">
-                  Upload livre IA
-                </div>
-
-                <div className="text-xs text-brand-100">
-                  PDF → métadonnées auto
-                </div>
-              </Link>
-
-              <Link
                 href="/admin/users"
                 className="bg-white border border-gray-200 rounded-2xl p-5 hover:shadow-md transition group"
               >
@@ -301,21 +286,6 @@ export default function AdminPage() {
 
                 <div className="text-xs text-gray-500">
                   Voir, modifier, supprimer
-                </div>
-              </Link>
-
-              <Link
-                href="/admin/books"
-                className="bg-white border border-gray-200 rounded-2xl p-5 hover:shadow-md transition group"
-              >
-                <BookOpen className="w-6 h-6 text-brand-600 mb-2 group-hover:scale-110 transition" />
-
-                <div className="font-bold">
-                  Livres
-                </div>
-
-                <div className="text-xs text-gray-500">
-                  Ajouter, modifier, publier
                 </div>
               </Link>
 

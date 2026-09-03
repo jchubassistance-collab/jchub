@@ -17,3 +17,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Vérification impossible.' }, { status: 500 });
   }
 }
+
+export const GET = POST;

@@ -6,19 +6,19 @@ import { headers } from 'next/headers';
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev'),
   title: {
-    default: 'JcHub — Outils & livres audio pour développeurs',
+    default: 'JcHub — Outils pour développeurs',
     template: '%s · JcHub',
   },
   description:
-    "L'écosystème d'apprentissage intelligent pour les développeurs. Outils gratuits, livres audio premium, et assistant IA personnalisé.",
-  keywords: ['développeur', 'outils dev', 'livre audio', 'apprentissage', 'ia'],
+    "L'écosystème pratique pour les développeurs : outils gratuits, automatisations et ressources utiles.",
+  keywords: ['développeur', 'outils dev', 'apprentissage', 'ia'],
   authors: [{ name: 'JcHub' }],
   icons: {
     icon: [
-      { url: '/favicon-sunset.svg', type: 'image/svg+xml' },
+      { url: '/favicon-blue.svg?v=2026-09-02', type: 'image/svg+xml' },
     ],
-    shortcut: '/favicon-sunset.svg',
-    apple: '/favicon-sunset.svg',
+    shortcut: '/favicon-blue.svg?v=2026-09-02',
+    apple: '/favicon-blue.svg?v=2026-09-02',
   },
   openGraph: {
     type: 'website',

@@ -8,9 +8,7 @@ import { createSupabaseBrowserClient } from '@/lib/supabase-browser';
 
 const navigation = [
   { href: '/admin', label: 'Vue d’ensemble', icon: BarChart3 },
-  { href: '/admin/upload', label: 'Ajouter un livre', icon: Upload },
   { href: '/admin/users', label: 'Utilisateurs', icon: Users, disabled: true },
-  { href: '/admin/books', label: 'Catalogue', icon: BookOpen, disabled: true },
   { href: '/admin/tools', label: 'Outils', icon: Wrench, disabled: true },
 ];
 

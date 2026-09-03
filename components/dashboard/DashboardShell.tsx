@@ -79,7 +79,7 @@ export function DashboardShell({ children }: { children: (user: UserProfile) => 
               <div className="mb-3 px-2 pb-2 pt-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-300">Navigation</div>
               {[
                 { href: '/compte/dashboard', label: 'Tableau de bord', icon: User },
-                { href: '/compte/bibliotheque', label: 'Ma bibliothèque', icon: BookOpen },
+                { href: '/outils', label: 'Outils', icon: Wrench },
                 { href: '/compte/abonnement', label: 'Abonnement', icon: CreditCard },
                 { href: '/compte/parametres', label: 'Paramètres', icon: Settings },
               ].map((item) => (
