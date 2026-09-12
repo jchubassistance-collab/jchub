@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { AppChrome } from '@/components/layout/AppChrome';
 import { headers } from 'next/headers';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev'),
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="fr">
       <body>
         <AppChrome isAdminHost={isAdminHost}>{children}</AppChrome>
+        <Analytics />
       </body>
     </html>
   );
