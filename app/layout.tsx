@@ -11,15 +11,15 @@ import { headers } from 'next/headers';
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev'),
   alternates: {
-    canonical: './',
+    canonical: 'https://jchub.dev',
   },
   title: {
-    default: 'JcHub — Outils pour développeurs',
-    template: '%s · JcHub',
+    default: 'JcHub | Outils pratiques pour développeurs',
+    template: '%s | JcHub',
   },
   description:
-    "L'écosystème pratique pour les développeurs : outils gratuits, automatisations et ressources utiles.",
-  keywords: ['développeur', 'outils dev', 'apprentissage', 'ia', 'Jessy Ngnambongo', 'JcHub'],
+    'JcHub regroupe des outils gratuits, des ressources utiles et des workflows pratiques pour développeurs, créateurs et équipes.',
+  keywords: ['JcHub', 'développeur', 'outils dev', 'outils gratuits', 'ressources développeurs', 'ia', 'Jessy Ngnambongo'],
   authors: [{ name: 'Jessy Ngnambongo' }],
   creator: 'Jessy Ngnambongo',
   publisher: 'Jessy Ngnambongo',
@@ -38,6 +38,15 @@ export const metadata: Metadata = {
     locale: 'fr_FR',
     url: 'https://jchub.dev',
     siteName: 'JcHub',
+    title: 'JcHub | Outils pratiques pour développeurs',
+    description:
+      'JcHub regroupe des outils gratuits, des ressources utiles et des workflows pratiques pour développeurs, créateurs et équipes.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'JcHub | Outils pratiques pour développeurs',
+    description:
+      'JcHub regroupe des outils gratuits, des ressources utiles et des workflows pratiques pour développeurs, créateurs et équipes.',
   },
 };
 

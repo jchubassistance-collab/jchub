@@ -32,10 +32,10 @@ export default async function HomePage() {
             <div className="order-last max-w-xl lg:order-first">
               <p className="mb-4 hidden text-sm font-semibold uppercase tracking-[0.28em] text-[#b6d6ff] sm:block">Trouvez le bon outil</p>
               <h1 className="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-                Des solutions utiles pour avancer sans friction.
+                JcHub : des solutions utiles pour avancer sans friction.
               </h1>
               <p className="mt-4 hidden max-w-lg text-base leading-relaxed text-slate-200 sm:mt-5 sm:block sm:text-lg">
-                JcHub regroupe des outils pratiques, des ressources claires et des workflows pensé pour gagner du temps dans le quotidien numérique.
+                JcHub regroupe des outils pratiques, des ressources claires et des workflows pensés pour gagner du temps dans le quotidien numérique.
               </p>
 
               <div className="mt-5 flex flex-wrap items-center gap-4 sm:mt-8">

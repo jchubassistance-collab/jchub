@@ -4,9 +4,9 @@ import { getPublishedTools } from '@/lib/tools';
 import { ToolsCatalog } from '@/components/tools/ToolsCatalog';
 
 export const metadata = {
-  title: 'Outils gratuits pour développeurs',
+  title: 'JcHub | Outils pratiques pour développeurs',
   description:
-    'Collection d\'outils gratuits pour développeurs : générateur de mot de passe, JSON formatter, Base64, UUID, regex tester.',
+    'JcHub propose des outils gratuits et pratiques pour développeurs : générateur de mot de passe, JSON formatter, Base64, UUID, conversion CSV/Excel et bien plus.',
 };
 
 export default async function ToolsPage() {
@@ -32,8 +32,8 @@ export default async function ToolsPage() {
         <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:gap-12 sm:px-6 sm:py-14 lg:grid-cols-[1fr_390px] lg:items-center lg:py-20">
           <div className="relative order-last lg:order-first" style={{ transform: 'perspective(1200px) rotateX(1.5deg) rotateY(-2deg)' }}>
             <div className="mb-5 hidden items-center gap-2 border border-[#9ccbff]/30 bg-[#9ccbff]/10 px-3 py-1.5 text-xs font-black uppercase tracking-[.18em] text-[#dfeeff] sm:inline-flex"><Wrench className="h-4 w-4" />Dev utility lab</div>
-            <h1 className="max-w-3xl text-4xl font-black leading-[.95] tracking-tight sm:text-7xl">Moins de friction.<br /><span className="text-[#9ccbff]">Plus de flow.</span></h1>
-            <p className="mt-4 hidden max-w-2xl text-lg leading-8 text-slate-300 sm:mt-6 sm:block">Des outils rapides, privés et gratuits pour débloquer les détails qui ralentissent les grands projets.</p>
+            <h1 className="max-w-3xl text-4xl font-black leading-[.95] tracking-tight sm:text-7xl">JcHub<br /><span className="text-[#9ccbff]">Outils pratiques pour développeurs.</span></h1>
+            <p className="mt-4 hidden max-w-2xl text-lg leading-8 text-slate-300 sm:mt-6 sm:block">Des outils rapides, privés et gratuits pour débloquer les détails qui ralentissent les grands projets et faire avancer ton travail.</p>
             <div className="mt-5 hidden flex-wrap gap-5 text-sm font-bold text-slate-300 sm:mt-8 sm:flex"><span className="inline-flex items-center gap-2"><Activity className="h-4 w-4 text-[#9ccbff]" />Instantané</span><span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#9ccbff]" />Traitement local</span></div>
           </div>
 
