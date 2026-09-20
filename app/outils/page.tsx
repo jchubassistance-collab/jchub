@@ -29,15 +29,15 @@ export default async function ToolsPage() {
         <div className="absolute -left-28 bottom-[-80px] h-80 w-80 rounded-full border border-white/10 bg-[#3a68d9]/10 blur-2xl" />
         <div className="absolute right-[-60px] top-[-40px] h-72 w-72 rounded-full border border-white/10 bg-[#96c7ff]/10 blur-2xl" />
 
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_390px] lg:items-center lg:py-20">
-          <div className="relative" style={{ transform: 'perspective(1200px) rotateX(1.5deg) rotateY(-2deg)' }}>
-            <div className="mb-5 inline-flex items-center gap-2 border border-[#9ccbff]/30 bg-[#9ccbff]/10 px-3 py-1.5 text-xs font-black uppercase tracking-[.18em] text-[#dfeeff]"><Wrench className="h-4 w-4" />Dev utility lab</div>
-            <h1 className="max-w-3xl text-5xl font-black leading-[.92] tracking-tight sm:text-7xl">Moins de friction.<br /><span className="text-[#9ccbff]">Plus de flow.</span></h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">Des outils rapides, privés et gratuits pour débloquer les détails qui ralentissent les grands projets.</p>
-            <div className="mt-8 flex flex-wrap gap-5 text-sm font-bold text-slate-300"><span className="inline-flex items-center gap-2"><Activity className="h-4 w-4 text-[#9ccbff]" />Instantané</span><span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#9ccbff]" />Traitement local</span></div>
+        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:gap-12 sm:px-6 sm:py-14 lg:grid-cols-[1fr_390px] lg:items-center lg:py-20">
+          <div className="relative order-last lg:order-first" style={{ transform: 'perspective(1200px) rotateX(1.5deg) rotateY(-2deg)' }}>
+            <div className="mb-5 hidden items-center gap-2 border border-[#9ccbff]/30 bg-[#9ccbff]/10 px-3 py-1.5 text-xs font-black uppercase tracking-[.18em] text-[#dfeeff] sm:inline-flex"><Wrench className="h-4 w-4" />Dev utility lab</div>
+            <h1 className="max-w-3xl text-4xl font-black leading-[.95] tracking-tight sm:text-7xl">Moins de friction.<br /><span className="text-[#9ccbff]">Plus de flow.</span></h1>
+            <p className="mt-4 hidden max-w-2xl text-lg leading-8 text-slate-300 sm:mt-6 sm:block">Des outils rapides, privés et gratuits pour débloquer les détails qui ralentissent les grands projets.</p>
+            <div className="mt-5 hidden flex-wrap gap-5 text-sm font-bold text-slate-300 sm:mt-8 sm:flex"><span className="inline-flex items-center gap-2"><Activity className="h-4 w-4 text-[#9ccbff]" />Instantané</span><span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#9ccbff]" />Traitement local</span></div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[2rem] border border-[#9ccbff]/20 bg-white/5 p-4 shadow-[0_35px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm" style={{ transform: 'perspective(1200px) rotateX(4deg) rotateY(-5deg)' }}>
+          <div className="relative order-first overflow-hidden rounded-[2rem] border border-[#9ccbff]/20 bg-white/5 p-3 shadow-[0_35px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm lg:order-last sm:p-4" style={{ transform: 'perspective(1200px) rotateX(4deg) rotateY(-5deg)' }}>
             <div className="tools-terminal relative overflow-hidden border border-[#9ccbff]/20 bg-[#071427]/80 p-5 shadow-2xl backdrop-blur-sm">
               <div className="flex items-center justify-between border-b border-white/10 pb-4 text-[10px] font-black uppercase tracking-[.18em] text-[#9ccbff]"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_#34d399]" />JcHub tools</span><Command className="h-4 w-4" /></div>
               <div className="mt-5 space-y-3 font-mono text-xs"><p className="text-slate-400"><span className="text-[#9ccbff]">$</span> choose_your_tool</p><p className="text-[#9ccbff]">{tools.length} utilities loaded</p><div className="tools-terminal-bars"><span /><span /><span /><span /><span /><span /><span /><span /><span /><span /><span /><span /></div><p className="text-slate-400"><span className="text-[#9ccbff]">$</span> build_something_great<span className="tools-cursor" /></p></div>

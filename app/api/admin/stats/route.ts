@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebase-admin';
 import { requireAdmin } from '@/lib/admin-auth';
+import { getPublishedTools } from '@/lib/tools';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,25 +11,24 @@ export async function GET(request: NextRequest) {
 
    const adminDb = getAdminDb();
 
-const [users, books, transactions] = await Promise.all([
-  adminDb.collection('users').get(),
-  adminDb.collection('books').get(),
-  adminDb.collection('transactions').get(),
-]);
+    const [users, articles, drafts, runs, publishedTools, articleViews] = await Promise.all([
+      adminDb.collection('users').get(),
+      adminDb.collection('articles').get(),
+      adminDb.collection('agent_drafts').get(),
+      adminDb.collection('agent_runs').get(),
+      getPublishedTools(),
+      adminDb.collection('blog_articles').get(),
+    ]);
 
-    const totalRevenue = transactions.docs.reduce(
-      (total, transaction) => total + Number(transaction.data().amount || 0),
-      0
-    );
-
-    const totalViews = books.docs.reduce(
-      (total, book) => total + Number(book.data().views || 0),
-      0
-    );
-    const totalDownloads = books.docs.reduce(
-      (total, book) => total + Number(book.data().downloads || 0),
-      0
-    );
+    const viewsBySlug = new Map(articleViews.docs.map((document) => [document.id, Number(document.data().views || 0)]));
+    const articleViewRows = articles.docs
+      .filter((article) => article.data().status === 'published')
+      .map((article) => ({
+        slug: String(article.data().slug || article.id),
+        title: String(article.data().title || article.id),
+        views: viewsBySlug.get(String(article.data().slug || article.id)) || 0,
+      }))
+      .sort((first, second) => second.views - first.views);
 
     const recentUsers = users.docs
       .map((user) => {
@@ -45,13 +45,44 @@ const [users, books, transactions] = await Promise.all([
       .slice(0, 5)
       .map(({ createdAtMillis: _createdAtMillis, ...user }) => user);
 
+    const recentArticles = articles.docs
+      .map((article) => {
+        const data = article.data();
+        return {
+          id: article.id,
+          title: String(data.title || article.id),
+          status: String(data.status || 'draft'),
+          publishedAt: data.publishedAt?.toDate?.().toISOString() || null,
+          publishedAtMillis: data.publishedAt?.toMillis?.() || 0,
+        };
+      })
+      .filter((article) => article.status === 'published')
+      .sort((first, second) => second.publishedAtMillis - first.publishedAtMillis)
+      .slice(0, 5)
+      .map(({ publishedAtMillis: _publishedAtMillis, ...article }) => article);
+
+    const recentRun = runs.docs
+      .map((run) => {
+        const data = run.data();
+        return {
+          date: String(data.date || run.id),
+          status: String(data.status || 'unknown'),
+          createdAt: data.createdAt?.toDate?.().toISOString() || null,
+          createdAtMillis: data.createdAt?.toMillis?.() || 0,
+        };
+      })
+      .sort((first, second) => second.createdAtMillis - first.createdAtMillis)[0] || null;
+
     return NextResponse.json({
       totalUsers: users.size,
-      totalBooks: books.size,
-      totalTransactions: transactions.size,
-      totalRevenue,
-      totalViews,
-      totalDownloads,
+      totalArticles: articles.docs.filter((article) => article.data().status === 'published').length,
+      totalDrafts: drafts.size,
+      approvedDrafts: drafts.docs.filter((draft) => draft.data().status === 'approved').length,
+      totalTools: publishedTools.length,
+      totalArticleViews: articleViewRows.reduce((total, article) => total + article.views, 0),
+      articleViews: articleViewRows.slice(0, 10),
+      recentArticles,
+      recentRun: recentRun ? { date: recentRun.date, status: recentRun.status, createdAt: recentRun.createdAt } : null,
       recentUsers,
     });
   } catch (error) {

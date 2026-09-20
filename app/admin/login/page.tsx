@@ -1,58 +1,36 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlertCircle, CheckCircle2, LockKeyhole, Mail, QrCode, ShieldCheck } from 'lucide-react';
-import QRCode from 'qrcode';
-import { createSupabaseBrowserClient } from '@/lib/supabase-browser';
-
-type Step = 'credentials' | 'totp' | 'enrollment';
+import { AlertCircle, LockKeyhole, Mail, ShieldCheck } from 'lucide-react';
+import { getCurrentIdToken, resetPassword, signInWithEmail } from '@/lib/firebase-auth';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [step, setStep] = useState<Step>('credentials');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [code, setCode] = useState('');
-  const [factorId, setFactorId] = useState('');
-  const [challengeId, setChallengeId] = useState('');
-  const [qr, setQr] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [resetMode, setResetMode] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setError('');
-    const supabase = createSupabaseBrowserClient();
     try {
-      if (step === 'totp') {
-        const { error: verifyError } = await supabase.auth.mfa.verify({ factorId, challengeId, code });
-        if (verifyError) throw verifyError;
-        router.replace('/admin');
-        return;
+      await signInWithEmail(email.trim().toLowerCase(), password);
+      const idToken = await getCurrentIdToken();
+      const response = await fetch('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idToken }) });
+      const responseText = await response.text();
+      let data: { error?: string } = {};
+      try {
+        data = JSON.parse(responseText) as { error?: string };
+      } catch {
+        throw new Error('Le serveur admin a renvoyé une réponse invalide. Réessaie dans quelques instants.');
       }
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
-      if (signInError) throw signInError;
-      const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
-      if (factorsError) throw factorsError;
-      const verifiedFactor = factors.totp.find((factor) => factor.status === 'verified');
-      if (verifiedFactor) {
-        const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: verifiedFactor.id });
-        if (challengeError) throw challengeError;
-        setFactorId(verifiedFactor.id);
-        setChallengeId(challenge.id);
-        setStep('totp');
-        return;
-      }
-      const { data: enrollment, error: enrollmentError } = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'JcHub Admin' });
-      if (enrollmentError) throw enrollmentError;
-      const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: enrollment.id });
-      if (challengeError) throw challengeError;
-      setFactorId(enrollment.id);
-      setChallengeId(challenge.id);
-      setQr(await QRCode.toDataURL(enrollment.totp.uri));
-      setStep('enrollment');
+      if (!response.ok) throw new Error(data.error || 'Accès administrateur refusé.');
+      router.replace('/admin');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Authentification impossible.');
     } finally {
@@ -60,40 +38,20 @@ export default function AdminLoginPage() {
     }
   };
 
-  const confirmEnrollment = async () => {
+  const handleResetPassword = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setLoading(true);
     setError('');
+    setResetSent(false);
     try {
-      const { error: verifyError } = await createSupabaseBrowserClient().auth.mfa.verify({ factorId, challengeId, code });
-      if (verifyError) throw verifyError;
-      router.replace('/admin');
+      await resetPassword(email.trim().toLowerCase());
+      setResetSent(true);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Code invalide.');
+      setError(cause instanceof Error ? cause.message : 'Impossible d’envoyer le lien de récupération.');
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (loading || code.length !== 6 || (!factorId && step !== 'totp' && step !== 'enrollment')) return;
-    if (!factorId || !challengeId) return;
-
-    const verifyCodeAutomatically = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const { error: verifyError } = await createSupabaseBrowserClient().auth.mfa.verify({ factorId, challengeId, code });
-        if (verifyError) throw verifyError;
-        router.replace('/admin');
-      } catch (cause) {
-        setError(cause instanceof Error ? cause.message : 'Code invalide.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void verifyCodeAutomatically();
-  }, [challengeId, code, factorId, loading, router, step]);
 
   return (
     <div className="grid min-h-screen place-items-center bg-slate-950 px-4 py-10 text-slate-900">
@@ -102,26 +60,22 @@ export default function AdminLoginPage() {
           <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-indigo-600 text-white"><ShieldCheck className="h-7 w-7" /></div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">JcHub Admin</p>
           <h1 className="mt-2 text-2xl font-black">Connexion sécurisée</h1>
-          <p className="mt-2 text-sm text-slate-500">Supabase Auth, mot de passe et authentification à deux facteurs.</p>
+          <p className="mt-2 text-sm text-slate-500">Firebase Auth, accès par e-mail et session sécurisée.</p>
         </div>
-        {step === 'enrollment' ? (
-          <div className="space-y-5">
-            <div className="rounded-2xl border border-indigo-100 bg-indigo-50 p-4 text-sm text-indigo-900"><div className="flex items-center gap-2 font-bold"><QrCode className="h-5 w-5" /> Enrôlement initial</div><p className="mt-2 leading-relaxed">Scanne ce QR avec Google Authenticator ou Microsoft Authenticator, puis confirme avec le code.</p></div>
-            <div className="mx-auto w-fit rounded-2xl bg-white p-3 shadow-lg ring-1 ring-slate-200"><img src={qr} alt="QR code TOTP" className="h-56 w-56" /></div>
-            <input type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, ''))} className="w-full rounded-xl border border-slate-200 py-3 text-center text-lg font-bold tracking-[0.4em] outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" placeholder="000000" aria-label="Code TOTP" />
-            {error && <ErrorMessage text={error} />}
-            <button type="button" onClick={confirmEnrollment} disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 font-bold text-white hover:bg-indigo-700 disabled:opacity-60"><CheckCircle2 className="h-4 w-4" />{loading ? 'Vérification...' : 'Confirmer le code'}</button>
-          </div>
-        ) : (
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            {step === 'credentials' ? <>
+        {resetMode ? <form className="space-y-5" onSubmit={handleResetPassword}>
+              <p className="text-sm text-slate-600">Saisis ton adresse e-mail. Tu recevras un lien sécurisé pour choisir un nouveau mot de passe.</p>
+              <label className="block text-sm font-semibold text-slate-700">Adresse e-mail<span className="relative mt-1.5 block"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-xl border border-slate-200 py-3 pl-10 pr-3 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" placeholder="admin@jchub.dev" /></span></label>
+              {resetSent && <p className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">Si cette adresse est associée à un compte, un e-mail de récupération vient d’être envoyé.</p>}
+              {error && <ErrorMessage text={error} />}
+              <button type="submit" disabled={loading} className="w-full rounded-xl bg-indigo-600 px-4 py-3 font-bold text-white hover:bg-indigo-700 disabled:opacity-60">{loading ? 'Envoi...' : 'Envoyer le lien'}</button>
+              <button type="button" onClick={() => { setResetMode(false); setError(''); setResetSent(false); }} className="w-full text-sm font-semibold text-slate-500 hover:text-indigo-600">Retour à la connexion</button>
+            </form> : <form className="space-y-5" onSubmit={handleSubmit}>
               <label className="block text-sm font-semibold text-slate-700">Adresse e-mail<span className="relative mt-1.5 block"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-xl border border-slate-200 py-3 pl-10 pr-3 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" placeholder="admin@jchub.dev" /></span></label>
               <label className="block text-sm font-semibold text-slate-700">Mot de passe<span className="relative mt-1.5 block"><LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input type="password" required autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-xl border border-slate-200 py-3 pl-10 pr-3 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" /></span></label>
-            </> : <label className="block text-sm font-semibold text-slate-700">Code Authenticator<input type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6} required value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, ''))} className="mt-1.5 w-full rounded-xl border border-slate-200 py-3 text-center text-lg font-bold tracking-[0.4em] outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" placeholder="000000" /></label>}
             {error && <ErrorMessage text={error} />}
-            <button type="submit" disabled={loading} className="w-full rounded-xl bg-indigo-600 px-4 py-3 font-bold text-white hover:bg-indigo-700 disabled:opacity-60">{loading ? 'Vérification...' : step === 'totp' ? 'Confirmer le code' : 'Accéder au dashboard'}</button>
-          </form>
-        )}
+            <button type="submit" disabled={loading} className="w-full rounded-xl bg-indigo-600 px-4 py-3 font-bold text-white hover:bg-indigo-700 disabled:opacity-60">{loading ? 'Connexion...' : 'Accéder au dashboard'}</button>
+              <button type="button" onClick={() => { setResetMode(true); setError(''); }} className="w-full text-sm font-semibold text-indigo-600 hover:text-indigo-800">Mot de passe oublié ?</button>
+            </form>}
       </div>
     </div>
   );

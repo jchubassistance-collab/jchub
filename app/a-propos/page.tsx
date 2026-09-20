@@ -60,17 +60,17 @@ export default function AboutPage() {
         <div className="relative mx-auto max-w-7xl px-5 pb-14 pt-8 sm:px-8 lg:min-h-[820px] lg:pb-20">
           <div className="flex items-center justify-end" aria-hidden="true" />
 
-          <div className="mt-8 grid items-center gap-10 lg:mt-12 lg:grid-cols-[1.1fr_0.9fr]" style={{ transform: 'perspective(1200px) rotateX(1.5deg) rotateY(-2deg)' }}>
-            <div className="max-w-xl">
-              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.28em] text-[#b6d6ff]">À propos de JcHub</p>
+          <div className="mt-5 grid items-center gap-6 lg:mt-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10" style={{ transform: 'perspective(1200px) rotateX(1.5deg) rotateY(-2deg)' }}>
+            <div className="order-last max-w-xl lg:order-first">
+              <p className="mb-4 hidden text-sm font-semibold uppercase tracking-[0.28em] text-[#b6d6ff] sm:block">À propos de JcHub</p>
               <h1 className="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
                 Le numérique avance.<span className="mt-2 block text-[#9ccbff]">Nous aussi.</span>
               </h1>
-              <p className="mt-5 max-w-lg text-base leading-relaxed text-slate-200 sm:text-lg">
+              <p className="mt-4 hidden max-w-lg text-base leading-relaxed text-slate-200 sm:mt-5 sm:block sm:text-lg">
                 JcHub construit un espace simple pour apprendre, expérimenter et progresser dans les métiers du numérique depuis l’Afrique.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center gap-4">
+              <div className="mt-5 flex flex-wrap items-center gap-4 sm:mt-8">
                 <Link href="/outils" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#0b1730] transition hover:scale-[1.02] hover:bg-[#eaf3ff]">
                   Découvrir JcHub <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -79,35 +79,35 @@ export default function AboutPage() {
                 </Link>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-5 text-sm text-slate-200">
+              <div className="mt-8 hidden flex-wrap gap-5 text-sm text-slate-200 sm:flex">
                 <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#9ccbff]" /> Outils gratuits</span>
                 <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#9ccbff]" /> Sans jargon</span>
                 <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#9ccbff]" /> 100% utiles</span>
               </div>
             </div>
 
-            <div className="relative mx-auto ml-auto w-full max-w-[560px]">
+            <div className="relative order-first mx-auto ml-auto w-full max-w-[560px] lg:order-last">
               <div className="absolute -left-8 top-10 h-36 w-36 rounded-full bg-[#a9d0ff]/20 blur-3xl" />
               <div className="absolute -right-8 bottom-6 h-32 w-32 rounded-full bg-[#dfeeff]/10 blur-3xl" />
 
               <div className="relative overflow-hidden rounded-[2rem] border border-[#9ccbff]/20 bg-white/5 p-3 shadow-[0_35px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm" style={{ transform: 'perspective(1200px) rotateX(4deg) rotateY(-5deg)' }}>
                 <Image
-                  src="/abouts.png"
+                  src="/about-abstract.svg"
                   alt="Une personne apprend avec JcHub"
-                  width={640}
-                  height={640}
+                  width={1200}
+                  height={900}
                   priority
-                  className="h-[440px] w-full rounded-[1.5rem] object-cover sm:h-[500px] lg:h-[560px]"
+                  className="h-[330px] w-full rounded-[1.5rem] object-cover sm:h-[500px] lg:h-[560px]"
                 />
               </div>
 
-              <div className="absolute -left-4 bottom-8 rounded-2xl border border-white/10 bg-[#0d1c38]/90 px-4 py-3 shadow-[0_20px_40px_rgba(5,12,25,0.4)] backdrop-blur-md">
+              <div className="absolute -left-4 bottom-8 hidden rounded-2xl border border-white/10 bg-[#0d1c38]/90 px-4 py-3 shadow-[0_20px_40px_rgba(5,12,25,0.4)] backdrop-blur-md sm:block">
                 <div className="text-xs uppercase tracking-[0.2em] text-[#9ccbff]">Congo</div>
                 <div className="mt-2 text-2xl font-black text-white">Brazzaville</div>
                 <div className="text-xs text-slate-300">Là où tout commence</div>
               </div>
 
-              <div className="absolute -right-3 top-8 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 shadow-[0_20px_40px_rgba(11,20,40,0.35)] backdrop-blur-md">
+              <div className="absolute -right-3 top-8 hidden rounded-2xl border border-white/10 bg-white/10 px-4 py-3 shadow-[0_20px_40px_rgba(11,20,40,0.35)] backdrop-blur-md sm:block">
                 <div className="text-xs uppercase tracking-[0.2em] text-[#dfeeff]">Mission</div>
                 <div className="mt-2 text-sm font-semibold text-white">Rendre le progrès possible</div>
               </div>

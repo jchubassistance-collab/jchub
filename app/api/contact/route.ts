@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
+import { z } from 'zod';
+import { verifyTurnstileToken } from '@/lib/turnstile';
+import { reportUserError } from '@/lib/user-error';
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const contactSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  email: z.string().trim().email().max(254),
+  subject: z.string().trim().min(1).max(80),
+  message: z.string().trim().min(1).max(5000),
+  turnstileToken: z.string().max(4096).optional(),
+}).strict();
 
 function getRequiredEnvironment(name: string): string {
   const value = process.env[name]?.trim();
@@ -16,15 +25,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Le service de contact est temporairement indisponible.' }, { status: 503 });
     }
 
-    const body = await request.json();
-    const name = typeof body.name === 'string' ? body.name.trim() : '';
-    const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
-    const subject = typeof body.subject === 'string' ? body.subject.trim() : '';
-    const message = typeof body.message === 'string' ? body.message.trim() : '';
-
-    if (!name || name.length > 120 || !emailPattern.test(email) || email.length > 254 || !subject || subject.length > 80 || !message || message.length > 5000) {
+    const parsedBody = contactSchema.safeParse(await request.json().catch(() => null));
+    if (!parsedBody.success) {
       return NextResponse.json({ error: 'Vérifie les champs du formulaire.' }, { status: 400 });
     }
+    if (!await verifyTurnstileToken(parsedBody.data.turnstileToken, request)) {
+      return NextResponse.json({ error: 'Vérification anti-abus échouée. Réessaie.' }, { status: 403 });
+    }
+    const { name, subject, message } = parsedBody.data;
+    const email = parsedBody.data.email.toLowerCase();
 
     const notificationEmail = getRequiredEnvironment('CONTACT_NOTIFICATION_EMAIL');
     const senderEmail = getRequiredEnvironment('BREVO_SENDER_EMAIL');
@@ -62,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     if (!notificationResponse.ok) {
       const brevoError = await notificationResponse.text();
-      console.error('Erreur Brevo contact:', notificationResponse.status, brevoError);
+      reportUserError();
       await messageRef.update({
         notificationStatus: 'failed',
         notificationError: `Brevo ${notificationResponse.status}`,
@@ -83,7 +92,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!confirmationResponse.ok) {
-      console.warn('Accusé de réception Brevo non envoyé:', confirmationResponse.status, await confirmationResponse.text());
+      reportUserError();
     }
 
     await messageRef.update({
@@ -93,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Erreur formulaire contact:', error);
+    reportUserError();
     return NextResponse.json({ error: 'Impossible d’envoyer ton message pour le moment.' }, { status: 500 });
   }
 }

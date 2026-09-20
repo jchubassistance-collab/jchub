@@ -1,0 +1,5 @@
+export default function AdminSettingsPage() {
+  return <div className="mx-auto max-w-4xl space-y-6"><header><p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600">Configuration</p><h1 className="mt-2 text-3xl font-black text-slate-950">Paramètres</h1><p className="mt-2 text-sm text-slate-600">État des services utilisés par l’administration.</p></header><div className="grid gap-4 sm:grid-cols-2"><Status name="Authentification" value="Firebase Auth" /><Status name="Base de données" value="Cloud Firestore" /><Status name="Agent IA" value={process.env.NEXT_PUBLIC_AI_PROVIDER || 'Gemini / Ollama'} /><Status name="Validation" value="Manuelle avant publication" /></div></div>;
+}
+
+function Status({ name, value }: { name: string; value: string }) { return <div className="rounded-2xl border border-slate-200 bg-white p-5"><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{name}</p><p className="mt-2 font-bold text-slate-950">{value}</p><span className="mt-3 inline-block rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">Configuré côté serveur</span></div>; }

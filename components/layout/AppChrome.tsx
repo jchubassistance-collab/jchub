@@ -25,8 +25,6 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  if (!mounted) return <PageLoader />;
-
   const safePathname = pathname ?? '';
 
   const isPrivateArea =
@@ -35,6 +33,8 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
     safePathname.startsWith('/admin/') ||
     safePathname === '/compte' ||
     safePathname.startsWith('/compte/');
+
+  if (!mounted && !isPrivateArea) return <PageLoader />;
 
   if (isPrivateArea) {
     return <main className="min-h-screen">{children}</main>;

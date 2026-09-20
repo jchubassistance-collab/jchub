@@ -22,34 +22,34 @@ export default async function BlogPage() {
         <div className="absolute -bottom-20 left-1/3 h-56 w-56 rounded-full border border-violet-300/20" />
         <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
         <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-16 sm:px-6 lg:px-8 lg:pb-20 lg:pt-24">
-          <div className="grid gap-12 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
-            <div className="animate-page-in">
+          <div className="grid gap-8 lg:grid-cols-[1.2fr_.8fr] lg:items-end lg:gap-12">
+            <div className="order-last animate-page-in lg:order-first">
               <div className="mb-6 inline-flex items-center gap-2 border border-cyan-300/30 bg-cyan-400/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[.18em] text-cyan-200">
                 <BookOpen className="h-3.5 w-3.5" /> JcHub / Journal
               </div>
-              <h1 className="max-w-4xl text-5xl font-black leading-[.88] tracking-[-0.05em] text-white sm:text-7xl lg:text-[5.5rem]">
+              <h1 className="max-w-4xl text-4xl font-black leading-[.92] tracking-tight text-white sm:text-7xl sm:leading-[.88] sm:tracking-[-0.05em] lg:text-[5.5rem]">
                 Des idées qui
                 <span className="mt-2 block bg-gradient-to-r from-orange-300 via-orange-200 to-cyan-300 bg-clip-text text-transparent">font avancer</span>
                 le code.
               </h1>
-              <p className="mt-7 max-w-xl text-base leading-7 text-slate-300 sm:text-lg">
+              <p className="mt-5 hidden max-w-xl text-base leading-7 text-slate-300 sm:mt-7 sm:block sm:text-lg">
                 Guides pratiques, retours terrain et raccourcis intelligents pour construire mieux, apprendre plus vite et créer depuis l’Afrique.
               </p>
-              <div className="mt-8 flex items-center gap-4">
+              <div className="mt-5 flex flex-wrap items-center gap-4 sm:mt-8">
                 <a href="#articles" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-slate-950 transition hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(255,255,255,0.16)]">
                   Explorer les articles <ArrowDownRight className="h-4 w-4" />
                 </a>
-                <span className="text-xs uppercase tracking-[.18em] text-slate-400">Tech • Product • Growth</span>
+                <span className="hidden text-xs uppercase tracking-[.18em] text-slate-400 sm:inline">Tech • Product • Growth</span>
               </div>
             </div>
 
             {featuredArticle ? (
-              <a href={`/blog/${featuredArticle.slug}`} className="group relative overflow-hidden rounded-[26px] border border-white/10 bg-white/5 p-3 shadow-[0_24px_70px_rgba(8,15,30,0.6)] backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:rotate-[1deg] hover:border-cyan-300/30 animate-slide-up">
+              <a href={`/blog/${featuredArticle.slug}`} className="group relative order-first overflow-hidden rounded-[26px] border border-white/10 bg-white/5 p-3 shadow-[0_24px_70px_rgba(8,15,30,0.6)] backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:rotate-[1deg] hover:border-cyan-300/30 animate-slide-up lg:order-last">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,.18),transparent_30%)]" />
                 <div className="relative aspect-[16/10] overflow-hidden rounded-[18px]">
                   <img src={featuredArticle.image} alt="" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
                 </div>
-                <div className="relative p-3 pb-2">
+                <div className="relative hidden p-3 pb-2 sm:block">
                   <p className="text-xs font-bold uppercase tracking-[.16em] text-orange-300">À la une · {featuredArticle.category}</p>
                   <h2 className="mt-2 text-xl font-black leading-tight text-white group-hover:text-orange-200">{featuredArticle.title}</h2>
                 </div>
@@ -57,7 +57,7 @@ export default async function BlogPage() {
             ) : null}
           </div>
 
-          <div className="mt-14 grid grid-cols-3 border-t border-white/15 pt-5 text-sm sm:max-w-xl">
+          <div className="mt-8 hidden grid-cols-3 border-t border-white/15 pt-5 text-sm sm:mt-14 sm:grid sm:max-w-xl">
             <div>
               <p className="text-2xl font-black text-white">{blogArticles.length}</p>
               <p className="mt-1 text-slate-400">articles publiés</p>

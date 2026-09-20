@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
+import { reportUserError } from '@/lib/user-error';
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest) {
     await getAdminDb().collection('users').doc(user.uid).set({ 'subscription.cancelAt': FieldValue.serverTimestamp(), 'subscription.autoRenew': false, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[SUBSCRIPTION] Annulation échouée:', error);
+    reportUserError();
     return NextResponse.json({ error: 'Impossible d’annuler l’abonnement.' }, { status: 500 });
   }
 }

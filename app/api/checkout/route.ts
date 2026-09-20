@@ -4,21 +4,22 @@ import { generateTransactionId, initiateMtnPayment } from '@/lib/mtn';
 import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { plans } from '@/lib/pricing';
+import { z } from 'zod';
+
+const checkoutSchema = z.object({
+  plan: z.enum(['day', 'monthly', 'yearly', 'lifetime']),
+  paymentMethod: z.literal('MTN_MOMO'),
+  customerPhone: z.string().trim().regex(/^242[0-9]{9}$/),
+}).strict();
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const parsedBody = checkoutSchema.safeParse(await req.json().catch(() => null));
+    if (!parsedBody.success) return NextResponse.json({ error: 'Données de paiement invalides.' }, { status: 400 });
     const token = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
     if (!token) return NextResponse.json({ error: 'Connecte-toi avant de t’abonner.' }, { status: 401 });
     const authenticatedUser = await getAdminAuth().verifyIdToken(token);
-    const {
-      plan,           // 'day' | 'monthly' | 'yearly' | 'lifetime'
-      paymentMethod,  // 'MTN_MOMO'
-      customerPhone,
-    } = body;
-    if (paymentMethod !== 'MTN_MOMO') {
-      return NextResponse.json({ error: 'Seul MTN MoMo est disponible.' }, { status: 400 });
-    }
+    const { plan, customerPhone } = parsedBody.data;
 
     // Le prix vient toujours du catalogue serveur, jamais du navigateur.
     let amount = 0;
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     // Validation du numéro Congo pour MTN MoMo.
     const phoneRegex = /^242[0-9]{9}$/;
-    if (!customerPhone || !phoneRegex.test(customerPhone.replace(/\s/g, ''))) {
+    if (!phoneRegex.test(customerPhone)) {
       return NextResponse.json(
         { error: 'Numéro invalide. Format attendu : 242XXXXXXXX' },
         { status: 400 }
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
     }
 
     const transactionId = generateTransactionId('JCH');
-    const normalizedPhone = customerPhone?.replace(/\s/g, '') || '000000000';
+    const normalizedPhone = customerPhone;
 
     await getAdminDb().collection('payments').doc(transactionId).set({
       userId: authenticatedUser.uid,

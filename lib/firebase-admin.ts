@@ -1,5 +1,7 @@
 // lib/firebase-admin.ts
 
+import 'server-only';
+
 import {
   cert,
   getApps,

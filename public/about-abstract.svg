@@ -1,0 +1,30 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1200" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#08172F"/>
+      <stop offset="0.45" stop-color="#0B2B55"/>
+      <stop offset="1" stop-color="#123F8C"/>
+    </linearGradient>
+    <linearGradient id="panel2" x1="250" y1="180" x2="970" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#102B52"/>
+      <stop offset="1" stop-color="#0A1730"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg2)"/>
+  <circle cx="270" cy="160" r="170" fill="#99C8FF" fill-opacity="0.14"/>
+  <circle cx="980" cy="760" r="220" fill="#7AB3FF" fill-opacity="0.12"/>
+  <rect x="180" y="120" width="840" height="660" rx="42" fill="url(#panel2)" stroke="#9CCBFF" stroke-opacity="0.28"/>
+  <rect x="245" y="184" width="710" height="72" rx="20" fill="#0A1730" fill-opacity="0.8"/>
+  <circle cx="600" cy="435" r="190" fill="#9CCBFF" fill-opacity="0.13"/>
+  <path d="M517 382C517 335.5 554.5 298 601 298C647.5 298 685 335.5 685 382V463C685 509.5 647.5 547 601 547C554.5 547 517 509.5 517 463V382Z" fill="#D9ECFF" fill-opacity="0.9"/>
+  <circle cx="601" cy="350" r="72" fill="#CDE6FF" fill-opacity="0.9"/>
+  <path d="M432 622C466 555 523 520 601 520C679 520 736 555 770 622V690H432V622Z" fill="#8ED5FF" fill-opacity="0.8"/>
+  <rect x="300" y="286" width="160" height="112" rx="14" fill="#0B1830" fill-opacity="0.8"/>
+  <rect x="740" y="286" width="160" height="112" rx="14" fill="#0B1830" fill-opacity="0.8"/>
+  <rect x="300" y="430" width="180" height="18" rx="9" fill="#D9ECFF" fill-opacity="0.8"/>
+  <rect x="300" y="465" width="105" height="18" rx="9" fill="#D9ECFF" fill-opacity="0.4"/>
+  <rect x="720" y="430" width="180" height="18" rx="9" fill="#D9ECFF" fill-opacity="0.8"/>
+  <rect x="720" y="465" width="110" height="18" rx="9" fill="#D9ECFF" fill-opacity="0.4"/>
+  <rect x="450" y="688" width="300" height="32" rx="16" fill="#9CCBFF" fill-opacity="0.9"/>
+  <text x="600" y="710" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#091A32">JcHub</text>
+</svg>

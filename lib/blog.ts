@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
+import { reportUserError } from '@/lib/user-error';
 
 export type BlogArticle = {
   slug: string;
@@ -21,6 +22,16 @@ export type BlogArticle = {
   tags: string[];
 };
 
+function toIsoDate(value: unknown): string {
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object' && 'toDate' in value && typeof value.toDate === 'function') {
+    const date = value.toDate();
+    return date instanceof Date ? date.toISOString() : '';
+  }
+  return '';
+}
+
 function toArticle(data: Record<string, unknown>): BlogArticle {
   const keywords = Array.isArray(data.keywords) ? data.keywords.map(String) : [];
   const category = String(data.category || 'Développement');
@@ -36,10 +47,10 @@ function toArticle(data: Record<string, unknown>): BlogArticle {
     image: String(data.image || '/blog/default.svg'),
     content: String(data.content || ''),
     status,
-    publishedAt: data.publishedAt instanceof Date ? data.publishedAt.toISOString() : String(data.publishedAt || ''),
-    scheduledFor: data.scheduledFor instanceof Date ? data.scheduledFor.toISOString() : String(data.scheduledFor || ''),
+    publishedAt: toIsoDate(data.publishedAt),
+    scheduledFor: toIsoDate(data.scheduledFor),
     readTime: String(data.readTime || '5 min'),
-    updatedAt: data.updatedAt instanceof Date ? data.updatedAt.toISOString() : String(data.updatedAt || ''),
+    updatedAt: toIsoDate(data.updatedAt),
     tags: Array.from(new Set([category, ...keywords.slice(0, 3)])),
   };
 }
@@ -50,7 +61,6 @@ function getLocalFallback(): BlogArticle[] {
   return fs.readdirSync(directory)
     .filter((file) => /^\d{2}-.+\.md$/.test(file))
     .sort()
-    .slice(0, 5)
     .map((file) => {
       const parsed = matter(fs.readFileSync(path.join(directory, file), 'utf8'));
       const data = parsed.data as Record<string, unknown>;
@@ -70,7 +80,7 @@ export async function getPublishedArticles(): Promise<BlogArticle[]> {
     const snapshot = await getAdminDb().collection('articles').where('status', '==', 'published').get();
     return snapshot.docs.map((document) => toArticle(document.data() as Record<string, unknown>));
   } catch (error) {
-    console.error('[BLOG] Chargement articles échoué:', error);
+    reportUserError();
     return getLocalFallback();
   }
 }
@@ -83,7 +93,7 @@ export async function getPublishedArticleBySlug(slug: string): Promise<BlogArtic
     const article = toArticle(document.data() as Record<string, unknown>);
     return article.status === 'published' ? article : null;
   } catch (error) {
-    console.error(`[BLOG] Chargement article ${slug} échoué:`, error);
+    reportUserError();
     return null;
   }
 }

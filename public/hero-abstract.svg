@@ -1,0 +1,44 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#071A33"/>
+      <stop offset="0.45" stop-color="#0C2A56"/>
+      <stop offset="1" stop-color="#123F8C"/>
+    </linearGradient>
+    <linearGradient id="card" x1="200" y1="200" x2="850" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1F3C"/>
+      <stop offset="1" stop-color="#1D3A68"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#8ED5FF"/>
+      <stop offset="1" stop-color="#67A9FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg)"/>
+  <circle cx="220" cy="160" r="180" fill="#9CCBFF" fill-opacity="0.12"/>
+  <circle cx="1000" cy="160" r="210" fill="#6DAAFF" fill-opacity="0.14"/>
+  <circle cx="690" cy="780" r="260" fill="#0B1830" fill-opacity="0.5"/>
+  <rect x="185" y="110" width="830" height="690" rx="42" fill="url(#card)" stroke="#9DCCFF" stroke-opacity="0.3"/>
+  <rect x="235" y="170" width="730" height="86" rx="24" fill="#0A1730" fill-opacity="0.7"/>
+  <rect x="260" y="195" width="180" height="32" rx="12" fill="#9CCBFF" fill-opacity="0.25"/>
+  <circle cx="285" cy="211" r="9" fill="#9CCBFF"/>
+  <circle cx="362" cy="211" r="9" fill="#9CCBFF" fill-opacity="0.75"/>
+  <circle cx="438" cy="211" r="9" fill="#9CCBFF" fill-opacity="0.5"/>
+  <g opacity="0.9">
+    <rect x="265" y="302" width="182" height="150" rx="18" fill="#F8FAFF" fill-opacity="0.12"/>
+    <rect x="424" y="302" width="182" height="150" rx="18" fill="#F8FAFF" fill-opacity="0.08"/>
+    <rect x="583" y="302" width="182" height="150" rx="18" fill="#F8FAFF" fill-opacity="0.08"/>
+    <rect x="742" y="302" width="182" height="150" rx="18" fill="#F8FAFF" fill-opacity="0.08"/>
+  </g>
+  <rect x="260" y="520" width="660" height="180" rx="28" fill="#0B1730" fill-opacity="0.75"/>
+  <rect x="295" y="552" width="270" height="18" rx="9" fill="#CDE4FF" fill-opacity="0.75"/>
+  <rect x="295" y="590" width="540" height="16" rx="8" fill="#BCD7FF" fill-opacity="0.45"/>
+  <rect x="295" y="620" width="500" height="16" rx="8" fill="#BCD7FF" fill-opacity="0.3"/>
+  <rect x="866" y="548" width="20" height="120" rx="10" fill="url(#accent)"/>
+  <circle cx="1000" cy="320" r="72" fill="#8ED5FF" fill-opacity="0.12"/>
+  <path d="M428 758C490 650 593 598 700 606C784 612 900 666 944 758H428Z" fill="#9CCBFF" fill-opacity="0.12"/>
+  <g>
+    <rect x="828" y="740" width="118" height="48" rx="18" fill="#8ED5FF" fill-opacity="0.9"/>
+    <text x="862" y="772" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#071A33">JcHub</text>
+  </g>
+</svg>

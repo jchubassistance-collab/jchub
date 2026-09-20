@@ -2,20 +2,35 @@
 
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, ChevronRight, Search, Wrench, X } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { Tool } from '@/lib/tools';
+import { trackEvent } from '@/lib/analytics-client';
 
 type ToolsCatalogProps = {
   tools: Tool[];
 };
 
-const PAGE_SIZE = 12;
+const DESKTOP_PAGE_SIZE = 12;
+const MOBILE_PAGE_SIZE = 4;
 
 export function ToolsCatalog({ tools }: ToolsCatalogProps) {
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DESKTOP_PAGE_SIZE);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('Toutes');
   const categories = ['Toutes', ...Array.from(new Set(tools.map((tool) => tool.category)))];
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 639px)');
+    const updatePageSize = () => {
+      setPageSize(mediaQuery.matches ? MOBILE_PAGE_SIZE : DESKTOP_PAGE_SIZE);
+      setPage(1);
+    };
+    updatePageSize();
+    mediaQuery.addEventListener('change', updatePageSize);
+    return () => mediaQuery.removeEventListener('change', updatePageSize);
+  }, []);
+
   const filteredTools = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return tools.filter((tool) => {
@@ -24,11 +39,11 @@ export function ToolsCatalog({ tools }: ToolsCatalogProps) {
       return matchesCategory && (!normalizedQuery || searchableText.includes(normalizedQuery));
     });
   }, [category, query, tools]);
-  const pageCount = Math.max(1, Math.ceil(filteredTools.length / PAGE_SIZE));
+  const pageCount = Math.max(1, Math.ceil(filteredTools.length / pageSize));
   const currentPage = Math.min(page, pageCount);
-  const visibleTools = filteredTools.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  const firstResult = filteredTools.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
-  const lastResult = Math.min(currentPage * PAGE_SIZE, filteredTools.length);
+  const visibleTools = filteredTools.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const firstResult = filteredTools.length === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const lastResult = Math.min(currentPage * pageSize, filteredTools.length);
 
   const updateQuery = (value: string) => { setQuery(value); setPage(1); };
 
@@ -69,6 +84,7 @@ export function ToolsCatalog({ tools }: ToolsCatalogProps) {
           <Link
             key={tool.slug}
             href={`/outils/${tool.slug}`}
+            onClick={() => trackEvent('tool_click', { tool: tool.slug, category: tool.category })}
             style={{ animationDelay: `${index * 55}ms`, transform: 'perspective(1200px) rotateX(2deg) rotateY(-2deg)' }}
             className="tool-card group flex min-h-[218px] flex-col rounded-[1.5rem] border border-white/10 bg-[rgba(13,28,52,0.8)] p-4 shadow-[0_18px_40px_rgba(7,19,40,0.24)] transition duration-300 hover:-translate-y-1.5 hover:border-[#9ccbff]/40 hover:shadow-[0_20px_50px_rgba(70,103,182,0.24)] backdrop-blur-sm"
           >
@@ -93,7 +109,7 @@ export function ToolsCatalog({ tools }: ToolsCatalogProps) {
       </div> : <div className="rounded-[1.5rem] border border-dashed border-white/10 bg-[rgba(13,28,52,0.8)] px-6 py-16 text-center"><Search className="mx-auto h-8 w-8 text-slate-300" /><h2 className="mt-3 font-black text-white">Aucun outil trouvé</h2><p className="mt-1 text-sm text-slate-400">Essaie un autre mot-clé ou une autre catégorie.</p></div>}
 
       {pageCount > 1 && (
-        <nav className="mt-8 flex items-center justify-center gap-2" aria-label="Pagination des outils">
+        <nav className="mt-8 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2" aria-label="Pagination des outils">
           <button
             type="button"
             onClick={() => goToPage(currentPage - 1)}
@@ -110,7 +126,7 @@ export function ToolsCatalog({ tools }: ToolsCatalogProps) {
               type="button"
               onClick={() => goToPage(pageNumber)}
               aria-current={pageNumber === currentPage ? 'page' : undefined}
-              className={`h-10 min-w-10 rounded-lg border px-3 text-sm font-bold transition ${
+              className={`h-10 min-w-10 shrink-0 rounded-lg border px-2.5 text-sm font-bold transition sm:px-3 ${
                 pageNumber === currentPage
                   ? 'border-brand-600 bg-brand-600 text-white'
                   : 'border-gray-200 bg-white text-gray-700 hover:border-brand-300 hover:text-brand-600'

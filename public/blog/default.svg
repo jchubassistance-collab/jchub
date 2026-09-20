@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">JcHub - Article technique</title>
+  <desc id="desc">Illustration de couverture JcHub pour un article technique.</desc>
+  <rect width="1200" height="630" fill="#07142b"/>
+  <circle cx="1020" cy="90" r="260" fill="#2d67f6" opacity=".22"/>
+  <circle cx="180" cy="570" r="220" fill="#11a873" opacity=".18"/>
+  <path d="M0 500C240 410 390 620 650 490s350-80 550 0v140H0Z" fill="#2d67f6" opacity=".18"/>
+  <rect x="100" y="110" width="108" height="108" rx="24" fill="#2d67f6"/>
+  <text x="154" y="184" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="62" font-weight="700">J</text>
+  <text x="100" y="330" fill="#fff" font-family="Arial,sans-serif" font-size="58" font-weight="700">JcHub</text>
+  <text x="104" y="388" fill="#b9c9e8" font-family="Arial,sans-serif" font-size="28">Outils et idées pour développeurs</text>
+  <path d="M860 300h180M860 360h130M860 420h160" stroke="#fff" stroke-width="18" stroke-linecap="round" opacity=".8"/>
+</svg>

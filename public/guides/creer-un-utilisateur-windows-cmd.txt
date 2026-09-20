@@ -1,0 +1,19 @@
+JCHUB — CRÉER UN UTILISATEUR WINDOWS AVEC CMD
+
+1. Ouvre l’invite de commandes en tant qu’administrateur.
+
+2. Crée l’utilisateur :
+   net user nouveau_user * /add
+
+   Windows te demandera le mot de passe sans l’afficher à l’écran.
+
+3. Ajoute-le au groupe des utilisateurs standard :
+   net localgroup Users nouveau_user /add
+
+4. Vérifie le compte :
+   net user nouveau_user
+
+5. Pour supprimer le compte plus tard :
+   net user nouveau_user /delete
+
+Remplace nouveau_user par le nom souhaité. N’utilise pas un mot de passe écrit directement dans la commande sur une machine partagée.

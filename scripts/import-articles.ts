@@ -55,7 +55,8 @@ async function run() {
   const files = readdirSync(resolve(process.cwd(), 'content/blog')).filter((file) => /^\d{2}-.+\.md$/.test(file)).sort();
   const now = new Date();
 
-  for (const [index, file] of files.entries()) {
+  for (let index = 0; index < files.length; index += 1) {
+    const file = files[index];
     const source = readFileSync(resolve(process.cwd(), 'content/blog', file), 'utf8');
     const parsed = matter(source);
     const data = parsed.data as Frontmatter;
@@ -91,6 +92,6 @@ async function run() {
 }
 
 run().catch((error: unknown) => {
-  console.error('[BLOG] Import échoué:', error);
+  console.error('Une erreur est survenue. Veuillez réessayer.');
   process.exitCode = 1;
 });

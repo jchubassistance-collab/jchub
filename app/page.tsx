@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Check, Code2, ShieldCheck, Sparkles, Wrench } from 'lucide-react';
 import { tools } from '@/lib/tools';
 import { Newsletter } from '@/components/Newsletter';
+import { PwaInstall } from '@/components/PwaInstall';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,17 +28,17 @@ export default async function HomePage() {
         <div className="relative mx-auto max-w-7xl px-5 pb-14 pt-8 sm:px-8 lg:min-h-[820px] lg:pb-20">
           <div className="flex items-center justify-end" aria-hidden="true" />
 
-          <div className="mt-8 grid items-center gap-10 lg:mt-12 lg:grid-cols-[1.1fr_0.9fr]" style={{ transform: 'perspective(1200px) rotateX(1.5deg) rotateY(-2deg)' }}>
-            <div className="max-w-xl">
-              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.28em] text-[#b6d6ff]">Trouvez le bon outil</p>
+          <div className="mt-5 grid items-center gap-6 lg:mt-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10" style={{ transform: 'perspective(1200px) rotateX(1.5deg) rotateY(-2deg)' }}>
+            <div className="order-last max-w-xl lg:order-first">
+              <p className="mb-4 hidden text-sm font-semibold uppercase tracking-[0.28em] text-[#b6d6ff] sm:block">Trouvez le bon outil</p>
               <h1 className="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
                 Des solutions utiles pour avancer sans friction.
               </h1>
-              <p className="mt-5 max-w-lg text-base leading-relaxed text-slate-200 sm:text-lg">
+              <p className="mt-4 hidden max-w-lg text-base leading-relaxed text-slate-200 sm:mt-5 sm:block sm:text-lg">
                 JcHub regroupe des outils pratiques, des ressources claires et des workflows pensé pour gagner du temps dans le quotidien numérique.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center gap-4">
+              <div className="mt-5 flex flex-wrap items-center gap-4 sm:mt-8">
                 <Link
                   href="/outils"
                   className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#0b1730] transition hover:scale-[1.02] hover:bg-[#eaf3ff]"
@@ -45,32 +47,36 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-5 text-sm text-slate-200">
+              <div className="mt-8 hidden flex-wrap gap-5 text-sm text-slate-200 sm:flex">
                 <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#9ccbff]" /> Outils gratuits</span>
                 <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#9ccbff]" /> Sans jargon</span>
                 <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#9ccbff]" /> 100% utiles</span>
               </div>
             </div>
 
-            <div className="relative mx-auto ml-auto w-full max-w-[560px]">
+            <div className="relative order-first mx-auto ml-auto w-full max-w-[560px] lg:order-last">
               <div className="absolute -left-8 top-10 h-36 w-36 rounded-full bg-[#a9d0ff]/20 blur-3xl" />
               <div className="absolute -right-8 bottom-6 h-32 w-32 rounded-full bg-[#dfeeff]/10 blur-3xl" />
 
               <div className="relative overflow-hidden rounded-[2rem] border border-[#9ccbff]/20 bg-white/5 p-3 shadow-[0_35px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm" style={{ transform: 'perspective(1200px) rotateX(4deg) rotateY(-5deg)' }}>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(110,168,255,0.15),_transparent_30%),linear-gradient(135deg,_rgba(8,13,23,0.5),_rgba(24,37,58,0.15))]" />
                 <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'linear-gradient(rgba(156,203,255,0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(156,203,255,0.14) 1px, transparent 1px)', backgroundSize: '22px 22px', maskImage: 'radial-gradient(circle at center, black 35%, transparent 100%)' }} />
-                <img
-                  src="/heros.png"
+                <Image
+                  src="/hero-abstract.svg"
                   alt="Illustration JcHub"
-                  className="relative h-[440px] w-full rounded-[1.5rem] object-cover sm:h-[500px] lg:h-[560px]"
+                  width={1200}
+                  height={900}
+                  priority
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 70vw, 560px"
+                  className="relative h-[330px] w-full rounded-[1.5rem] object-cover sm:h-[500px] lg:h-[560px]"
                 />
 
-                <div className="absolute left-6 top-6 flex items-center gap-2 rounded-full border border-cyan-300/30 bg-[#081426]/75 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-100 shadow-[0_0_18px_rgba(103,184,255,0.15)] backdrop-blur-md">
+                <div className="absolute left-6 top-6 hidden items-center gap-2 rounded-full border border-cyan-300/30 bg-[#081426]/75 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-100 shadow-[0_0_18px_rgba(103,184,255,0.15)] backdrop-blur-md sm:flex">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
                   live stack
                 </div>
 
-                <div className="absolute bottom-6 left-6 right-6 rounded-2xl border border-white/10 bg-[#071224]/90 p-4 shadow-[0_22px_45px_rgba(7,17,34,0.5)] backdrop-blur-md">
+                <div className="absolute bottom-6 left-6 right-6 hidden rounded-2xl border border-white/10 bg-[#071224]/90 p-4 shadow-[0_22px_45px_rgba(7,17,34,0.5)] backdrop-blur-md sm:block">
                   <div className="mb-3 flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-slate-300">
                     <span>system</span>
                     <span className="text-emerald-300">online</span>
@@ -96,13 +102,13 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              <div className="absolute -left-4 bottom-8 rounded-2xl border border-white/10 bg-[#0d1c38]/90 px-4 py-3 shadow-[0_20px_40px_rgba(5,12,25,0.4)] backdrop-blur-md">
+              <div className="absolute -left-4 bottom-8 hidden rounded-2xl border border-white/10 bg-[#0d1c38]/90 px-4 py-3 shadow-[0_20px_40px_rgba(5,12,25,0.4)] backdrop-blur-md sm:block">
                 <div className="text-xs uppercase tracking-[0.2em] text-[#9ccbff]">Performance</div>
                 <div className="mt-2 text-2xl font-black text-white">+45%</div>
                 <div className="text-xs text-slate-300">gain de temps</div>
               </div>
 
-              <div className="absolute -right-3 top-8 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 shadow-[0_20px_40px_rgba(11,20,40,0.35)] backdrop-blur-md">
+              <div className="absolute -right-3 top-8 hidden rounded-2xl border border-white/10 bg-white/10 px-4 py-3 shadow-[0_20px_40px_rgba(11,20,40,0.35)] backdrop-blur-md sm:block">
                 <div className="text-xs uppercase tracking-[0.2em] text-[#dfeeff]">Focus</div>
                 <div className="mt-2 text-sm font-semibold text-white">Outils & ressources</div>
               </div>
@@ -114,9 +120,10 @@ export default async function HomePage() {
       <main className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <section className="mb-16 grid gap-4 sm:grid-cols-3">
           <QuickLink href="/outils" icon={<Wrench className="h-5 w-5 text-[#9ccbff]" />} title="Outils gratuits" meta="Résoudre maintenant" />
-          <QuickLink href="/blog" icon={<Sparkles className="h-5 w-5 text-[#9ccbff]" />} title="Ressources" meta="Guides pratiques" />
           <QuickLink href="/contact" icon={<Code2 className="h-5 w-5 text-[#9ccbff]" />} title="Contact" meta="Parlons projets" />
         </section>
+
+        <PwaInstall />
 
         <section className="mb-16">
           <SectionTitle eyebrow="OUTILS PRATIQUES" title="Ce dont tu as besoin, sans distraction." action="Tous les outils" href="/outils" />
@@ -175,8 +182,8 @@ export default async function HomePage() {
             <p className="mx-auto max-w-2xl text-slate-300">JcHub est ouvert aux écoles, communautés, entreprises et créateurs qui souhaitent rendre les compétences numériques plus accessibles.</p>
 
             <div className="mt-2 grid gap-4 sm:grid-cols-2">
-              <Partner name="GitHub" logo="/partners/github.svg" />
-              <Partner name="2MD Designer" logo="/partners/2md-designer.svg" />
+              <Partner name="njdwebs" logo="/partners/njd_web_logo.svg" href="https://njdwebs.com" />
+              <Partner name="2MD Designer" logo="/partners/2md-designer.svg" href="https://2md-designer.com" />
             </div>
 
             <div className="pt-2">
@@ -253,12 +260,19 @@ function Benefit({ text }: { text: string }) {
   );
 }
 
-function Partner({ name, logo }: { name: string; logo: string }) {
+function Partner({ name, logo, href }: { name: string; logo: string; href?: string }) {
   return (
     <div className="group grid min-h-40 place-items-center rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_top,_rgba(156,203,255,0.12),_rgba(9,18,35,0.7))] p-5 transition duration-300 hover:-translate-y-1 hover:border-[#9ccbff]/50 hover:shadow-[0_18px_40px_rgba(60,110,210,0.18)] backdrop-blur-sm" style={{ transform: 'perspective(1200px) rotateX(2deg) rotateY(-2deg)' }}>
-      <div className="flex h-24 w-full items-center justify-center rounded-2xl bg-white/[0.03] ring-1 ring-white/5">
-        <img src={logo} alt={`Logo ${name}`} className="h-16 w-auto max-w-[72%] object-contain opacity-90 transition duration-300 group-hover:scale-[1.04] group-hover:opacity-100" />
-      </div>
+      <a href={href} aria-label={`Visiter le site de ${name}`} className="flex h-24 w-full items-center justify-center rounded-2xl bg-white/[0.03] ring-1 ring-white/5">
+        <Image
+          src={logo}
+          alt={`Logo ${name}`}
+          width={240}
+          height={96}
+          sizes="240px"
+          className="h-16 w-auto max-w-[72%] object-contain opacity-90 transition duration-300 group-hover:scale-[1.04] group-hover:opacity-100"
+        />
+      </a>
     </div>
   );
 }

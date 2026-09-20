@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Mail, MessageCircle, MapPin, Phone, Send, Sparkles, ArrowRight, Check, Clock } from 'lucide-react';
+import { TurnstileWidget } from '@/components/TurnstileWidget';
 
 const contactMethods = [
   {
@@ -56,6 +57,7 @@ export default function ContactPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +67,7 @@ export default function ContactPage() {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, turnstileToken }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Envoi impossible.');
@@ -89,19 +91,19 @@ export default function ContactPage() {
         <div className="relative mx-auto max-w-7xl px-5 pb-20 pt-8 sm:px-8 lg:min-h-[920px] lg:pb-28 lg:pt-10">
           <div className="flex items-center justify-end" aria-hidden="true" />
 
-          <div className="mt-10 grid items-center gap-10 lg:mt-16 lg:grid-cols-[1.08fr_0.92fr]" style={{ transform: 'perspective(1200px) rotateX(1.5deg) rotateY(-2deg)' }}>
-            <div className="max-w-xl">
-              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.28em] text-[#b6d6ff]">On te répond vite</p>
+          <div className="mt-5 grid items-center gap-6 lg:mt-16 lg:grid-cols-[1.08fr_0.92fr] lg:gap-10" style={{ transform: 'perspective(1200px) rotateX(1.5deg) rotateY(-2deg)' }}>
+            <div className="order-last max-w-xl lg:order-first">
+              <p className="mb-4 hidden text-sm font-semibold uppercase tracking-[0.28em] text-[#b6d6ff] sm:block">On te répond vite</p>
               <h1 className="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
                 Une question ?
                 <span className="mt-2 block text-[#9ccbff]">Parlons-en ensemble.</span>
               </h1>
-              <p className="mt-5 max-w-lg text-base leading-relaxed text-slate-200 sm:text-lg">
+              <p className="mt-4 hidden max-w-lg text-base leading-relaxed text-slate-200 sm:mt-5 sm:block sm:text-lg">
                 Notre équipe est basée à <strong className="text-white">Brazzaville</strong> et répond à tous
                 tes messages. Que ce soit pour un bug, un partenariat ou juste dire bonjour.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center gap-4">
+              <div className="mt-5 flex flex-wrap items-center gap-4 sm:mt-8">
                 <a
                   href="#contact-form"
                   className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#0b1730] transition hover:scale-[1.02] hover:bg-[#eaf3ff]"
@@ -116,32 +118,32 @@ export default function ContactPage() {
                 </a>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-5 text-sm text-slate-200">
+              <div className="mt-8 hidden flex-wrap gap-5 text-sm text-slate-200 sm:flex">
                 <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#9ccbff]" /> Réponse sous 24h</span>
                 <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#9ccbff]" /> Support local</span>
                 <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#9ccbff]" /> Équipe disponible</span>
               </div>
             </div>
 
-            <div className="relative mx-auto ml-auto w-full max-w-[560px]">
+            <div className="relative order-first mx-auto ml-auto w-full max-w-[560px] lg:order-last">
               <div className="absolute -left-8 top-10 h-36 w-36 rounded-full bg-[#a9d0ff]/20 blur-3xl" />
               <div className="absolute -right-8 bottom-6 h-32 w-32 rounded-full bg-[#dfeeff]/10 blur-3xl" />
 
               <div className="relative overflow-hidden rounded-[2rem] border border-[#9ccbff]/20 bg-white/5 p-3 shadow-[0_35px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm" style={{ transform: 'perspective(1200px) rotateX(4deg) rotateY(-5deg)' }}>
                 <img
-                  src="/tel.png"
+                  src="/contact-abstract.svg"
                   alt="Une équipe qui échange"
-                  className="h-[520px] w-full rounded-[1.5rem] object-contain bg-[#0d1c38] sm:h-[560px] lg:h-[640px]"
+                  className="h-[340px] w-full rounded-[1.5rem] object-contain bg-[#0d1c38] sm:h-[560px] lg:h-[640px]"
                 />
               </div>
 
-              <div className="absolute -left-4 bottom-8 rounded-2xl border border-white/10 bg-[#0d1c38]/90 px-4 py-3 shadow-[0_20px_40px_rgba(5,12,25,0.4)] backdrop-blur-md">
+              <div className="absolute -left-4 bottom-8 hidden rounded-2xl border border-white/10 bg-[#0d1c38]/90 px-4 py-3 shadow-[0_20px_40px_rgba(5,12,25,0.4)] backdrop-blur-md sm:block">
                 <div className="text-xs uppercase tracking-[0.2em] text-[#9ccbff]">Support</div>
                 <div className="mt-2 text-2xl font-black text-white">24h</div>
                 <div className="text-xs text-slate-300">réponse max</div>
               </div>
 
-              <div className="absolute -right-3 top-8 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 shadow-[0_20px_40px_rgba(11,20,40,0.35)] backdrop-blur-md">
+              <div className="absolute -right-3 top-8 hidden rounded-2xl border border-white/10 bg-white/10 px-4 py-3 shadow-[0_20px_40px_rgba(11,20,40,0.35)] backdrop-blur-md sm:block">
                 <div className="text-xs uppercase tracking-[0.2em] text-[#dfeeff]">Local</div>
                 <div className="mt-2 text-sm font-semibold text-white">Brazzaville, Congo</div>
               </div>
@@ -259,6 +261,7 @@ export default function ContactPage() {
                         />
                       </div>
 
+                      <TurnstileWidget onToken={setTurnstileToken} />
                       <button
                         type="submit"
                         disabled={loading}

@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import { z } from 'zod';
+import { verifyTurnstileToken } from '@/lib/turnstile';
+import { reportUserError } from '@/lib/user-error';
+
+const newsletterSchema = z.object({
+  email: z.string().trim().email().max(254),
+  turnstileToken: z.string().max(4096).optional(),
+}).strict();
 
 function getRequiredEnvironment(name: string): string {
   const value = process.env[name]?.trim();
@@ -19,23 +27,23 @@ export async function POST(request: NextRequest) {
 
     const adminDb = getAdminDb();
 
-    const { email } = await request.json();
-
-    const normalizedEmail =
-      typeof email === 'string'
-        ? email.trim().toLowerCase()
-        : '';
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    const parsedBody = newsletterSchema.safeParse(await request.json().catch(() => null));
+    if (!parsedBody.success) {
       return NextResponse.json(
         { error: 'Adresse e-mail invalide.' },
         { status: 400 }
       );
     }
+    if (!await verifyTurnstileToken(parsedBody.data.turnstileToken, request)) {
+      return NextResponse.json({ error: 'Vérification anti-abus échouée. Réessaie.' }, { status: 403 });
+    }
+    const normalizedEmail = parsedBody.data.email.toLowerCase();
 
     const subscriberRef = adminDb
       .collection('newsletter_subscribers')
       .doc(normalizedEmail);
+    const existingSubscriber = await subscriberRef.get();
+    const shouldSendWelcome = !existingSubscriber.exists || existingSubscriber.data()?.status !== 'active';
 
     await subscriberRef.set(
       {
@@ -70,7 +78,7 @@ export async function POST(request: NextRequest) {
 
     if (!brevoResponse.ok) {
       const brevoError = await brevoResponse.text();
-      console.error('Erreur Brevo newsletter:', brevoResponse.status, brevoError);
+      reportUserError();
       await subscriberRef.update({
         status: 'pending',
         brevoStatus: 'failed',
@@ -90,14 +98,37 @@ export async function POST(request: NextRequest) {
       updatedAt: FieldValue.serverTimestamp(),
     });
 
+    if (!shouldSendWelcome) {
+      return NextResponse.json({ success: true, alreadySubscribed: true });
+    }
+
+    const senderEmail = getRequiredEnvironment('BREVO_SENDER_EMAIL');
+    const senderName = process.env.BREVO_SENDER_NAME?.trim() || 'JcHub';
+    const confirmationResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'api-key': getRequiredEnvironment('BREVO_API_KEY'),
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        sender: { email: senderEmail, name: senderName },
+        to: [{ email: normalizedEmail }],
+        subject: 'Bienvenue dans la newsletter JcHub',
+        textContent: `Bonjour,\n\nTon inscription à la newsletter JcHub est confirmée.\nTu recevras nos nouveaux outils et articles directement par email.\n\nÀ bientôt,\nL’équipe JcHub`,
+      }),
+      cache: 'no-store',
+    });
+
+    if (!confirmationResponse.ok) {
+      reportUserError();
+    }
+
     return NextResponse.json({
       success: true,
     });
   } catch (error) {
-    console.error(
-      'Erreur inscription newsletter:',
-      error
-    );
+    reportUserError();
 
     return NextResponse.json(
       {

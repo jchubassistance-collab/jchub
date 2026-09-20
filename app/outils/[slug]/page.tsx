@@ -16,6 +16,9 @@ import { NumberBaseConverter } from '@/app/tools/jchub-tools/NumberBaseConverter
 import { QrCodeGenerator } from '@/app/tools/jchub-tools/QrCodeGenerator';
 import { TimestampConverter } from '@/app/tools/jchub-tools/TimestampConverter';
 import { UrlEncoder } from '@/app/tools/jchub-tools/UrlEncoder';
+import { PdfToWord } from '@/components/tools/PdfToWord';
+import { ExcelToCsvTool } from '@/components/tools/ExcelToCsvTool';
+import { CsvToExcelTool } from '@/components/tools/CsvToExcelTool';
 
 const componentMap = {
   PasswordGenerator,
@@ -23,6 +26,9 @@ const componentMap = {
   Base64Tool,
   UuidGenerator,
   RegexTester,
+  PdfToWord,
+  ExcelToCsvTool,
+  CsvToExcelTool,
   ColorConverter,
   HashGenerator,
   JwtDecoder,
@@ -40,15 +46,20 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const tool = await getToolBySlug(params.slug);
   if (!tool) return {};
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
+  const toolUrl = `${baseUrl}/outils/${tool.slug}`;
   return {
     title: tool.seo.title,
     description: tool.seo.description,
     keywords: tool.seo.keywords,
+    alternates: { canonical: toolUrl },
     openGraph: {
       title: tool.seo.title,
       description: tool.seo.description,
+      url: toolUrl,
       type: 'website',
     },
+    twitter: { card: 'summary', title: tool.seo.title, description: tool.seo.description },
   };
 }
 

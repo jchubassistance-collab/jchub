@@ -1,3 +1,8 @@
+import 'server-only';
+
+import { createHash } from 'node:crypto';
+import { v2 as cloudinary } from 'cloudinary';
+
 // lib/cloudinary.ts — Helper Cloudinary pour JcHub
 // Utilisé pour : PDF, audio (livres), covers, images
 
@@ -16,6 +21,26 @@ export type CloudinaryResource = {
   bytes: number;
   resource_type: 'image' | 'video' | 'raw';
 };
+
+export function signedCloudinaryDownloadUrl(publicId: string, format = 'pdf'): string {
+  if (!API_KEY || !API_SECRET || CLOUD_NAME === 'demo') {
+    throw new Error('Cloudinary non configuré pour les téléchargements privés');
+  }
+
+  cloudinary.config({
+    cloud_name: CLOUD_NAME,
+    api_key: API_KEY,
+    api_secret: API_SECRET,
+    secure: true,
+  });
+
+  const rawPublicId = /\.[a-z0-9]+$/i.test(publicId) ? publicId : `${publicId}.${format}`;
+  return cloudinary.utils.private_download_url(rawPublicId, format, {
+    resource_type: 'raw',
+    type: 'upload',
+    attachment: true,
+  });
+}
 
 /**
  * Construit une URL Cloudinary avec transformations
@@ -114,11 +139,26 @@ export async function uploadToCloudinary(
     throw new Error('Cloudinary non configuré');
   }
 
+  const timestamp = Math.floor(Date.now() / 1000);
+  const signatureParameters = [
+    `folder=${folder}`,
+    ...(publicId ? [`public_id=${publicId}`] : []),
+    `timestamp=${timestamp}`,
+  ].join('&');
+  const signature = createHash('sha1')
+    .update(`${signatureParameters}${API_SECRET}`)
+    .digest('hex');
   const formData = new FormData();
-  formData.append('file', file as any);
+  if (file instanceof Buffer) {
+    formData.append('file', new Blob([file as unknown as ArrayBuffer]), publicId || 'upload');
+  } else {
+    formData.append('file', file as Blob);
+  }
   formData.append('api_key', API_KEY);
   formData.append('folder', folder);
   if (publicId) formData.append('public_id', publicId);
+  formData.append('timestamp', String(timestamp));
+  formData.append('signature', signature);
 
   const response = await fetch(
     `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`,
@@ -129,7 +169,8 @@ export async function uploadToCloudinary(
   );
 
   if (!response.ok) {
-    throw new Error(`Cloudinary upload failed: ${response.statusText}`);
+    const details = await response.text();
+    throw new Error(`Cloudinary upload failed (${response.status}): ${details.slice(0, 300)}`);
   }
 
   return await response.json();

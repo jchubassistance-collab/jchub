@@ -1,6 +1,5 @@
 // lib/tools.ts — Catalogue des outils JcHub
-
-import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
+import { reportUserError } from '@/lib/user-error';
 
 export type Tool = {
   slug: string;
@@ -17,6 +16,8 @@ export type Tool = {
     keywords: string[];
   };
 };
+
+const DISABLED_TOOL_SLUGS = new Set(['images-en-pdf']);
 
 export const tools: Tool[] = [
   {
@@ -92,6 +93,51 @@ export const tools: Tool[] = [
       title: 'Regex Tester en ligne gratuit — JcHub',
       description: 'Teste et débugge tes expressions régulières avec highlighting.',
       keywords: ['regex tester', 'tester regex'],
+    },
+  },
+  {
+    slug: 'excel-vers-csv',
+    name: 'Excel vers CSV',
+    description: 'Convertis un fichier Excel en CSV en gardant les données tabulaires structurées.',
+    category: 'Document',
+    icon: '📊',
+    tags: ['excel', 'csv', 'tableur', 'conversion'],
+    component: 'ExcelToCsvTool',
+    status: 'published',
+    seo: {
+      title: 'Convertir Excel en CSV gratuitement — JcHub',
+      description: 'Transforme un fichier Excel en CSV proprement structuré en quelques secondes.',
+      keywords: ['excel vers csv', 'convertir excel en csv', 'xlsx csv'],
+    },
+  },
+  {
+    slug: 'csv-vers-excel',
+    name: 'CSV vers Excel',
+    description: 'Transforme un fichier CSV en tableau Excel .xlsx directement depuis le navigateur.',
+    category: 'Document',
+    icon: '📈',
+    tags: ['csv', 'excel', 'xlsx', 'conversion'],
+    component: 'CsvToExcelTool',
+    status: 'published',
+    seo: {
+      title: 'Convertir CSV en Excel gratuitement — JcHub',
+      description: 'Crée un fichier Excel à partir d’un CSV en gardant les colonnes et les lignes.',
+      keywords: ['csv vers excel', 'convertir csv en excel', 'csv xlsx'],
+    },
+  },
+  {
+    slug: 'pdf-to-word',
+    name: 'PDF vers Word',
+    description: 'Convertis un PDF en document Word DOCX directement depuis le navigateur.',
+    category: 'Document',
+    icon: '📄',
+    tags: ['pdf', 'word', 'docx', 'conversion'],
+    component: 'PdfToWord',
+    status: 'published',
+    seo: {
+      title: 'Convertir PDF en Word gratuitement — JcHub',
+      description: 'Transforme facilement un fichier PDF en document Word DOCX en quelques secondes.',
+      keywords: ['pdf vers word', 'convertir pdf en word', 'docx', 'pdf to word'],
     },
   },
   {
@@ -235,21 +281,46 @@ function toToolRecord(data: Record<string, any>): Tool {
 }
 
 export async function getPublishedTools(): Promise<Tool[]> {
-  if (!hasFirebaseAdminConfig()) {
+  const hasConfig = Boolean(
+    process.env.FIREBASE_PROJECT_ID
+    && process.env.FIREBASE_CLIENT_EMAIL
+    && process.env.FIREBASE_PRIVATE_KEY,
+  );
+
+  if (!hasConfig) {
     return tools;
   }
 
   try {
+    const { getAdminDb } = await import('@/lib/firebase-admin');
     const snapshot = await getAdminDb().collection('tools').where('status', '==', 'published').get();
     const fromFirestore = snapshot.docs.map((document) => toToolRecord(document.data()));
-    return fromFirestore.length > 0 ? fromFirestore : tools;
+
+    if (fromFirestore.length === 0) {
+      return tools;
+    }
+
+    const mergedBySlug = new Map<string, Tool>();
+
+    for (const tool of tools) {
+      mergedBySlug.set(tool.slug, tool);
+    }
+
+    for (const tool of fromFirestore) {
+      if (tool.slug) {
+        mergedBySlug.set(tool.slug, tool);
+      }
+    }
+
+    return Array.from(mergedBySlug.values()).filter((tool) => !DISABLED_TOOL_SLUGS.has(tool.slug));
   } catch (error) {
-    console.error('Erreur chargement outils Firestore:', error);
+    reportUserError();
     return tools;
   }
 }
 
 export async function getToolBySlug(slug: string): Promise<Tool | null> {
+  if (DISABLED_TOOL_SLUGS.has(slug)) return null;
   const toolList = await getPublishedTools();
-  return toolList.find((tool) => tool.slug === slug) ?? null;
+  return toolList.find((tool) => tool.slug === slug) ?? tools.find((tool) => tool.slug === slug) ?? null;
 }

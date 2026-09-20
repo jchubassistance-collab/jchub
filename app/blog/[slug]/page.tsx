@@ -14,12 +14,17 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = await getPublishedArticleBySlug(params.slug);
   if (!article) return {};
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
+  const articleUrl = `${baseUrl}/blog/${article.slug}`;
+  const imageUrl = article.image.startsWith('http') ? article.image : `${baseUrl}${article.image.startsWith('/') ? '' : '/'}${article.image}`;
   return {
     title: article.title,
     description: article.description,
     keywords: article.keywords,
     authors: [{ name: article.author }],
-    openGraph: { title: article.title, description: article.description, type: 'article', images: [article.image] },
+    alternates: { canonical: articleUrl },
+    openGraph: { title: article.title, description: article.description, url: articleUrl, type: 'article', images: [{ url: imageUrl, width: 1200, height: 630, alt: article.title }] },
+    twitter: { card: 'summary_large_image', title: article.title, description: article.description, images: [imageUrl] },
   };
 }
 

@@ -1,4 +1,8 @@
+import 'server-only';
+
 export type MtnEnvironment = 'sandbox' | 'production';
+
+import { reportUserError } from '@/lib/user-error';
 
 export function generateTransactionId(prefix = 'JCH'): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
@@ -59,7 +63,7 @@ export async function getMtnAccessToken(): Promise<string | null> {
     const data = await response.json();
     return data.access_token || null;
   } catch (error) {
-    console.error('[MTN] token request failed:', error);
+    reportUserError();
     throw error;
   }
 }

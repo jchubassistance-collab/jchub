@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { getAdminDb } from '@/lib/firebase-admin';
+import { reportUserError } from '@/lib/user-error';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.json({ success: true, scanned: result.resources?.length || 0, draftsCreated: created });
   } catch (error) {
-    console.error('Erreur cron audio:', error);
+    reportUserError();
     return NextResponse.json({ success: false, error: 'Synchronisation impossible.' }, { status: 500 });
   }
 }

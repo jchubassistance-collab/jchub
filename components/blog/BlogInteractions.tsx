@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Check, Copy, Eye, Linkedin, MessageCircle, Twitter } from 'lucide-react';
+import { trackEvent } from '@/lib/analytics-client';
 
 export function BlogInteractions({ slug, title }: { slug: string; title: string }) {
   const [views, setViews] = useState<number | null>(null);
@@ -16,6 +17,7 @@ export function BlogInteractions({ slug, title }: { slug: string; title: string 
   }, [slug]);
 
   const share = (network: 'twitter' | 'linkedin') => {
+    trackEvent('social_click', { network, content_type: 'article' });
     const shareUrl = encodeURIComponent(window.location.href);
     const shareTitle = encodeURIComponent(title);
     const target = network === 'twitter'
@@ -26,6 +28,7 @@ export function BlogInteractions({ slug, title }: { slug: string; title: string 
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(window.location.href);
+    trackEvent('social_click', { network: 'copy_link', content_type: 'article' });
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   };

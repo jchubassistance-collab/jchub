@@ -180,6 +180,11 @@ export async function signOut(): Promise<void> {
   await fbSignOut(auth);
 }
 
+export async function getCurrentIdToken(): Promise<string> {
+  if (!auth.currentUser) throw new Error('Session Firebase introuvable.');
+  return auth.currentUser.getIdToken(true);
+}
+
 export async function resetPassword(email: string): Promise<void> {
   await sendPasswordResetEmail(auth, email);
 }

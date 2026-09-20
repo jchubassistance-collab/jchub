@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import type { BlogArticle } from '@/lib/blog';
 
 export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
-  const pageSize = 6;
+  const pageSize = 8;
   const categories = ['Tous', ...Array.from(new Set(articles.map((article) => article.category)))];
   const [category, setCategory] = useState('Tous');
   const [query, setQuery] = useState('');
@@ -104,20 +104,20 @@ export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
       )}
 
       {pageCount > 1 && (
-        <nav className="mt-8 flex items-center justify-center gap-2" aria-label="Pagination des articles">
-          <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1} className="rounded-lg border border-white/10 bg-[#071526] px-3 py-2 text-sm font-semibold text-slate-200 disabled:opacity-40">Précédent</button>
+        <nav className="mt-8 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2" aria-label="Pagination des articles">
+          <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1} aria-label="Page précédente" className="shrink-0 rounded-lg border border-white/10 bg-[#071526] px-2.5 py-2 text-xs font-semibold text-slate-200 disabled:opacity-40 sm:px-3 sm:text-sm"><span className="sm:hidden">Préc.</span><span className="hidden sm:inline">Précédent</span></button>
           {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
             <button
               key={pageNumber}
               type="button"
               onClick={() => setPage(pageNumber)}
               aria-current={currentPage === pageNumber ? 'page' : undefined}
-              className={`h-9 min-w-9 rounded-lg border px-3 text-sm font-bold ${currentPage === pageNumber ? 'border-cyan-400 bg-cyan-400 text-slate-950' : 'border-white/10 bg-[#071526] text-slate-300'}`}
+              className={`h-9 min-w-9 shrink-0 rounded-lg border px-2.5 text-sm font-bold ${currentPage === pageNumber ? 'border-cyan-400 bg-cyan-400 text-slate-950' : 'border-white/10 bg-[#071526] text-slate-300'}`}
             >
               {pageNumber}
             </button>
           ))}
-          <button type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage === pageCount} className="rounded-lg border border-white/10 bg-[#071526] px-3 py-2 text-sm font-semibold text-slate-200 disabled:opacity-40">Suivant</button>
+          <button type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage === pageCount} aria-label="Page suivante" className="shrink-0 rounded-lg border border-white/10 bg-[#071526] px-2.5 py-2 text-xs font-semibold text-slate-200 disabled:opacity-40 sm:px-3 sm:text-sm"><span className="sm:hidden">Suiv.</span><span className="hidden sm:inline">Suivant</span></button>
         </nav>
       )}
     </>

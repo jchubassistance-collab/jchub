@@ -1,6 +1,7 @@
 // lib/pdf-extract.ts — Extraction de texte depuis un PDF
 import pdf from 'pdf-parse';
 import { Buffer } from 'buffer';
+import { reportUserError } from '@/lib/user-error';
 
 export type PdfMetadata = {
   text: string;
@@ -41,7 +42,7 @@ export async function extractPdfFromBuffer(buffer: Buffer): Promise<PdfMetadata>
       },
     };
   } catch (error) {
-    console.error('Erreur extraction PDF:', error);
+    reportUserError();
     throw new Error('Impossible d\'extraire le texte du PDF');
   }
 }

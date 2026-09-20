@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { notifyBrevoNewArticle } from '@/lib/brevo';
+import { reportUserError } from '@/lib/user-error';
 
 export async function POST(request: NextRequest) {
   const authorization = request.headers.get('authorization');
@@ -11,13 +12,17 @@ export async function POST(request: NextRequest) {
   if (!hasFirebaseAdminConfig()) return NextResponse.json({ error: 'Firebase indisponible.' }, { status: 503 });
 
   try {
+    const now = Timestamp.now();
     const snapshot = await getAdminDb().collection('articles')
       .where('status', '==', 'scheduled')
-      .where('scheduledFor', '<=', Timestamp.now())
       .get();
     const articles: string[] = [];
     for (const document of snapshot.docs) {
       const article = document.data();
+      const scheduledFor = article.scheduledFor;
+      if (!scheduledFor || typeof scheduledFor.toMillis !== 'function' || scheduledFor.toMillis() > now.toMillis()) {
+        continue;
+      }
       await document.ref.update({ status: 'published', publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
       const image = String(article.image || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev'}/blog/default.svg`);
       const imageUrl = image.startsWith('http') ? image : `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev'}${image.startsWith('/') ? '' : '/'}${image}`;
@@ -30,11 +35,10 @@ export async function POST(request: NextRequest) {
         category: String(article.category || 'Développement'),
       });
       articles.push(document.id);
-      console.log(`[BLOG] Publication automatique: ${document.id} (Brevo: ${brevoNotified ? 'envoyé' : 'non envoyé'})`);
     }
     return NextResponse.json({ published: articles.length, articles });
   } catch (error) {
-    console.error('[BLOG] Cron publication échoué:', error);
+    reportUserError();
     return NextResponse.json({ error: 'Publication impossible.' }, { status: 500 });
   }
 }

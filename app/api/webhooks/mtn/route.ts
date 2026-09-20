@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/lib/firebase-admin';
 import { subscriptionExpiry, type SubscriptionTier } from '@/lib/subscription';
+import { timingSafeEqual } from 'node:crypto';
+import { reportUserError } from '@/lib/user-error';
+
+function hasValidWebhookSecret(request: NextRequest): boolean {
+  const expected = process.env.MTN_WEBHOOK_SECRET?.trim();
+  if (!expected) return true;
+  const received = request.headers.get('x-mtn-webhook-secret') || request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  if (!received) return false;
+  const expectedBytes = Buffer.from(expected);
+  const receivedBytes = Buffer.from(received);
+  return expectedBytes.length === receivedBytes.length && timingSafeEqual(expectedBytes, receivedBytes);
+}
 
 function normalizeStatus(value: unknown): string {
   if (typeof value === 'string') return value.toUpperCase();
@@ -11,6 +23,9 @@ function normalizeStatus(value: unknown): string {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!hasValidWebhookSecret(request)) {
+      return NextResponse.json({ received: false, error: 'Webhook non autorisé.' }, { status: 401 });
+    }
     const adminDb = getAdminDb();
     const body = await request.json().catch(() => ({}));
 
@@ -142,7 +157,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ received: true, status: 'SUCCESS', warning: 'Type de paiement inconnu' });
   } catch (error: any) {
-    console.error('[MTN] webhook error:', error);
+    reportUserError();
     return NextResponse.json({ received: false, error: error?.message || 'Erreur webhook MTN' }, { status: 500 });
   }
 }

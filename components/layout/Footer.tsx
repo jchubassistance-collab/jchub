@@ -64,6 +64,7 @@ export function Footer() {
       <div className="border-t border-white/10 bg-[#0c2135]/70">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-xs text-slate-400 sm:flex-row sm:justify-between sm:px-6">
           <span>© {new Date().getFullYear()} JcHub. Tous droits réservés.</span>
+          <span>Créé par Jessy Ngnambongo.</span>
         </div>
       </div>
     </footer>

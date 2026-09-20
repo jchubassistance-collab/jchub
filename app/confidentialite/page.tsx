@@ -58,6 +58,7 @@ export default function ConfidentialitePage() {
                 <li><strong className="text-white">Profil public</strong> : nom, email, photo de profil si tu l&apos;utilises</li>
                 <li><strong className="text-white">Onboarding</strong> : niveau, langages connus, centres d&apos;intérêt, objectif</li>
                 <li><strong className="text-white">Usage</strong> : contenus consultés, outils utilisés, progression</li>
+                <li><strong className="text-white">Guides</strong> : adresse e-mail fournie pour débloquer un téléchargement et guide demandé</li>
                 <li><strong className="text-white">Contact</strong> : demande via le formulaire, email ou message reçu</li>
                 <li><strong className="text-white">Technique</strong> : adresse IP, type de navigateur, pages visitées</li>
               </ul>
