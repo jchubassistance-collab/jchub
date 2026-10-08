@@ -3,6 +3,9 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/lib/firebase-admin';
 import { verifyMtnPayment } from '@/lib/mtn';
 import { subscriptionExpiry, type SubscriptionTier } from '@/lib/subscription';
+import { getAdminAuth } from '@/lib/firebase-admin';
+import { enforceRateLimit } from '@/lib/rate-limit';
+import { plans } from '@/lib/pricing';
 
 async function completePayment(reference: string, data: FirebaseFirestore.DocumentData) {
   const adminDb = getAdminDb();
@@ -41,11 +44,19 @@ async function completePayment(reference: string, data: FirebaseFirestore.Docume
 }
 
 export async function GET(request: NextRequest) {
+  const limited = await enforceRateLimit(request, 'payment-status', 40, 60_000);
+  if (limited) return limited;
+  const token = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  if (!token) return NextResponse.json({ status: 'FAILED', error: 'Authentification requise.' }, { status: 401 });
+  let uid: string;
+  try { uid = (await getAdminAuth().verifyIdToken(token)).uid; }
+  catch { return NextResponse.json({ status: 'FAILED', error: 'Authentification requise.' }, { status: 401 }); }
   const reference = request.nextUrl.searchParams.get('reference')?.trim();
   if (!reference) return NextResponse.json({ status: 'FAILED', error: 'Référence manquante' }, { status: 400 });
 
   const payment = await getAdminDb().collection('payments').doc(reference).get();
   if (!payment.exists) return NextResponse.json({ status: 'FAILED', error: 'Transaction introuvable' }, { status: 404 });
+  if (payment.data()?.userId !== uid || payment.data()?.provider !== 'mtn') return NextResponse.json({ status: 'FAILED', error: 'Transaction introuvable' }, { status: 404 });
 
   const storedStatus = payment.data()?.status;
   if (storedStatus === 'success') return NextResponse.json({ status: 'SUCCESS' });
@@ -54,6 +65,11 @@ export async function GET(request: NextRequest) {
   const verification = await verifyMtnPayment(reference);
   const status = verification.status.toUpperCase();
   if (['SUCCESSFUL', 'SUCCESS', 'COMPLETED', 'PAID'].includes(status)) {
+    const expectedAmount = Number(payment.data()?.amount);
+    const plan = plans.find((item) => item.id === payment.data()?.plan);
+    if (!Number.isFinite(verification.amount) || verification.amount !== expectedAmount || !plan || plan.priceXAF !== expectedAmount) {
+      return NextResponse.json({ status: 'PENDING' });
+    }
     await completePayment(reference, payment.data() || {});
     return NextResponse.json({ status: 'SUCCESS' });
   }

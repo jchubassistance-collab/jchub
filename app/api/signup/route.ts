@@ -2,20 +2,18 @@ import { start } from 'workflow/api';
 import { NextRequest, NextResponse } from 'next/server';
 import { handleUserSignup } from '@/workflows/user-signup';
 import { z } from 'zod';
-import { verifyTurnstileToken } from '@/lib/turnstile';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 const signupSchema = z.object({
   email: z.string().trim().email().max(254),
-  turnstileToken: z.string().max(4096).optional(),
-}).strict();
+});
 
 export async function POST(request: NextRequest) {
+  const limited = await enforceRateLimit(request, 'signup', 5, 10 * 60_000);
+  if (limited) return limited;
   const parsedBody = signupSchema.safeParse(await request.json().catch(() => null));
   if (!parsedBody.success) {
     return NextResponse.json({ error: 'Adresse email invalide.' }, { status: 400 });
-  }
-  if (!await verifyTurnstileToken(parsedBody.data.turnstileToken, request)) {
-    return NextResponse.json({ error: 'Vérification anti-abus échouée. Réessaie.' }, { status: 403 });
   }
 
   const run = await start(handleUserSignup, [parsedBody.data.email.toLowerCase()]);

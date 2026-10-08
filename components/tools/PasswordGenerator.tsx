@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Copy, Check, RefreshCw, Shield } from 'lucide-react';
 
 export function PasswordGenerator() {
@@ -15,7 +15,7 @@ export function PasswordGenerator() {
   const [copied, setCopied] = useState(false);
   const [strength, setStrength] = useState(0);
 
-  const generate = () => {
+  const generate = useCallback(() => {
     let charset = '';
     if (options.uppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     if (options.lowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
@@ -34,11 +34,11 @@ export function PasswordGenerator() {
       pwd += charset[array[i] % charset.length];
     }
     setPassword(pwd);
-  };
+  }, [length, options]);
 
   useEffect(() => {
     generate();
-  }, []);
+  }, [generate]);
 
   useEffect(() => {
     let s = 0;
@@ -143,7 +143,7 @@ export function PasswordGenerator() {
       )}
 
       <p className="text-center text-xs text-slate-400">
-        🔒 Génération 100% locale (Web Crypto API). Aucun mot de passe n'est envoyé sur internet.
+        🔒 Génération 100% locale (Web Crypto API). Aucun mot de passe n&apos;est envoyé sur internet.
       </p>
     </div>
   );

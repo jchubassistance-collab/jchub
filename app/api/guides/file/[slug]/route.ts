@@ -14,24 +14,33 @@ export const runtime = 'nodejs';
 
 export async function GET(
   _request: Request,
-  { params }: { params: { slug: string } },
+  { params }: { params: Promise<{ slug: string }> },
 ) {
-  const file = files[params.slug];
+  const { slug } = await params;
+  const file = files[slug];
   if (!file) {
-    const guide = await getGuideBySlug(params.slug);
-    if (!guide || !/^https?:\/\//i.test(guide.downloadUrl)) {
+    const guide = await getGuideBySlug(slug);
+    if (!guide) {
       return NextResponse.json({ error: 'Guide introuvable.' }, { status: 404 });
     }
 
     const sourceUrl = guide.cloudinaryPublicId
       ? signedCloudinaryDownloadUrl(guide.cloudinaryPublicId, guide.format.toLowerCase())
       : guide.downloadUrl;
-    const cloudinaryResponse = await fetch(sourceUrl, { cache: 'no-store' });
+    let parsedUrl: URL;
+    try { parsedUrl = new URL(sourceUrl); }
+    catch { return NextResponse.json({ error: 'Fichier du guide indisponible.' }, { status: 404 }); }
+    if (parsedUrl.protocol !== 'https:' || parsedUrl.hostname !== 'res.cloudinary.com' ||
+        parsedUrl.pathname.split('/')[1] !== (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'demo')) {
+      return NextResponse.json({ error: 'Fichier du guide indisponible.' }, { status: 404 });
+    }
+    const cloudinaryResponse = await fetch(parsedUrl, { cache: 'no-store', signal: AbortSignal.timeout(10_000) });
     if (!cloudinaryResponse.ok) {
       return NextResponse.json({ error: 'Fichier du guide indisponible.' }, { status: 502 });
     }
 
     const contents = await cloudinaryResponse.arrayBuffer();
+    if (contents.byteLength > 50 * 1024 * 1024) return NextResponse.json({ error: 'Fichier du guide trop volumineux.' }, { status: 413 });
     const safeFileName = `${guide.slug}.pdf`;
     return new NextResponse(contents, {
       headers: {

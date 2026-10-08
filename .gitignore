@@ -1,4 +1,5 @@
 .env*
+/.swc
 node_modules
 .next
 .vercel

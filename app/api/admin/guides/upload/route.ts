@@ -81,6 +81,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, slug });
   } catch (error) {
     reportUserError();
-    return NextResponse.json({ error: error instanceof Error ? error.message : 'Impossible dâ€™ajouter le guide.' }, { status: 500 });
+    return NextResponse.json({ error: 'Impossible d’ajouter le guide pour le moment.' }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { getPublicBaseUrl } from '@/lib/site-url';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/api/', '/compte/', '/checkout/'],
     },
-    sitemap: 'https://jchub.dev/sitemap.xml',
+    sitemap: `${getPublicBaseUrl()}/sitemap.xml`,
   };
 }

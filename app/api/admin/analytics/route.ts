@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
     reportUserError();
     return NextResponse.json({
       error: code === 'FORBIDDEN' ? 'Accès refusé.' : 'Rapport Analytics indisponible.',
-      details: code === 'FORBIDDEN' ? undefined : code,
     }, { status: code === 'FORBIDDEN' ? 403 : 500 });
   }
 }

@@ -11,9 +11,12 @@ export async function GET(request: NextRequest) {
     await requireAdmin(request);
     if (!hasFirebaseAdminConfig()) return NextResponse.json({ error: 'Firebase indisponible.' }, { status: 503 });
 
-    const [leadsSnapshot, availableGuides] = await Promise.all([
-      getAdminDb().collection('guide_download_leads').limit(500).get(),
+    const leadsCollection = getAdminDb().collection('guide_download_leads');
+    const [leadsSnapshot, availableGuides, totalLeadsSnapshot, sentEmailsSnapshot] = await Promise.all([
+      leadsCollection.orderBy('downloadedAt', 'desc').limit(10).get(),
       getGuides(),
+      leadsCollection.count().get(),
+      leadsCollection.where('guideEmailStatus', '==', 'sent').count().get(),
     ]);
     const leads = leadsSnapshot.docs.map((document) => {
       const data = document.data();
@@ -26,7 +29,7 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({ guides: availableGuides, leads });
+    return NextResponse.json({ guides: availableGuides, leads, totalLeads: totalLeadsSnapshot.data().count, sentEmails: sentEmailsSnapshot.data().count });
   } catch (error) {
     const code = error instanceof Error ? error.message : 'INTERNAL_ERROR';
     const status = code === 'FORBIDDEN' ? 403 : code === 'UNAUTHORIZED' || code === 'INVALID_TOKEN' ? 401 : 500;

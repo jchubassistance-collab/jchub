@@ -2,13 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { z } from 'zod';
-import { verifyTurnstileToken } from '@/lib/turnstile';
 import { reportUserError } from '@/lib/user-error';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 const newsletterSchema = z.object({
   email: z.string().trim().email().max(254),
-  turnstileToken: z.string().max(4096).optional(),
-}).strict();
+});
 
 function getRequiredEnvironment(name: string): string {
   const value = process.env[name]?.trim();
@@ -17,6 +16,8 @@ function getRequiredEnvironment(name: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = await enforceRateLimit(request, 'newsletter', 3, 10 * 60_000);
+  if (limited) return limited;
   try {
     if (!hasFirebaseAdminConfig()) {
       return NextResponse.json(
@@ -33,9 +34,6 @@ export async function POST(request: NextRequest) {
         { error: 'Adresse e-mail invalide.' },
         { status: 400 }
       );
-    }
-    if (!await verifyTurnstileToken(parsedBody.data.turnstileToken, request)) {
-      return NextResponse.json({ error: 'Vérification anti-abus échouée. Réessaie.' }, { status: 403 });
     }
     const normalizedEmail = parsedBody.data.email.toLowerCase();
 

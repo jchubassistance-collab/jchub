@@ -7,7 +7,7 @@ import { reportUserError } from '@/lib/user-error';
 
 function hasValidWebhookSecret(request: NextRequest): boolean {
   const expected = process.env.MTN_WEBHOOK_SECRET?.trim();
-  if (!expected) return true;
+  if (!expected) return false;
   const received = request.headers.get('x-mtn-webhook-secret') || request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
   if (!received) return false;
   const expectedBytes = Buffer.from(expected);
@@ -23,6 +23,8 @@ function normalizeStatus(value: unknown): string {
 
 export async function POST(request: NextRequest) {
   try {
+    const contentLength = Number(request.headers.get('content-length') || 0);
+    if (contentLength > 64 * 1024) return NextResponse.json({ received: false, error: 'Requête invalide.' }, { status: 413 });
     if (!hasValidWebhookSecret(request)) {
       return NextResponse.json({ received: false, error: 'Webhook non autorisé.' }, { status: 401 });
     }
@@ -32,13 +34,16 @@ export async function POST(request: NextRequest) {
     const status = normalizeStatus(body.status ?? body.state ?? body.transactionStatus ?? body.resultCode ?? body.data?.status);
     const reference = String(body.reference ?? body.externalId ?? body.transactionId ?? body.data?.reference ?? body.data?.transactionId ?? body.id ?? '');
 
-    if (!reference) {
+    if (!/^[A-Za-z0-9_-]{8,100}$/.test(reference)) {
       return NextResponse.json({ received: false, error: 'reference MTN manquante' }, { status: 400 });
     }
 
     const paymentRef = adminDb.collection('payments').doc(reference);
     const paymentSnapshot = await paymentRef.get();
     const paymentData = paymentSnapshot.data();
+    if (!paymentSnapshot.exists || paymentData?.provider !== 'mtn') {
+      return NextResponse.json({ received: false, error: 'Transaction inconnue.' }, { status: 404 });
+    }
     if (paymentData?.status === 'success') {
       return NextResponse.json({ received: true, alreadyProcessed: true });
     }
@@ -60,27 +65,38 @@ export async function POST(request: NextRequest) {
       bookSlug: metadata.bookSlug || paymentData?.bookSlug,
     };
 
-    const userId = metadata.userId || body.userId || body.data?.userId;
+    const userId = paymentData.userId;
     if (!userId) {
       return NextResponse.json({ received: false, error: 'userId manquant' }, { status: 400 });
     }
 
     const isSuccessful = ['SUCCESS', 'SUCCESSFUL', 'COMPLETED', 'PAID'].includes(status);
+    const isPending = ['PENDING', 'PROCESSING', 'ACCEPTED'].includes(status);
+    const isFailed = ['FAILED', 'REJECTED', 'CANCELLED', 'DECLINED'].includes(status);
+    if (!isSuccessful && !isPending && !isFailed) {
+      return NextResponse.json({ received: false, error: 'Statut invalide.' }, { status: 400 });
+    }
     if (!isSuccessful) {
+      if (isFailed) {
+        await paymentRef.set({ status: 'failed', updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+        return NextResponse.json({ received: true, status: 'FAILED' });
+      }
       await paymentRef.set({
-        userId,
         status: 'pending',
         provider: 'mtn',
         reference,
-        raw: body,
         updatedAt: FieldValue.serverTimestamp(),
       }, { merge: true });
 
       return NextResponse.json({ received: true, status: 'PENDING' });
     }
 
-    const plan = metadata.plan || body.plan || body.data?.plan;
-    const bookSlug = metadata.bookSlug || body.bookSlug || body.data?.bookSlug;
+    const plan = paymentData.plan || paymentData.tier;
+    const bookSlug = paymentData.bookSlug;
+    const amount = Number(body.amount ?? body.data?.amount);
+    if (Number.isFinite(amount) && amount > 0 && amount !== Number(paymentData.amount)) {
+      return NextResponse.json({ received: false, error: 'Montant invalide.' }, { status: 400 });
+    }
 
     if (plan === 'day' || plan === 'monthly' || plan === 'yearly' || plan === 'lifetime') {
       const tier = plan as SubscriptionTier;
@@ -96,7 +112,6 @@ export async function POST(request: NextRequest) {
         tier,
         completedAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
-        raw: body,
       }, { merge: true });
 
       await userRef.set({
@@ -128,7 +143,6 @@ export async function POST(request: NextRequest) {
         tier: 'free',
         completedAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
-        raw: body,
       }, { merge: true });
 
       await userRef.collection('purchasedBooks').doc(bookSlug).set({
@@ -146,18 +160,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true, status: 'SUCCESS', type: 'book', bookSlug });
     }
 
-    await paymentRef.set({
-      status: 'success',
-      userId,
-      provider: 'mtn',
-      raw: body,
-      completedAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp(),
-    }, { merge: true });
-
-    return NextResponse.json({ received: true, status: 'SUCCESS', warning: 'Type de paiement inconnu' });
+    return NextResponse.json({ received: false, error: 'Type de paiement inconnu.' }, { status: 400 });
   } catch (error: any) {
     reportUserError();
-    return NextResponse.json({ received: false, error: error?.message || 'Erreur webhook MTN' }, { status: 500 });
+    return NextResponse.json({ received: false, error: 'Erreur temporaire du webhook.' }, { status: 500 });
   }
 }

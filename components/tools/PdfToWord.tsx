@@ -2,7 +2,6 @@
 
 import { useRef, useState, type ChangeEvent } from 'react';
 import { Download, FileText, Loader2, ScanLine, UploadCloud } from 'lucide-react';
-import { TurnstileWidget } from '@/components/TurnstileWidget';
 
 const MAX_PDF_SIZE_BYTES = 4 * 1024 * 1024;
 
@@ -14,7 +13,6 @@ export function PdfToWord() {
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [hasConverted, setHasConverted] = useState(false);
   const [fileName, setFileName] = useState<string>('document.docx');
-  const [turnstileToken, setTurnstileToken] = useState('');
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const nextFile = event.target.files?.[0] ?? null;
@@ -65,7 +63,6 @@ export function PdfToWord() {
 
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('turnstileToken', turnstileToken);
 
       const response = await fetch('/api/tools/pdf-to-word', {
         method: 'POST',
@@ -130,8 +127,6 @@ export function PdfToWord() {
         {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileText className="h-5 w-5" />}
         {isLoading ? 'Conversion en cours…' : 'Convertir en Word'}
       </button>
-
-      <TurnstileWidget onToken={setTurnstileToken} />
 
       {error && <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{error}</div>}
 

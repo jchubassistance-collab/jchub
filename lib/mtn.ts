@@ -3,9 +3,10 @@ import 'server-only';
 export type MtnEnvironment = 'sandbox' | 'production';
 
 import { reportUserError } from '@/lib/user-error';
+import { randomUUID } from 'node:crypto';
 
 export function generateTransactionId(prefix = 'JCH'): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+  return `${prefix}-${randomUUID()}`;
 }
 
 export type MtnConfig = {
@@ -145,7 +146,8 @@ export async function verifyMtnPayment(reference: string): Promise<{ status: str
       return { status: 'PENDING', error: 'Token MTN indisponible' };
     }
 
-    const response = await fetch(`${config.baseUrl}/collection/v1_0/requesttopay/${reference}`, {
+    if (!/^[A-Za-z0-9_-]{8,100}$/.test(reference)) return { status: 'PENDING', error: 'Référence invalide' };
+    const response = await fetch(`${config.baseUrl}/collection/v1_0/requesttopay/${encodeURIComponent(reference)}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,

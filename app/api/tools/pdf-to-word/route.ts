@@ -5,7 +5,6 @@ import { join } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { buildVisuallyFaithfulWordDocument } from '@/lib/pdf-to-word';
 import { convertPdfWithAdobe, hasAdobePdfServicesConfig } from '@/lib/document-services';
-import { verifyTurnstileToken } from '@/lib/turnstile';
 import { reportUserError } from '@/lib/user-error';
 
 export const dynamic = 'force-dynamic';
@@ -69,9 +68,6 @@ export async function POST(request: NextRequest) {
     const bytes = Buffer.from(await file.arrayBuffer());
     if (bytes.subarray(0, 5).toString('ascii') !== '%PDF-') {
       return NextResponse.json({ error: 'Le fichier reçu n’est pas un PDF valide.' }, { status: 400 });
-    }
-    if (!await verifyTurnstileToken(formData.get('turnstileToken'), request)) {
-      return NextResponse.json({ error: 'Vérification anti-abus échouée. Réessaie.' }, { status: 403 });
     }
     if (!await consumePdfQuota(request)) {
       return NextResponse.json({ error: 'Limite atteinte : 5 conversions par heure. Réessaie plus tard.' }, { status: 429 });

@@ -18,8 +18,8 @@ export default function NotFound() {
         </div>
         <h2 className="text-2xl md:text-3xl font-black mb-3">Page introuvable</h2>
         <p className="text-gray-600 mb-8">
-          Oups ! La page que tu cherches n'existe pas (ou plus). Mais t'inquiète, on a plein
-          d'autres trucs sympas à te proposer.
+          Oups ! La page que tu cherches n&apos;existe pas (ou plus). Mais t&apos;inquiète, on a plein
+          d&apos;autres trucs sympas à te proposer.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -28,7 +28,7 @@ export default function NotFound() {
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-brand-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition"
           >
             <Home className="w-4 h-4" />
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </Link>
           <Link
             href="/outils"

@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - JcHub</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        sky: {
+                            soft: '#eff6ff',
+                            light: '#dbeafe',
+                            button: '#93c5fd',
+                            buttonDark: '#60a5fa',
+                            accent: '#2563eb',
+                        },
+                        navy: {
+                            DEFAULT: '#0f172a',
+                            soft: '#1e3a8a',
+                            muted: '#475569',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #eff6ff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .bg-tech-grid {
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 75%);
+            -webkit-mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 75%);
+            pointer-events: none;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            position: relative;
+        }
+
+        .card:hover {
+            box-shadow:
+                0 20px 40px rgba(37, 99, 235, 0.12),
+                0 0 0 1px rgba(37, 99, 235, 0.08);
+            transform: translateY(-5px);
+        }
+
+        .btn-primary {
+            background: #93c5fd;
+            color: #0f172a;
+            padding: 14px 32px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            position: relative;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #60a5fa;
+            transform: translateY(-3px);
+            box-shadow:
+                0 12px 25px rgba(37, 99, 235, 0.3),
+                0 4px 10px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-white {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 14px 32px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-white:hover {
+            box-shadow:
+                0 12px 25px rgba(37, 99, 235, 0.15),
+                0 4px 10px rgba(37, 99, 235, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #1e3a8a;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-link {
+            font-weight: 600;
+            font-size: 15px;
+            color: #0f172a;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #2563eb;
+        }
+
+        .search-bar {
+            background: #ffffff;
+            border-radius: 999px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .search-bar:focus-within {
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: #0f172a;
+            width: 100%;
+        }
+
+        .search-bar input::placeholder {
+            color: #94a3b8;
+        }
+
+        .icon-soft {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s ease;
+        }
+
+        .card:hover .icon-soft {
+            background: #2563eb;
+            color: #ffffff;
+            transform: scale(1.1) rotate(-5deg);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .tech-dot {
+            position: absolute;
+            border-radius: 50%;
+            background: #2563eb;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .float-1 { animation: floatDot 6s ease-in-out infinite; }
+        .float-2 { animation: floatDot 8s ease-in-out infinite 1s; }
+        .float-3 { animation: floatDot 7s ease-in-out infinite 2s; }
+
+        @keyframes floatDot {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-20px) translateX(10px); }
+        }
+
+        .title-xl {
+            font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            color: #0f172a;
+        }
+
+        /* Langue switcher */
+        .lang-switch {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: #ffffff;
+            border-radius: 999px;
+            padding: 3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .lang-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: none;
+            background: transparent;
+        }
+
+        .lang-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .lang-btn:hover:not(.active) {
+            color: #0f172a;
+        }
+
+        .translatable {
+            transition: opacity 0.2s ease;
+        }
+
+        /* ===== HERO IMAGE 3D STYLE (comme index) ===== */
+        .perspective-wrap {
+            perspective: 1400px;
+        }
+
+        .circle-3d {
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            padding: 18px;
+            position: relative;
+            transform: rotateY(-10deg) rotateX(5deg);
+            transition: transform 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow:
+                40px 40px 80px rgba(37, 99, 235, 0.2),
+                -15px -15px 40px rgba(255, 255, 255, 0.9),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+            transform-style: preserve-3d;
+        }
+
+        .circle-3d:hover {
+            transform: rotateY(0deg) rotateX(0deg) scale(1.02);
+            box-shadow:
+                0 50px 100px rgba(37, 99, 235, 0.25),
+                -15px -15px 40px rgba(255, 255, 255, 0.9),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+        }
+
+        .circle-3d::before {
+            content: '';
+            position: absolute;
+            inset: -15px;
+            border-radius: 50%;
+            border: 1px dashed rgba(37, 99, 235, 0.25);
+            animation: rotateRing 30s linear infinite;
+            pointer-events: none;
+        }
+
+        .circle-3d::after {
+            content: '';
+            position: absolute;
+            inset: -25px;
+            border-radius: 50%;
+            border: 1px solid rgba(37, 99, 235, 0.12);
+            animation: pulseRing 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotateRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulseRing {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.05); opacity: 0.2; }
+        }
+
+        .circle-image {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            position: relative;
+            z-index: 1;
+            box-shadow: inset 0 0 40px rgba(37, 99, 235, 0.15);
+        }
+
+        .circle-image-wrap {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .circle-image-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background:
+                linear-gradient(rgba(37, 99, 235, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.03) 1px, transparent 1px);
+            background-size: 25px 25px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .floating-badge {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow:
+                0 15px 35px rgba(37, 99, 235, 0.15),
+                0 5px 15px rgba(37, 99, 235, 0.08),
+                0 1px 0 rgba(255, 255, 255, 1) inset;
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            animation: floatBadge 6s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        .floating-badge:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow:
+                0 25px 50px rgba(37, 99, 235, 0.25),
+                0 5px 15px rgba(37, 99, 235, 0.1),
+                0 1px 0 rgba(255, 255, 255, 1) inset;
+        }
+
+        .floating-badge-2 {
+            animation: floatBadge 7s ease-in-out infinite 1s;
+        }
+
+        @keyframes floatBadge {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Form styles */
+        .form-input {
+            width: 100%;
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-size: 15px;
+            color: #0f172a;
+            transition: all 0.25s ease;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .form-input:focus {
+            background: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        .form-input.error {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            border-radius: 16px;
+            background: #eff6ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .contact-method:hover {
+            background: #dbeafe;
+            transform: translateX(4px);
+        }
+
+        .contact-method-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: #ffffff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .contact-method:hover .contact-method-icon {
+            background: #2563eb;
+            color: #ffffff;
+            transform: scale(1.08) rotate(-5deg);
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #dbeafe;
+            padding: 20px 0;
+            cursor: pointer;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            color: #0f172a;
+            font-size: 15px;
+        }
+
+        .faq-icon {
+            transition: transform 0.3s ease;
+            color: #2563eb;
+            flex-shrink: 0;
+        }
+
+        .faq-item.open .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 300px;
+            padding-top: 12px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 16px 22px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+            transform: translateY(150%);
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 1000;
+            font-size: 14px;
+            font-weight: 500;
+            max-width: 90vw;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(37, 99, 235, 0.2);
+            color: #93c5fd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 bg-sky-soft/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center h-20">
+
+                <a href="index.html" class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                        <span class="font-display font-bold text-white text-xl">J</span>
+                    </div>
+                    <span class="font-display font-bold text-2xl text-navy tracking-tight">JcHub</span>
+                </a>
+
+                <div class="hidden lg:flex items-center gap-10">
+                    <a href="index.html" class="nav-link translatable" data-fr="Accueil" data-en="Home">Accueil</a>
+                    <a href="#" class="nav-link translatable" data-fr="Outils" data-en="Tools">Outils</a>
+                    <a href="about.html" class="nav-link translatable" data-fr="À propos" data-en="About">À propos</a>
+                    <a href="contact.html" class="nav-link active translatable" data-fr="Contact" data-en="Contact">Contact</a>
+                </div>
+
+                <div class="hidden lg:flex items-center gap-4">
+                    <div class="search-bar w-56">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                        <input type="text" class="translatable" data-fr-placeholder="Rechercher..." data-en-placeholder="Search..." placeholder="Rechercher...">
+                    </div>
+
+                    <div class="lang-switch">
+                        <button class="lang-btn active" data-lang="fr" onclick="setLanguage('fr')">🇫🇷 FR</button>
+                        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇬🇧 EN</button>
+                    </div>
+                </div>
+
+                <button class="lg:hidden text-navy" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" class="w-7 h-7"></i>
+                </button>
+            </div>
+
+            <!-- Mobile menu -->
+            <div id="mobileMenu" class="lg:hidden hidden pb-6 space-y-3">
+                <a href="index.html" class="block nav-link translatable py-2" data-fr="Accueil" data-en="Home">Accueil</a>
+                <a href="outils.html" class="block nav-link translatable py-2" data-fr="Outils" data-en="Tools">Outils</a>
+                <a href="about.html" class="block nav-link translatable py-2" data-fr="À propos" data-en="About">À propos</a>
+                <a href="contact.html" class="block nav-link active translatable py-2" data-fr="Contact" data-en="Contact">Contact</a>
+                <div class="lang-switch w-fit mt-3">
+                    <button class="lang-btn active" data-lang="fr" onclick="setLanguage('fr')">🇫🇷 FR</button>
+                    <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇬🇧 EN</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Contact AVEC IMAGE -->
+    <section class="relative pt-32 pb-20 overflow-hidden">
+        <div class="bg-tech-grid absolute inset-0 z-0"></div>
+
+        <div class="tech-dot float-1" style="width: 5px; height: 5px; top: 25%; left: 8%;"></div>
+        <div class="tech-dot float-2" style="width: 6px; height: 6px; top: 65%; left: 5%;"></div>
+        <div class="tech-dot float-3" style="width: 4px; height: 4px; top: 45%; left: 12%;"></div>
+
+        <div class="absolute rounded-full bg-sky-light/40 pointer-events-none" style="width: 300px; height: 300px; top: 100px; left: -150px;"></div>
+        <div class="absolute rounded-full bg-sky-light/30 pointer-events-none" style="width: 400px; height: 400px; top: 400px; right: -200px;"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+                <!-- Texte -->
+                <div class="space-y-8">
+                    <div class="badge-pill w-fit">
+                        <span class="w-2 h-2 rounded-full bg-sky-accent animate-pulse"></span>
+                        <span class="translatable" data-fr="Réponse sous 24h" data-en="Reply within 24h">Réponse sous 24h</span>
+                    </div>
+
+                    <h1 class="title-xl">
+                        <span class="translatable" data-fr="Parlons de votre" data-en="Let's talk about your">Parlons de votre</span><br>
+                        <span class="text-sky-accent translatable" data-fr="prochain projet." data-en="next project.">prochain projet.</span>
+                    </h1>
+
+                    <p class="text-lg text-navy-muted max-w-lg leading-relaxed translatable"
+                       data-fr="Une question, une idée, un partenariat ? Écrivez-nous et nous vous répondrons rapidement."
+                       data-en="A question, an idea, a partnership? Write to us and we'll get back to you quickly.">
+                        Une question, une idée, un partenariat ? Écrivez-nous et nous vous répondrons rapidement.
+                    </p>
+
+                    <!-- Mini stats -->
+                    <div class="flex flex-wrap gap-6 pt-2">
+                        <div>
+                            <div class="font-display text-2xl font-bold text-navy">&lt; 24h</div>
+                            <div class="text-xs text-navy-muted translatable" data-fr="Temps de réponse" data-en="Response time">Temps de réponse</div>
+                        </div>
+                        <div class="w-px bg-sky-light"></div>
+                        <div>
+                            <div class="font-display text-2xl font-bold text-navy">+1 200</div>
+                            <div class="text-xs text-navy-muted translatable" data-fr="Utilisateurs" data-en="Users">Utilisateurs</div>
+                        </div>
+                        <div class="w-px bg-sky-light"></div>
+                        <div>
+                            <div class="font-display text-2xl font-bold text-navy">100%</div>
+                            <div class="text-xs text-navy-muted translatable" data-fr="Gratuit" data-en="Free">Gratuit</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IMAGE Hero (style 3D cercle comme index) -->
+                <div class="flex justify-center lg:justify-end perspective-wrap">
+                    <div class="relative">
+                        <div class="circle-3d w-[340px] h-[340px] lg:w-[440px] lg:h-[440px] flex items-center justify-center">
+
+                            <div class="circle-image-wrap">
+                                <!-- ⬇️ Image contact : deux personnes qui discutent / poignée de main / team -->
+                                <img
+                                    src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=900&fit=crop"
+                                    alt="Contact JcHub"
+                                    class="circle-image"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Badge flottant 1 -->
+                        <div class="floating-badge absolute -bottom-4 -left-4">
+                            <div class="w-10 h-10 bg-sky-light rounded-xl flex items-center justify-center">
+                                <i data-lucide="message-circle" class="w-5 h-5 text-sky-accent"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-navy-muted font-medium translatable" data-fr="Réponse" data-en="Reply">Réponse</div>
+                                <div class="font-display font-bold text-navy text-sm translatable" data-fr="Rapide & claire" data-en="Fast & clear">Rapide &amp; claire</div>
+                            </div>
+                        </div>
+
+                        <!-- Badge flottant 2 -->
+                        <div class="floating-badge floating-badge-2 absolute -top-4 -right-4">
+                            <div class="w-10 h-10 bg-sky-light rounded-xl flex items-center justify-center">
+                                <i data-lucide="heart-handshake" class="w-5 h-5 text-sky-accent"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-navy-muted font-medium translatable" data-fr="Écoute" data-en="Listening">Écoute</div>
+                                <div class="font-display font-bold text-navy text-sm translatable" data-fr="À votre écoute" data-en="Here for you">À votre écoute</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenu principal -->
+    <section class="max-w-7xl mx-auto px-6 pb-20">
+        <div class="grid lg:grid-cols-5 gap-8">
+
+            <!-- Formulaire -->
+            <div class="lg:col-span-3">
+                <div class="card p-8 md:p-10">
+                    <div class="mb-8">
+                        <h2 class="font-display text-2xl font-bold text-navy mb-2 translatable"
+                            data-fr="Envoyez-nous un message"
+                            data-en="Send us a message">
+                            Envoyez-nous un message
+                        </h2>
+                        <p class="text-navy-muted text-sm translatable"
+                           data-fr="Tous les champs marqués d'un * sont obligatoires."
+                           data-en="All fields marked with * are required.">
+                            Tous les champs marqués d'un * sont obligatoires.
+                        </p>
+                    </div>
+
+                    <form id="contactForm" novalidate class="space-y-5">
+                        <div class="grid md:grid-cols-2 gap-5">
+                            <div>
+                                <label for="name" class="form-label">
+                                    <span class="translatable" data-fr="Nom complet" data-en="Full name">Nom complet</span> *
+                                </label>
+                                <input type="text" id="name" name="name" class="form-input"
+                                       data-fr-placeholder="Jean Dupont"
+                                       data-en-placeholder="John Doe"
+                                       placeholder="Jean Dupont" required>
+                            </div>
+
+                            <div>
+                                <label for="email" class="form-label">
+                                    <span class="translatable" data-fr="Email" data-en="Email">Email</span> *
+                                </label>
+                                <input type="email" id="email" name="email" class="form-input"
+                                       data-fr-placeholder="ton@email.com"
+                                       data-en-placeholder="your@email.com"
+                                       placeholder="ton@email.com" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="subject" class="form-label">
+                                <span class="translatable" data-fr="Sujet" data-en="Subject">Sujet</span> *
+                            </label>
+                            <select id="subject" name="subject" class="form-input" required>
+                                <option value="" class="translatable" data-fr="Choisir un sujet" data-en="Choose a subject">Choisir un sujet</option>
+                                <option value="general" class="translatable" data-fr="Question générale" data-en="General question">Question générale</option>
+                                <option value="support" class="translatable" data-fr="Support technique" data-en="Technical support">Support technique</option>
+                                <option value="partnership" class="translatable" data-fr="Partenariat" data-en="Partnership">Partenariat</option>
+                                <option value="feedback" class="translatable" data-fr="Suggestion / Feedback" data-en="Suggestion / Feedback">Suggestion / Feedback</option>
+                                <option value="other" class="translatable" data-fr="Autre" data-en="Other">Autre</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="message" class="form-label">
+                                <span class="translatable" data-fr="Message" data-en="Message">Message</span> *
+                            </label>
+                            <textarea id="message" name="message" rows="6" class="form-input resize-none"
+                                      data-fr-placeholder="Décrivez votre projet ou votre question..."
+                                      data-en-placeholder="Describe your project or question..."
+                                      placeholder="Décrivez votre projet ou votre question..." required></textarea>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" id="consent" name="consent"
+                                   class="mt-1 w-4 h-4 rounded border-sky-light text-sky-accent focus:ring-sky-accent"
+                                   required>
+                            <label for="consent" class="text-sm text-navy-muted leading-relaxed cursor-pointer translatable"
+                                   data-fr="J'accepte que mes données soient utilisées pour me recontacter concernant ma demande."
+                                   data-en="I agree that my data may be used to contact me regarding my request.">
+                                J'accepte que mes données soient utilisées pour me recontacter concernant ma demande.
+                            </label>
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="submit" class="btn-primary w-full justify-center">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                                <span class="translatable" data-fr="Envoyer le message" data-en="Send message">Envoyer le message</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Coordonnées + infos -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Contact direct -->
+                <div class="card p-8">
+                    <h3 class="font-display text-lg font-bold text-navy mb-6 translatable"
+                        data-fr="Contact direct"
+                        data-en="Direct contact">
+                        Contact direct
+                    </h3>
+
+                    <div class="space-y-3">
+                        <a href="mailto:hello@jchub.dev" class="contact-method">
+                            <div class="contact-method-icon">
+                                <i data-lucide="mail" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-navy-muted font-medium uppercase tracking-wider">Email</div>
+                                <div class="font-display font-semibold text-navy text-sm">hello@jchub.dev</div>
+                            </div>
+                        </a>
+
+                        <a href="tel:+242000000000" class="contact-method">
+                            <div class="contact-method-icon">
+                                <i data-lucide="phone" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-navy-muted font-medium uppercase tracking-wider translatable"
+                                     data-fr="Téléphone"
+                                     data-en="Phone">Téléphone</div>
+                                <div class="font-display font-semibold text-navy text-sm">+242 00 00 00 00</div>
+                            </div>
+                        </a>
+
+                        <a href="#" class="contact-method">
+                            <div class="contact-method-icon">
+                                <i data-lucide="map-pin" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-navy-muted font-medium uppercase tracking-wider translatable"
+                                     data-fr="Localisation"
+                                     data-en="Location">Localisation</div>
+                                <div class="font-display font-semibold text-navy text-sm translatable"
+                                     data-fr="Congo Brazzaville"
+                                     data-en="Congo Brazzaville">Congo Brazzaville</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Réseaux sociaux -->
+                <div class="card p-8">
+                    <h3 class="font-display text-lg font-bold text-navy mb-6 translatable"
+                        data-fr="Suivez-nous"
+                        data-en="Follow us">
+                        Suivez-nous
+                    </h3>
+
+                    <div class="grid grid-cols-4 gap-3">
+                        <a href="#" class="aspect-square bg-sky-soft rounded-2xl flex items-center justify-center text-sky-accent hover:bg-sky-accent hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="Twitter">
+                            <i data-lucide="twitter" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="aspect-square bg-sky-soft rounded-2xl flex items-center justify-center text-sky-accent hover:bg-sky-accent hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="GitHub">
+                            <i data-lucide="github" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="aspect-square bg-sky-soft rounded-2xl flex items-center justify-center text-sky-accent hover:bg-sky-accent hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="LinkedIn">
+                            <i data-lucide="linkedin" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="aspect-square bg-sky-soft rounded-2xl flex items-center justify-center text-sky-accent hover:bg-sky-accent hover:text-white transition-all duration-300 hover:-translate-y-1" aria-label="Instagram">
+                            <i data-lucide="instagram" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Disponibilité -->
+                <div class="bg-navy rounded-3xl p-8 relative overflow-hidden">
+                    <div class="absolute -top-16 -right-16 w-48 h-48 bg-sky-accent rounded-full opacity-15 blur-3xl"></div>
+                    <div class="relative z-10 space-y-3">
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-sky-light text-xs font-bold tracking-widest uppercase">
+                            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                            <span class="translatable" data-fr="Disponible" data-en="Available">Disponible</span>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-white translatable"
+                            data-fr="On répond vite."
+                            data-en="We reply fast.">
+                            On répond vite.
+                        </h3>
+                        <p class="text-sky-light/80 text-sm leading-relaxed translatable"
+                           data-fr="En moyenne, nous répondons en moins de 24 heures les jours ouvrés."
+                           data-en="On average, we respond in less than 24 hours on business days.">
+                            En moyenne, nous répondons en moins de 24 heures les jours ouvrés.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="max-w-4xl mx-auto px-6 pb-20">
+        <div class="text-center mb-10 space-y-4">
+            <div class="badge-pill mx-auto translatable" data-fr="FAQ" data-en="FAQ">FAQ</div>
+            <h2 class="font-display text-3xl md:text-4xl font-bold text-navy leading-tight translatable"
+                data-fr="Questions fréquentes."
+                data-en="Frequently asked questions.">
+                Questions fréquentes.
+            </h2>
+        </div>
+
+        <div class="card p-8 md:p-10">
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span class="translatable"
+                          data-fr="Combien de temps avant d'avoir une réponse ?"
+                          data-en="How long before I get a reply?">
+                        Combien de temps avant d'avoir une réponse ?
+                    </span>
+                    <i data-lucide="chevron-down" class="faq-icon w-5 h-5"></i>
+                </div>
+                <div class="faq-answer translatable"
+                     data-fr="Nous répondons généralement en moins de 24 heures les jours ouvrés. Pour les demandes urgentes, précisez-le dans votre message."
+                     data-en="We usually reply in less than 24 hours on business days. For urgent requests, please mention it in your message.">
+                    Nous répondons généralement en moins de 24 heures les jours ouvrés. Pour les demandes urgentes, précisez-le dans votre message.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span class="translatable"
+                          data-fr="Proposez-vous des services sur mesure ?"
+                          data-en="Do you offer custom services?">
+                        Proposez-vous des services sur mesure ?
+                    </span>
+                    <i data-lucide="chevron-down" class="faq-icon w-5 h-5"></i>
+                </div>
+                <div class="faq-answer translatable"
+                     data-fr="Oui. Selon votre projet, nous pouvons collaborer sur des outils, des workflows ou des intégrations personnalisées. Contactez-nous avec les détails."
+                     data-en="Yes. Depending on your project, we can collaborate on custom tools, workflows or integrations. Contact us with the details.">
+                    Oui. Selon votre projet, nous pouvons collaborer sur des outils, des workflows ou des intégrations personnalisées. Contactez-nous avec les détails.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span class="translatable"
+                          data-fr="Comment devenir partenaire de JcHub ?"
+                          data-en="How do I become a JcHub partner?">
+                        Comment devenir partenaire de JcHub ?
+                    </span>
+                    <i data-lucide="chevron-down" class="faq-icon w-5 h-5"></i>
+                </div>
+                <div class="faq-answer translatable"
+                     data-fr="Sélectionnez « Partenariat » dans le formulaire de contact et décrivez votre structure. Notre équipe reviendra vers vous rapidement."
+                     data-en="Select 'Partnership' in the contact form and describe your organization. Our team will get back to you quickly.">
+                    Sélectionnez « Partenariat » dans le formulaire de contact et décrivez votre structure. Notre équipe reviendra vers vous rapidement.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span class="translatable"
+                          data-fr="Mes données sont-elles protégées ?"
+                          data-en="Is my data protected?">
+                        Mes données sont-elles protégées ?
+                    </span>
+                    <i data-lucide="chevron-down" class="faq-icon w-5 h-5"></i>
+                </div>
+                <div class="faq-answer translatable"
+                     data-fr="Oui. Vos informations sont utilisées uniquement pour répondre à votre demande et ne sont jamais partagées avec des tiers."
+                     data-en="Yes. Your information is used only to respond to your request and is never shared with third parties.">
+                    Oui. Vos informations sont utilisées uniquement pour répondre à votre demande et ne sont jamais partagées avec des tiers.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Finale -->
+    <section class="max-w-7xl mx-auto px-6 pb-20">
+        <div class="bg-navy rounded-3xl p-8 md:p-16 relative overflow-hidden">
+            <div class="absolute -top-20 -right-20 w-96 h-96 bg-sky-accent rounded-full opacity-10 blur-3xl"></div>
+
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-8 relative z-10">
+                <div class="space-y-4 max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-sky-light text-xs font-bold tracking-widest uppercase">
+                        <i data-lucide="sparkles" class="w-3 h-3"></i>
+                        <span class="translatable" data-fr="Prêt à démarrer" data-en="Ready to start">Prêt à démarrer</span>
+                    </div>
+                    <h2 class="font-display text-3xl md:text-4xl font-bold text-white leading-tight">
+                        <span class="translatable" data-fr="Explorez nos outils en attendant," data-en="Explore our tools in the meantime,">Explorez nos outils en attendant,</span><br>
+                        <span class="translatable" data-fr="ils sont gratuits." data-en="they're free.">ils sont gratuits.</span>
+                    </h2>
+                </div>
+
+                <div class="flex-shrink-0">
+                    <a href="index.html" class="bg-white text-navy px-8 py-4 rounded-full font-semibold inline-flex items-center gap-2 hover:bg-sky-light transition-colors">
+                        <span class="translatable" data-fr="Voir les outils" data-en="View tools">Voir les outils</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white pt-16 pb-8 border-t border-sky-light">
+        <div class="max-w-7xl mx-auto px-6">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                            <span class="font-display font-bold text-white text-lg">J</span>
+                        </div>
+                        <span class="font-display font-bold text-xl text-navy">JcHub</span>
+                    </div>
+                    <p class="text-navy-muted text-sm leading-relaxed translatable"
+                       data-fr="Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques."
+                       data-en="A clear platform to learn, use useful tools and move forward with your digital projects.">
+                        Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques.
+                    </p>
+                    <div class="space-y-3 pt-2">
+                        <a href="mailto:hello@jchub.dev" class="flex items-center gap-3 text-sm text-navy-muted hover:text-sky-accent transition-colors">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                            hello@jchub.dev
+                        </a>
+                        <div class="flex items-center gap-3 text-sm text-navy-muted">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span class="translatable" data-fr="Congo Brazzaville" data-en="Congo Brazzaville">Congo Brazzaville</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="Plateforme" data-en="Platform">Plateforme</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Outils" data-en="Tools">Outils</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Ressources" data-en="Resources">Ressources</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Workflows" data-en="Workflows">Workflows</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Nouveautés" data-en="What's new">Nouveautés</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="JcHub" data-en="JcHub">JcHub</h3>
+                    <ul class="space-y-3">
+                        <li><a href="about.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="À propos" data-en="About">À propos</a></li>
+                        <li><a href="contact.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Contact" data-en="Contact">Contact</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Blog" data-en="Blog">Blog</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Partenaires" data-en="Partners">Partenaires</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="Légal" data-en="Legal">Légal</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Conditions d'utilisation" data-en="Terms of use">Conditions d'utilisation</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Conditions de vente" data-en="Terms of sale">Conditions de vente</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Confidentialité" data-en="Privacy">Confidentialité</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Mentions légales" data-en="Legal notice">Mentions légales</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-sky-light pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-navy-muted text-sm translatable" data-fr="© 2026 JcHub. Tous droits réservés." data-en="© 2026 JcHub. All rights reserved.">© 2026 JcHub. Tous droits réservés.</p>
+                <p class="text-navy-muted text-sm">
+                    <span class="translatable" data-fr="Créé par" data-en="Created by">Créé par</span>
+                    <span class="text-navy font-semibold">Jessy Ngnambongo</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast">
+        <div class="toast-icon">
+            <i data-lucide="check" class="w-5 h-5"></i>
+        </div>
+        <div>
+            <div class="font-semibold translatable" data-fr="Message envoyé !" data-en="Message sent!">Message envoyé !</div>
+            <div class="text-xs text-slate-300 translatable" data-fr="Nous vous répondrons bientôt." data-en="We'll get back to you soon.">Nous vous répondrons bientôt.</div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // ===== TRADUCTION =====
+        function setLanguage(lang) {
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll('.translatable').forEach(el => {
+                const translation = el.getAttribute(`data-${lang}`);
+                if (translation) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = translation;
+                    } else if (el.tagName === 'OPTION') {
+                        el.textContent = translation;
+                    } else {
+                        if (translation.includes('<')) {
+                            el.innerHTML = translation;
+                        } else {
+                            el.textContent = translation;
+                        }
+                    }
+                }
+            });
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+            });
+
+            localStorage.setItem('jchub-lang', lang);
+        }
+
+        // ===== MENU MOBILE =====
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // ===== FAQ ACCORDÉON =====
+        function toggleFaq(el) {
+            const wasOpen = el.classList.contains('open');
+            document.querySelectorAll('.faq-item').forEach(item => item.classList.remove('open'));
+            if (!wasOpen) el.classList.add('open');
+        }
+
+        // ===== TOAST =====
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        // ===== FORMULAIRE =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // Langue
+            const savedLang = localStorage.getItem('jchub-lang') || 'fr';
+            setLanguage(savedLang);
+
+            // Animation scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.card, section > div > div').forEach((el) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(15px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+
+            // Validation formulaire
+            const form = document.getElementById('contactForm');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const name = document.getElementById('name');
+                const email = document.getElementById('email');
+                const subject = document.getElementById('subject');
+                const message = document.getElementById('message');
+                const consent = document.getElementById('consent');
+
+                let valid = true;
+                const markError = (el, isError) => {
+                    el.classList.toggle('error', isError);
+                    if (isError) valid = false;
+                };
+
+                markError(name, name.value.trim().length < 2);
+                markError(email, !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()));
+                markError(subject, subject.value === '');
+                markError(message, message.value.trim().length < 10);
+
+                if (!consent.checked) valid = false;
+
+                if (!valid) {
+                    const firstError = form.querySelector('.form-input.error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.focus({ preventScroll: true });
+                    }
+                    return;
+                }
+
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalHTML = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg><span>Envoi...</span>';
+                submitBtn.disabled = true;
+
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalHTML;
+                    submitBtn.disabled = false;
+                    lucide.createIcons();
+                    form.reset();
+                    showToast();
+                }, 1200);
+            });
+
+            form.querySelectorAll('.form-input').forEach(input => {
+                input.addEventListener('input', () => input.classList.remove('error'));
+            });
+        });
+    </script>
+</body>
+</html>

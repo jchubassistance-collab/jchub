@@ -7,6 +7,8 @@ import {
   createUserWithEmailAndPassword,
   signOut as fbSignOut,
   sendPasswordResetEmail,
+  verifyPasswordResetCode,
+  confirmPasswordReset,
   updateProfile,
   User as FirebaseUser,
   onAuthStateChanged,
@@ -187,6 +189,14 @@ export async function getCurrentIdToken(): Promise<string> {
 
 export async function resetPassword(email: string): Promise<void> {
   await sendPasswordResetEmail(auth, email);
+}
+
+export async function checkPasswordResetCode(code: string): Promise<string> {
+  return verifyPasswordResetCode(auth, code);
+}
+
+export async function applyPasswordReset(code: string, password: string): Promise<void> {
+  await confirmPasswordReset(auth, code, password);
 }
 
 export function onAuthChange(callback: (user: FirebaseUser | null) => void) {

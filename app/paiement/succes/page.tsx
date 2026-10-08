@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CheckCircle2, Clock3, XCircle } from 'lucide-react';
+import { getCurrentIdToken } from '@/lib/firebase-auth';
 
 type PaymentState = 'PENDING' | 'SUCCESS' | 'FAILED';
 
@@ -23,7 +24,10 @@ export default function PaymentSuccessPage() {
 
     const checkPayment = async () => {
       try {
-        const response = await fetch(`/api/payment/mtn/status?reference=${encodeURIComponent(reference)}`);
+        const token = await getCurrentIdToken();
+        const response = await fetch(`/api/payment/mtn/status?reference=${encodeURIComponent(reference)}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const payload = await response.json();
         if (cancelled) return;
 

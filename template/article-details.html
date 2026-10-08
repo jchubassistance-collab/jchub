@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comment structurer un projet front-end moderne en 2026 - JcHub</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        sky: {
+                            soft: '#eff6ff',
+                            light: '#dbeafe',
+                            button: '#93c5fd',
+                            buttonDark: '#60a5fa',
+                            accent: '#2563eb',
+                        },
+                        navy: {
+                            DEFAULT: '#0f172a',
+                            soft: '#1e3a8a',
+                            muted: '#475569',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #eff6ff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* ============================================
+           AMBIANCE TECH
+           ============================================ */
+        .bg-tech-grid {
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(circle at 50% 40%, black 25%, transparent 75%);
+            -webkit-mask-image: radial-gradient(circle at 50% 40%, black 25%, transparent 75%);
+            pointer-events: none;
+        }
+
+        .tech-dot {
+            position: absolute;
+            border-radius: 50%;
+            background: #2563eb;
+            opacity: 0.18;
+            pointer-events: none;
+        }
+
+        .float-1 { animation: floatDot 6s ease-in-out infinite; }
+        .float-2 { animation: floatDot 8s ease-in-out infinite 1s; }
+
+        @keyframes floatDot {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-15px) translateX(6px); }
+        }
+
+        /* ============================================
+           NAVBAR
+           ============================================ */
+        .nav-link {
+            font-weight: 600;
+            font-size: 15px;
+            color: #0f172a;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active { color: #2563eb; }
+
+        .lang-switch {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: #ffffff;
+            border-radius: 999px;
+            padding: 3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .lang-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: none;
+            background: transparent;
+        }
+
+        .lang-btn.active { background: #2563eb; color: #ffffff; }
+        .lang-btn:hover:not(.active) { color: #0f172a; }
+
+        .translatable { transition: opacity 0.2s ease; }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #1e3a8a;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        /* ============================================
+           HERO ARTICLE
+           ============================================ */
+        .article-hero-image {
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow:
+                0 30px 60px -15px rgba(37, 99, 235, 0.3),
+                0 20px 40px -15px rgba(15, 23, 42, 0.2);
+            position: relative;
+        }
+
+        .article-hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .article-hero-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 50%, rgba(15, 23, 42, 0.3) 100%);
+            pointer-events: none;
+        }
+
+        /* ============================================
+           CONTENU ARTICLE (typographie)
+           ============================================ */
+        .prose-article {
+            color: #334155;
+            font-size: 17px;
+            line-height: 1.85;
+        }
+
+        .prose-article > * + * {
+            margin-top: 1.5em;
+        }
+
+        .prose-article h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+            line-height: 1.25;
+            margin-top: 2.5em;
+            margin-bottom: 0.8em;
+            padding-top: 0.5em;
+            position: relative;
+        }
+
+        .prose-article h2::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: #2563eb;
+            border-radius: 999px;
+        }
+
+        .prose-article h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+            margin-top: 2em;
+            margin-bottom: 0.6em;
+        }
+
+        .prose-article p {
+            color: #334155;
+        }
+
+        .prose-article strong {
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .prose-article a {
+            color: #2563eb;
+            text-decoration: underline;
+            text-decoration-thickness: 1.5px;
+            text-underline-offset: 3px;
+            transition: color 0.2s ease;
+        }
+
+        .prose-article a:hover {
+            color: #0f172a;
+        }
+
+        .prose-article ul, .prose-article ol {
+            padding-left: 1.5em;
+            margin-top: 1.2em;
+            margin-bottom: 1.2em;
+        }
+
+        .prose-article ul li {
+            margin-bottom: 0.6em;
+            position: relative;
+            padding-left: 0.5em;
+        }
+
+        .prose-article ul li::before {
+            content: '';
+            position: absolute;
+            left: -1em;
+            top: 0.7em;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #2563eb;
+        }
+
+        .prose-article ol {
+            list-style: decimal;
+        }
+
+        .prose-article ol li {
+            margin-bottom: 0.6em;
+            padding-left: 0.3em;
+        }
+
+        .prose-article ol li::marker {
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        .prose-article blockquote {
+            border-left: 4px solid #2563eb;
+            background: linear-gradient(90deg, #eff6ff, transparent);
+            padding: 20px 24px;
+            border-radius: 0 16px 16px 0;
+            font-style: italic;
+            color: #0f172a;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 2em 0;
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+        }
+
+        .prose-article blockquote p {
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .prose-article code:not(pre code) {
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            font-weight: 500;
+            border: 1px solid #dbeafe;
+        }
+
+        .prose-article pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 24px 28px;
+            border-radius: 16px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            margin: 2em 0;
+            box-shadow:
+                0 20px 40px -10px rgba(15, 23, 42, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .prose-article pre::before {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: 18px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ef4444;
+            box-shadow: 18px 0 0 #f59e0b, 36px 0 0 #22c55e;
+        }
+
+        .prose-article pre code {
+            padding-top: 14px;
+            display: block;
+        }
+
+        .token-keyword { color: #c084fc; }
+        .token-string { color: #86efac; }
+        .token-function { color: #60a5fa; }
+        .token-comment { color: #64748b; font-style: italic; }
+        .token-number { color: #fbbf24; }
+
+        .prose-article hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #dbeafe, transparent);
+            margin: 3em 0;
+        }
+
+        .prose-article img {
+            border-radius: 16px;
+            box-shadow: 0 15px 30px -10px rgba(37, 99, 235, 0.2);
+            margin: 2em 0;
+        }
+
+        /* ============================================
+           TABLE DES MATIÈRES (sticky)
+           ============================================ */
+        .toc-sticky {
+            position: sticky;
+            top: 100px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .toc-sticky::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .toc-sticky::-webkit-scrollbar-thumb {
+            background: #dbeafe;
+            border-radius: 999px;
+        }
+
+        .toc-link {
+            display: block;
+            padding: 8px 14px;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 500;
+            border-left: 2px solid transparent;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .toc-link:hover {
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .toc-link.active {
+            color: #2563eb;
+            border-left-color: #2563eb;
+            background: #eff6ff;
+            font-weight: 600;
+        }
+
+        .toc-link.sub {
+            padding-left: 26px;
+            font-size: 13px;
+        }
+
+        /* ============================================
+           PROGRESS BAR LECTURE
+           ============================================ */
+        .reading-progress {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: transparent;
+            z-index: 40;
+            pointer-events: none;
+        }
+
+        .reading-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #60a5fa);
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: 0 999px 999px 0;
+            box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
+        }
+
+        /* ============================================
+           BOUTONS, CARTES
+           ============================================ */
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow:
+                0 4px 12px rgba(15, 23, 42, 0.04),
+                inset 0 1px 0 #ffffff;
+            border: 1px solid rgba(219, 234, 254, 0.9);
+        }
+
+        .btn-primary {
+            background: #93c5fd;
+            color: #0f172a;
+            padding: 14px 28px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #60a5fa;
+            transform: translateY(-3px);
+            box-shadow:
+                0 12px 25px rgba(37, 99, 235, 0.3),
+                0 4px 10px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-white {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 14px 28px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #dbeafe;
+        }
+
+        .btn-white:hover {
+            box-shadow:
+                0 12px 25px rgba(37, 99, 235, 0.15),
+                0 4px 10px rgba(37, 99, 235, 0.1);
+            transform: translateY(-3px);
+        }
+
+        /* Share buttons */
+        .share-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #dbeafe;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+
+        .share-btn:hover {
+            background: #2563eb;
+            color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        /* ============================================
+           CARTES ARTICLES SIMILAIRES
+           ============================================ */
+        .related-card {
+            background: #ffffff;
+            border-radius: 18px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+            border: 1px solid rgba(219, 234, 254, 0.9);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .related-card:hover {
+            transform: translateY(-6px);
+            box-shadow:
+                0 20px 40px rgba(37, 99, 235, 0.15),
+                0 10px 20px rgba(37, 99, 235, 0.08);
+        }
+
+        .related-card img {
+            transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .related-card:hover img {
+            transform: scale(1.06);
+        }
+
+        /* ============================================
+           NEWSLETTER
+           ============================================ */
+        .newsletter-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 999px;
+            padding: 14px 24px;
+            font-size: 15px;
+            color: #ffffff;
+            outline: none;
+            transition: all 0.25s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .newsletter-input::placeholder { color: rgba(219, 234, 254, 0.6); }
+
+        .newsletter-input:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
+        }
+
+        /* Scroll to top */
+        .scroll-top {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4);
+            cursor: pointer;
+            border: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+
+        .scroll-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-top:hover {
+            background: #1e40af;
+            transform: translateY(-4px);
+        }
+
+        @media (max-width: 1024px) {
+            .toc-sticky {
+                position: relative;
+                top: 0;
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .prose-article { font-size: 16px; }
+            .prose-article h2 { font-size: 24px; }
+            .prose-article h3 { font-size: 20px; }
+            .prose-article blockquote { font-size: 16px; padding: 16px 20px; }
+            .prose-article pre { padding: 20px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barre de progression lecture -->
+    <div class="reading-progress">
+        <div class="reading-progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 bg-sky-soft/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center h-20">
+
+                <a href="index.html" class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                        <span class="font-display font-bold text-white text-xl">J</span>
+                    </div>
+                    <span class="font-display font-bold text-2xl text-navy tracking-tight">JcHub</span>
+                </a>
+
+                <div class="hidden lg:flex items-center gap-10">
+                    <a href="index.html" class="nav-link translatable" data-fr="Accueil" data-en="Home">Accueil</a>
+                    <a href="outils.html" class="nav-link translatable" data-fr="Outils" data-en="Tools">Outils</a>
+                    <a href="about.html" class="nav-link translatable" data-fr="À propos" data-en="About">À propos</a>
+                    <a href="blog.html" class="nav-link active translatable" data-fr="Blog" data-en="Blog">Blog</a>
+                    <a href="contact.html" class="nav-link translatable" data-fr="Contact" data-en="Contact">Contact</a>
+                </div>
+
+                <div class="hidden lg:flex items-center gap-4">
+                    <div class="lang-switch">
+                        <button class="lang-btn active" data-lang="fr" onclick="setLanguage('fr')">🇫🇷 FR</button>
+                        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇬🇧 EN</button>
+                    </div>
+                </div>
+
+                <button class="lg:hidden text-navy" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" class="w-7 h-7"></i>
+                </button>
+            </div>
+
+            <div id="mobileMenu" class="lg:hidden hidden pb-6 space-y-3">
+                <a href="index.html" class="block nav-link translatable py-2" data-fr="Accueil" data-en="Home">Accueil</a>
+                <a href="outils.html" class="block nav-link translatable py-2" data-fr="Outils" data-en="Tools">Outils</a>
+                <a href="about.html" class="block nav-link translatable py-2" data-fr="À propos" data-en="About">À propos</a>
+                <a href="blog.html" class="block nav-link active translatable py-2" data-fr="Blog" data-en="Blog">Blog</a>
+                <a href="contact.html" class="block nav-link translatable py-2" data-fr="Contact" data-en="Contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+         HERO ARTICLE
+         ============================================================ -->
+    <section class="relative pt-28 pb-10 overflow-hidden">
+        <div class="bg-tech-grid absolute inset-0 z-0"></div>
+        <div class="tech-dot float-1" style="width: 5px; height: 5px; top: 20%; left: 5%;"></div>
+        <div class="tech-dot float-2" style="width: 6px; height: 6px; top: 60%; right: 6%;"></div>
+
+        <div class="max-w-4xl mx-auto px-6 relative z-10">
+
+            <!-- Breadcrumb -->
+            <div class="flex items-center gap-2 text-sm text-navy-muted mb-6 flex-wrap">
+                <a href="blog.html" class="hover:text-sky-accent transition-colors translatable" data-fr="Blog" data-en="Blog">Blog</a>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                <a href="#" class="hover:text-sky-accent transition-colors translatable" data-fr="Développement" data-en="Development">Développement</a>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                <span class="text-navy font-semibold truncate translatable" data-fr="Structurer un projet front-end" data-en="Structuring a front-end project">Structurer un projet front-end</span>
+            </div>
+
+            <!-- Tags -->
+            <div class="flex items-center gap-3 mb-6 flex-wrap">
+                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white text-sky-accent text-xs font-bold tracking-wider uppercase shadow-sm border border-sky-light">
+                    <i data-lucide="code-2" class="w-3 h-3"></i>
+                    <span class="translatable" data-fr="Développement" data-en="Development">Développement</span>
+                </span>
+                <span class="inline-flex items-center gap-2 text-xs text-navy-muted font-medium">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                    <span class="translatable" data-fr="12 mai 2026" data-en="May 12, 2026">12 mai 2026</span>
+                </span>
+                <span class="inline-flex items-center gap-2 text-xs text-navy-muted font-medium">
+                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                    <span class="translatable" data-fr="8 min de lecture" data-en="8 min read">8 min de lecture</span>
+                </span>
+            </div>
+
+            <!-- Titre -->
+            <h1 class="font-display font-extrabold text-navy leading-[1.1] tracking-tight mb-6"
+                style="font-size: clamp(2rem, 4.5vw, 3.2rem);">
+                <span class="translatable"
+                      data-fr="Comment structurer un projet front-end moderne en 2026"
+                      data-en="How to structure a modern front-end project in 2026">
+                    Comment structurer un projet front-end moderne en 2026
+                </span>
+            </h1>
+
+            <!-- Chapô -->
+            <p class="text-lg md:text-xl text-navy-muted leading-relaxed mb-8 translatable"
+               data-fr="Architecture, outils, workflows : notre méthode complète pour garder un code propre et maintenable, du prototype à la production."
+               data-en="Architecture, tools, workflows: our complete method to keep a clean and maintainable codebase, from prototype to production.">
+                Architecture, outils, workflows : notre méthode complète pour garder un code propre et maintenable, du prototype à la production.
+            </p>
+
+            <!-- Auteur + Share -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-8 border-b border-sky-light">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-sky-light to-sky-buttonDark flex items-center justify-center text-navy font-bold">
+                        JN
+                    </div>
+                    <div>
+                        <div class="font-semibold text-navy text-sm">Jessy Ngnambongo</div>
+                        <div class="text-xs text-navy-muted translatable"
+                             data-fr="Développeur & fondateur de JcHub"
+                             data-en="Developer & founder of JcHub">
+                            Développeur &amp; fondateur de JcHub
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-navy-muted font-medium mr-2 translatable"
+                          data-fr="Partager"
+                          data-en="Share">
+                        Partager
+                    </span>
+                    <button class="share-btn" onclick="shareArticle('twitter')" aria-label="Twitter">
+                        <i data-lucide="twitter" class="w-4 h-4"></i>
+                    </button>
+                    <button class="share-btn" onclick="shareArticle('linkedin')" aria-label="LinkedIn">
+                        <i data-lucide="linkedin" class="w-4 h-4"></i>
+                    </button>
+                    <button class="share-btn" onclick="shareArticle('facebook')" aria-label="Facebook">
+                        <i data-lucide="facebook" class="w-4 h-4"></i>
+                    </button>
+                    <button class="share-btn" onclick="copyLink()" aria-label="Copier le lien">
+                        <i data-lucide="link-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         IMAGE PRINCIPALE
+         ============================================================ -->
+    <section class="max-w-5xl mx-auto px-6 pb-12">
+        <div class="article-hero-image" style="height: 480px;">
+            <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1600&h=900&fit=crop"
+                 alt="Article - Structurer un projet front-end">
+        </div>
+    </section>
+
+    <!-- ============================================================
+         CONTENU + SIDEBAR
+         ============================================================ -->
+    <section class="max-w-6xl mx-auto px-6 pb-20">
+        <div class="grid lg:grid-cols-12 gap-10">
+
+            <!-- ============ CONTENU PRINCIPAL ============ -->
+            <article class="lg:col-span-8">
+
+                <div class="prose-article">
+
+                    <p class="translatable"
+                       data-fr="Structurer un projet front-end moderne ne se résume plus à « choisir un framework ». En 2026, la vraie différence se joue sur l'architecture, les conventions et les workflows qui permettent à une équipe de livrer vite sans casser ce qui existe déjà."
+                       data-en="Structuring a modern front-end project is no longer about 'picking a framework'. In 2026, the real difference lies in the architecture, conventions and workflows that let a team ship fast without breaking what already exists.">
+                        Structurer un projet front-end moderne ne se résume plus à « choisir un framework ». En 2026, la vraie différence se joue sur l'architecture, les conventions et les workflows qui permettent à une équipe de livrer vite sans casser ce qui existe déjà.
+                    </p>
+
+                    <p class="translatable"
+                       data-fr="Dans cet article, on partage la méthode qu'on applique sur nos propres projets — celle qui tient sur la durée, scalable, testable et lisible même après six mois."
+                       data-en="In this article, we share the method we apply on our own projects — one that lasts, scales, is testable and readable even six months later.">
+                        Dans cet article, on partage la méthode qu'on applique sur nos propres projets — celle qui tient sur la durée, scalable, testable et lisible même après six mois.
+                    </p>
+
+                    <h2 id="principes" class="translatable"
+                        data-fr="1. Les principes de base"
+                        data-en="1. The basic principles">
+                        1. Les principes de base
+                    </h2>
+
+                    <p class="translatable"
+                       data-fr="Avant de parler de dossiers et d'outils, il faut poser les principes qui guideront toutes les décisions techniques :"
+                       data-en="Before talking about folders and tools, you need to lay down the principles that will guide every technical decision:">
+                        Avant de parler de dossiers et d'outils, il faut poser les principes qui guideront toutes les décisions techniques :
+                    </p>
+
+                    <ul>
+                        <li class="translatable"
+                            data-fr="<strong>La colocation</strong> : tout ce qui va ensemble doit être au même endroit."
+                            data-en="<strong>Colocation</strong>: everything that belongs together should be in the same place.">
+                            <strong>La colocation</strong> : tout ce qui va ensemble doit être au même endroit.
+                        </li>
+                        <li class="translatable"
+                            data-fr="<strong>La séparation des responsabilités</strong> : logique métier ≠ UI ≠ data fetching."
+                            data-en="<strong>Separation of concerns</strong>: business logic ≠ UI ≠ data fetching.">
+                            <strong>La séparation des responsabilités</strong> : logique métier ≠ UI ≠ data fetching.
+                        </li>
+                        <li class="translatable"
+                            data-fr="<strong>La simplicité</strong> : si un nouveau dev met plus de 30 minutes à comprendre la structure, c'est raté."
+                            data-en="<strong>Simplicity</strong>: if a new dev takes more than 30 minutes to understand the structure, it's failed.">
+                            <strong>La simplicité</strong> : si un nouveau dev met plus de 30 minutes à comprendre la structure, c'est raté.
+                        </li>
+                        <li class="translatable"
+                            data-fr="<strong>L'explicite</strong> : le code doit être lisible sans commentaire."
+                            data-en="<strong>Explicitness</strong>: code should be readable without comments.">
+                            <strong>L'explicite</strong> : le code doit être lisible sans commentaire.
+                        </li>
+                    </ul>
+
+                    <blockquote>
+                        <p class="translatable"
+                           data-fr="Une bonne architecture ne se remarque pas. Elle se ressent dans la facilité à ajouter une feature, pas dans la beauté du dossier."
+                           data-en="Good architecture isn't noticed. It's felt in how easy it is to add a feature, not in the beauty of the folder.">
+                            Une bonne architecture ne se remarque pas. Elle se ressent dans la facilité à ajouter une feature, pas dans la beauté du dossier.
+                        </p>
+                    </blockquote>
+
+                    <h2 id="structure" class="translatable"
+                        data-fr="2. Une structure de dossiers qui tient"
+                        data-en="2. A folder structure that lasts">
+                        2. Une structure de dossiers qui tient
+                    </h2>
+
+                    <p class="translatable"
+                       data-fr="Voici la structure qu'on utilise par défaut sur un projet React/Next.js moderne :"
+                       data-en="Here's the structure we use by default on a modern React/Next.js project:">
+                        Voici la structure qu'on utilise par défaut sur un projet React/Next.js moderne :
+                    </p>
+
+                    <pre><code><span class="token-comment">// Structure des dossiers</span>
+src/
+├── <span class="token-function">app</span>/              <span class="token-comment">// routes, layouts, pages</span>
+├── <span class="token-function">components</span>/
+│   ├── <span class="token-function">ui</span>/           <span class="token-comment">// boutons, inputs, base</span>
+│   └── <span class="token-function">features</span>/     <span class="token-comment">// composants métier</span>
+├── <span class="token-function">features</span>/           <span class="token-comment">// logique métier isolée</span>
+│   ├── <span class="token-function">auth</span>/
+│   │   ├── <span class="token-function">components</span>/
+│   │   ├── <span class="token-function">hooks</span>/
+│   │   ├── <span class="token-function">api</span>/
+│   │   └── <span class="token-function">types</span>/
+│   └── <span class="token-function">dashboard</span>/
+├── <span class="token-function">lib</span>/                <span class="token-comment">// helpers, utils, config</span>
+├── <span class="token-function">hooks</span>/              <span class="token-comment">// hooks globaux</span>
+├── <span class="token-function">types</span>/              <span class="token-comment">// types globaux</span>
+└── <span class="token-function">styles</span>/             <span class="token-comment">// styles globaux</span>
+</code></pre>
+
+                    <h3 id="pourquoi-features" class="translatable"
+                        data-fr="Pourquoi le dossier features/ change tout"
+                        data-en="Why the features/ folder changes everything">
+                        Pourquoi le dossier <code>features/</code> change tout
+                    </h3>
+
+                    <p class="translatable"
+                       data-fr="La plupart des projets mélangent les composants métier avec les composants UI. Résultat : impossible de savoir ce qui appartient à quelle fonctionnalité. En isolant chaque feature dans son propre dossier, on obtient :"
+                       data-en="Most projects mix business components with UI components. The result: impossible to know what belongs to which feature. By isolating each feature in its own folder, we get:">
+                        La plupart des projets mélangent les composants métier avec les composants UI. Résultat : impossible de savoir ce qui appartient à quelle fonctionnalité. En isolant chaque feature dans son propre dossier, on obtient :
+                    </p>
+
+                    <ol>
+                        <li class="translatable"
+                            data-fr="Une <strong>lecture immédiate</strong> du projet"
+                            data-en="An <strong>immediate read</strong> of the project">
+                            Une <strong>lecture immédiate</strong> du projet
+                        </li>
+                        <li class="translatable"
+                            data-fr="Une <strong>suppression facile</strong> d'une feature entière"
+                            data-en="An <strong>easy removal</strong> of an entire feature">
+                            Une <strong>suppression facile</strong> d'une feature entière
+                        </li>
+                        <li class="translatable"
+                            data-fr="Des <strong>tests ciblés</strong> par feature"
+                            data-en="<strong>Targeted tests</strong> per feature">
+                            Des <strong>tests ciblés</strong> par feature
+                        </li>
+                        <li class="translatable"
+                            data-fr="Une <strong>équipe qui peut travailler en parallèle</strong> sans se marcher dessus"
+                            data-en="A <strong>team that can work in parallel</strong> without stepping on each other">
+                            Une <strong>équipe qui peut travailler en parallèle</strong> sans se marcher dessus
+                        </li>
+                    </ol>
+
+                    <h2 id="conventions" class="translatable"
+                        data-fr="3. Les conventions qui sauvent des heures"
+                        data-en="3. Conventions that save hours">
+                        3. Les conventions qui sauvent des heures
+                    </h2>
+
+                    <p class="translatable"
+                       data-fr="Les conventions ne sont pas là pour faire joli. Elles évitent les débats inutiles et rendent le code prévisible."
+                       data-en="Conventions aren't there to look pretty. They prevent useless debates and make code predictable.">
+                        Les conventions ne sont pas là pour faire joli. Elles évitent les débats inutiles et rendent le code prévisible.
+                    </p>
+
+                    <h3 id="nommage" class="translatable"
+                        data-fr="Nommage"
+                        data-en="Naming">
+                        Nommage
+                    </h3>
+
+                    <ul>
+                        <li><code>PascalCase</code> <span class="translatable" data-fr="pour les composants et types" data-en="for components and types">pour les composants et types</span></li>
+                        <li><code>camelCase</code> <span class="translatable" data-fr="pour les variables et fonctions" data-en="for variables and functions">pour les variables et fonctions</span></li>
+                        <li><code>kebab-case</code> <span class="translatable" data-fr="pour les dossiers et fichiers non-composants" data-en="for folders and non-component files">pour les dossiers et fichiers non-composants</span></li>
+                        <li><code>SCREAMING_SNAKE_CASE</code> <span class="translatable" data-fr="pour les constantes globales" data-en="for global constants">pour les constantes globales</span></li>
+                    </ul>
+
+                    <h3 id="imports" class="translatable"
+                        data-fr="Ordre des imports"
+                        data-en="Import order">
+                        Ordre des imports
+                    </h3>
+
+                    <p class="translatable"
+                       data-fr="On impose systématiquement cet ordre — et ESLint le vérifie pour nous :"
+                       data-en="We systematically enforce this order — and ESLint checks it for us:">
+                        On impose systématiquement cet ordre — et ESLint le vérifie pour nous :
+                    </p>
+
+                    <pre><code><span class="token-comment">// 1. Librairies externes</span>
+<span class="token-keyword">import</span> <span class="token-function">React</span> <span class="token-keyword">from</span> <span class="token-string">'react'</span>;
+<span class="token-keyword">import</span> { useState } <span class="token-keyword">from</span> <span class="token-string">'react'</span>;
+
+<span class="token-comment">// 2. Imports absolus du projet</span>
+<span class="token-keyword">import</span> { <span class="token-function">Button</span> } <span class="token-keyword">from</span> <span class="token-string">'@/components/ui/Button'</span>;
+<span class="token-keyword">import</span> { <span class="token-function">useAuth</span> } <span class="token-keyword">from</span> <span class="token-string">'@/features/auth/hooks'</span>;
+
+<span class="token-comment">// 3. Imports relatifs</span>
+<span class="token-keyword">import</span> { <span class="token-function">localHelper</span> } <span class="token-keyword">from</span> <span class="token-string">'./helper'</span>;
+
+<span class="token-comment">// 4. Styles</span>
+<span class="token-keyword">import</span> <span class="token-string">'./styles.css'</span>;
+</code></pre>
+
+                    <h2 id="outillage" class="translatable"
+                        data-fr="4. L'outillage minimum"
+                        data-en="4. The minimum tooling">
+                        4. L'outillage minimum
+                    </h2>
+
+                    <p class="translatable"
+                       data-fr="Pas besoin de cinquante outils. Il faut juste les bons, configurés correctement :"
+                       data-en="You don't need fifty tools. You just need the right ones, properly configured:">
+                        Pas besoin de cinquante outils. Il faut juste les bons, configurés correctement :
+                    </p>
+
+                    <ul>
+                        <li class="translatable"
+                            data-fr="<strong>ESLint + Prettier</strong> : zéro débat de style en review"
+                            data-en="<strong>ESLint + Prettier</strong>: zero style debate in review">
+                            <strong>ESLint + Prettier</strong> : zéro débat de style en review
+                        </li>
+                        <li class="translatable"
+                            data-fr="<strong>TypeScript strict</strong> : pas de compromis sur le typage"
+                            data-en="<strong>TypeScript strict</strong>: no compromise on typing">
+                            <strong>TypeScript strict</strong> : pas de compromis sur le typage
+                        </li>
+                        <li class="translatable"
+                            data-fr="<strong>Vitest ou Jest</strong> : tests unitaires rapides"
+                            data-en="<strong>Vitest or Jest</strong>: fast unit tests">
+                            <strong>Vitest ou Jest</strong> : tests unitaires rapides
+                        </li>
+                        <li class="translatable"
+                            data-fr="<strong>Husky + lint-staged</strong> : vérification avant chaque commit"
+                            data-en="<strong>Husky + lint-staged</strong>: checks before each commit">
+                            <strong>Husky + lint-staged</strong> : vérification avant chaque commit
+                        </li>
+                    </ul>
+
+                    <h2 id="conclusion" class="translatable"
+                        data-fr="Conclusion"
+                        data-en="Conclusion">
+                        Conclusion
+                    </h2>
+
+                    <p class="translatable"
+                       data-fr="Une bonne architecture front-end n'est pas un dogme. C'est un ensemble de décisions cohérentes qui vous font gagner du temps chaque jour. Commencez simple, itérez, et surtout : gardez le code lisible pour celui qui arrivera après vous."
+                       data-en="Good front-end architecture isn't dogma. It's a set of consistent decisions that save you time every day. Start simple, iterate, and above all: keep the code readable for the one who comes after you.">
+                        Une bonne architecture front-end n'est pas un dogme. C'est un ensemble de décisions cohérentes qui vous font gagner du temps chaque jour. Commencez simple, itérez, et surtout : gardez le code lisible pour celui qui arrivera après vous.
+                    </p>
+
+                    <hr>
+
+                    <!-- Tags -->
+                    <div class="flex flex-wrap items-center gap-2 pt-6">
+                        <span class="text-sm font-semibold text-navy mr-2 translatable"
+                              data-fr="Tags :"
+                              data-en="Tags:">
+                            Tags :
+                        </span>
+                        <a href="#" class="px-3 py-1.5 rounded-full bg-white border border-sky-light text-xs font-semibold text-navy-muted hover:border-sky-accent hover:text-sky-accent transition-colors">#React</a>
+                        <a href="#" class="px-3 py-1.5 rounded-full bg-white border border-sky-light text-xs font-semibold text-navy-muted hover:border-sky-accent hover:text-sky-accent transition-colors">#Architecture</a>
+                        <a href="#" class="px-3 py-1.5 rounded-full bg-white border border-sky-light text-xs font-semibold text-navy-muted hover:border-sky-accent hover:text-sky-accent transition-colors">#TypeScript</a>
+                        <a href="#" class="px-3 py-1.5 rounded-full bg-white border border-sky-light text-xs font-semibold text-navy-muted hover:border-sky-accent hover:text-sky-accent transition-colors">#BestPractices</a>
+                    </div>
+
+                    <!-- Bio auteur -->
+                    <div class="mt-10 p-6 md:p-8 rounded-2xl bg-white border border-sky-light flex flex-col sm:flex-row items-start gap-5">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-sky-light to-sky-buttonDark flex items-center justify-center text-navy font-bold text-xl flex-shrink-0">
+                            JN
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-xs font-bold uppercase tracking-wider text-sky-accent mb-1 translatable"
+                                 data-fr="Écrit par"
+                                 data-en="Written by">
+                                Écrit par
+                            </div>
+                            <h3 class="font-display font-bold text-navy text-lg mb-2">Jessy Ngnambongo</h3>
+                            <p class="text-navy-muted text-sm leading-relaxed mb-3 translatable"
+                               data-fr="Développeur full-stack, fondateur de JcHub. Je construis des outils web pour simplifier le quotidien des développeurs et des créateurs."
+                               data-en="Full-stack developer, founder of JcHub. I build web tools to simplify the daily lives of developers and creators.">
+                                Développeur full-stack, fondateur de JcHub. Je construis des outils web pour simplifier le quotidien des développeurs et des créateurs.
+                            </p>
+                            <div class="flex items-center gap-2">
+                                <a href="#" class="w-8 h-8 rounded-lg bg-sky-soft flex items-center justify-center text-sky-accent hover:bg-sky-accent hover:text-white transition-colors">
+                                    <i data-lucide="twitter" class="w-3.5 h-3.5"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 rounded-lg bg-sky-soft flex items-center justify-center text-sky-accent hover:bg-sky-accent hover:text-white transition-colors">
+                                    <i data-lucide="github" class="w-3.5 h-3.5"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 rounded-lg bg-sky-soft flex items-center justify-center text-sky-accent hover:bg-sky-accent hover:text-white transition-colors">
+                                    <i data-lucide="linkedin" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Précédent / Suivant -->
+                    <div class="mt-10 grid md:grid-cols-2 gap-4">
+                        <a href="#" class="card p-5 group hover:border-sky-accent transition-colors">
+                            <div class="flex items-center gap-2 text-xs font-semibold text-navy-muted mb-2">
+                                <i data-lucide="arrow-left" class="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform"></i>
+                                <span class="translatable" data-fr="Article précédent" data-en="Previous article">Article précédent</span>
+                            </div>
+                            <div class="font-display font-bold text-navy text-sm leading-snug group-hover:text-sky-accent transition-colors">
+                                <span class="translatable"
+                                      data-fr="10 principes de design UI intemporels"
+                                      data-en="10 timeless UI design principles">
+                                    10 principes de design UI intemporels
+                                </span>
+                            </div>
+                        </a>
+
+                        <a href="#" class="card p-5 group hover:border-sky-accent transition-colors md:text-right">
+                            <div class="flex items-center gap-2 text-xs font-semibold text-navy-muted mb-2 md:justify-end">
+                                <span class="translatable" data-fr="Article suivant" data-en="Next article">Article suivant</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                            <div class="font-display font-bold text-navy text-sm leading-snug group-hover:text-sky-accent transition-colors">
+                                <span class="translatable"
+                                      data-fr="Les outils dev incontournables en 2026"
+                                      data-en="Must-have dev tools in 2026">
+                                    Les outils dev incontournables en 2026
+                                </span>
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
+            </article>
+
+            <!-- ============ SIDEBAR ============ -->
+            <aside class="lg:col-span-4">
+                <div class="toc-sticky space-y-6">
+
+                    <!-- TOC -->
+                    <div class="card p-6">
+                        <div class="flex items-center gap-2 mb-4">
+                            <i data-lucide="list" class="w-4 h-4 text-sky-accent"></i>
+                            <h3 class="font-display font-bold text-navy text-sm uppercase tracking-wider translatable"
+                                data-fr="Sommaire"
+                                data-en="Table of contents">
+                                Sommaire
+                            </h3>
+                        </div>
+                        <nav id="toc" class="space-y-1">
+                            <a href="#principes" class="toc-link translatable" data-fr="1. Les principes de base" data-en="1. Basic principles">1. Les principes de base</a>
+                            <a href="#structure" class="toc-link translatable" data-fr="2. Structure de dossiers" data-en="2. Folder structure">2. Structure de dossiers</a>
+                            <a href="#pourquoi-features" class="toc-link sub translatable" data-fr="Le dossier features/" data-en="The features/ folder">Le dossier features/</a>
+                            <a href="#conventions" class="toc-link translatable" data-fr="3. Conventions" data-en="3. Conventions">3. Conventions</a>
+                            <a href="#nommage" class="toc-link sub translatable" data-fr="Nommage" data-en="Naming">Nommage</a>
+                            <a href="#imports" class="toc-link sub translatable" data-fr="Ordre des imports" data-en="Import order">Ordre des imports</a>
+                            <a href="#outillage" class="toc-link translatable" data-fr="4. Outillage" data-en="4. Tooling">4. Outillage</a>
+                            <a href="#conclusion" class="toc-link translatable" data-fr="Conclusion" data-en="Conclusion">Conclusion</a>
+                        </nav>
+                    </div>
+
+                    <!-- Auteur mini -->
+                    <div class="card p-6">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-sky-light to-sky-buttonDark flex items-center justify-center text-navy font-bold">
+                                JN
+                            </div>
+                            <div>
+                                <div class="font-semibold text-navy text-sm">Jessy Ngnambongo</div>
+                                <div class="text-xs text-navy-muted translatable"
+                                     data-fr="Développeur"
+                                     data-en="Developer">
+                                    Développeur
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-white w-full justify-center text-sm py-3">
+                            <i data-lucide="user-plus" class="w-4 h-4"></i>
+                            <span class="translatable" data-fr="Suivre" data-en="Follow">Suivre</span>
+                        </button>
+                    </div>
+
+                    <!-- CTA Outils -->
+                    <div class="rounded-2xl p-6 relative overflow-hidden"
+                         style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);">
+                        <div class="bg-tech-grid absolute inset-0 opacity-30"></div>
+                        <div class="absolute -top-12 -right-12 w-40 h-40 bg-sky-accent rounded-full opacity-15 blur-2xl"></div>
+                        <div class="relative z-10 space-y-3">
+                            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-sky-light text-xs font-bold tracking-widest uppercase">
+                                <i data-lucide="zap" class="w-3 h-3"></i>
+                                <span class="translatable" data-fr="Outils gratuits" data-en="Free tools">Outils gratuits</span>
+                            </div>
+                            <h3 class="font-display text-base font-bold text-white leading-snug translatable"
+                                data-fr="Gagnez du temps avec nos outils."
+                                data-en="Save time with our tools.">
+                                Gagnez du temps avec nos outils.
+                            </h3>
+                            <a href="outils.html" class="inline-flex items-center gap-2 text-xs font-semibold text-sky-light hover:text-white transition-colors">
+                                <span class="translatable" data-fr="Voir les outils" data-en="View tools">Voir les outils</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+
+        </div>
+    </section>
+
+    <!-- ============================================================
+         ARTICLES SIMILAIRES
+         ============================================================ -->
+    <section class="max-w-6xl mx-auto px-6 pb-20">
+        <div class="flex items-end justify-between mb-8 flex-wrap gap-4">
+            <div class="space-y-3">
+                <div class="badge-pill translatable" data-fr="À lire aussi" data-en="Read next">À lire aussi</div>
+                <h2 class="font-display text-2xl md:text-3xl font-bold text-navy translatable"
+                    data-fr="Articles similaires"
+                    data-en="Related articles">
+                    Articles similaires
+                </h2>
+            </div>
+            <a href="blog.html" class="text-sm font-semibold text-sky-accent hover:text-navy transition-colors flex items-center gap-2 group">
+                <span class="translatable" data-fr="Tous les articles" data-en="All articles">Tous les articles</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+
+            <a href="#" class="related-card">
+                <div class="h-48 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&h=500&fit=crop"
+                         alt="Article"
+                         class="w-full h-full object-cover">
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center gap-2 text-xs text-navy-muted mb-2">
+                        <span class="text-sky-accent font-semibold translatable" data-fr="Design" data-en="Design">Design</span>
+                        <span>•</span>
+                        <span class="translatable" data-fr="5 min" data-en="5 min">5 min</span>
+                    </div>
+                    <h3 class="font-display font-bold text-navy mb-2 leading-snug text-base translatable"
+                        data-fr="10 principes de design UI intemporels"
+                        data-en="10 timeless UI design principles">
+                        10 principes de design UI intemporels
+                    </h3>
+                    <div class="flex items-center text-xs font-semibold text-sky-accent gap-1 mt-3">
+                        <span class="translatable" data-fr="Lire" data-en="Read">Lire</span>
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </div>
+                </div>
+            </a>
+
+            <a href="#" class="related-card">
+                <div class="h-48 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=500&fit=crop"
+                         alt="Article"
+                         class="w-full h-full object-cover">
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center gap-2 text-xs text-navy-muted mb-2">
+                        <span class="text-sky-accent font-semibold translatable" data-fr="Outils" data-en="Tools">Outils</span>
+                        <span>•</span>
+                        <span class="translatable" data-fr="7 min" data-en="7 min">7 min</span>
+                    </div>
+                    <h3 class="font-display font-bold text-navy mb-2 leading-snug text-base translatable"
+                        data-fr="Les outils dev incontournables en 2026"
+                        data-en="Must-have dev tools in 2026">
+                        Les outils dev incontournables en 2026
+                    </h3>
+                    <div class="flex items-center text-xs font-semibold text-sky-accent gap-1 mt-3">
+                        <span class="translatable" data-fr="Lire" data-en="Read">Lire</span>
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </div>
+                </div>
+            </a>
+
+            <a href="#" class="related-card">
+                <div class="h-48 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=800&h=500&fit=crop"
+                         alt="Article"
+                         class="w-full h-full object-cover">
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center gap-2 text-xs text-navy-muted mb-2">
+                        <span class="text-sky-accent font-semibold translatable" data-fr="Développement" data-en="Development">Développement</span>
+                        <span>•</span>
+                        <span class="translatable" data-fr="9 min" data-en="9 min">9 min</span>
+                    </div>
+                    <h3 class="font-display font-bold text-navy mb-2 leading-snug text-base translatable"
+                        data-fr="Optimiser les performances d'une app React"
+                        data-en="Optimizing a React app's performance">
+                        Optimiser les performances d'une app React
+                    </h3>
+                    <div class="flex items-center text-xs font-semibold text-sky-accent gap-1 mt-3">
+                        <span class="translatable" data-fr="Lire" data-en="Read">Lire</span>
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- ============================================================
+         NEWSLETTER
+         ============================================================ -->
+    <section class="max-w-7xl mx-auto px-6 pb-20">
+        <div class="rounded-3xl p-8 md:p-16 relative overflow-hidden"
+             style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); box-shadow: 0 30px 60px -20px rgba(15, 23, 42, 0.5);">
+            <div class="bg-tech-grid absolute inset-0 opacity-25"></div>
+            <div class="absolute -top-20 -right-20 w-96 h-96 bg-sky-accent rounded-full opacity-15 blur-3xl"></div>
+            <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-sky-buttonDark rounded-full opacity-10 blur-3xl"></div>
+
+            <div class="grid lg:grid-cols-2 gap-10 items-center relative z-10">
+                <div class="space-y-5">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-sky-light text-xs font-bold tracking-widest uppercase backdrop-blur">
+                        <i data-lucide="mail" class="w-3 h-3"></i>
+                        <span class="translatable" data-fr="Newsletter" data-en="Newsletter">Newsletter</span>
+                    </div>
+                    <h2 class="font-display text-3xl md:text-4xl font-bold text-white leading-tight">
+                        <span class="translatable" data-fr="Recevez les nouveaux articles," data-en="Get new articles,">Recevez les nouveaux articles,</span><br>
+                        <span class="translatable" data-fr="une fois par semaine." data-en="once a week.">une fois par semaine.</span>
+                    </h2>
+                    <p class="text-sky-light/80 leading-relaxed translatable"
+                       data-fr="Pas de spam. Juste des articles utiles, des outils et des conseils pratiques pour progresser."
+                       data-en="No spam. Just useful articles, tools and practical tips to improve.">
+                        Pas de spam. Juste des articles utiles, des outils et des conseils pratiques pour progresser.
+                    </p>
+                </div>
+
+                <form class="space-y-3">
+                    <input type="email"
+                           class="newsletter-input translatable"
+                           data-fr-placeholder="ton@email.com"
+                           data-en-placeholder="your@email.com"
+                           placeholder="ton@email.com"
+                           required>
+                    <button type="submit" class="btn-primary w-full justify-center"
+                            style="background: #ffffff; color: #0f172a;">
+                        <span class="translatable" data-fr="S'abonner à la newsletter" data-en="Subscribe to newsletter">S'abonner à la newsletter</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                    <p class="text-center text-sky-light/60 text-xs translatable"
+                       data-fr="Désinscription possible à tout moment."
+                       data-en="Unsubscribe at any time.">
+                        Désinscription possible à tout moment.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white pt-16 pb-8 border-t border-sky-light">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                            <span class="font-display font-bold text-white text-lg">J</span>
+                        </div>
+                        <span class="font-display font-bold text-xl text-navy">JcHub</span>
+                    </div>
+                    <p class="text-navy-muted text-sm leading-relaxed translatable"
+                       data-fr="Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques."
+                       data-en="A clear platform to learn, use useful tools and move forward with your digital projects.">
+                        Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques.
+                    </p>
+                    <div class="space-y-3 pt-2">
+                        <a href="mailto:hello@jchub.dev" class="flex items-center gap-3 text-sm text-navy-muted hover:text-sky-accent transition-colors">
+                            <i data-lucide="mail" class="w-4 h-4"></i> hello@jchub.dev
+                        </a>
+                        <div class="flex items-center gap-3 text-sm text-navy-muted">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span class="translatable" data-fr="Congo Brazzaville" data-en="Congo Brazzaville">Congo Brazzaville</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="Plateforme" data-en="Platform">Plateforme</h3>
+                    <ul class="space-y-3">
+                        <li><a href="outils.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Outils" data-en="Tools">Outils</a></li>
+                        <li><a href="blog.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Blog" data-en="Blog">Blog</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Ressources" data-en="Resources">Ressources</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Nouveautés" data-en="What's new">Nouveautés</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="JcHub" data-en="JcHub">JcHub</h3>
+                    <ul class="space-y-3">
+                        <li><a href="about.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="À propos" data-en="About">À propos</a></li>
+                        <li><a href="contact.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Contact" data-en="Contact">Contact</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Partenaires" data-en="Partners">Partenaires</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Presse" data-en="Press">Presse</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="Légal" data-en="Legal">Légal</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Conditions d'utilisation" data-en="Terms of use">Conditions d'utilisation</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Confidentialité" data-en="Privacy">Confidentialité</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Mentions légales" data-en="Legal notice">Mentions légales</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Cookies" data-en="Cookies">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-sky-light pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-navy-muted text-sm translatable" data-fr="© 2026 JcHub. Tous droits réservés." data-en="© 2026 JcHub. All rights reserved.">© 2026 JcHub. Tous droits réservés.</p>
+                <p class="text-navy-muted text-sm">
+                    <span class="translatable" data-fr="Créé par" data-en="Created by">Créé par</span>
+                    <span class="text-navy font-semibold">Jessy Ngnambongo</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll top -->
+    <button class="scroll-top" id="scrollTop" onclick="scrollToTop()" aria-label="Retour en haut">
+        <i data-lucide="arrow-up" class="w-5 h-5"></i>
+    </button>
+
+    <!-- Toast -->
+    <div id="copyToast" class="fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-32 bg-navy text-white px-5 py-3 rounded-full shadow-2xl transition-transform duration-400 z-[1000] text-sm font-semibold flex items-center gap-2">
+        <i data-lucide="check" class="w-4 h-4 text-green-400"></i>
+        <span class="translatable" data-fr="Lien copié !" data-en="Link copied!">Lien copié !</span>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // ===== TRADUCTION =====
+        function setLanguage(lang) {
+            document.documentElement.lang = lang;
+            document.querySelectorAll('.translatable').forEach(el => {
+                const translation = el.getAttribute(`data-${lang}`);
+                if (translation) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = translation;
+                    } else {
+                        if (translation.includes('<')) el.innerHTML = translation;
+                        else el.textContent = translation;
+                    }
+                }
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+            });
+            localStorage.setItem('jchub-lang', lang);
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        }
+
+        // ===== PARTAGE =====
+        function shareArticle(network) {
+            const url = window.location.href;
+            const title = document.title;
+            let shareUrl = '';
+
+            switch (network) {
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+                    break;
+                case 'linkedin':
+                    shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+                    break;
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+                    break;
+            }
+
+            window.open(shareUrl, '_blank', 'width=600,height=500');
+        }
+
+        async function copyLink() {
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                showToast();
+            } catch (e) {
+                // fallback
+                const input = document.createElement('input');
+                input.value = window.location.href;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                showToast();
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('copyToast');
+            toast.style.transform = 'translate(-50%, 0)';
+            setTimeout(() => {
+                toast.style.transform = 'translate(-50%, 8rem)';
+            }, 2200);
+        }
+
+        // ===== PROGRESS BAR + SCROLL TOP =====
+        function updateProgress() {
+            const article = document.querySelector('.prose-article');
+            if (!article) return;
+
+            const rect = article.getBoundingClientRect();
+            const total = article.offsetHeight - window.innerHeight + 200;
+            const scrolled = -rect.top + 200;
+            const percent = Math.max(0, Math.min(100, (scrolled / total) * 100));
+
+            document.getElementById('progressFill').style.width = percent + '%';
+
+            const scrollTop = document.getElementById('scrollTop');
+            if (window.scrollY > 500) scrollTop.classList.add('show');
+            else scrollTop.classList.remove('show');
+        }
+
+        window.addEventListener('scroll', updateProgress);
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ===== TOC ACTIVE =====
+        function updateTocActive() {
+            const headings = document.querySelectorAll('.prose-article h2[id], .prose-article h3[id]');
+            const tocLinks = document.querySelectorAll('.toc-link');
+
+            let currentId = '';
+            headings.forEach(h => {
+                const rect = h.getBoundingClientRect();
+                if (rect.top <= 150) currentId = h.id;
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+            });
+        }
+
+        window.addEventListener('scroll', updateTocActive);
+
+        // ===== SMOOTH SCROLL POUR TOC =====
+        document.querySelectorAll('.toc-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) {
+                    const y = target.getBoundingClientRect().top + window.pageYOffset - 100;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+            });
+        });
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('jchub-lang') || 'fr';
+            setLanguage(savedLang);
+            updateProgress();
+            updateTocActive();
+        });
+    </script>
+</body>
+</html>

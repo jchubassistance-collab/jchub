@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conditions Générales de Vente - JcHub</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        sky: {
+                            soft: '#eff6ff',
+                            light: '#dbeafe',
+                            button: '#93c5fd',
+                            buttonDark: '#60a5fa',
+                            accent: '#2563eb',
+                        },
+                        navy: {
+                            DEFAULT: '#0f172a',
+                            soft: '#1e3a8a',
+                            muted: '#475569',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #eff6ff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* ============================================
+           AMBIANCE TECH
+           ============================================ */
+        .bg-tech-grid {
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(circle at 50% 40%, black 25%, transparent 75%);
+            -webkit-mask-image: radial-gradient(circle at 50% 40%, black 25%, transparent 75%);
+            pointer-events: none;
+        }
+
+        .tech-dot {
+            position: absolute;
+            border-radius: 50%;
+            background: #2563eb;
+            opacity: 0.18;
+            pointer-events: none;
+        }
+
+        .float-1 { animation: floatDot 6s ease-in-out infinite; }
+        .float-2 { animation: floatDot 8s ease-in-out infinite 1s; }
+
+        @keyframes floatDot {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-15px) translateX(6px); }
+        }
+
+        /* ============================================
+           NAVBAR
+           ============================================ */
+        .nav-link {
+            font-weight: 600;
+            font-size: 15px;
+            color: #0f172a;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active { color: #2563eb; }
+
+        .lang-switch {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: #ffffff;
+            border-radius: 999px;
+            padding: 3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .lang-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: none;
+            background: transparent;
+        }
+
+        .lang-btn.active { background: #2563eb; color: #ffffff; }
+        .lang-btn:hover:not(.active) { color: #0f172a; }
+
+        .translatable { transition: opacity 0.2s ease; }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #1e3a8a;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        /* ============================================
+           CONTENU LÉGAL
+           ============================================ */
+        .legal-content {
+            color: #334155;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .legal-content > * + * {
+            margin-top: 1.3em;
+        }
+
+        .legal-content h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+            margin-top: 2.5em;
+            margin-bottom: 0.8em;
+            padding-top: 1.5em;
+            border-top: 1px solid #dbeafe;
+            scroll-margin-top: 100px;
+        }
+
+        .legal-content h2:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        .legal-content h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.01em;
+            line-height: 1.4;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            scroll-margin-top: 100px;
+        }
+
+        .legal-content p {
+            color: #334155;
+        }
+
+        .legal-content strong {
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .legal-content a {
+            color: #2563eb;
+            text-decoration: underline;
+            text-decoration-thickness: 1.5px;
+            text-underline-offset: 3px;
+            transition: color 0.2s ease;
+        }
+
+        .legal-content a:hover {
+            color: #0f172a;
+        }
+
+        .legal-content ul, .legal-content ol {
+            padding-left: 1.5em;
+            margin-top: 1em;
+            margin-bottom: 1em;
+        }
+
+        .legal-content ul li {
+            margin-bottom: 0.6em;
+            position: relative;
+            padding-left: 0.5em;
+        }
+
+        .legal-content ul li::before {
+            content: '';
+            position: absolute;
+            left: -1em;
+            top: 0.7em;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #2563eb;
+        }
+
+        .legal-content ol {
+            list-style: decimal;
+        }
+
+        .legal-content ol li {
+            margin-bottom: 0.6em;
+            padding-left: 0.3em;
+        }
+
+        .legal-content ol li::marker {
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        .legal-content .info-box {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 1px solid #bfdbfe;
+            border-left: 4px solid #2563eb;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 1.8em 0;
+        }
+
+        .legal-content .info-box p {
+            color: #1e3a8a;
+            font-size: 15px;
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        .legal-content .info-box strong {
+            color: #0f172a;
+        }
+
+        .legal-content .warning-box {
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 1.8em 0;
+        }
+
+        .legal-content .warning-box p {
+            color: #78350f;
+            font-size: 15px;
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        /* ============================================
+           TOC STICKY
+           ============================================ */
+        .toc-sticky {
+            position: sticky;
+            top: 100px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .toc-sticky::-webkit-scrollbar { width: 4px; }
+        .toc-sticky::-webkit-scrollbar-thumb {
+            background: #dbeafe;
+            border-radius: 999px;
+        }
+
+        .toc-link {
+            display: block;
+            padding: 8px 14px;
+            color: #475569;
+            font-size: 13.5px;
+            font-weight: 500;
+            border-left: 2px solid transparent;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            line-height: 1.4;
+        }
+
+        .toc-link:hover {
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .toc-link.active {
+            color: #2563eb;
+            border-left-color: #2563eb;
+            background: #eff6ff;
+            font-weight: 600;
+        }
+
+        /* ============================================
+           CARTES, BOUTONS
+           ============================================ */
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow:
+                0 4px 12px rgba(15, 23, 42, 0.04),
+                inset 0 1px 0 #ffffff;
+            border: 1px solid rgba(219, 234, 254, 0.9);
+        }
+
+        .btn-primary {
+            background: #93c5fd;
+            color: #0f172a;
+            padding: 14px 28px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #60a5fa;
+            transform: translateY(-3px);
+            box-shadow:
+                0 12px 25px rgba(37, 99, 235, 0.3),
+                0 4px 10px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-white {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 14px 28px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #dbeafe;
+        }
+
+        .btn-white:hover {
+            box-shadow:
+                0 12px 25px rgba(37, 99, 235, 0.15),
+                0 4px 10px rgba(37, 99, 235, 0.1);
+            transform: translateY(-3px);
+        }
+
+        /* Scroll to top */
+        .scroll-top {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4);
+            cursor: pointer;
+            border: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+
+        .scroll-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-top:hover {
+            background: #1e40af;
+            transform: translateY(-4px);
+        }
+
+        /* Progress bar */
+        .reading-progress {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: transparent;
+            z-index: 40;
+            pointer-events: none;
+        }
+
+        .reading-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #60a5fa);
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: 0 999px 999px 0;
+            box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
+        }
+
+        @media (max-width: 1024px) {
+            .toc-sticky {
+                position: relative;
+                top: 0;
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .legal-content { font-size: 15px; }
+            .legal-content h2 { font-size: 20px; }
+            .legal-content h3 { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barre de progression -->
+    <div class="reading-progress">
+        <div class="reading-progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 bg-sky-soft/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center h-20">
+
+                <a href="index.html" class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                        <span class="font-display font-bold text-white text-xl">J</span>
+                    </div>
+                    <span class="font-display font-bold text-2xl text-navy tracking-tight">JcHub</span>
+                </a>
+
+                <div class="hidden lg:flex items-center gap-10">
+                    <a href="index.html" class="nav-link translatable" data-fr="Accueil" data-en="Home">Accueil</a>
+                    <a href="outils.html" class="nav-link translatable" data-fr="Outils" data-en="Tools">Outils</a>
+                    <a href="about.html" class="nav-link translatable" data-fr="À propos" data-en="About">À propos</a>
+                    <a href="blog.html" class="nav-link translatable" data-fr="Blog" data-en="Blog">Blog</a>
+                    <a href="contact.html" class="nav-link translatable" data-fr="Contact" data-en="Contact">Contact</a>
+                </div>
+
+                <div class="hidden lg:flex items-center gap-4">
+                    <div class="lang-switch">
+                        <button class="lang-btn active" data-lang="fr" onclick="setLanguage('fr')">🇫🇷 FR</button>
+                        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇬🇧 EN</button>
+                    </div>
+                </div>
+
+                <button class="lg:hidden text-navy" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" class="w-7 h-7"></i>
+                </button>
+            </div>
+
+            <div id="mobileMenu" class="lg:hidden hidden pb-6 space-y-3">
+                <a href="index.html" class="block nav-link translatable py-2" data-fr="Accueil" data-en="Home">Accueil</a>
+                <a href="outils.html" class="block nav-link translatable py-2" data-fr="Outils" data-en="Tools">Outils</a>
+                <a href="about.html" class="block nav-link translatable py-2" data-fr="À propos" data-en="About">À propos</a>
+                <a href="blog.html" class="block nav-link translatable py-2" data-fr="Blog" data-en="Blog">Blog</a>
+                <a href="contact.html" class="block nav-link translatable py-2" data-fr="Contact" data-en="Contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+         HERO LÉGAL
+         ============================================================ -->
+    <section class="relative pt-32 pb-10 overflow-hidden">
+        <div class="bg-tech-grid absolute inset-0 z-0"></div>
+        <div class="tech-dot float-1" style="width: 5px; height: 5px; top: 20%; left: 5%;"></div>
+        <div class="tech-dot float-2" style="width: 6px; height: 6px; top: 60%; right: 6%;"></div>
+
+        <div class="max-w-4xl mx-auto px-6 relative z-10">
+
+            <!-- Breadcrumb -->
+            <div class="flex items-center gap-2 text-sm text-navy-muted mb-6 flex-wrap">
+                <a href="index.html" class="hover:text-sky-accent transition-colors translatable" data-fr="Accueil" data-en="Home">Accueil</a>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                <span class="text-navy font-semibold translatable" data-fr="Conditions Générales de Vente" data-en="Terms of Sale">Conditions Générales de Vente</span>
+            </div>
+
+            <!-- Badge -->
+            <div class="badge-pill w-fit mb-6">
+                <i data-lucide="file-text" class="w-3.5 h-3.5 text-sky-accent"></i>
+                <span class="translatable" data-fr="Document légal" data-en="Legal document">Document légal</span>
+            </div>
+
+            <!-- Titre -->
+            <h1 class="font-display font-extrabold text-navy leading-[1.1] tracking-tight mb-6"
+                style="font-size: clamp(2rem, 4.5vw, 3rem);">
+                <span class="translatable" data-fr="Conditions Générales" data-en="Terms of Sale">Conditions Générales</span><br>
+                <span class="text-sky-accent translatable" data-fr="de Vente" data-en="">de Vente</span>
+            </h1>
+
+            <p class="text-lg text-navy-muted leading-relaxed mb-6 max-w-2xl translatable"
+               data-fr="Les présentes Conditions Générales de Vente régissent l'utilisation des services et outils proposés par JcHub. En accédant à la plateforme, vous acceptez sans réserve les conditions décrites ci-dessous."
+               data-en="These Terms of Sale govern the use of services and tools offered by JcHub. By accessing the platform, you accept without reservation the conditions described below.">
+                Les présentes Conditions Générales de Vente régissent l'utilisation des services et outils proposés par JcHub. En accédant à la plateforme, vous acceptez sans réserve les conditions décrites ci-dessous.
+            </p>
+
+            <!-- Meta -->
+            <div class="flex flex-wrap items-center gap-4 text-sm text-navy-muted pt-4 border-t border-sky-light">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span class="translatable" data-fr="Dernière mise à jour : 15 mai 2026" data-en="Last updated: May 15, 2026">Dernière mise à jour : 15 mai 2026</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="clock" class="w-4 h-4"></i>
+                    <span class="translatable" data-fr="Version 1.2" data-en="Version 1.2">Version 1.2</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ============================================================
+         CONTENU + SIDEBAR
+         ============================================================ -->
+    <section class="max-w-6xl mx-auto px-6 pb-20">
+        <div class="grid lg:grid-cols-12 gap-10">
+
+            <!-- ============ CONTENU ============ -->
+            <article class="lg:col-span-8">
+                <div class="card p-8 md:p-12">
+                    <div class="legal-content">
+
+                        <div class="info-box">
+                            <p class="translatable"
+                               data-fr="<strong>Résumé :</strong> JcHub propose des outils numériques gratuits et des services optionnels payants. L'utilisation de la plateforme implique l'acceptation des présentes conditions. Aucune donnée personnelle n'est revendue."
+                               data-en="<strong>Summary:</strong> JcHub offers free digital tools and optional paid services. Using the platform implies acceptance of these terms. No personal data is resold.">
+                                <strong>Résumé :</strong> JcHub propose des outils numériques gratuits et des services optionnels payants. L'utilisation de la plateforme implique l'acceptation des présentes conditions. Aucune donnée personnelle n'est revendue.
+                            </p>
+                        </div>
+
+                        <h2 id="article-1" class="translatable"
+                            data-fr="Article 1 — Objet et champ d'application"
+                            data-en="Article 1 — Purpose and scope">
+                            Article 1 — Objet et champ d'application
+                        </h2>
+
+                        <p class="translatable"
+                           data-fr="Les présentes Conditions Générales de Vente (ci-après « CGV ») ont pour objet de définir les modalités et conditions dans lesquelles JcHub met à disposition ses services et outils numériques, ainsi que les droits et obligations des utilisateurs."
+                           data-en="These Terms of Sale (hereinafter 'ToS') aim to define the terms and conditions under which JcHub provides its digital services and tools, as well as the rights and obligations of users.">
+                            Les présentes Conditions Générales de Vente (ci-après « CGV ») ont pour objet de définir les modalités et conditions dans lesquelles JcHub met à disposition ses services et outils numériques, ainsi que les droits et obligations des utilisateurs.
+                        </p>
+
+                        <p class="translatable"
+                           data-fr="Toute utilisation de la plateforme <strong>jchub.dev</strong>, qu'elle soit gratuite ou payante, implique l'acceptation pleine et entière des présentes CGV."
+                           data-en="Any use of the <strong>jchub.dev</strong> platform, whether free or paid, implies full and complete acceptance of these ToS.">
+                            Toute utilisation de la plateforme <strong>jchub.dev</strong>, qu'elle soit gratuite ou payante, implique l'acceptation pleine et entière des présentes CGV.
+                        </p>
+
+                        <h2 id="article-2" class="translatable"
+                            data-fr="Article 2 — Services proposés"
+                            data-en="Article 2 — Services offered">
+                            Article 2 — Services proposés
+                        </h2>
+
+                        <p class="translatable"
+                           data-fr="JcHub propose deux catégories de services :"
+                           data-en="JcHub offers two categories of services:">
+                            JcHub propose deux catégories de services :
+                        </p>
+
+                        <h3 class="translatable"
+                            data-fr="2.1 Outils gratuits"
+                            data-en="2.1 Free tools">
+                            2.1 Outils gratuits
+                        </h3>
+
+                        <p class="translatable"
+                           data-fr="L'accès à la majorité des outils (générateur de mot de passe, JSON Formatter, Base64 Encoder, etc.) est <strong>entièrement gratuit</strong> et ne nécessite aucune inscription."
+                           data-en="Access to most tools (password generator, JSON Formatter, Base64 Encoder, etc.) is <strong>completely free</strong> and requires no registration.">
+                            L'accès à la majorité des outils (générateur de mot de passe, JSON Formatter, Base64 Encoder, etc.) est <strong>entièrement gratuit</strong> et ne nécessite aucune inscription.
+                        </p>
+
+                        <h3 class="translatable"
+                            data-fr="2.2 Services payants"
+                            data-en="2.2 Paid services">
+                            2.2 Services payants
+                        </h3>
+
+                        <p class="translatable"
+                           data-fr="Certains services optionnels peuvent être proposés à titre payant :"
+                           data-en="Some optional services may be offered for a fee:">
+                            Certains services optionnels peuvent être proposés à titre payant :
+                        </p>
+
+                        <ul>
+                            <li class="translatable"
+                                data-fr="Fonctionnalités avancées (API, stockage cloud, exports premium)"
+                                data-en="Advanced features (API, cloud storage, premium exports)">
+                                Fonctionnalités avancées (API, stockage cloud, exports premium)
+                            </li>
+                            <li class="translatable"
+                                data-fr="Accompagnement et prestations sur mesure"
+                                data-en="Coaching and custom services">
+                                Accompagnement et prestations sur mesure
+                            </li>
+                            <li class="translatable"
+                                data-fr="Licences professionnelles pour entreprises"
+                                data-en="Professional licenses for businesses">
+                                Licences professionnelles pour entreprises
+                            </li>
+                        </ul>
+
+                        <p class="translatable"
+                           data-fr="Les tarifs sont indiqués en euros (EUR) ou en francs CFA (XAF), toutes taxes comprises, sur la page de commande."
+                           data-en="Prices are indicated in euros (EUR) or CFA francs (XAF), including taxes, on the order page.">
+                            Les tarifs sont indiqués en euros (EUR) ou en francs CFA (XAF), toutes taxes comprises, sur la page de commande.
+                        </p>
+
+                        <h2 id="article-3" class="translatable"
+                            data-fr="Article 3 — Commande et formation du contrat"
+                            data-en="Article 3 — Order and contract formation">
+                            Article 3 — Commande et formation du contrat
+                        </h2>
+
+                        <p class="translatable"
+                           data-fr="Toute commande de service payant implique :"
+                           data-en="Any order of a paid service implies:">
+                            Toute commande de service payant implique :
+                        </p>
+
+                        <ol>
+                            <li class="translatable"
+                                data-fr="La sélection du service souhaité sur la plateforme."
+                                data-en="Selection of the desired service on the platform.">
+                                La sélection du service souhaité sur la plateforme.
+                            </li>
+                            <li class="translatable"
+                                data-fr="La validation du devis ou du paiement par l'utilisateur."
+                                data-en="Validation of the quote or payment by the user.">
+                                La validation du devis ou du paiement par l'utilisateur.
+                            </li>
+                            <li class="translatable"
+                                data-fr="La réception d'un email de confirmation par JcHub."
+                                data-en="Receipt of a confirmation email from JcHub.">
+                                La réception d'un email de confirmation par JcHub.
+                            </li>
+                        </ol>
+
+                        <p class="translatable"
+                           data-fr="Le contrat est formé au moment de la confirmation du paiement. JcHub se réserve le droit de refuser toute commande pour motif légitime."
+                           data-en="The contract is formed upon confirmation of payment. JcHub reserves the right to refuse any order for legitimate reasons.">
+                            Le contrat est formé au moment de la confirmation du paiement. JcHub se réserve le droit de refuser toute commande pour motif légitime.
+                        </p>
+
+                        <h2 id="article-4" class="translatable"
+                            data-fr="Article 4 — Tarifs et modalités de paiement"
+                            data-en="Article 4 — Pricing and payment terms">
+                            Article 4 — Tarifs et modalités de paiement
+                        </h2>
+
+                        <p class="translatable"
+                           data-fr="Les prix des services sont indiqués en euros ou en francs CFA, toutes taxes comprises. JcHub se réserve le droit de modifier ses tarifs à tout moment, les modifications n'affectant pas les commandes en cours."
+                           data-en="Service prices are indicated in euros or CFA francs, all taxes included. JcHub reserves the right to modify its prices at any time, with changes not affecting ongoing orders.">
+                            Les prix des services sont indiqués en euros ou en francs CFA, toutes taxes comprises. JcHub se réserve le droit de modifier ses tarifs à tout moment, les modifications n'affectant pas les commandes en cours.
+                        </p>
+
+                        <p class="translatable"
+                           data-fr="Le paiement s'effectue en ligne, de manière sécurisée, via les moyens de paiement suivants :"
+                           data-en="Payment is made online, securely, via the following payment methods:">
+                            Le paiement s'effectue en ligne, de manière sécurisée, via les moyens de paiement suivants :
+                        </p>
+
+                        <ul>
+                            <li class="translatable"
+                                data-fr="Carte bancaire (Visa, Mastercard)"
+                                data-en="Bank card (Visa, Mastercard)">
+                                Carte bancaire (Visa, Mastercard)
+                            </li>
+                            <li class="translatable"
+                                data-fr="Mobile Money (Airtel Money, MTN Mobile Money)"
+                                data-en="Mobile Money (Airtel Money, MTN Mobile Money)">
+                                Mobile Money (Airtel Money, MTN Mobile Money)
+                            </li>
+                            <li class="translatable"
+                                data-fr="Virement bancaire (pour les commandes supérieures à 500 EUR)"
+                                data-en="Bank transfer (for orders over 500 EUR)">
+                                Virement bancaire (pour les commandes supérieures à 500 EUR)
+                            </li>
+                        </ul>
+
+                        <div class="info-box">
+                            <p class="translatable"
+                               data-fr="<strong>Sécurité :</strong> Toutes les transactions sont traitées via des prestataires de paiement sécurisés. JcHub ne stocke aucune donnée bancaire."
+                               data-en="<strong>Security:</strong> All transactions are processed via secure payment providers. JcHub does not store any banking data.">
+                                <strong>Sécurité :</strong> Toutes les transactions sont traitées via des prestataires de paiement sécurisés. JcHub ne stocke aucune donnée bancaire.
+                            </p>
+                        </div>
+
+                        <h2 id="article-5" class="translatable"
+                            data-fr="Article 5 — Droit de rétractation"
+                            data-en="Article 5 — Right of withdrawal">
+                            Article 5 — Droit de rétractation
+                        </h2>
+
+                        <p class="translatable"
+                           data-fr="Conformément à la réglementation en vigueur, l'utilisateur dispose d'un délai de <strong>14 jours</strong> à compter de la date de commande pour exercer son droit de rétractation, sans avoir à justifier de motif."
+                           data-en="In accordance with applicable regulations, the user has a period of <strong>14 days</strong> from the order date to exercise their right of withdrawal, without having to justify a reason.">
+                            Conformément à la réglementation en vigueur, l'utilisateur dispose d'un délai de <strong>14 jours</strong> à compter de la date de commande pour exercer son droit de rétractation, sans avoir à justifier de motif.
+                        </p>
+
+                        <p class="translatable"
+                           data-fr="Pour exercer ce droit, l'utilisateur doit envoyer une demande écrite à <a href='mailto:contact@jchub.dev'>contact@jchub.dev</a>. Le remboursement sera effectué dans un délai de 14 jours suivant la réception de la demande."
+                           data-en="To exercise this right, the user must send a written request to <a href='mailto:contact@jchub.dev'>contact@jchub.dev</a>. The refund will be made within 14 days of receiving the request.">
+                            Pour exercer ce droit, l'utilisateur doit envoyer une demande écrite à <a href='mailto:contact@jchub.dev'>contact@jchub.dev</a>. Le remboursement sera effectué dans un délai de 14 jours suivant la réception de la demande.
+                        </p>
+
+                        <div class="warning-box">
+                            <p class="translatable"
+                               data-fr="<strong>Exception :</strong> Le droit de rétractation ne s'applique pas aux services numériques déjà exécutés (téléchargements, API activée, prestations déjà réalisées) après accord exprès de l'utilisateur."
+                               data-en="<strong>Exception:</strong> The right of withdrawal does not apply to digital services already performed (downloads, activated API, services already completed) after express agreement of the user.">
+                                <strong>Exception :</strong> Le droit de rétractation ne s'applique pas aux services numériques déjà exécutés (téléchargements, API activée, prestations déjà réalisées) après accord exprès de l'utilisateur.
+                            </p>
+                        </div>
+
+                        <h2 id="article-6" class="translatable"
+                            data-fr="Article 6 — Obligations de l'utilisateur"
+                            data-en="Article 6 — User obligations">
+                            Article 6 — Obligations de l'utilisateur
+                        </h2>
+
+                        <p class="translatable"
+                           data-fr="L'utilisateur s'engage à :"
+                           data-en="The user agrees to:">
+                            L'utilisateur s'engage à :
+                        </p>
+
+                        <ul>
+                            <li class="translatable"
+                                data-fr="Utiliser les services de manière conforme à leur destination et à la législation."
+                                data-en="Use the services in accordance with their purpose and applicable law.">
+                                Utiliser les services de manière conforme à leur destination et à la législation.
+                            </li>
+                            <li class="translatable"
+                                data-fr="Ne pas tenter de contourner les mesures de sécurité de la plateforme."
+                                data-en="Not attempt to bypass the platform's security measures.">
+                                Ne pas tenter de contourner les mesures de sécurité de la plateforme.
+                            </li>
+                            <li class="translatable"
+                                data-fr="Ne pas utiliser les outils à des fins illégales ou malveillantes."
+                                data-en="Not use the tools for illegal or malicious purposes.">
+                                Ne pas utiliser les outils à des fins illégales ou malveillantes.
+                            </li>
+                            <li class="translatable"
+                                data-fr="Fournir des informations exactes lors d'une commande."
+                                data-en="Provide accurate information when placing an order.">
+                                Fournir des informations exactes lors d'une commande.
+                            </li>
+                        </ul>
+
+                        <p class="translatable"
+                           data-fr="Tout manquement à ces obligations peut entraîner la suspension ou la résiliation de l'accès au service, sans remboursement."
+                           data-en="Any breach of these obligations may result in suspension or termination of access to the service, without refund.">
+                            Tout manquement à ces obligations peut entraîner la suspension ou la résiliation de l'accès au service, sans remboursement.
+                        </p>
+
+                        <h2 id="article-7" class="translatable"
+                            data-fr="Article 7 — Responsabilité"
+                            data-en="Article 7 — Liability">
+                            Article 7 — Responsabilité
+                        </h2>
+
+                        <p class="translatable"
+                           data-fr="JcHub met tout en œuvre pour assurer la disponibilité et la fiabilité de ses services. Cependant, la responsabilité de JcHub ne saurait être engagée en cas de :"
+                           data-en="JcHub makes every effort to ensure the availability and reliability of its services. However, JcHub's liability cannot be engaged in case of:">
+                            JcHub met tout en œuvre pour assurer la disponibilité et la fiabilité de ses services. Cependant, la responsabilité de JcHub ne saurait être engagée en cas de :
+                        </p>
+
+                        <ul>
+                            <li class="translatable"
+                                data-fr="Interruption temporaire du service pour maintenance ou mise à jour."
+                                data-en="Temporary service interruption for maintenance or updates.">
+                                Interruption temporaire du service pour maintenance ou mise à jour.
+                            </li>
+                            <li class="translatable"
+                                data-fr="Utilisation inappropriée des outils par l'utilisateur."
+                                data-en="Inappropriate use of tools by the user.">
+                                Utilisation inappropriée des outils par l'utilisateur.
+                            </li>
+                            <li class="translatable"
+                                data-fr="Perte de données due à un cas de force majeure ou à une défaillance technique externe."
+                                data-en="Data loss due to force majeure or external technical failure.">
+                                Perte de données due à un cas de force majeure ou à une défaillance technique externe.
+                            </li>
+                        </ul>
+
+                        <h2 id="article-8" class="translatable"
+                            data-fr="Article 8 — Propriété intellectuelle"
+                            data-en="Article 8 — Intellectual property">
+                            Article 8 — Propriété intellectuelle
+                        </h2>
+
+                        <p class="translatable"
+                           data-fr="L'ensemble des éléments composant la plateforme JcHub (code source, design, textes, logos, illustrations) est protégé par le droit d'auteur et demeure la propriété exclusive de son créateur."
+                           data-en="All elements composing the JcHub platform (source code, design, texts, logos, illustrations) are protected by copyright and remain the exclusive property of their creator.">
+                            L'ensemble des éléments composant la plateforme JcHub (code source, design, textes, logos, illustrations) est protégé par le droit d'auteur et demeure la propriété exclusive de son créateur.
+                        </p>
+
+                        <p class="translatable"
+                           data-fr="Toute reproduction, distribution ou utilisation non autorisée est strictement interdite, sauf accord écrit préalable."
+                           data-en="Any unauthorized reproduction, distribution or use is strictly prohibited, except with prior written consent.">
+                            Toute reproduction, distribution ou utilisation non autorisée est strictement interdite, sauf accord écrit préalable.
+                        </p>
+
+                        <h2 id="article-9" class="translatable"
+                            data-fr="Article 9 — Données personnelles"
+                            data-en="Article 9 — Personal data">
+                            Article 9 — Données personnelles
+                        </h2>
+
+                        <p class="translatable"
+                           data-fr="JcHub s'engage à protéger les données personnelles de ses utilisateurs conformément au RGPD et aux réglementations locales applicables. Les informations collectées sont utilisées uniquement pour la fourniture du service."
+                           data-en="JcHub undertakes to protect the personal data of its users in accordance with the GDPR and applicable local regulations. Collected information is used only for providing the service.">
+                            JcHub s'engage à protéger les données personnelles de ses utilisateurs conformément au RGPD et aux réglementations locales applicables. Les informations collectées sont utilisées uniquement pour la fourniture du service.
+                        </p>
+
+                        <p class="translatable"
+                           data-fr="Pour plus d'informations, consultez notre <a href='#'>Politique de confidentialité</a>."
+                           data-en="For more information, see our <a href='#'>Privacy Policy</a>.">
+                            Pour plus d'informations, consultez notre <a href='#'>Politique de confidentialité</a>.
+                        </p>
+
+                        <h2 id="article-10" class="translatable"
+                            data-fr="Article 10 — Modifications des CGV"
+                            data-en="Article 10 — Modifications of the ToS">
+                            Article 10 — Modifications des CGV
+                        </h2>
+
+                        <p class="translatable"
+                           data-fr="JcHub se réserve le droit de modifier les présentes CGV à tout moment. Les utilisateurs seront informés de toute modification importante par email ou via un avis sur la plateforme."
+                           data-en="JcHub reserves the right to modify these ToS at any time. Users will be informed of any significant change by email or via a notice on the platform.">
+                            JcHub se réserve le droit de modifier les présentes CGV à tout moment. Les utilisateurs seront informés de toute modification importante par email ou via un avis sur la plateforme.
+                        </p>
+
+                        <p class="translatable"
+                           data-fr="La poursuite de l'utilisation des services après modification vaut acceptation des nouvelles conditions."
+                           data-en="Continued use of the services after modification constitutes acceptance of the new conditions.">
+                            La poursuite de l'utilisation des services après modification vaut acceptation des nouvelles conditions.
+                        </p>
+
+                        <h2 id="article-11" class="translatable"
+                            data-fr="Article 11 — Droit applicable et juridiction"
+                            data-en="Article 11 — Applicable law and jurisdiction">
+                            Article 11 — Droit applicable et juridiction
+                        </h2>
+
+                        <p class="translatable"
+                           data-fr="Les présentes CGV sont régies par le droit français et congolais. En cas de litige, une solution amiable sera recherchée en priorité. À défaut, les tribunaux compétents seront saisis."
+                           data-en="These ToS are governed by French and Congolese law. In case of dispute, an amicable solution will be sought first. Otherwise, the competent courts will have jurisdiction.">
+                            Les présentes CGV sont régies par le droit français et congolais. En cas de litige, une solution amiable sera recherchée en priorité. À défaut, les tribunaux compétents seront saisis.
+                        </p>
+
+                        <h2 id="article-12" class="translatable"
+                            data-fr="Article 12 — Contact"
+                            data-en="Article 12 — Contact">
+                            Article 12 — Contact
+                        </h2>
+
+                        <p class="translatable"
+                           data-fr="Pour toute question relative aux présentes CGV, vous pouvez nous contacter :"
+                           data-en="For any questions regarding these ToS, you can contact us:">
+                            Pour toute question relative aux présentes CGV, vous pouvez nous contacter :
+                        </p>
+
+                        <ul>
+                            <li><strong>Email :</strong> <a href="mailto:contact@jchub.dev">contact@jchub.dev</a></li>
+                            <li><strong>Email légal :</strong> <a href="mailto:legal@jchub.dev">legal@jchub.dev</a></li>
+                            <li><strong>Adresse :</strong> <span class="translatable" data-fr="Congo Brazzaville" data-en="Congo Brazzaville">Congo Brazzaville</span></li>
+                        </ul>
+
+                    </div>
+                </div>
+            </article>
+
+            <!-- ============ SIDEBAR ============ -->
+            <aside class="lg:col-span-4">
+                <div class="toc-sticky space-y-6">
+
+                    <!-- TOC -->
+                    <div class="card p-6">
+                        <div class="flex items-center gap-2 mb-4">
+                            <i data-lucide="list" class="w-4 h-4 text-sky-accent"></i>
+                            <h3 class="font-display font-bold text-navy text-sm uppercase tracking-wider translatable"
+                                data-fr="Sommaire"
+                                data-en="Table of contents">
+                                Sommaire
+                            </h3>
+                        </div>
+                        <nav id="toc" class="space-y-1">
+                            <a href="#article-1" class="toc-link translatable" data-fr="Article 1 — Objet" data-en="Article 1 — Purpose">Article 1 — Objet</a>
+                            <a href="#article-2" class="toc-link translatable" data-fr="Article 2 — Services" data-en="Article 2 — Services">Article 2 — Services</a>
+                            <a href="#article-3" class="toc-link translatable" data-fr="Article 3 — Commande" data-en="Article 3 — Order">Article 3 — Commande</a>
+                            <a href="#article-4" class="toc-link translatable" data-fr="Article 4 — Tarifs" data-en="Article 4 — Pricing">Article 4 — Tarifs</a>
+                            <a href="#article-5" class="toc-link translatable" data-fr="Article 5 — Rétractation" data-en="Article 5 — Withdrawal">Article 5 — Rétractation</a>
+                            <a href="#article-6" class="toc-link translatable" data-fr="Article 6 — Obligations" data-en="Article 6 — Obligations">Article 6 — Obligations</a>
+                            <a href="#article-7" class="toc-link translatable" data-fr="Article 7 — Responsabilité" data-en="Article 7 — Liability">Article 7 — Responsabilité</a>
+                            <a href="#article-8" class="toc-link translatable" data-fr="Article 8 — Propriété" data-en="Article 8 — Property">Article 8 — Propriété</a>
+                            <a href="#article-9" class="toc-link translatable" data-fr="Article 9 — Données" data-en="Article 9 — Data">Article 9 — Données</a>
+                            <a href="#article-10" class="toc-link translatable" data-fr="Article 10 — Modifications" data-en="Article 10 — Modifications">Article 10 — Modifications</a>
+                            <a href="#article-11" class="toc-link translatable" data-fr="Article 11 — Juridiction" data-en="Article 11 — Jurisdiction">Article 11 — Juridiction</a>
+                            <a href="#article-12" class="toc-link translatable" data-fr="Article 12 — Contact" data-en="Article 12 — Contact">Article 12 — Contact</a>
+                        </nav>
+                    </div>
+
+                    <!-- Aide -->
+                    <div class="card p-6">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-sky-light flex items-center justify-center text-sky-accent flex-shrink-0">
+                                <i data-lucide="help-circle" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <div class="font-display font-bold text-navy text-sm translatable"
+                                     data-fr="Besoin d'aide ?"
+                                     data-en="Need help?">
+                                    Besoin d'aide ?
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-navy-muted leading-relaxed mb-4 translatable"
+                           data-fr="Une question sur nos conditions ? Notre équipe vous répond sous 24h."
+                           data-en="A question about our terms? Our team replies within 24h.">
+                            Une question sur nos conditions ? Notre équipe vous répond sous 24h.
+                        </p>
+                        <a href="contact.html" class="btn-white w-full justify-center text-sm py-3">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                            <span class="translatable" data-fr="Nous contacter" data-en="Contact us">Nous contacter</span>
+                        </a>
+                    </div>
+
+                    <!-- Documents légaux -->
+                    <div class="card p-6">
+                        <div class="flex items-center gap-2 mb-4">
+                            <i data-lucide="file-text" class="w-4 h-4 text-sky-accent"></i>
+                            <h3 class="font-display font-bold text-navy text-sm uppercase tracking-wider translatable"
+                                data-fr="Documents légaux"
+                                data-en="Legal documents">
+                                Documents légaux
+                            </h3>
+                        </div>
+                        <ul class="space-y-1">
+                            <li>
+                                <a href="cgu.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-sky-soft transition-colors text-sm text-navy-muted hover:text-sky-accent">
+                                    <i data-lucide="file-check" class="w-4 h-4"></i>
+                                    <span class="translatable" data-fr="Conditions Générales d'Utilisation" data-en="Terms of Use">Conditions Générales d'Utilisation</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="cgv.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-sky-soft transition-colors text-sm text-sky-accent font-semibold">
+                                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                                    <span class="translatable" data-fr="Conditions Générales de Vente" data-en="Terms of Sale">Conditions Générales de Vente</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-sky-soft transition-colors text-sm text-navy-muted hover:text-sky-accent">
+                                    <i data-lucide="shield" class="w-4 h-4"></i>
+                                    <span class="translatable" data-fr="Confidentialité" data-en="Privacy">Confidentialité</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-sky-soft transition-colors text-sm text-navy-muted hover:text-sky-accent">
+                                    <i data-lucide="cookie" class="w-4 h-4"></i>
+                                    <span class="translatable" data-fr="Cookies" data-en="Cookies">Cookies</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-sky-soft transition-colors text-sm text-navy-muted hover:text-sky-accent">
+                                    <i data-lucide="gavel" class="w-4 h-4"></i>
+                                    <span class="translatable" data-fr="Mentions légales" data-en="Legal notice">Mentions légales</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- CTA -->
+                    <div class="rounded-2xl p-6 relative overflow-hidden"
+                         style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);">
+                        <div class="bg-tech-grid absolute inset-0 opacity-30"></div>
+                        <div class="absolute -top-12 -right-12 w-40 h-40 bg-sky-accent rounded-full opacity-15 blur-2xl"></div>
+                        <div class="relative z-10 space-y-3">
+                            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-sky-light text-xs font-bold tracking-widest uppercase">
+                                <i data-lucide="shield-check" class="w-3 h-3"></i>
+                                <span class="translatable" data-fr="Confiance" data-en="Trust">Confiance</span>
+                            </div>
+                            <h3 class="font-display text-base font-bold text-white leading-snug translatable"
+                                data-fr="Vos données restent les vôtres."
+                                data-en="Your data stays yours.">
+                                Vos données restent les vôtres.
+                            </h3>
+                            <a href="#" class="inline-flex items-center gap-2 text-xs font-semibold text-sky-light hover:text-white transition-colors">
+                                <span class="translatable" data-fr="Politique de confidentialité" data-en="Privacy policy">Politique de confidentialité</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white pt-16 pb-8 border-t border-sky-light">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                            <span class="font-display font-bold text-white text-lg">J</span>
+                        </div>
+                        <span class="font-display font-bold text-xl text-navy">JcHub</span>
+                    </div>
+                    <p class="text-navy-muted text-sm leading-relaxed translatable"
+                       data-fr="Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques."
+                       data-en="A clear platform to learn, use useful tools and move forward with your digital projects.">
+                        Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques.
+                    </p>
+                    <div class="space-y-3 pt-2">
+                        <a href="mailto:contact@jchub.dev" class="flex items-center gap-3 text-sm text-navy-muted hover:text-sky-accent transition-colors">
+                            <i data-lucide="mail" class="w-4 h-4"></i> contact@jchub.dev
+                        </a>
+                        <div class="flex items-center gap-3 text-sm text-navy-muted">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span class="translatable" data-fr="Congo Brazzaville" data-en="Congo Brazzaville">Congo Brazzaville</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="Plateforme" data-en="Platform">Plateforme</h3>
+                    <ul class="space-y-3">
+                        <li><a href="outils.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Outils" data-en="Tools">Outils</a></li>
+                        <li><a href="blog.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Blog" data-en="Blog">Blog</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Ressources" data-en="Resources">Ressources</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Nouveautés" data-en="What's new">Nouveautés</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="JcHub" data-en="JcHub">JcHub</h3>
+                    <ul class="space-y-3">
+                        <li><a href="about.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="À propos" data-en="About">À propos</a></li>
+                        <li><a href="contact.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Contact" data-en="Contact">Contact</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Partenaires" data-en="Partners">Partenaires</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Presse" data-en="Press">Presse</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="Légal" data-en="Legal">Légal</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Conditions d'utilisation" data-en="Terms of use">Conditions d'utilisation</a></li>
+                        <li><a href="cgv.html" class="text-sky-accent font-semibold transition-colors text-sm translatable" data-fr="Conditions de vente" data-en="Terms of sale">Conditions de vente</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Confidentialité" data-en="Privacy">Confidentialité</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Mentions légales" data-en="Legal notice">Mentions légales</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-sky-light pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-navy-muted text-sm translatable" data-fr="© 2026 JcHub. Tous droits réservés." data-en="© 2026 JcHub. All rights reserved.">© 2026 JcHub. Tous droits réservés.</p>
+                <p class="text-navy-muted text-sm">
+                    <span class="translatable" data-fr="Créé par" data-en="Created by">Créé par</span>
+                    <span class="text-navy font-semibold">Jessy Ngnambongo</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll top -->
+    <button class="scroll-top" id="scrollTop" onclick="scrollToTop()" aria-label="Retour en haut">
+        <i data-lucide="arrow-up" class="w-5 h-5"></i>
+    </button>
+
+    <script>
+        lucide.createIcons();
+
+        // ===== TRADUCTION =====
+        function setLanguage(lang) {
+            document.documentElement.lang = lang;
+            document.querySelectorAll('.translatable').forEach(el => {
+                const translation = el.getAttribute(`data-${lang}`);
+                if (translation) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = translation;
+                    } else {
+                        if (translation.includes('<')) el.innerHTML = translation;
+                        else el.textContent = translation;
+                    }
+                }
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+            });
+            localStorage.setItem('jchub-lang', lang);
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        }
+
+        // ===== PROGRESS BAR =====
+        function updateProgress() {
+            const article = document.querySelector('.legal-content');
+            if (!article) return;
+
+            const rect = article.getBoundingClientRect();
+            const total = article.offsetHeight - window.innerHeight + 200;
+            const scrolled = -rect.top + 200;
+            const percent = Math.max(0, Math.min(100, (scrolled / total) * 100));
+
+            document.getElementById('progressFill').style.width = percent + '%';
+
+            const scrollTop = document.getElementById('scrollTop');
+            if (window.scrollY > 500) scrollTop.classList.add('show');
+            else scrollTop.classList.remove('show');
+        }
+
+        window.addEventListener('scroll', updateProgress);
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ===== TOC ACTIVE =====
+        function updateTocActive() {
+            const headings = document.querySelectorAll('.legal-content h2[id]');
+            const tocLinks = document.querySelectorAll('.toc-link');
+
+            let currentId = '';
+            headings.forEach(h => {
+                const rect = h.getBoundingClientRect();
+                if (rect.top <= 150) currentId = h.id;
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+            });
+        }
+
+        window.addEventListener('scroll', updateTocActive);
+
+        // Smooth scroll TOC
+        document.querySelectorAll('.toc-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) {
+                    const y = target.getBoundingClientRect().top + window.pageYOffset - 100;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+            });
+        });
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('jchub-lang') || 'fr';
+            setLanguage(savedLang);
+            updateProgress();
+            updateTocActive();
+        });
+    </script>
+</body>
+</html>

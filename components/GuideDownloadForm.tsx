@@ -4,7 +4,6 @@ import { FormEvent, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CheckCircle2, Download, Loader2, Mail, X } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics-client';
-import { TurnstileWidget } from '@/components/TurnstileWidget';
 
 type Props = {
   guideSlug: string;
@@ -16,7 +15,6 @@ export function GuideDownloadForm({ guideSlug }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [state, setState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
-  const [turnstileToken, setTurnstileToken] = useState('');
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -27,10 +25,12 @@ export function GuideDownloadForm({ guideSlug }: Props) {
       const response = await fetch('/api/guides/download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guideSlug, email, newsletterOptIn, turnstileToken }),
+        body: JSON.stringify({ guideSlug, email, newsletterOptIn }),
       });
       const data = await response.json().catch(() => ({ error: '' })) as { error?: string };
-      if (!response.ok) throw new Error(data.error || 'Envoi indisponible.');
+      if (!response.ok) {
+        throw new Error(data.error || 'Envoi indisponible.');
+      }
 
       setState('success');
       trackEvent('guide_download', { guide: guideSlug, method: 'email' });
@@ -91,7 +91,6 @@ export function GuideDownloadForm({ guideSlug }: Props) {
                 <input type="checkbox" checked={newsletterOptIn} onChange={(event) => setNewsletterOptIn(event.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-cyan-400" />
                 <span>Je souhaite recevoir les nouveaux guides et ressources par e-mail. Désinscription possible à tout moment.</span>
               </label>
-              <TurnstileWidget onToken={setTurnstileToken} />
               <button type="submit" disabled={state === 'loading'} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-300 px-4 py-3 text-sm font-black text-slate-950 shadow-[0_10px_25px_rgba(103,232,249,.14)] transition hover:bg-cyan-200 disabled:cursor-wait disabled:opacity-60">
                 {state === 'loading' ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-4 w-4" />}
                 Confirmer le téléchargement

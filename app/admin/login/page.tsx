@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlertCircle, LockKeyhole, Mail, ShieldCheck } from 'lucide-react';
+import { AlertCircle, ArrowRight } from 'lucide-react';
 import { getCurrentIdToken, resetPassword, signInWithEmail } from '@/lib/firebase-auth';
 
 export default function AdminLoginPage() {
@@ -24,63 +24,73 @@ export default function AdminLoginPage() {
       const response = await fetch('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idToken }) });
       const responseText = await response.text();
       let data: { error?: string } = {};
-      try {
-        data = JSON.parse(responseText) as { error?: string };
-      } catch {
-        throw new Error('Le serveur admin a renvoyé une réponse invalide. Réessaie dans quelques instants.');
-      }
+      try { data = JSON.parse(responseText) as { error?: string }; }
+      catch { throw new Error('Le serveur admin a renvoyé une réponse invalide. Réessaie dans quelques instants.'); }
       if (!response.ok) throw new Error(data.error || 'Accès administrateur refusé.');
       router.replace('/admin');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Authentification impossible.');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   const handleResetPassword = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLoading(true);
-    setError('');
-    setResetSent(false);
-    try {
-      await resetPassword(email.trim().toLowerCase());
-      setResetSent(true);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Impossible d’envoyer le lien de récupération.');
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true); setError(''); setResetSent(false);
+    try { await resetPassword(email.trim().toLowerCase()); setResetSent(true); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : 'Impossible d’envoyer le lien de récupération.'); }
+    finally { setLoading(false); }
   };
 
   return (
-    <div className="grid min-h-screen place-items-center bg-slate-950 px-4 py-10 text-slate-900">
-      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl sm:p-10">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-indigo-600 text-white"><ShieldCheck className="h-7 w-7" /></div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">JcHub Admin</p>
-          <h1 className="mt-2 text-2xl font-black">Connexion sécurisée</h1>
-          <p className="mt-2 text-sm text-slate-500">Firebase Auth, accès par e-mail et session sécurisée.</p>
-        </div>
-        {resetMode ? <form className="space-y-5" onSubmit={handleResetPassword}>
-              <p className="text-sm text-slate-600">Saisis ton adresse e-mail. Tu recevras un lien sécurisé pour choisir un nouveau mot de passe.</p>
-              <label className="block text-sm font-semibold text-slate-700">Adresse e-mail<span className="relative mt-1.5 block"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-xl border border-slate-200 py-3 pl-10 pr-3 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" placeholder="admin@jchub.dev" /></span></label>
-              {resetSent && <p className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">Si cette adresse est associée à un compte, un e-mail de récupération vient d’être envoyé.</p>}
-              {error && <ErrorMessage text={error} />}
-              <button type="submit" disabled={loading} className="w-full rounded-xl bg-indigo-600 px-4 py-3 font-bold text-white hover:bg-indigo-700 disabled:opacity-60">{loading ? 'Envoi...' : 'Envoyer le lien'}</button>
-              <button type="button" onClick={() => { setResetMode(false); setError(''); setResetSent(false); }} className="w-full text-sm font-semibold text-slate-500 hover:text-indigo-600">Retour à la connexion</button>
-            </form> : <form className="space-y-5" onSubmit={handleSubmit}>
-              <label className="block text-sm font-semibold text-slate-700">Adresse e-mail<span className="relative mt-1.5 block"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-xl border border-slate-200 py-3 pl-10 pr-3 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" placeholder="admin@jchub.dev" /></span></label>
-              <label className="block text-sm font-semibold text-slate-700">Mot de passe<span className="relative mt-1.5 block"><LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input type="password" required autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-xl border border-slate-200 py-3 pl-10 pr-3 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" /></span></label>
-            {error && <ErrorMessage text={error} />}
-            <button type="submit" disabled={loading} className="w-full rounded-xl bg-indigo-600 px-4 py-3 font-bold text-white hover:bg-indigo-700 disabled:opacity-60">{loading ? 'Connexion...' : 'Accéder au dashboard'}</button>
-              <button type="button" onClick={() => { setResetMode(true); setError(''); }} className="w-full text-sm font-semibold text-indigo-600 hover:text-indigo-800">Mot de passe oublié ?</button>
-            </form>}
+    <main className="relative isolate grid min-h-screen place-items-center overflow-hidden bg-[#064d82] px-5 py-10 text-white">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-[radial-gradient(ellipse_at_48%_8%,rgba(42,157,225,.62),transparent_56%),radial-gradient(ellipse_at_88%_76%,rgba(5,108,170,.38),transparent_48%),linear-gradient(118deg,#075389_0%,#08639e_46%,#064875_100%)]">
+        <div className="absolute -left-[18%] top-[38%] h-52 w-[138%] rotate-[-7deg] rounded-[50%] bg-[#063f70]/55 blur-3xl" />
+        <div className="absolute left-[12%] top-[18%] h-40 w-40 rounded-full bg-cyan-300/10 blur-3xl" />
+        <div className="absolute -right-24 -top-28 h-80 w-80 rounded-full bg-sky-300/15 blur-3xl" />
+        <div className="absolute -bottom-36 left-[38%] h-80 w-[60%] rounded-full bg-[#063b69]/45 blur-3xl" />
+        <div className="absolute inset-0 opacity-[.075] [background-image:linear-gradient(rgba(255,255,255,.2)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.2)_1px,transparent_1px)] [background-size:54px_54px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_78%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,.045),transparent_42%,rgba(0,20,45,.2))]" />
       </div>
-    </div>
+
+      <div className="grid w-full max-w-[620px] grid-cols-1 items-center gap-8 sm:grid-cols-[minmax(0,1fr)_1px_minmax(0,1.05fr)] sm:gap-12">
+        <section className="flex min-h-[180px] flex-col items-center justify-center text-center sm:min-h-[220px] sm:items-start sm:pl-1 sm:text-left">
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[.24em] text-sky-100/75">Espace sécurisé</p>
+          <div className="relative inline-flex items-center pr-5 text-[42px] font-bold leading-none tracking-[-.065em] text-white drop-shadow-[0_2px_12px_rgba(0,22,54,.2)] sm:text-[48px]">
+            JcHub<span className="absolute -right-0.5 -top-2 h-4 w-4 rounded-full border border-dotted border-sky-100/75" />
+          </div>
+          <p className="mt-6 text-[15px] font-medium tracking-wide text-white/90">Console d’administration</p>
+          <p className="mt-2 max-w-[220px] text-[12px] leading-6 text-sky-100/65">Gère tes contenus et tes outils depuis un seul espace.</p>
+        </section>
+
+        <div aria-hidden="true" className="hidden h-[270px] w-px bg-gradient-to-b from-transparent via-sky-100/65 to-transparent sm:block" />
+        <div aria-hidden="true" className="h-px w-full bg-gradient-to-r from-transparent via-sky-100/50 to-transparent sm:hidden" />
+
+        <section className="w-full sm:pl-0.5">
+          <h1 className="mb-4 text-[20px] font-medium text-white">{resetMode ? 'Reset Password' : 'Sign In'}</h1>
+          {resetMode ? (
+            <form className="space-y-3" onSubmit={handleResetPassword}>
+              <label className="sr-only" htmlFor="admin-email-reset">Email</label>
+              <input id="admin-email-reset" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="h-11 w-full border border-white/15 bg-white px-3.5 text-[15px] text-slate-700 outline-none placeholder:text-slate-400 transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200/40" placeholder="Email" />
+              {resetSent && <p className="text-sm leading-5 text-emerald-100">If this email is linked to an account, a reset link has been sent.</p>}
+              {error && <ErrorMessage text={error} />}
+              <div className="flex items-center justify-between pt-1"><button type="button" onClick={() => { setResetMode(false); setError(''); setResetSent(false); }} className="text-sm italic text-white/70 transition hover:text-white">Back to Sign In</button><button type="submit" disabled={loading} className="group inline-flex items-center gap-1.5 text-[20px] font-medium text-white transition hover:text-sky-100 disabled:opacity-60">{loading ? 'Sending…' : 'Go'}<ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" /></button></div>
+            </form>
+          ) : (
+            <form className="space-y-3" onSubmit={handleSubmit}>
+              <label className="sr-only" htmlFor="admin-email">Email</label>
+              <input id="admin-email" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="h-11 w-full border border-white/15 bg-white px-3.5 text-[15px] text-slate-700 outline-none placeholder:text-slate-400 transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200/40" placeholder="Email" />
+              <label className="sr-only" htmlFor="admin-password">Password</label>
+              <input id="admin-password" type="password" required autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="h-11 w-full border border-white/15 bg-white px-3.5 text-[15px] text-slate-700 outline-none placeholder:text-slate-400 transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200/40" placeholder="Password" />
+              {error && <ErrorMessage text={error} />}
+              <div className="flex items-center justify-between pt-1"><button type="button" onClick={() => { setResetMode(true); setError(''); setResetSent(false); }} className="text-sm italic text-white/70 transition hover:text-white">Forgot Password</button><button type="submit" disabled={loading} className="group inline-flex items-center gap-1.5 text-[20px] font-medium text-white transition hover:text-sky-100 disabled:opacity-60"><span>{loading ? 'Signing in…' : 'Go'}</span><ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" /></button></div>
+            </form>
+          )}
+        </section>
+      </div>
+    </main>
   );
 }
 
 function ErrorMessage({ text }: { text: string }) {
-  return <p className="flex gap-2 rounded-xl bg-red-50 p-3 text-sm text-red-700"><AlertCircle className="h-4 w-4 shrink-0" />{text}</p>;
+  return <p className="flex gap-2 rounded bg-red-950/30 p-2 text-[10px] text-red-100"><AlertCircle className="h-3.5 w-3.5 shrink-0" />{text}</p>;
 }

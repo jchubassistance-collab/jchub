@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebase-admin';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getPublishedTools } from '@/lib/tools';
+import { getGa4Overview } from '@/lib/ga4';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,13 +12,15 @@ export async function GET(request: NextRequest) {
 
    const adminDb = getAdminDb();
 
-    const [users, articles, drafts, runs, publishedTools, articleViews] = await Promise.all([
+    const [users, articles, drafts, runs, publishedTools, articleViews, pendingMessages, analytics] = await Promise.all([
       adminDb.collection('users').get(),
       adminDb.collection('articles').get(),
       adminDb.collection('agent_drafts').get(),
       adminDb.collection('agent_runs').get(),
       getPublishedTools(),
       adminDb.collection('blog_articles').get(),
+      adminDb.collection('contact_messages').where('status', '==', 'new').get(),
+      getGa4Overview().catch(() => ({ configured: false as const })),
     ]);
 
     const viewsBySlug = new Map(articleViews.docs.map((document) => [document.id, Number(document.data().views || 0)]));
@@ -73,17 +76,50 @@ export async function GET(request: NextRequest) {
       })
       .sort((first, second) => second.createdAtMillis - first.createdAtMillis)[0] || null;
 
+    const publishedDates = articles.docs.filter((article) => article.data().status === 'published').map((article) => article.data().publishedAt?.toDate?.()).filter((date): date is Date => date instanceof Date);
+    const publishedByDay = new Map<string, number>();
+    const publishedByMonth = new Map<string, number>();
+    const publishedByYear = new Map<string, number>();
+    const now = Date.now();
+    const currentWindowStart = now - 28 * 24 * 60 * 60 * 1000;
+    const previousWindowStart = now - 56 * 24 * 60 * 60 * 1000;
+    const currentPeriodPublications = publishedDates.filter((date) => date.getTime() >= currentWindowStart && date.getTime() <= now).length;
+    const previousPeriodPublications = publishedDates.filter((date) => date.getTime() >= previousWindowStart && date.getTime() < currentWindowStart).length;
+    for (const date of publishedDates) {
+      const day = date.toISOString().slice(0, 10);
+      const month = day.slice(0, 7);
+      const year = day.slice(0, 4);
+      publishedByDay.set(day, (publishedByDay.get(day) || 0) + 1);
+      publishedByMonth.set(month, (publishedByMonth.get(month) || 0) + 1);
+      publishedByYear.set(year, (publishedByYear.get(year) || 0) + 1);
+    }
+
     return NextResponse.json({
       totalUsers: users.size,
       totalArticles: articles.docs.filter((article) => article.data().status === 'published').length,
-      totalDrafts: drafts.size,
+      totalDrafts: drafts.docs.filter((draft) => ['draft', 'approved'].includes(String(draft.data().status || 'draft'))).length,
       approvedDrafts: drafts.docs.filter((draft) => draft.data().status === 'approved').length,
+      pendingMessages: pendingMessages.size,
       totalTools: publishedTools.length,
       totalArticleViews: articleViewRows.reduce((total, article) => total + article.views, 0),
       articleViews: articleViewRows.slice(0, 10),
       recentArticles,
       recentRun: recentRun ? { date: recentRun.date, status: recentRun.status, createdAt: recentRun.createdAt } : null,
       recentUsers,
+      recentDrafts: drafts.docs.map((draft) => ({ id: draft.id, title: String(draft.data().title || 'Brouillon IA'), status: String(draft.data().status || 'draft'), createdAt: draft.data().createdAt?.toDate?.().toISOString() || null })).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || '')).slice(0, 5),
+      contentTrends: {
+        configured: analytics.configured,
+        dailyViews: analytics.configured ? analytics.dailyViews : [],
+        monthlyViews: analytics.configured ? analytics.monthlyViews : [],
+        yearlyViews: analytics.configured ? analytics.yearlyViews : [],
+        publishedByDay: Object.fromEntries(publishedByDay),
+        publishedByMonth: Object.fromEntries(publishedByMonth),
+        publishedByYear: Object.fromEntries(publishedByYear),
+        currentPeriodPublications,
+        previousPeriodPublications,
+        currentPeriodViews: analytics.configured ? analytics.currentPeriodViews : null,
+        previousPeriodViews: analytics.configured ? analytics.previousPeriodViews : null,
+      },
     });
   } catch (error) {
     const code = error instanceof Error ? error.message : 'INTERNAL_ERROR';

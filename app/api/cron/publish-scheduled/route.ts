@@ -3,6 +3,8 @@ import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { notifyBrevoNewArticle } from '@/lib/brevo';
 import { reportUserError } from '@/lib/user-error';
+import { start } from 'workflow/api';
+import { runSocialPreparation } from '@/workflows/social-publishing';
 
 export async function POST(request: NextRequest) {
   const authorization = request.headers.get('authorization');
@@ -24,6 +26,16 @@ export async function POST(request: NextRequest) {
         continue;
       }
       await document.ref.update({ status: 'published', publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
+      try { await start(runSocialPreparation, [String(article.slug || document.id)]); }
+      catch { reportUserError(); }
+      if (article.sourceDraftId) {
+        await getAdminDb().collection('agent_drafts').doc(String(article.sourceDraftId)).set({
+          status: 'published',
+          publishedSlug: String(article.slug || document.id),
+          publishedAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
+        }, { merge: true });
+      }
       const image = String(article.image || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev'}/blog/default.svg`);
       const imageUrl = image.startsWith('http') ? image : `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev'}${image.startsWith('/') ? '' : '/'}${image}`;
       const brevoNotified = await notifyBrevoNewArticle({

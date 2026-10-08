@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
-import { ADMIN_SESSION_COOKIE } from '@/lib/admin-auth';
+import { ADMIN_SESSION_COOKIE, requireAdmin } from '@/lib/admin-auth';
 import { z } from 'zod';
 import { reportUserError } from '@/lib/user-error';
 
@@ -44,4 +44,14 @@ export async function DELETE() {
   const response = NextResponse.json({ authenticated: false });
   response.cookies.set(ADMIN_SESSION_COOKIE, '', { httpOnly: true, expires: new Date(0), path: '/' });
   return response;
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    await requireAdmin(request);
+    return NextResponse.json({ authenticated: true }, { headers: { 'Cache-Control': 'no-store' } });
+  } catch (error) {
+    const status = error instanceof Error && error.message === 'FORBIDDEN' ? 403 : 401;
+    return NextResponse.json({ authenticated: false }, { status, headers: { 'Cache-Control': 'no-store' } });
+  }
 }

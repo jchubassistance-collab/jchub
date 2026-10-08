@@ -114,7 +114,7 @@ export function RegexTester() {
           <div className="space-y-1.5">
             {matches.slice(0, 10).map((m, i) => (
               <div key={i} className="rounded-lg border border-yellow-400/30 bg-yellow-500/10 p-2.5 text-sm text-yellow-100">
-                <div className="font-semibold">#{i + 1} : <span className="font-mono">"{m.match}"</span> à l'index {m.index}</div>
+                <div className="font-semibold">#{i + 1} : <span className="font-mono">&quot;{m.match}&quot;</span> à l&apos;index {m.index}</div>
                 {m.groups.length > 0 && (
                   <div className="mt-1 text-xs text-slate-300">
                     Groupes : <span className="font-mono">{m.groups.join(', ')}</span>

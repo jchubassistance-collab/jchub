@@ -1,35 +1,64 @@
-<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+﻿<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Contacter l’équipe JcHub</title>
+  <desc id="desc">Une enveloppe et des bulles de conversation symbolisent le support et les échanges avec l’équipe.</desc>
   <defs>
-    <linearGradient id="bg3" x1="0" y1="0" x2="1200" y2="900" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#08172F"/>
-      <stop offset="0.52" stop-color="#0C2A56"/>
-      <stop offset="1" stop-color="#123F8C"/>
+    <linearGradient id="orb" x1="112" y1="104" x2="704" y2="704" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EFF6FF"/>
+      <stop offset="1" stop-color="#BFDBFE"/>
     </linearGradient>
-    <linearGradient id="card3" x1="200" y1="180" x2="980" y2="720" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#102B52"/>
-      <stop offset="1" stop-color="#0A1830"/>
+    <linearGradient id="letter" x1="288" y1="345" x2="552" y2="564" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60A5FA"/>
+      <stop offset="1" stop-color="#2563EB"/>
     </linearGradient>
+    <linearGradient id="bubble" x1="198" y1="204" x2="406" y2="344" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <filter id="shadow" x="126" y="135" width="568" height="548" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="22"/>
+      <feGaussianBlur stdDeviation="24"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.12 0 0 0 0 0.30 0 0 0 0 0.58 0 0 0 0.16 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
   </defs>
-  <rect width="1200" height="900" fill="url(#bg3)"/>
-  <circle cx="230" cy="170" r="170" fill="#99C8FF" fill-opacity="0.12"/>
-  <circle cx="990" cy="700" r="220" fill="#7AB3FF" fill-opacity="0.12"/>
-  <rect x="180" y="130" width="840" height="660" rx="42" fill="url(#card3)" stroke="#9CCBFF" stroke-opacity="0.25"/>
-  <rect x="250" y="190" width="700" height="74" rx="18" fill="#0A1730" fill-opacity="0.8"/>
-  <rect x="270" y="210" width="140" height="32" rx="12" fill="#9CCBFF" fill-opacity="0.25"/>
-  <rect x="300" y="320" width="188" height="174" rx="22" fill="#0B1830" fill-opacity="0.7"/>
-  <rect x="510" y="320" width="188" height="174" rx="22" fill="#0B1830" fill-opacity="0.7"/>
-  <rect x="720" y="320" width="188" height="174" rx="22" fill="#0B1830" fill-opacity="0.7"/>
-  <rect x="300" y="560" width="608" height="140" rx="22" fill="#0B1830" fill-opacity="0.75"/>
-  <path d="M504 636C504 593.7 538.7 559 581 559H734C776.3 559 811 593.7 811 636V637H504V636Z" fill="#9CCBFF" fill-opacity="0.9"/>
-  <circle cx="358" cy="398" r="36" fill="#D9ECFF" fill-opacity="0.95"/>
-  <circle cx="568" cy="398" r="36" fill="#D9ECFF" fill-opacity="0.95"/>
-  <circle cx="778" cy="398" r="36" fill="#D9ECFF" fill-opacity="0.95"/>
-  <rect x="332" y="456" width="190" height="14" rx="7" fill="#D9ECFF" fill-opacity="0.8"/>
-  <rect x="542" y="456" width="190" height="14" rx="7" fill="#D9ECFF" fill-opacity="0.8"/>
-  <rect x="752" y="456" width="190" height="14" rx="7" fill="#D9ECFF" fill-opacity="0.8"/>
-  <rect x="334" y="599" width="230" height="16" rx="8" fill="#D9ECFF" fill-opacity="0.8"/>
-  <rect x="334" y="635" width="530" height="16" rx="8" fill="#D9ECFF" fill-opacity="0.4"/>
-  <rect x="302" y="278" width="110" height="18" rx="9" fill="#9CCBFF" fill-opacity="0.8"/>
-  <rect x="512" y="278" width="110" height="18" rx="9" fill="#9CCBFF" fill-opacity="0.8"/>
-  <rect x="722" y="278" width="110" height="18" rx="9" fill="#9CCBFF" fill-opacity="0.8"/>
+
+  <circle cx="400" cy="400" r="320" fill="url(#orb)"/>
+  <circle cx="400" cy="400" r="278" stroke="white" stroke-opacity=".78" stroke-width="3"/>
+  <circle cx="180" cy="465" r="10" fill="#60A5FA" fill-opacity=".65"/>
+  <circle cx="633" cy="420" r="13" fill="#F59E0B" fill-opacity=".8"/>
+  <circle cx="570" cy="202" r="8" fill="#3B82F6" fill-opacity=".55"/>
+
+  <g filter="url(#shadow)">
+    <rect x="207" y="324" width="386" height="278" rx="34" fill="white"/>
+    <rect x="230" y="347" width="340" height="232" rx="23" fill="#F8FBFF"/>
+    <path d="M247 381C247 369.954 255.954 361 267 361H533C544.046 361 553 369.954 553 381V392L400 493L247 392V381Z" fill="url(#letter)"/>
+    <path d="M247 396L378.5 493C391.267 502.411 408.733 502.411 421.5 493L553 396V545C553 556.046 544.046 565 533 565H267C255.954 565 247 556.046 247 545V396Z" fill="#DBEAFE"/>
+    <path d="M247 401L382.6 506C392.863 513.944 407.137 513.944 417.4 506L553 401" stroke="#93C5FD" stroke-width="7" stroke-linecap="round"/>
+  </g>
+
+  <g>
+    <path d="M184 198C184 173.147 204.147 153 229 153H373C397.853 153 418 173.147 418 198V281C418 305.853 397.853 326 373 326H282L236 365V326H229C204.147 326 184 305.853 184 281V198Z" fill="url(#bubble)"/>
+    <circle cx="251" cy="240" r="11" fill="white"/>
+    <circle cx="301" cy="240" r="11" fill="white" fill-opacity=".84"/>
+    <circle cx="351" cy="240" r="11" fill="white" fill-opacity=".68"/>
+  </g>
+
+  <g>
+    <path d="M489 191C489 174.984 501.984 162 518 162H626C642.016 162 655 174.984 655 191V236C655 252.016 642.016 265 626 265H611L638 291L584 265H518C501.984 265 489 252.016 489 236V191Z" fill="white" stroke="#BFDBFE" stroke-width="5"/>
+    <path d="M522 204H622M522 225H594" stroke="#60A5FA" stroke-width="9" stroke-linecap="round"/>
+  </g>
+
+  <g>
+    <circle cx="585" cy="528" r="55" fill="white"/>
+    <circle cx="585" cy="511" r="18" fill="#93C5FD"/>
+    <path d="M550 558C550 537.013 566.013 521 587 521H588C608.987 521 625 537.013 625 558V562H550V558Z" fill="#2563EB"/>
+    <circle cx="585" cy="528" r="55" stroke="#DBEAFE" stroke-width="5"/>
+  </g>
+
+  <path d="M191 558L203 570L225 544" stroke="#16A34A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="191" cy="558" r="31" fill="white" stroke="#DCFCE7" stroke-width="4"/>
 </svg>

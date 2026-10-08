@@ -78,7 +78,10 @@ export async function getPublishedArticles(): Promise<BlogArticle[]> {
   if (!hasFirebaseAdminConfig()) return getLocalFallback();
   try {
     const snapshot = await getAdminDb().collection('articles').where('status', '==', 'published').get();
-    return snapshot.docs.map((document) => toArticle(document.data() as Record<string, unknown>));
+    return snapshot.docs.map((document) => {
+      const data = document.data() as Record<string, unknown>;
+      return toArticle({ ...data, slug: data.slug || document.id });
+    });
   } catch (error) {
     reportUserError();
     return getLocalFallback();
@@ -88,13 +91,25 @@ export async function getPublishedArticles(): Promise<BlogArticle[]> {
 export async function getPublishedArticleBySlug(slug: string): Promise<BlogArticle | null> {
   if (!hasFirebaseAdminConfig()) return getLocalFallback().find((article) => article.slug === slug) || null;
   try {
-    const document = await getAdminDb().collection('articles').doc(slug).get();
-    if (!document.exists) return null;
-    const article = toArticle(document.data() as Record<string, unknown>);
-    return article.status === 'published' ? article : null;
+    const articles = getAdminDb().collection('articles');
+    const document = await articles.doc(slug).get();
+    if (document.exists) {
+      const data = document.data() as Record<string, unknown>;
+      const article = toArticle({ ...data, slug: data.slug || document.id });
+      if (article.status === 'published' && article.slug === slug) return article;
+    }
+
+    const snapshot = await articles.where('status', '==', 'published').get();
+    const article = snapshot.docs
+      .map((item) => {
+        const data = item.data() as Record<string, unknown>;
+        return toArticle({ ...data, slug: data.slug || item.id });
+      })
+      .find((item) => item.slug === slug);
+    return article || null;
   } catch (error) {
     reportUserError();
-    return null;
+    return getLocalFallback().find((article) => article.slug === slug) || null;
   }
 }
 

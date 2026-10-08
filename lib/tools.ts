@@ -3,13 +3,16 @@ import { reportUserError } from '@/lib/user-error';
 
 export type Tool = {
   slug: string;
+  path?: string;
   name: string;
   description: string;
   category: string;
   icon: string;
   tags: string[];
   component: string;
-  status?: 'published' | 'draft';
+  status?: 'published' | 'draft' | 'archived';
+  /** JavaScript weekday numbers in Africa/Lagos (Sunday = 0). */
+  visibleDays?: number[];
   seo: {
     title: string;
     description: string;
@@ -17,9 +20,41 @@ export type Tool = {
   };
 };
 
-const DISABLED_TOOL_SLUGS = new Set(['images-en-pdf']);
+const DISABLED_TOOL_SLUGS = new Set<string>();
 
 export const tools: Tool[] = [
+  {
+    slug: 'images-en-pdf',
+    name: 'Images en PDF',
+    description: 'Convertis plusieurs images JPG, JPEG ou PNG en un PDF, avec une image par page et une taille de page au choix.',
+    category: 'Document',
+    icon: '🖼️',
+    tags: ['image', 'jpg', 'jpeg', 'png', 'pdf', 'conversion'],
+    component: 'ImagesToPdf',
+    status: 'published',
+    visibleDays: [5],
+    seo: {
+      title: 'Convertir des images en PDF gratuitement — JcHub',
+      description: 'Assemble des images JPG, JPEG et PNG en PDF. Choisis le format et l’orientation des pages ; chaque image occupe une page.',
+      keywords: ['images en pdf', 'jpg en pdf', 'png en pdf', 'convertir image pdf'],
+    },
+  },
+  {
+    slug: 'api-cost-calculator',
+    path: '/tools/api-cost-calculator',
+    name: 'API Cost Calculator',
+    description: 'Estimate API request volumes, monthly costs, quotas, retries, and rate limits.',
+    category: 'Development',
+    icon: '💸',
+    tags: ['api', 'pricing', 'cost', 'usage', 'rate limit', 'developer tools', 'json', 'http'],
+    component: 'ApiCostCalculator',
+    status: 'published',
+    seo: {
+      title: 'API Cost Calculator – Estimate API Usage & Costs | JcHub',
+      description: "Calculate API costs, estimate monthly usage, simulate request volumes, and monitor API rate limits with JcHub's free API Cost Calculator.",
+      keywords: ['API Cost Calculator', 'API Pricing Calculator', 'API Usage Calculator', 'API Budget Calculator', 'API Rate Limit Calculator', 'API Cost Estimator'],
+    },
+  },
   {
     slug: 'generateur-mot-de-passe',
     name: 'Générateur de mot de passe sécurisé',
@@ -138,6 +173,21 @@ export const tools: Tool[] = [
       title: 'Convertir PDF en Word gratuitement — JcHub',
       description: 'Transforme facilement un fichier PDF en document Word DOCX en quelques secondes.',
       keywords: ['pdf vers word', 'convertir pdf en word', 'docx', 'pdf to word'],
+    },
+  },
+  {
+    slug: 'word-to-pdf',
+    name: 'Word vers PDF',
+    description: 'Convertis un document Word DOCX en PDF en conservant sa mise en page.',
+    category: 'Document',
+    icon: '📄',
+    tags: ['word', 'pdf', 'docx', 'conversion'],
+    component: 'WordToPdf',
+    status: 'published',
+    seo: {
+      title: 'Convertir Word en PDF gratuitement — JcHub',
+      description: 'Transforme un document Word DOCX en PDF prêt à partager.',
+      keywords: ['word vers pdf', 'convertir word en pdf', 'docx en pdf', 'word to pdf'],
     },
   },
   {
@@ -262,16 +312,29 @@ export const tools: Tool[] = [
   },
 ];
 
+export function isToolVisibleToday(tool: Tool, date = new Date()): boolean {
+  if (!tool.visibleDays?.length) return true;
+  const weekday = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Africa/Lagos',
+    weekday: 'short',
+  }).format(date);
+  const weekdayNumber: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  return tool.visibleDays.includes(weekdayNumber[weekday]);
+}
+
 function toToolRecord(data: Record<string, any>): Tool {
+  const registeredTool = tools.find((tool) => tool.slug === String(data.slug || ''));
   return {
     slug: String(data.slug || ''),
+    path: typeof data.path === 'string' ? data.path : registeredTool?.path,
     name: String(data.name || 'Outil sans nom'),
     description: String(data.description || ''),
     category: String(data.category || 'Autre'),
     icon: String(data.icon || '🛠️'),
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
     component: String(data.component || data.slug || 'GenericTool'),
-    status: data.status === 'draft' ? 'draft' : 'published',
+    status: data.status === 'draft' || data.status === 'archived' ? data.status : 'published',
+    visibleDays: Array.isArray(data.visibleDays) ? data.visibleDays.map(Number) : registeredTool?.visibleDays,
     seo: {
       title: String(data.seo?.title || data.name || 'Outil JcHub'),
       description: String(data.seo?.description || data.description || ''),
@@ -288,12 +351,12 @@ export async function getPublishedTools(): Promise<Tool[]> {
   );
 
   if (!hasConfig) {
-    return tools;
+    return tools.filter(isToolVisibleToday);
   }
 
   try {
     const { getAdminDb } = await import('@/lib/firebase-admin');
-    const snapshot = await getAdminDb().collection('tools').where('status', '==', 'published').get();
+    const snapshot = await getAdminDb().collection('tools').get();
     const fromFirestore = snapshot.docs.map((document) => toToolRecord(document.data()));
 
     if (fromFirestore.length === 0) {
@@ -312,15 +375,15 @@ export async function getPublishedTools(): Promise<Tool[]> {
       }
     }
 
-    return Array.from(mergedBySlug.values()).filter((tool) => !DISABLED_TOOL_SLUGS.has(tool.slug));
+    return Array.from(mergedBySlug.values()).filter((tool) => tool.status === 'published' && !DISABLED_TOOL_SLUGS.has(tool.slug) && isToolVisibleToday(tool));
   } catch (error) {
     reportUserError();
-    return tools;
+    return tools.filter(isToolVisibleToday);
   }
 }
 
 export async function getToolBySlug(slug: string): Promise<Tool | null> {
   if (DISABLED_TOOL_SLUGS.has(slug)) return null;
   const toolList = await getPublishedTools();
-  return toolList.find((tool) => tool.slug === slug) ?? tools.find((tool) => tool.slug === slug) ?? null;
+  return toolList.find((tool) => tool.slug === slug) ?? null;
 }

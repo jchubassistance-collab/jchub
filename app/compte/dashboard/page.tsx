@@ -14,7 +14,7 @@ export default function DashboardPage() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.18),_transparent_35%)]" />
             <div className="relative">
               <h1 className="text-2xl font-black md:text-3xl">Bienvenue, {user.displayName?.split(' ')[0]} 👋</h1>
-              <p className="mt-2 max-w-xl text-sm text-slate-200 md:text-base">Prêt à continuer ton travail aujourd'hui ?</p>
+              <p className="mt-2 max-w-xl text-sm text-slate-200 md:text-base">Prêt à continuer ton travail aujourd&apos;hui ?</p>
               <div className="mt-5 flex flex-wrap gap-2">
                 <Link href="/outils" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#17324d] transition hover:-translate-y-0.5 hover:shadow-lg">
                   <Sparkles className="h-4 w-4" />

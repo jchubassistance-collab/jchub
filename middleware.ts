@@ -14,6 +14,7 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAdminPath = pathname.startsWith('/admin') || pathname.startsWith('/api/admin');
   const hostname = request.nextUrl.hostname;
+  const requestHeaders = new Headers(request.headers);
 
   if (hostname === WWW_HOST) {
     const canonicalUrl = request.nextUrl.clone();
@@ -30,7 +31,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (isAdminPath) {
-    const response = NextResponse.next();
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
     response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
     response.headers.set('Cache-Control', 'private, no-store, no-cache, must-revalidate');
     response.headers.set('CDN-Cache-Control', 'no-store');
@@ -48,9 +49,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.json({ error: 'Accès admin non autorisé depuis cette adresse IP.' }, { status: 403 });
   }
 
-  return NextResponse.next();
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|rss.xml).*)'],
 };

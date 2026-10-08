@@ -1,11 +1,13 @@
 import 'server-only';
 
+import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/lib/firebase-admin';
 import { collectTrends } from '@/lib/content-sources';
 import { getPublishedArticles } from '@/lib/blog';
 import { getPublishedTools } from '@/lib/tools';
 import type { TrendCandidate } from '@/lib/content-sources';
 import { reportUserError } from '@/lib/user-error';
+import { assessEditorialImportance } from '@/lib/editorial-importance';
 
 export { collectTrends } from '@/lib/content-sources';
 
@@ -17,8 +19,6 @@ export type EditorialDraft = {
   description: string;
   article: string;
   posts: {
-    x: string;
-    linkedin: string;
     devto: string;
   };
   promotion: {
@@ -31,6 +31,8 @@ export type EditorialDraft = {
     type: 'tool' | 'article';
     title: string;
     reason: string;
+    problem?: string;
+    targetUser?: string;
     suggestedSlug: string;
   }>;
   sources: TrendCandidate[];
@@ -61,7 +63,7 @@ Règles obligatoires:
 - Choisis exactement un élément dans le catalogue JcHub pour la promotion.
 - Utilise exactement son nom, son slug et son URL. N'invente jamais de lien.
 - Évite les éléments dont les identifiants sont dans la liste récemment promus, sauf si tout le catalogue y figure.
-- Les textes X, LinkedIn et Dev.to doivent parler de l'élément promu et contenir son URL.
+- The Dev.to post must focus on the promoted JcHub item, offer useful guidance, and include its exact URL.
 - Les recommandations doivent être des idées distinctes d'outils ou d'articles que JcHub pourrait créer.
 - Écris comme un rédacteur technique francophone naturel, précis et utile, avec des exemples concrets.
 - Ne mentionne jamais une IA, un modèle, un prompt, une génération automatique ou tes consignes.
@@ -69,6 +71,8 @@ Règles obligatoires:
 - Ne fabrique aucune expérience personnelle, citation, statistique ou résultat de test.
 - L'article doit être directement publiable en Markdown, sans JSON, frontmatter ou commentaire destiné à l'éditeur.
 - Réponds uniquement avec un JSON valide.
+
+- For every suggested tool, state the concrete user problem, who has it, and why existing JcHub tools do not solve it. Suggestions are for admin review only; never create a tool automatically.
 
 Tendances Internet:
 ${JSON.stringify(candidates, null, 2)}
@@ -80,14 +84,14 @@ Identifiants récemment promus:
 ${JSON.stringify(recentlyPromoted)}
 
 Structure JSON exacte:
-{"title":"...","slug":"...","description":"...","article":"Markdown de 700 à 1000 mots lié à la tendance et à l'élément promu","promotion":{"type":"tool|article","slug":"slug exact du catalogue","name":"nom exact","url":"URL exacte du catalogue"},"recommendations":[{"type":"tool|article","title":"...","reason":"...","suggestedSlug":"..."}],"posts":{"x":"moins de 280 caractères avec l'URL exacte","linkedin":"publication professionnelle avec l'URL exacte","devto":"introduction Dev.to avec l'URL exacte"}}`;
+{"title":"...","slug":"...","description":"...","article":"Markdown de 700 à 1000 mots lié à la tendance et à l'élément promu","promotion":{"type":"tool|article","slug":"slug exact du catalogue","name":"nom exact","url":"URL exacte du catalogue"},"recommendations":[{"type":"tool|article","title":"...","problem":"specific user problem","targetUser":"who has the problem","reason":"how the proposal solves it and why the current catalog does not","suggestedSlug":"..."}],"posts":{"devto":"useful introduction with the exact URL"}`;
 }
 
 function parseDraft(text: string, sources: TrendCandidate[], catalog: CatalogItem[]): EditorialDraft {
   const cleaned = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
   const parsed = JSON.parse(cleaned) as Omit<EditorialDraft, 'sources'>;
   const promoted = catalog.find((item) => item.slug === parsed.promotion?.slug && item.type === parsed.promotion?.type);
-  if (!parsed.title || !parsed.slug || !parsed.description || !parsed.article || !parsed.posts?.x || !parsed.posts.linkedin || !parsed.posts.devto || !promoted) {
+  if (!parsed.title || !parsed.slug || !parsed.description || !parsed.article || !parsed.posts?.devto || !promoted) {
     throw new Error('La réponse IA ne respecte pas le format éditorial attendu.');
   }
   return { ...parsed, promotion: { type: promoted.type, slug: promoted.slug, name: promoted.title, url: promoted.url }, sources };
@@ -162,14 +166,44 @@ export async function generateEditorialDraft(candidates: TrendCandidate[], catal
 }
 
 export async function saveEditorialDraft(draft: EditorialDraft) {
-  const reference = await getAdminDb().collection('agent_drafts').add({
+  const db = getAdminDb();
+  const importance = assessEditorialImportance(draft.sources, `${draft.title} ${draft.description}`);
+  const reference = await db.collection('agent_drafts').add({
     ...draft,
     provider: getProvider(),
     promotion: draft.promotion,
     recommendations: draft.recommendations,
+    importance,
     status: 'draft',
     createdAt: new Date(),
     updatedAt: new Date(),
   });
-  return reference.id;
+  if (!importance.autoPublish) return { draftId: reference.id, status: 'draft' as const, importance };
+
+  const baseSlug = draft.slug.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '').slice(0, 80) || 'article-jchub';
+  let slug = baseSlug;
+  if ((await db.collection('articles').doc(slug).get()).exists) slug = `${baseSlug}-${reference.id.slice(0, 6)}`;
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
+  const image = `${siteUrl}/api/article-cover?title=${encodeURIComponent(draft.title)}&category=${encodeURIComponent(draft.promotion.name)}`;
+  await db.collection('articles').doc(slug).set({
+    slug,
+    title: draft.title,
+    description: draft.description,
+    excerpt: draft.description,
+    content: draft.article,
+    category: 'Technologie',
+    keywords: ['informatique', 'technologie'],
+    tags: ['Informatique', 'technologie'],
+    author: 'JcHub',
+    image,
+    readTime: '5 min',
+    status: 'published',
+    publishedAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
+    sourceDraftId: reference.id,
+    autoPublished: true,
+    importance,
+  });
+  await reference.update({ status: 'published', publishedSlug: slug, publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
+  return { draftId: reference.id, status: 'published' as const, publishedSlug: slug, importance };
 }

@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de mot de passe - JcHub</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        sky: {
+                            soft: '#eff6ff',
+                            light: '#dbeafe',
+                            button: '#93c5fd',
+                            buttonDark: '#60a5fa',
+                            accent: '#2563eb',
+                        },
+                        navy: {
+                            DEFAULT: '#0f172a',
+                            soft: '#1e3a8a',
+                            muted: '#475569',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #eff6ff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* ============================================
+           AMBIANCE TECH (15%)
+           ============================================ */
+        .bg-tech-grid {
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(circle at 50% 40%, black 25%, transparent 75%);
+            -webkit-mask-image: radial-gradient(circle at 50% 40%, black 25%, transparent 75%);
+            pointer-events: none;
+        }
+
+        .tech-dot {
+            position: absolute;
+            border-radius: 50%;
+            background: #2563eb;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .float-1 { animation: floatDot 6s ease-in-out infinite; }
+        .float-2 { animation: floatDot 8s ease-in-out infinite 1s; }
+        .float-3 { animation: floatDot 7s ease-in-out infinite 2s; }
+
+        @keyframes floatDot {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-20px) translateX(10px); }
+        }
+
+        /* ============================================
+           3D LAYER (30% - VISIBLE !)
+           ============================================ */
+
+        /* ---- CUBE 3D ROTATIF ---- */
+        .scene-3d {
+            perspective: 1200px;
+            perspective-origin: 50% 50%;
+        }
+
+        .cube-container {
+            width: 90px;
+            height: 90px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotateCube 15s infinite linear;
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(96, 165, 250, 0.08));
+            border: 2px solid rgba(37, 99, 235, 0.4);
+            box-shadow:
+                inset 0 0 25px rgba(37, 99, 235, 0.2),
+                0 0 20px rgba(37, 99, 235, 0.15);
+            backdrop-filter: blur(4px);
+        }
+
+        .cube-face::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border: 1px dashed rgba(37, 99, 235, 0.3);
+            border-radius: 4px;
+        }
+
+        .cube-face:nth-child(1) { transform: translateZ(45px); }
+        .cube-face:nth-child(2) { transform: rotateY(180deg) translateZ(45px); }
+        .cube-face:nth-child(3) { transform: rotateY(90deg) translateZ(45px); }
+        .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(45px); }
+        .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(45px); }
+        .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(45px); }
+
+        @keyframes rotateCube {
+            from { transform: rotateX(0deg) rotateY(0deg); }
+            to { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        /* ---- AFFICHAGE MOT DE PASSE EN 3D ---- */
+        .password-3d-wrap {
+            perspective: 1500px;
+            perspective-origin: 50% 50%;
+        }
+
+        .password-3d {
+            transform-style: preserve-3d;
+            transform: rotateX(6deg) rotateY(-2deg);
+            transition: transform 1s cubic-bezier(0.23, 1, 0.32, 1);
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1e40af 100%);
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                0 30px 60px -10px rgba(37, 99, 235, 0.45),
+                0 20px 40px -15px rgba(15, 23, 42, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .password-3d-wrap:hover .password-3d {
+            transform: rotateX(0deg) rotateY(0deg);
+        }
+
+        .password-3d::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(96, 165, 250, 0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(96, 165, 250, 0.12) 1px, transparent 1px);
+            background-size: 28px 28px;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Effet de lumière qui traverse */
+        .password-3d::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                115deg,
+                transparent 30%,
+                rgba(147, 197, 253, 0.15) 50%,
+                transparent 70%
+            );
+            animation: shine 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shine {
+            0%, 100% { transform: translateX(-30%) translateY(-30%); }
+            50% { transform: translateX(30%) translateY(30%); }
+        }
+
+        /* Anneaux 3D autour du password */
+        .ring-3d {
+            position: absolute;
+            border-radius: 50%;
+            border: 1.5px dashed rgba(147, 197, 253, 0.35);
+            pointer-events: none;
+            animation: rotateRing 25s linear infinite;
+        }
+
+        .ring-3d-1 {
+            inset: -20px;
+            animation-duration: 25s;
+        }
+
+        .ring-3d-2 {
+            inset: -40px;
+            border-style: solid;
+            border-color: rgba(96, 165, 250, 0.15);
+            animation-duration: 35s;
+            animation-direction: reverse;
+        }
+
+        @keyframes rotateRing {
+            from { transform: rotate(0deg) rotateX(60deg); }
+            to { transform: rotate(360deg) rotateX(60deg); }
+        }
+
+        .password-output {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(1.15rem, 2.6vw, 1.7rem);
+            font-weight: 700;
+            word-break: break-all;
+            line-height: 1.5;
+            letter-spacing: 0.03em;
+            position: relative;
+            z-index: 2;
+            min-height: 3rem;
+            text-shadow: 0 2px 12px rgba(96, 165, 250, 0.4);
+        }
+
+        .char-digit { color: #60a5fa; text-shadow: 0 0 12px rgba(96, 165, 250, 0.6); }
+        .char-symbol { color: #fbbf24; text-shadow: 0 0 12px rgba(251, 191, 36, 0.6); }
+        .char-upper { color: #ffffff; text-shadow: 0 0 12px rgba(255, 255, 255, 0.5); }
+        .char-lower { color: #93c5fd; text-shadow: 0 0 12px rgba(147, 197, 253, 0.5); }
+
+        /* ---- BOUTON 3D ---- */
+        .btn-3d {
+            position: relative;
+            background: linear-gradient(135deg, #93c5fd, #60a5fa);
+            color: #0f172a;
+            padding: 16px 32px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow:
+                0 10px 0 #2563eb,
+                0 14px 24px rgba(37, 99, 235, 0.35);
+            transform: translateY(0);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-3d:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 12px 0 #2563eb,
+                0 18px 28px rgba(37, 99, 235, 0.4);
+            background: linear-gradient(135deg, #bfdbfe, #93c5fd);
+        }
+
+        .btn-3d:active {
+            transform: translateY(6px);
+            box-shadow:
+                0 4px 0 #2563eb,
+                0 6px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-3d.spinning svg {
+            animation: spin 0.5s ease;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ---- ICÔNES FLOTTANTES 3D ---- */
+        .icon-btn-3d {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow:
+                0 6px 16px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .icon-btn-3d:hover {
+            background: linear-gradient(145deg, rgba(96, 165, 250, 0.3), rgba(37, 99, 235, 0.2));
+            transform: translateY(-3px) translateZ(10px);
+            box-shadow:
+                0 12px 24px rgba(37, 99, 235, 0.4),
+                0 0 20px rgba(96, 165, 250, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .icon-btn-3d:active {
+            transform: translateY(0) translateZ(0);
+        }
+
+        .icon-btn-3d.active {
+            background: linear-gradient(145deg, #3b82f6, #2563eb);
+            box-shadow:
+                0 0 0 2px rgba(96, 165, 250, 0.5),
+                0 12px 24px rgba(37, 99, 235, 0.5);
+        }
+
+        /* ---- BARRE DE FORCE 3D ---- */
+        .strength-bar-3d {
+            height: 12px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+            overflow: hidden;
+            position: relative;
+            box-shadow:
+                inset 0 2px 4px rgba(0, 0, 0, 0.4),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .strength-fill-3d {
+            height: 100%;
+            border-radius: 999px;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            width: 0%;
+            position: relative;
+            box-shadow:
+                0 0 20px currentColor,
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .strength-fill-3d::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .strength-weak { background: linear-gradient(90deg, #dc2626, #ef4444, #f87171); color: #ef4444; }
+        .strength-fair { background: linear-gradient(90deg, #d97706, #f59e0b, #fbbf24); color: #f59e0b; }
+        .strength-good { background: linear-gradient(90deg, #ca8a04, #eab308, #facc15); color: #eab308; }
+        .strength-strong { background: linear-gradient(90deg, #16a34a, #22c55e, #4ade80); color: #22c55e; }
+        .strength-excellent { background: linear-gradient(90deg, #059669, #10b981, #34d399); color: #10b981; }
+
+        /* ---- SLIDER 3D ---- */
+        .slider-3d-wrap {
+            padding: 22px 24px;
+            background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            border-radius: 20px;
+            box-shadow:
+                0 10px 30px rgba(37, 99, 235, 0.08),
+                inset 0 1px 0 #ffffff,
+                inset 0 -1px 0 rgba(37, 99, 235, 0.05);
+            border: 1px solid rgba(219, 234, 254, 0.8);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 12px;
+            background: linear-gradient(180deg, #cbd5e1, #e2e8f0);
+            border-radius: 999px;
+            outline: none;
+            cursor: pointer;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #93c5fd, #2563eb);
+            cursor: pointer;
+            border: 4px solid #ffffff;
+            box-shadow:
+                0 8px 16px rgba(37, 99, 235, 0.5),
+                0 4px 8px rgba(37, 99, 235, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow:
+                0 12px 24px rgba(37, 99, 235, 0.6),
+                0 6px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #93c5fd, #2563eb);
+            cursor: pointer;
+            border: 4px solid #ffffff;
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.5);
+        }
+
+        /* ---- OPTION CARD 3D ---- */
+        .option-3d {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px;
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            border: 1px solid rgba(219, 234, 254, 0.9);
+            box-shadow:
+                0 4px 12px rgba(15, 23, 42, 0.04),
+                inset 0 1px 0 #ffffff;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .option-3d:hover {
+            transform: translateY(-3px) translateZ(10px);
+            box-shadow:
+                0 16px 28px rgba(37, 99, 235, 0.12),
+                0 0 0 1px rgba(96, 165, 250, 0.3),
+                inset 0 1px 0 #ffffff;
+            background: linear-gradient(145deg, #ffffff, #eff6ff);
+        }
+
+        .option-3d:active {
+            transform: translateY(0) translateZ(0);
+        }
+
+        .option-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .option-sublabel {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 3px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ---- TOGGLE 3D ---- */
+        .toggle-3d {
+            position: relative;
+            width: 54px;
+            height: 30px;
+            background: linear-gradient(180deg, #cbd5e1, #e2e8f0);
+            border-radius: 999px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            flex-shrink: 0;
+            cursor: pointer;
+            border: none;
+            box-shadow:
+                inset 0 2px 5px rgba(0, 0, 0, 0.15),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .toggle-3d::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            box-shadow:
+                0 3px 6px rgba(0, 0, 0, 0.2),
+                0 1px 2px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 #ffffff;
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .toggle-3d.on {
+            background: linear-gradient(180deg, #2563eb, #3b82f6);
+            box-shadow:
+                inset 0 2px 5px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .toggle-3d.on::after {
+            transform: translateX(24px);
+            box-shadow:
+                0 3px 8px rgba(0, 0, 0, 0.3),
+                0 0 12px rgba(255, 255, 255, 0.5),
+                inset 0 1px 0 #ffffff;
+        }
+
+        /* ---- CARTE 3D GÉNÉRIQUE ---- */
+        .card-3d {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border-radius: 20px;
+            border: 1px solid rgba(219, 234, 254, 0.9);
+            box-shadow:
+                0 4px 12px rgba(15, 23, 42, 0.04),
+                inset 0 1px 0 #ffffff;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+
+        .card-3d:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 20px 40px rgba(37, 99, 235, 0.12),
+                0 0 0 1px rgba(96, 165, 250, 0.2),
+                inset 0 1px 0 #ffffff;
+        }
+
+        /* ---- HISTORIQUE 3D ---- */
+        .history-item-3d {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            border-radius: 14px;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            border: 1px solid rgba(219, 234, 254, 0.9);
+            box-shadow:
+                0 3px 8px rgba(15, 23, 42, 0.05),
+                inset 0 1px 0 #ffffff;
+            transform-style: preserve-3d;
+        }
+
+        .history-item-3d:hover {
+            transform: translateX(4px) translateY(-2px);
+            box-shadow:
+                0 10px 20px rgba(37, 99, 235, 0.15),
+                0 0 0 1px rgba(96, 165, 250, 0.3),
+                inset 0 1px 0 #ffffff;
+            background: linear-gradient(145deg, #ffffff, #eff6ff);
+        }
+
+        /* ---- BADGE / PILL 3D ---- */
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            color: #1e3a8a;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow:
+                0 4px 10px rgba(15, 23, 42, 0.06),
+                inset 0 1px 0 #ffffff;
+            border: 1px solid rgba(219, 234, 254, 0.8);
+        }
+
+        /* ---- NAVBAR ---- */
+        .nav-link {
+            font-weight: 600;
+            font-size: 15px;
+            color: #0f172a;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active { color: #2563eb; }
+
+        .lang-switch {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: #ffffff;
+            border-radius: 999px;
+            padding: 3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .lang-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: none;
+            background: transparent;
+        }
+
+        .lang-btn.active { background: #2563eb; color: #ffffff; }
+        .lang-btn:hover:not(.active) { color: #0f172a; }
+
+        .translatable { transition: opacity 0.2s ease; }
+
+        /* ---- TOAST ---- */
+        .copy-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(150%);
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 22px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.4);
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 1000;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .copy-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ---- FAQ ---- */
+        .faq-item {
+            border-bottom: 1px solid #dbeafe;
+            padding: 20px 0;
+            cursor: pointer;
+        }
+        .faq-item:last-child { border-bottom: none; }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            color: #0f172a;
+            font-size: 15px;
+        }
+
+        .faq-icon { transition: transform 0.3s ease; color: #2563eb; flex-shrink: 0; }
+        .faq-item.open .faq-icon { transform: rotate(180deg); }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .faq-item.open .faq-answer { max-height: 400px; padding-top: 12px; }
+
+        /* ---- FLOATING BADGE 3D ---- */
+        .badge-float-3d {
+            position: absolute;
+            background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            border-radius: 16px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow:
+                0 20px 40px rgba(37, 99, 235, 0.2),
+                0 0 0 1px rgba(219, 234, 254, 0.8),
+                inset 0 1px 0 #ffffff;
+            animation: floatBadge 6s ease-in-out infinite;
+            z-index: 10;
+            transform-style: preserve-3d;
+        }
+
+        .badge-float-3d:hover {
+            transform: translateY(-6px) translateZ(20px) scale(1.05);
+        }
+
+        @keyframes floatBadge {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .password-3d { padding: 24px; transform: none; }
+            .cube-container { width: 60px; height: 60px; }
+            .cube-face { width: 60px; height: 60px; }
+            .cube-face:nth-child(1) { transform: translateZ(30px); }
+            .cube-face:nth-child(2) { transform: rotateY(180deg) translateZ(30px); }
+            .cube-face:nth-child(3) { transform: rotateY(90deg) translateZ(30px); }
+            .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(30px); }
+            .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(30px); }
+            .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(30px); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 bg-sky-soft/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center h-20">
+
+                <a href="index.html" class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                        <span class="font-display font-bold text-white text-xl">J</span>
+                    </div>
+                    <span class="font-display font-bold text-2xl text-navy tracking-tight">JcHub</span>
+                </a>
+
+                <div class="hidden lg:flex items-center gap-10">
+                    <a href="index.html" class="nav-link translatable" data-fr="Accueil" data-en="Home">Accueil</a>
+                    <a href="outils.html" class="nav-link active translatable" data-fr="Outils" data-en="Tools">Outils</a>
+                    <a href="about.html" class="nav-link translatable" data-fr="À propos" data-en="About">À propos</a>
+                    <a href="contact.html" class="nav-link translatable" data-fr="Contact" data-en="Contact">Contact</a>
+                </div>
+
+                <div class="hidden lg:flex items-center gap-4">
+                    <div class="lang-switch">
+                        <button class="lang-btn active" data-lang="fr" onclick="setLanguage('fr')">🇫🇷 FR</button>
+                        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇬🇧 EN</button>
+                    </div>
+                </div>
+
+                <button class="lg:hidden text-navy" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" class="w-7 h-7"></i>
+                </button>
+            </div>
+
+            <div id="mobileMenu" class="lg:hidden hidden pb-6 space-y-3">
+                <a href="index.html" class="block nav-link translatable py-2" data-fr="Accueil" data-en="Home">Accueil</a>
+                <a href="outils.html" class="block nav-link active translatable py-2" data-fr="Outils" data-en="Tools">Outils</a>
+                <a href="about.html" class="block nav-link translatable py-2" data-fr="À propos" data-en="About">À propos</a>
+                <a href="contact.html" class="block nav-link translatable py-2" data-fr="Contact" data-en="Contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <section class="pt-28 pb-4">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="flex items-center gap-2 text-sm text-navy-muted">
+                <a href="outils.html" class="hover:text-sky-accent transition-colors translatable" data-fr="Outils" data-en="Tools">Outils</a>
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                <span class="text-navy font-semibold translatable" data-fr="Générateur de mot de passe" data-en="Password Generator">Générateur de mot de passe</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Header de l'outil avec CUBE 3D -->
+    <section class="relative pt-4 pb-10 overflow-hidden">
+        <div class="bg-tech-grid absolute inset-0 z-0"></div>
+        <div class="tech-dot float-1" style="width: 5px; height: 5px; top: 20%; left: 6%;"></div>
+        <div class="tech-dot float-2" style="width: 6px; height: 6px; top: 60%; right: 8%;"></div>
+        <div class="tech-dot float-3" style="width: 4px; height: 4px; top: 40%; left: 12%;"></div>
+
+        <div class="max-w-5xl mx-auto px-6 relative z-10">
+            <div class="flex items-start justify-between gap-6 flex-wrap">
+                <div class="flex items-center gap-5">
+                    <!-- Icône 3D avec profondeur -->
+                    <div style="perspective: 800px;">
+                        <div class="w-16 h-16 bg-gradient-to-br from-sky-light to-sky-buttonDark rounded-2xl flex items-center justify-center text-white shadow-2xl"
+                             style="transform: rotateY(-15deg) rotateX(10deg); box-shadow: 15px 15px 30px rgba(37, 99, 235, 0.35), -5px -5px 15px rgba(255, 255, 255, 0.8), inset 0 0 0 1px rgba(255,255,255,0.5);">
+                            <i data-lucide="lock" class="w-8 h-8 drop-shadow-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="inline-flex items-center gap-2 mb-2">
+                            <span style="display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; background: #fef3c7; color: #92400e; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);">
+                                ⭐ <span class="translatable ml-1" data-fr="Populaire" data-en="Popular">Populaire</span>
+                            </span>
+                        </div>
+                        <h1 class="font-display text-2xl md:text-3xl font-bold text-navy translatable"
+                            data-fr="Générateur de mot de passe"
+                            data-en="Password Generator">
+                            Générateur de mot de passe
+                        </h1>
+                    </div>
+                </div>
+
+                <!-- Cube 3D rotatif -->
+                <div class="scene-3d hidden md:block">
+                    <div class="cube-container">
+                        <div class="cube-face"></div>
+                        <div class="cube-face"></div>
+                        <div class="cube-face"></div>
+                        <div class="cube-face"></div>
+                        <div class="cube-face"></div>
+                        <div class="cube-face"></div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-navy-muted leading-relaxed max-w-2xl mt-6 translatable"
+               data-fr="Créez des mots de passe forts, aléatoires et personnalisables en un clic. 100% local, aucune donnée n'est envoyée sur un serveur."
+               data-en="Create strong, random and customizable passwords in one click. 100% local, no data is sent to a server.">
+                Créez des mots de passe forts, aléatoires et personnalisables en un clic. 100% local, aucune donnée n'est envoyée sur un serveur.
+            </p>
+        </div>
+    </section>
+
+    <!-- OUTIL -->
+    <section class="max-w-5xl mx-auto px-6 pb-16">
+        <div class="grid lg:grid-cols-5 gap-6">
+
+            <!-- Colonne principale -->
+            <div class="lg:col-span-3 space-y-6">
+
+                <!-- AFFICHAGE MOT DE PASSE 3D -->
+                <div class="password-3d-wrap">
+                    <div class="password-3d">
+                        <!-- Anneaux 3D -->
+                        <div class="ring-3d ring-3d-1"></div>
+                        <div class="ring-3d ring-3d-2"></div>
+
+                        <div class="flex items-center justify-between mb-5 relative z-10">
+                            <div class="text-xs font-bold uppercase tracking-widest text-sky-light/70 translatable"
+                                 data-fr="Votre mot de passe"
+                                 data-en="Your password">
+                                Votre mot de passe
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="icon-btn-3d" onclick="copyPassword()" title="Copier" aria-label="Copier">
+                                    <i data-lucide="copy" class="w-5 h-5"></i>
+                                </button>
+                                <button class="icon-btn-3d" id="regenerateIconBtn" onclick="generatePassword()" title="Regénérer" aria-label="Regénérer">
+                                    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="password-output" id="passwordOutput">
+                            <span class="char-lower">-</span>
+                        </div>
+
+                        <!-- Barre de force 3D -->
+                        <div class="mt-6 relative z-10">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-xs font-semibold text-sky-light/80 translatable"
+                                      data-fr="Force du mot de passe"
+                                      data-en="Password strength">
+                                    Force du mot de passe
+                                </span>
+                                <span class="text-xs font-bold text-white" id="strengthLabel">—</span>
+                            </div>
+                            <div class="strength-bar-3d">
+                                <div class="strength-fill-3d" id="strengthBar"></div>
+                            </div>
+                            <div class="text-xs text-sky-light/60 mt-3 font-mono" id="entropyInfo"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bouton principal 3D -->
+                <button class="btn-3d w-full" id="regenerateBtn" onclick="generatePassword()">
+                    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                    <span class="translatable" data-fr="Générer un nouveau mot de passe" data-en="Generate new password">Générer un nouveau mot de passe</span>
+                </button>
+
+                <!-- Slider 3D -->
+                <div class="slider-3d-wrap">
+                    <div class="flex justify-between items-center mb-4">
+                        <label for="lengthSlider" class="option-label translatable"
+                               data-fr="Longueur du mot de passe"
+                               data-en="Password length">
+                            Longueur du mot de passe
+                        </label>
+                        <div class="font-display font-extrabold text-2xl text-sky-accent" id="lengthValue">16</div>
+                    </div>
+                    <input type="range" id="lengthSlider" min="4" max="64" value="16">
+                    <div class="flex justify-between text-xs text-navy-muted mt-3 font-mono">
+                        <span>4</span>
+                        <span>32</span>
+                        <span>64</span>
+                    </div>
+                </div>
+
+                <!-- Options 3D -->
+                <div class="space-y-3">
+                    <div class="option-3d" onclick="toggleOption('lowercase')">
+                        <div>
+                            <div class="option-label translatable" data-fr="Minuscules (a-z)" data-en="Lowercase (a-z)">Minuscules (a-z)</div>
+                            <div class="option-sublabel">abcdefghijklmnopqrstuvwxyz</div>
+                        </div>
+                        <button class="toggle-3d on" id="toggle-lowercase" aria-label="Minuscules"></button>
+                    </div>
+
+                    <div class="option-3d" onclick="toggleOption('uppercase')">
+                        <div>
+                            <div class="option-label translatable" data-fr="Majuscules (A-Z)" data-en="Uppercase (A-Z)">Majuscules (A-Z)</div>
+                            <div class="option-sublabel">ABCDEFGHIJKLMNOPQRSTUVWXYZ</div>
+                        </div>
+                        <button class="toggle-3d on" id="toggle-uppercase" aria-label="Majuscules"></button>
+                    </div>
+
+                    <div class="option-3d" onclick="toggleOption('numbers')">
+                        <div>
+                            <div class="option-label translatable" data-fr="Chiffres (0-9)" data-en="Numbers (0-9)">Chiffres (0-9)</div>
+                            <div class="option-sublabel">0123456789</div>
+                        </div>
+                        <button class="toggle-3d on" id="toggle-numbers" aria-label="Chiffres"></button>
+                    </div>
+
+                    <div class="option-3d" onclick="toggleOption('symbols')">
+                        <div>
+                            <div class="option-label translatable" data-fr="Symboles (!@#$...)" data-en="Symbols (!@#$...)">Symboles (!@#$...)</div>
+                            <div class="option-sublabel">!@#$%^&*()_+-=[]{}|;:,.<>?</div>
+                        </div>
+                        <button class="toggle-3d on" id="toggle-symbols" aria-label="Symboles"></button>
+                    </div>
+
+                    <div class="option-3d" onclick="toggleOption('excludeAmbiguous')">
+                        <div>
+                            <div class="option-label translatable" data-fr="Exclure les caractères ambigus" data-en="Exclude ambiguous characters">Exclure les caractères ambigus</div>
+                            <div class="option-sublabel translatable" data-fr="Retire : 0, O, o, 1, l, I, |" data-en="Removes: 0, O, o, 1, l, I, |">Retire : 0, O, o, 1, l, I, |</div>
+                        </div>
+                        <button class="toggle-3d" id="toggle-excludeAmbiguous" aria-label="Exclure ambigus"></button>
+                    </div>
+
+                    <div class="option-3d" onclick="toggleOption('noRepeats')">
+                        <div>
+                            <div class="option-label translatable" data-fr="Aucun caractère répété" data-en="No repeated characters">Aucun caractère répété</div>
+                            <div class="option-sublabel translatable" data-fr="Chaque caractère n'apparaît qu'une seule fois" data-en="Each character appears only once">Chaque caractère n'apparaît qu'une seule fois</div>
+                        </div>
+                        <button class="toggle-3d" id="toggle-noRepeats" aria-label="Sans répétition"></button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Colonne latérale -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Historique 3D -->
+                <div class="card-3d p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <h3 class="font-display text-base font-bold text-navy translatable"
+                            data-fr="Historique récent"
+                            data-en="Recent history">
+                            Historique récent
+                        </h3>
+                        <button onclick="clearHistory()" class="text-xs font-semibold text-navy-muted hover:text-red-500 transition-colors">
+                            <span class="translatable" data-fr="Effacer" data-en="Clear">Effacer</span>
+                        </button>
+                    </div>
+                    <div id="historyList" class="space-y-2">
+                        <div class="text-center text-sm text-navy-muted py-6 translatable"
+                             data-fr="Aucun mot de passe généré pour le moment."
+                             data-en="No password generated yet.">
+                            Aucun mot de passe généré pour le moment.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conseils -->
+                <div class="card-3d p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-sky-light to-sky-buttonDark rounded-xl flex items-center justify-center text-white shadow-lg"
+                             style="transform: rotateY(-10deg);">
+                            <i data-lucide="shield-check" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-display text-base font-bold text-navy translatable"
+                            data-fr="Bonnes pratiques"
+                            data-en="Best practices">
+                            Bonnes pratiques
+                        </h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-navy-muted">
+                        <li class="flex items-start gap-3">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5"></i>
+                            <span class="translatable" data-fr="Utilisez au moins 12 caractères" data-en="Use at least 12 characters">Utilisez au moins 12 caractères</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5"></i>
+                            <span class="translatable" data-fr="Un mot de passe unique par site" data-en="A unique password per site">Un mot de passe unique par site</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5"></i>
+                            <span class="translatable" data-fr="Ne partagez jamais vos mots de passe" data-en="Never share your passwords">Ne partagez jamais vos mots de passe</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5"></i>
+                            <span class="translatable" data-fr="Activez la double authentification (2FA)" data-en="Enable 2FA">Activez la double authentification (2FA)</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Badge 3D flottant -->
+                <div class="relative">
+                    <div class="bg-gradient-to-br from-navy to-navy-soft rounded-3xl p-6 relative overflow-hidden shadow-2xl"
+                         style="transform: perspective(1000px) rotateY(-3deg); box-shadow: 20px 20px 40px rgba(15, 23, 42, 0.3), -5px -5px 20px rgba(255, 255, 255, 0.5);">
+                        <div class="absolute -top-12 -right-12 w-40 h-40 bg-sky-accent rounded-full opacity-20 blur-2xl"></div>
+                        <div class="relative z-10 space-y-3">
+                            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-sky-light text-xs font-bold tracking-widest uppercase backdrop-blur">
+                                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                                <span class="translatable" data-fr="100% local" data-en="100% local">100% local</span>
+                            </div>
+                            <h3 class="font-display text-lg font-bold text-white translatable"
+                                data-fr="Vos données restent chez vous."
+                                data-en="Your data stays with you.">
+                                Vos données restent chez vous.
+                            </h3>
+                            <p class="text-sky-light/80 text-xs leading-relaxed translatable"
+                               data-fr="Tout est généré dans votre navigateur. Aucun mot de passe n'est transmis, stocké ou partagé."
+                               data-en="Everything is generated in your browser. No password is transmitted, stored or shared.">
+                                Tout est généré dans votre navigateur. Aucun mot de passe n'est transmis, stocké ou partagé.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="max-w-4xl mx-auto px-6 pb-20">
+        <div class="text-center mb-10 space-y-4">
+            <div class="badge-pill mx-auto translatable" data-fr="FAQ" data-en="FAQ">FAQ</div>
+            <h2 class="font-display text-3xl md:text-4xl font-bold text-navy leading-tight translatable"
+                data-fr="Questions fréquentes."
+                data-en="Frequently asked questions.">
+                Questions fréquentes.
+            </h2>
+        </div>
+
+        <div class="card-3d p-8 md:p-10">
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span class="translatable" data-fr="Est-ce que mes mots de passe sont envoyés quelque part ?" data-en="Are my passwords sent anywhere?">Est-ce que mes mots de passe sont envoyés quelque part ?</span>
+                    <i data-lucide="chevron-down" class="faq-icon w-5 h-5"></i>
+                </div>
+                <div class="faq-answer translatable"
+                     data-fr="Non. Tout est généré localement dans votre navigateur grâce à l'API crypto native. Aucun mot de passe n'est transmis à un serveur."
+                     data-en="No. Everything is generated locally in your browser using the native crypto API. No password is sent to a server.">
+                    Non. Tout est généré localement dans votre navigateur grâce à l'API crypto native. Aucun mot de passe n'est transmis à un serveur.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span class="translatable" data-fr="Quelle est la longueur recommandée ?" data-en="What length is recommended?">Quelle est la longueur recommandée ?</span>
+                    <i data-lucide="chevron-down" class="faq-icon w-5 h-5"></i>
+                </div>
+                <div class="faq-answer translatable"
+                     data-fr="Nous recommandons au minimum 16 caractères pour un usage moderne. 12 caractères restent acceptables si le site impose une limite."
+                     data-en="We recommend at least 16 characters for modern use. 12 characters remain acceptable if the site imposes a limit.">
+                    Nous recommandons au minimum 16 caractères pour un usage moderne. 12 caractères restent acceptables si le site impose une limite.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span class="translatable" data-fr="Que signifie la barre de force ?" data-en="What does the strength bar mean?">Que signifie la barre de force ?</span>
+                    <i data-lucide="chevron-down" class="faq-icon w-5 h-5"></i>
+                </div>
+                <div class="faq-answer translatable"
+                     data-fr="La barre estime l'entropie (en bits) du mot de passe. Plus la valeur est élevée, plus le mot de passe est difficile à casser par force brute."
+                     data-en="The bar estimates the entropy (in bits) of the password. The higher the value, the harder it is to crack by brute force.">
+                    La barre estime l'entropie (en bits) du mot de passe. Plus la valeur est élevée, plus le mot de passe est difficile à casser par force brute.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span class="translatable" data-fr="Pourquoi exclure les caractères ambigus ?" data-en="Why exclude ambiguous characters?">Pourquoi exclure les caractères ambigus ?</span>
+                    <i data-lucide="chevron-down" class="faq-icon w-5 h-5"></i>
+                </div>
+                <div class="faq-answer translatable"
+                     data-fr="Les caractères comme 0/O ou 1/l/I peuvent prêter à confusion lors d'une saisie manuelle. Les exclure facilite la lecture."
+                     data-en="Characters like 0/O or 1/l/I can be confusing during manual entry. Excluding them makes reading easier.">
+                    Les caractères comme 0/O ou 1/l/I peuvent prêter à confusion lors d'une saisie manuelle. Les exclure facilite la lecture.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="max-w-5xl mx-auto px-6 pb-20">
+        <div class="bg-navy rounded-3xl p-8 md:p-12 relative overflow-hidden"
+             style="transform: perspective(1200px) rotateX(2deg); box-shadow: 0 40px 80px rgba(15, 23, 42, 0.3);">
+            <div class="bg-tech-grid absolute inset-0 opacity-30"></div>
+            <div class="absolute -top-16 -right-16 w-72 h-72 bg-sky-accent rounded-full opacity-15 blur-3xl"></div>
+
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 relative z-10">
+                <div class="space-y-3 max-w-xl">
+                    <h2 class="font-display text-2xl md:text-3xl font-bold text-white leading-tight translatable"
+                        data-fr="Explorez les autres outils."
+                        data-en="Explore other tools.">
+                        Explorez les autres outils.
+                    </h2>
+                    <p class="text-sky-light/80 text-sm translatable"
+                       data-fr="JSON Formatter, UUID, Base64, QR Code... tout est gratuit."
+                       data-en="JSON Formatter, UUID, Base64, QR Code... everything is free.">
+                        JSON Formatter, UUID, Base64, QR Code... tout est gratuit.
+                    </p>
+                </div>
+                <a href="outils.html" class="bg-white text-navy px-7 py-4 rounded-full font-semibold inline-flex items-center gap-2 hover:bg-sky-light transition-colors flex-shrink-0"
+                   style="box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);">
+                    <span class="translatable" data-fr="Voir tous les outils" data-en="View all tools">Voir tous les outils</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white pt-16 pb-8 border-t border-sky-light">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="border-t border-sky-light pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-navy-muted text-sm translatable" data-fr="© 2026 JcHub. Tous droits réservés." data-en="© 2026 JcHub. All rights reserved.">© 2026 JcHub. Tous droits réservés.</p>
+                <p class="text-navy-muted text-sm">
+                    <span class="translatable" data-fr="Créé par" data-en="Created by">Créé par</span>
+                    <span class="text-navy font-semibold">Jessy Ngnambongo</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast -->
+    <div class="copy-toast" id="copyToast">
+        <i data-lucide="check" class="w-4 h-4 text-green-400"></i>
+        <span class="translatable" data-fr="Copié dans le presse-papier !" data-en="Copied to clipboard!">Copié dans le presse-papier !</span>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const state = {
+            length: 16,
+            options: {
+                lowercase: true,
+                uppercase: true,
+                numbers: true,
+                symbols: true,
+                excludeAmbiguous: false,
+                noRepeats: false,
+            },
+            currentPassword: '',
+            history: [],
+        };
+
+        const CHARSETS = {
+            lowercase: 'abcdefghijklmnopqrstuvwxyz',
+            uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            numbers: '0123456789',
+            symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?',
+        };
+
+        const AMBIGUOUS = '0Oo1lI|`\'"';
+        const MAX_HISTORY = 5;
+
+        function secureRandom(max) {
+            const array = new Uint32Array(1);
+            crypto.getRandomValues(array);
+            return array[0] % max;
+        }
+
+        function buildCharset() {
+            let charset = '';
+            if (state.options.lowercase) charset += CHARSETS.lowercase;
+            if (state.options.uppercase) charset += CHARSETS.uppercase;
+            if (state.options.numbers) charset += CHARSETS.numbers;
+            if (state.options.symbols) charset += CHARSETS.symbols;
+
+            if (state.options.excludeAmbiguous) {
+                charset = charset.split('').filter(c => !AMBIGUOUS.includes(c)).join('');
+            }
+            return charset;
+        }
+
+        function generatePassword() {
+            const charset = buildCharset();
+
+            if (!charset) {
+                state.currentPassword = '';
+                renderPassword('');
+                showError('Sélectionnez au moins une option');
+                return;
+            }
+
+            let password = '';
+            const usedChars = new Set();
+            const targetLength = state.options.noRepeats
+                ? Math.min(state.length, charset.length)
+                : state.length;
+
+            let attempts = 0;
+            const maxAttempts = targetLength * 100;
+
+            while (password.length < targetLength && attempts < maxAttempts) {
+                attempts++;
+                const char = charset[secureRandom(charset.length)];
+                if (state.options.noRepeats) {
+                    if (usedChars.has(char)) continue;
+                    usedChars.add(char);
+                }
+                password += char;
+            }
+
+            if (!state.options.noRepeats) {
+                password = ensureAllCategories(password, charset);
+            }
+
+            state.currentPassword = password;
+            renderPassword(password);
+            updateStrength(password);
+            addToHistory(password);
+
+            const btn = document.getElementById('regenerateBtn');
+            btn.classList.add('spinning');
+            setTimeout(() => btn.classList.remove('spinning'), 500);
+
+            const iconBtn = document.getElementById('regenerateIconBtn');
+            iconBtn.classList.add('active');
+            setTimeout(() => iconBtn.classList.remove('active'), 300);
+        }
+
+        function ensureAllCategories(password, charset) {
+            const required = [];
+            if (state.options.lowercase) required.push('lowercase');
+            if (state.options.uppercase) required.push('uppercase');
+            if (state.options.numbers) required.push('numbers');
+            if (state.options.symbols) required.push('symbols');
+
+            if (password.length < required.length) return password;
+
+            const chars = password.split('');
+
+            required.forEach(cat => {
+                let pool = CHARSETS[cat];
+                if (state.options.excludeAmbiguous) {
+                    pool = pool.split('').filter(c => !AMBIGUOUS.includes(c)).join('');
+                }
+                if (!pool) return;
+
+                const hasCat = chars.some(c => pool.includes(c));
+                if (!hasCat) {
+                    const idx = secureRandom(chars.length);
+                    chars[idx] = pool[secureRandom(pool.length)];
+                }
+            });
+
+            for (let i = chars.length - 1; i > 0; i--) {
+                const j = secureRandom(i + 1);
+                [chars[i], chars[j]] = [chars[j], chars[i]];
+            }
+
+            return chars.join('');
+        }
+
+        function renderPassword(password) {
+            const output = document.getElementById('passwordOutput');
+            if (!password) {
+                output.innerHTML = '<span class="char-lower">-</span>';
+                return;
+            }
+            output.innerHTML = password.split('').map(char => {
+                let cls = 'char-lower';
+                if (/\d/.test(char)) cls = 'char-digit';
+                else if (/[A-Z]/.test(char)) cls = 'char-upper';
+                else if (/[a-z]/.test(char)) cls = 'char-lower';
+                else cls = 'char-symbol';
+                return `<span class="${cls}">${escapeHtml(char)}</span>`;
+            }).join('');
+        }
+
+        function escapeHtml(char) {
+            if (char === '<') return '&lt;';
+            if (char === '>') return '&gt;';
+            if (char === '&') return '&amp;';
+            if (char === '"') return '&quot;';
+            if (char === "'") return '&#39;';
+            return char;
+        }
+
+        function calculateEntropy(password) {
+            if (!password) return 0;
+            let poolSize = 0;
+            if (/[a-z]/.test(password)) poolSize += 26;
+            if (/[A-Z]/.test(password)) poolSize += 26;
+            if (/\d/.test(password)) poolSize += 10;
+            if (/[^a-zA-Z0-9]/.test(password)) poolSize += 32;
+            return Math.round(password.length * Math.log2(poolSize));
+        }
+
+        function updateStrength(password) {
+            const bar = document.getElementById('strengthBar');
+            const label = document.getElementById('strengthLabel');
+            const info = document.getElementById('entropyInfo');
+
+            if (!password) {
+                bar.style.width = '0%';
+                bar.className = 'strength-fill-3d';
+                label.textContent = '—';
+                info.textContent = '';
+                return;
+            }
+
+            const entropy = calculateEntropy(password);
+            let percent, colorClass, textFR, textEN;
+
+            if (entropy < 40) { percent = 25; colorClass = 'strength-weak'; textFR = 'Faible'; textEN = 'Weak'; }
+            else if (entropy < 60) { percent = 50; colorClass = 'strength-fair'; textFR = 'Moyen'; textEN = 'Fair'; }
+            else if (entropy < 80) { percent = 70; colorClass = 'strength-good'; textFR = 'Bon'; textEN = 'Good'; }
+            else if (entropy < 120) { percent = 88; colorClass = 'strength-strong'; textFR = 'Fort'; textEN = 'Strong'; }
+            else { percent = 100; colorClass = 'strength-excellent'; textFR = 'Excellent'; textEN = 'Excellent'; }
+
+            bar.className = `strength-fill-3d ${colorClass}`;
+            bar.style.width = percent + '%';
+
+            const lang = localStorage.getItem('jchub-lang') || 'fr';
+            label.textContent = lang === 'fr' ? textFR : textEN;
+            info.textContent = lang === 'fr' ? `Entropie : ${entropy} bits` : `Entropy: ${entropy} bits`;
+        }
+
+        async function copyPassword() {
+            if (!state.currentPassword) return;
+            try {
+                await navigator.clipboard.writeText(state.currentPassword);
+                showCopyToast();
+                const btn = document.querySelector('.icon-btn-3d');
+                btn.classList.add('active');
+                setTimeout(() => btn.classList.remove('active'), 500);
+            } catch (err) {
+                const textarea = document.createElement('textarea');
+                textarea.value = state.currentPassword;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showCopyToast();
+            }
+        }
+
+        function showCopyToast() {
+            const toast = document.getElementById('copyToast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2200);
+        }
+
+        function showError(message) {
+            const toast = document.getElementById('copyToast');
+            toast.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 text-red-400"></i><span>${message}</span>`;
+            lucide.createIcons();
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-green-400"></i><span class="translatable" data-fr="Copié !" data-en="Copied!">Copié !</span>';
+                    lucide.createIcons();
+                }, 400);
+            }, 2500);
+        }
+
+        function toggleOption(key) {
+            state.options[key] = !state.options[key];
+            const btn = document.getElementById(`toggle-${key}`);
+            btn.classList.toggle('on', state.options[key]);
+
+            const charset = buildCharset();
+            if (!charset) {
+                state.options[key] = true;
+                btn.classList.add('on');
+                showError('Au moins une option doit rester activée');
+                return;
+            }
+            generatePassword();
+        }
+
+        const lengthSlider = document.getElementById('lengthSlider');
+        const lengthValue = document.getElementById('lengthValue');
+
+        lengthSlider.addEventListener('input', (e) => {
+            state.length = parseInt(e.target.value);
+            lengthValue.textContent = state.length;
+        });
+
+        lengthSlider.addEventListener('change', () => generatePassword());
+
+        function addToHistory(password) {
+            if (!password) return;
+            state.history.unshift(password);
+            if (state.history.length > MAX_HISTORY) state.history = state.history.slice(0, MAX_HISTORY);
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            if (state.history.length === 0) {
+                list.innerHTML = `<div class="text-center text-sm text-navy-muted py-6 translatable" data-fr="Aucun mot de passe généré pour le moment." data-en="No password generated yet.">Aucun mot de passe généré pour le moment.</div>`;
+                const lang = localStorage.getItem('jchub-lang') || 'fr';
+                setLanguage(lang);
+                return;
+            }
+            list.innerHTML = state.history.map((pw, i) => `
+                <div class="history-item-3d">
+                    <span class="font-mono text-xs font-semibold text-navy break-all flex-1" title="${escapeHtml(pw)}">${escapeHtml(maskPassword(pw))}</span>
+                    <button onclick="copyHistoryItem(${i})" class="text-sky-accent hover:text-navy transition-colors flex-shrink-0" aria-label="Copier">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function maskPassword(pw) {
+            if (pw.length <= 12) return pw;
+            return pw.slice(0, 8) + '••••' + pw.slice(-4);
+        }
+
+        async function copyHistoryItem(index) {
+            try {
+                await navigator.clipboard.writeText(state.history[index]);
+                showCopyToast();
+            } catch (e) { console.error(e); }
+        }
+
+        function clearHistory() {
+            state.history = [];
+            renderHistory();
+        }
+
+        function setLanguage(lang) {
+            document.documentElement.lang = lang;
+            document.querySelectorAll('.translatable').forEach(el => {
+                const translation = el.getAttribute(`data-${lang}`);
+                if (translation) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = translation;
+                    } else {
+                        if (translation.includes('<')) el.innerHTML = translation;
+                        else el.textContent = translation;
+                    }
+                }
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+            });
+            localStorage.setItem('jchub-lang', lang);
+            updateStrength(state.currentPassword);
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        }
+
+        function toggleFaq(el) {
+            const wasOpen = el.classList.contains('open');
+            document.querySelectorAll('.faq-item').forEach(item => item.classList.remove('open'));
+            if (!wasOpen) el.classList.add('open');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('jchub-lang') || 'fr';
+            setLanguage(savedLang);
+            generatePassword();
+
+            document.addEventListener('keydown', (e) => {
+                const tag = document.activeElement.tagName;
+                if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    generatePassword();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

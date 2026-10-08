@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - JcHub</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        sky: {
+                            soft: '#eff6ff',
+                            light: '#dbeafe',
+                            button: '#93c5fd',
+                            buttonDark: '#60a5fa',
+                            accent: '#2563eb',
+                        },
+                        navy: {
+                            DEFAULT: '#0f172a',
+                            soft: '#1e3a8a',
+                            muted: '#475569',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #eff6ff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* ============================================
+           AMBIANCE TECH (grille + dots)
+           ============================================ */
+        .bg-tech-grid {
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(circle at 50% 40%, black 25%, transparent 75%);
+            -webkit-mask-image: radial-gradient(circle at 50% 40%, black 25%, transparent 75%);
+            pointer-events: none;
+        }
+
+        .tech-dot {
+            position: absolute;
+            border-radius: 50%;
+            background: #2563eb;
+            opacity: 0.18;
+            pointer-events: none;
+        }
+
+        .float-1 { animation: floatDot 6s ease-in-out infinite; }
+        .float-2 { animation: floatDot 8s ease-in-out infinite 1s; }
+        .float-3 { animation: floatDot 7s ease-in-out infinite 2s; }
+
+        @keyframes floatDot {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-15px) translateX(6px); }
+        }
+
+        /* ============================================
+           MOSAÏQUE SUBTILE (légère perspective uniquement)
+           ============================================ */
+        .mosaic-stage {
+            position: relative;
+            min-height: 540px;
+        }
+
+        /* Carte principale - très légère inclinaison */
+        .mosaic-main {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 58%;
+            height: 540px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow:
+                0 25px 50px -12px rgba(37, 99, 235, 0.35),
+                0 15px 25px -10px rgba(15, 23, 42, 0.25);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+        }
+
+        .mosaic-main:hover {
+            transform: translateY(-6px);
+            box-shadow:
+                0 35px 60px -12px rgba(37, 99, 235, 0.4),
+                0 20px 30px -10px rgba(15, 23, 42, 0.3);
+        }
+
+        .mosaic-main::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 80% 20%, rgba(96, 165, 250, 0.3), transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(147, 197, 253, 0.2), transparent 50%);
+            pointer-events: none;
+        }
+
+        .mosaic-main::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(96, 165, 250, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(96, 165, 250, 0.08) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+        }
+
+        /* Carte secondaire haut droite */
+        .mosaic-side-1 {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 38%;
+            height: 258px;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow:
+                0 20px 40px -10px rgba(37, 99, 235, 0.25),
+                0 10px 20px -8px rgba(15, 23, 42, 0.15);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+        }
+
+        .mosaic-side-1:hover {
+            transform: translateY(-6px);
+            box-shadow:
+                0 30px 50px -10px rgba(37, 99, 235, 0.35),
+                0 15px 25px -8px rgba(15, 23, 42, 0.2);
+        }
+
+        /* Carte secondaire bas droite */
+        .mosaic-side-2 {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 38%;
+            height: 258px;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow:
+                0 20px 40px -10px rgba(37, 99, 235, 0.25),
+                0 10px 20px -8px rgba(15, 23, 42, 0.15);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+        }
+
+        .mosaic-side-2:hover {
+            transform: translateY(-6px);
+            box-shadow:
+                0 30px 50px -10px rgba(37, 99, 235, 0.35),
+                0 15px 25px -8px rgba(15, 23, 42, 0.2);
+        }
+
+        .mosaic-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .mosaic-side-1:hover .mosaic-image,
+        .mosaic-side-2:hover .mosaic-image {
+            transform: scale(1.08);
+        }
+
+        .mosaic-image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 30%, rgba(15, 23, 42, 0.9) 100%);
+            pointer-events: none;
+        }
+
+        .mosaic-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .mosaic-main-content {
+            position: relative;
+            z-index: 2;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: space-between;
+        }
+
+        /* ============================================
+           CUBE 3D DISCRET (un seul, subtil)
+           ============================================ */
+        .cube-wrap {
+            position: absolute;
+            top: 15%;
+            right: 3%;
+            width: 70px;
+            height: 70px;
+            perspective: 900px;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.85;
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotateCube 18s linear infinite;
+        }
+
+        @keyframes rotateCube {
+            from { transform: rotateX(-15deg) rotateY(0deg); }
+            to { transform: rotateX(-15deg) rotateY(360deg); }
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(96, 165, 250, 0.08));
+            border: 1.5px solid rgba(37, 99, 235, 0.35);
+            box-shadow: inset 0 0 20px rgba(37, 99, 235, 0.15);
+        }
+
+        .cube-face:nth-child(1) { transform: translateZ(35px); }
+        .cube-face:nth-child(2) { transform: rotateY(180deg) translateZ(35px); }
+        .cube-face:nth-child(3) { transform: rotateY(90deg) translateZ(35px); }
+        .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(35px); }
+        .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(35px); }
+        .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(35px); }
+
+        /* ============================================
+           CARTE ARTICLE (légère élévation)
+           ============================================ */
+        .article-card-3d {
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow:
+                0 4px 12px rgba(15, 23, 42, 0.04),
+                inset 0 1px 0 #ffffff;
+            border: 1px solid rgba(219, 234, 254, 0.9);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .article-card-3d:hover {
+            transform: translateY(-6px);
+            box-shadow:
+                0 20px 40px rgba(37, 99, 235, 0.15),
+                0 10px 20px rgba(37, 99, 235, 0.08),
+                0 0 0 1px rgba(37, 99, 235, 0.1);
+        }
+
+        .article-image-wrap {
+            position: relative;
+            overflow: hidden;
+            height: 220px;
+        }
+
+        .article-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .article-card-3d:hover .article-image-wrap img {
+            transform: scale(1.06);
+        }
+
+        .article-category {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.95);
+            color: #2563eb;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+        }
+
+        /* ============================================
+           UI COMMUNE
+           ============================================ */
+        .btn-primary {
+            background: #93c5fd;
+            color: #0f172a;
+            padding: 14px 32px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #60a5fa;
+            transform: translateY(-3px);
+            box-shadow:
+                0 12px 25px rgba(37, 99, 235, 0.3),
+                0 4px 10px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-white {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 14px 32px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-white:hover {
+            box-shadow:
+                0 12px 25px rgba(37, 99, 235, 0.15),
+                0 4px 10px rgba(37, 99, 235, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #1e3a8a;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-link {
+            font-weight: 600;
+            font-size: 15px;
+            color: #0f172a;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active { color: #2563eb; }
+
+        .lang-switch {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: #ffffff;
+            border-radius: 999px;
+            padding: 3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .lang-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: none;
+            background: transparent;
+        }
+
+        .lang-btn.active { background: #2563eb; color: #ffffff; }
+        .lang-btn:hover:not(.active) { color: #0f172a; }
+
+        .translatable { transition: opacity 0.2s ease; }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            background: #ffffff;
+            border: 1px solid #dbeafe;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            color: #2563eb;
+            border-color: #93c5fd;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        .newsletter-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 999px;
+            padding: 14px 24px;
+            font-size: 15px;
+            color: #ffffff;
+            outline: none;
+            transition: all 0.25s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .newsletter-input::placeholder { color: rgba(219, 234, 254, 0.6); }
+
+        .newsletter-input:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .mosaic-stage { min-height: auto; }
+            .mosaic-main,
+            .mosaic-side-1,
+            .mosaic-side-2 {
+                position: relative;
+                width: 100%;
+                height: auto;
+                margin-bottom: 16px;
+            }
+            .mosaic-main { min-height: 320px; height: auto; padding: 8px 0; }
+            .mosaic-side-1, .mosaic-side-2 { height: 200px; }
+            .cube-wrap { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 bg-sky-soft/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center h-20">
+
+                <a href="index.html" class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                        <span class="font-display font-bold text-white text-xl">J</span>
+                    </div>
+                    <span class="font-display font-bold text-2xl text-navy tracking-tight">JcHub</span>
+                </a>
+
+                <div class="hidden lg:flex items-center gap-10">
+                    <a href="index.html" class="nav-link translatable" data-fr="Accueil" data-en="Home">Accueil</a>
+                    <a href="outils.html" class="nav-link translatable" data-fr="Outils" data-en="Tools">Outils</a>
+                    <a href="about.html" class="nav-link translatable" data-fr="À propos" data-en="About">À propos</a>
+                    <a href="blog.html" class="nav-link active translatable" data-fr="Blog" data-en="Blog">Blog</a>
+                    <a href="contact.html" class="nav-link translatable" data-fr="Contact" data-en="Contact">Contact</a>
+                </div>
+
+                <div class="hidden lg:flex items-center gap-4">
+                    <div class="lang-switch">
+                        <button class="lang-btn active" data-lang="fr" onclick="setLanguage('fr')">🇫🇷 FR</button>
+                        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇬🇧 EN</button>
+                    </div>
+                </div>
+
+                <button class="lg:hidden text-navy" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" class="w-7 h-7"></i>
+                </button>
+            </div>
+
+            <div id="mobileMenu" class="lg:hidden hidden pb-6 space-y-3">
+                <a href="index.html" class="block nav-link translatable py-2" data-fr="Accueil" data-en="Home">Accueil</a>
+                <a href="outils.html" class="block nav-link translatable py-2" data-fr="Outils" data-en="Tools">Outils</a>
+                <a href="about.html" class="block nav-link translatable py-2" data-fr="À propos" data-en="About">À propos</a>
+                <a href="blog.html" class="block nav-link active translatable py-2" data-fr="Blog" data-en="Blog">Blog</a>
+                <a href="contact.html" class="block nav-link translatable py-2" data-fr="Contact" data-en="Contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+         HERO BLOG — MOSAÏQUE ÉPURÉE + CUBE DISCRET
+         ============================================================ -->
+    <section class="relative pt-32 pb-16 overflow-hidden">
+        <div class="bg-tech-grid absolute inset-0 z-0"></div>
+
+        <div class="tech-dot float-1" style="width: 5px; height: 5px; top: 20%; left: 5%;"></div>
+        <div class="tech-dot float-2" style="width: 6px; height: 6px; top: 60%; right: 6%;"></div>
+        <div class="tech-dot float-3" style="width: 4px; height: 4px; top: 40%; left: 10%;"></div>
+
+        <div class="absolute rounded-full bg-sky-light/40 pointer-events-none" style="width: 300px; height: 300px; top: 50px; left: -150px;"></div>
+        <div class="absolute rounded-full bg-sky-light/30 pointer-events-none" style="width: 400px; height: 400px; bottom: 100px; right: -200px;"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+
+            <!-- En-tête -->
+            <div class="max-w-3xl mb-14 space-y-6">
+                <div class="badge-pill w-fit">
+                    <span class="w-2 h-2 rounded-full bg-sky-accent animate-pulse"></span>
+                    <span class="translatable" data-fr="Blog & Ressources" data-en="Blog & Resources">Blog &amp; Ressources</span>
+                </div>
+
+                <h1 class="font-display font-extrabold text-navy leading-[1.05] tracking-tight"
+                    style="font-size: clamp(2.4rem, 5.5vw, 4rem);">
+                    <span class="translatable" data-fr="Idées, tutoriels" data-en="Ideas, tutorials">Idées, tutoriels</span><br>
+                    <span class="text-sky-accent translatable" data-fr="& inspiration tech." data-en="& tech inspiration.">&amp; inspiration tech.</span>
+                </h1>
+
+                <p class="text-lg text-navy-muted leading-relaxed max-w-xl translatable"
+                   data-fr="Des articles pratiques sur le développement, les outils web et les workflows qui font gagner du temps."
+                   data-en="Practical articles on development, web tools and time-saving workflows.">
+                    Des articles pratiques sur le développement, les outils web et les workflows qui font gagner du temps.
+                </p>
+
+                <div class="flex flex-wrap gap-3 pt-2">
+                    <a href="#articles" class="btn-primary">
+                        <i data-lucide="book-open" class="w-5 h-5"></i>
+                        <span class="translatable" data-fr="Lire les articles" data-en="Read articles">Lire les articles</span>
+                    </a>
+                    <a href="#newsletter" class="btn-white">
+                        <i data-lucide="mail" class="w-5 h-5"></i>
+                        <span class="translatable" data-fr="S'abonner" data-en="Subscribe">S'abonner</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- MOSAÏQUE ÉPURÉE -->
+            <div class="mosaic-stage">
+
+                <!-- CUBE 3D DISCRET -->
+                <div class="cube-wrap">
+                    <div class="cube">
+                        <div class="cube-face"></div>
+                        <div class="cube-face"></div>
+                        <div class="cube-face"></div>
+                        <div class="cube-face"></div>
+                        <div class="cube-face"></div>
+                        <div class="cube-face"></div>
+                    </div>
+                </div>
+
+                <!-- Carte principale -->
+                <div class="mosaic-main">
+                    <div class="mosaic-main-content">
+                        <div>
+                            <span class="mosaic-tag">
+                                <i data-lucide="star" class="w-3 h-3"></i>
+                                <span class="translatable" data-fr="À la une" data-en="Featured">À la une</span>
+                            </span>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3 text-xs text-sky-light/70">
+                                <span class="translatable" data-fr="Développement Web" data-en="Web Development">Développement Web</span>
+                                <span>•</span>
+                                <span class="translatable" data-fr="8 min de lecture" data-en="8 min read">8 min de lecture</span>
+                            </div>
+
+                            <h2 class="font-display text-2xl md:text-3xl lg:text-4xl font-bold leading-tight text-white">
+                                <span class="translatable"
+                                      data-fr="Comment structurer un projet front-end moderne en 2026"
+                                      data-en="How to structure a modern front-end project in 2026">
+                                    Comment structurer un projet front-end moderne en 2026
+                                </span>
+                            </h2>
+
+                            <p class="text-sky-light/80 text-sm md:text-base leading-relaxed max-w-md translatable"
+                               data-fr="Architecture, outils, workflows : notre méthode complète pour garder un code propre et maintenable."
+                               data-en="Architecture, tools, workflows: our complete method to keep a clean and maintainable codebase.">
+                                Architecture, outils, workflows : notre méthode complète pour garder un code propre et maintenable.
+                            </p>
+
+                            <div class="flex items-center gap-3 pt-4">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-sky-light to-sky-buttonDark flex items-center justify-center text-navy font-bold text-sm">
+                                    JN
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold text-white">Jessy Ngnambongo</div>
+                                    <div class="text-xs text-sky-light/60 translatable"
+                                         data-fr="Publié le 12 mai 2026"
+                                         data-en="Published on May 12, 2026">
+                                        Publié le 12 mai 2026
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center text-sm font-semibold text-sky-light gap-2 pt-2">
+                                <span class="translatable" data-fr="Lire l'article" data-en="Read article">Lire l'article</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carte secondaire 1 -->
+                <div class="mosaic-side-1">
+                    <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&h=500&fit=crop"
+                         alt="Article"
+                         class="mosaic-image">
+                    <div class="mosaic-image-overlay"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-5">
+                        <span class="mosaic-tag mb-3">
+                            <span class="translatable" data-fr="Design" data-en="Design">Design</span>
+                        </span>
+                        <h3 class="font-display text-white font-bold text-base leading-snug">
+                            <span class="translatable"
+                                  data-fr="10 principes de design UI intemporels"
+                                  data-en="10 timeless UI design principles">
+                                10 principes de design UI intemporels
+                            </span>
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Carte secondaire 2 -->
+                <div class="mosaic-side-2">
+                    <img src="https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=800&h=500&fit=crop"
+                         alt="Article"
+                         class="mosaic-image">
+                    <div class="mosaic-image-overlay"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-5">
+                        <span class="mosaic-tag mb-3">
+                            <span class="translatable" data-fr="Outils" data-en="Tools">Outils</span>
+                        </span>
+                        <h3 class="font-display text-white font-bold text-base leading-snug">
+                            <span class="translatable"
+                                  data-fr="Les outils dev incontournables en 2026"
+                                  data-en="Must-have dev tools in 2026">
+                                Les outils dev incontournables en 2026
+                            </span>
+                        </h3>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ============================================================
+         LISTE DES ARTICLES
+         ============================================================ -->
+    <section id="articles" class="max-w-7xl mx-auto px-6 py-16">
+
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10">
+            <div class="space-y-3">
+                <div class="badge-pill translatable" data-fr="Tous les articles" data-en="All articles">Tous les articles</div>
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-navy leading-tight translatable"
+                    data-fr="Le contenu le plus récent."
+                    data-en="The most recent content.">
+                    Le contenu le plus récent.
+                </h2>
+            </div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="flex flex-wrap gap-3 mb-10">
+            <button class="filter-btn active" data-filter="all" onclick="filterArticles(this)">
+                <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Tous" data-en="All">Tous</span>
+            </button>
+            <button class="filter-btn" data-filter="dev" onclick="filterArticles(this)">
+                <i data-lucide="code-2" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Développement" data-en="Development">Développement</span>
+            </button>
+            <button class="filter-btn" data-filter="design" onclick="filterArticles(this)">
+                <i data-lucide="palette" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Design" data-en="Design">Design</span>
+            </button>
+            <button class="filter-btn" data-filter="tools" onclick="filterArticles(this)">
+                <i data-lucide="wrench" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Outils" data-en="Tools">Outils</span>
+            </button>
+            <button class="filter-btn" data-filter="tutorial" onclick="filterArticles(this)">
+                <i data-lucide="book-open" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Tutoriels" data-en="Tutorials">Tutoriels</span>
+            </button>
+            <button class="filter-btn" data-filter="news" onclick="filterArticles(this)">
+                <i data-lucide="newspaper" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Actualités" data-en="News">Actualités</span>
+            </button>
+        </div>
+
+        <!-- Grille d'articles -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <a href="#" class="article-card-3d" data-category="dev">
+                <div class="article-image-wrap">
+                    <span class="article-category translatable" data-fr="Développement" data-en="Development">Développement</span>
+                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=500&fit=crop" alt="Article">
+                </div>
+                <div class="p-6 flex flex-col flex-1">
+                    <div class="flex items-center gap-3 text-xs text-navy-muted mb-3">
+                        <span class="translatable" data-fr="12 mai 2026" data-en="May 12, 2026">12 mai 2026</span>
+                        <span>•</span>
+                        <span class="translatable" data-fr="6 min" data-en="6 min">6 min</span>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-3 leading-snug translatable"
+                        data-fr="Maîtriser TypeScript en 2026 : le guide essentiel"
+                        data-en="Mastering TypeScript in 2026: the essential guide">
+                        Maîtriser TypeScript en 2026 : le guide essentiel
+                    </h3>
+                    <p class="text-navy-muted text-sm leading-relaxed flex-1 translatable"
+                       data-fr="Types avancés, generics, utility types — tout ce qu'il faut pour écrire du TypeScript propre."
+                       data-en="Advanced types, generics, utility types — everything you need to write clean TypeScript.">
+                        Types avancés, generics, utility types — tout ce qu'il faut pour écrire du TypeScript propre.
+                    </p>
+                    <div class="flex items-center text-sm font-semibold text-sky-accent gap-2 mt-4">
+                        <span class="translatable" data-fr="Lire" data-en="Read">Lire</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </a>
+
+            <a href="#" class="article-card-3d" data-category="design">
+                <div class="article-image-wrap">
+                    <span class="article-category translatable" data-fr="Design" data-en="Design">Design</span>
+                    <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=500&fit=crop" alt="Article">
+                </div>
+                <div class="p-6 flex flex-col flex-1">
+                    <div class="flex items-center gap-3 text-xs text-navy-muted mb-3">
+                        <span class="translatable" data-fr="8 mai 2026" data-en="May 8, 2026">8 mai 2026</span>
+                        <span>•</span>
+                        <span class="translatable" data-fr="5 min" data-en="5 min">5 min</span>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-3 leading-snug translatable"
+                        data-fr="Le design system minimaliste qui fonctionne"
+                        data-en="The minimalist design system that works">
+                        Le design system minimaliste qui fonctionne
+                    </h3>
+                    <p class="text-navy-muted text-sm leading-relaxed flex-1 translatable"
+                       data-fr="Comment construire un design system simple, cohérent et utile sans tomber dans la complexité."
+                       data-en="How to build a simple, consistent and useful design system without falling into complexity.">
+                        Comment construire un design system simple, cohérent et utile sans tomber dans la complexité.
+                    </p>
+                    <div class="flex items-center text-sm font-semibold text-sky-accent gap-2 mt-4">
+                        <span class="translatable" data-fr="Lire" data-en="Read">Lire</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </a>
+
+            <a href="#" class="article-card-3d" data-category="tools">
+                <div class="article-image-wrap">
+                    <span class="article-category translatable" data-fr="Outils" data-en="Tools">Outils</span>
+                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=500&fit=crop" alt="Article">
+                </div>
+                <div class="p-6 flex flex-col flex-1">
+                    <div class="flex items-center gap-3 text-xs text-navy-muted mb-3">
+                        <span class="translatable" data-fr="5 mai 2026" data-en="May 5, 2026">5 mai 2026</span>
+                        <span>•</span>
+                        <span class="translatable" data-fr="7 min" data-en="7 min">7 min</span>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-3 leading-snug translatable"
+                        data-fr="Les 10 outils dev qui changent la vie en 2026"
+                        data-en="The 10 dev tools that change your life in 2026">
+                        Les 10 outils dev qui changent la vie en 2026
+                    </h3>
+                    <p class="text-navy-muted text-sm leading-relaxed flex-1 translatable"
+                       data-fr="Notre sélection d'outils incontournables pour booster votre productivité au quotidien."
+                       data-en="Our selection of must-have tools to boost your daily productivity.">
+                        Notre sélection d'outils incontournables pour booster votre productivité au quotidien.
+                    </p>
+                    <div class="flex items-center text-sm font-semibold text-sky-accent gap-2 mt-4">
+                        <span class="translatable" data-fr="Lire" data-en="Read">Lire</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </a>
+
+            <a href="#" class="article-card-3d" data-category="tutorial">
+                <div class="article-image-wrap">
+                    <span class="article-category translatable" data-fr="Tutoriel" data-en="Tutorial">Tutoriel</span>
+                    <img src="https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=800&h=500&fit=crop" alt="Article">
+                </div>
+                <div class="p-6 flex flex-col flex-1">
+                    <div class="flex items-center gap-3 text-xs text-navy-muted mb-3">
+                        <span class="translatable" data-fr="2 mai 2026" data-en="May 2, 2026">2 mai 2026</span>
+                        <span>•</span>
+                        <span class="translatable" data-fr="10 min" data-en="10 min">10 min</span>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-3 leading-snug translatable"
+                        data-fr="Créer une API REST avec Node.js et Express"
+                        data-en="Build a REST API with Node.js and Express">
+                        Créer une API REST avec Node.js et Express
+                    </h3>
+                    <p class="text-navy-muted text-sm leading-relaxed flex-1 translatable"
+                       data-fr="Un tutoriel pas à pas pour construire une API robuste, sécurisée et prête pour la production."
+                       data-en="A step-by-step tutorial to build a robust, secure, production-ready API.">
+                        Un tutoriel pas à pas pour construire une API robuste, sécurisée et prête pour la production.
+                    </p>
+                    <div class="flex items-center text-sm font-semibold text-sky-accent gap-2 mt-4">
+                        <span class="translatable" data-fr="Lire" data-en="Read">Lire</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </a>
+
+            <a href="#" class="article-card-3d" data-category="news">
+                <div class="article-image-wrap">
+                    <span class="article-category translatable" data-fr="Actualités" data-en="News">Actualités</span>
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=500&fit=crop" alt="Article">
+                </div>
+                <div class="p-6 flex flex-col flex-1">
+                    <div class="flex items-center gap-3 text-xs text-navy-muted mb-3">
+                        <span class="translatable" data-fr="28 avril 2026" data-en="April 28, 2026">28 avril 2026</span>
+                        <span>•</span>
+                        <span class="translatable" data-fr="4 min" data-en="4 min">4 min</span>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-3 leading-snug translatable"
+                        data-fr="JcHub dépasse les 1 200 utilisateurs actifs"
+                        data-en="JcHub reaches 1,200 active users">
+                        JcHub dépasse les 1 200 utilisateurs actifs
+                    </h3>
+                    <p class="text-navy-muted text-sm leading-relaxed flex-1 translatable"
+                       data-fr="Retour sur les 6 derniers mois, les chiffres clés et les prochains objectifs de la plateforme."
+                       data-en="Looking back at the last 6 months, key numbers and the platform's next goals.">
+                        Retour sur les 6 derniers mois, les chiffres clés et les prochains objectifs de la plateforme.
+                    </p>
+                    <div class="flex items-center text-sm font-semibold text-sky-accent gap-2 mt-4">
+                        <span class="translatable" data-fr="Lire" data-en="Read">Lire</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </a>
+
+            <a href="#" class="article-card-3d" data-category="dev">
+                <div class="article-image-wrap">
+                    <span class="article-category translatable" data-fr="Développement" data-en="Development">Développement</span>
+                    <img src="https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=800&h=500&fit=crop" alt="Article">
+                </div>
+                <div class="p-6 flex flex-col flex-1">
+                    <div class="flex items-center gap-3 text-xs text-navy-muted mb-3">
+                        <span class="translatable" data-fr="24 avril 2026" data-en="April 24, 2026">24 avril 2026</span>
+                        <span>•</span>
+                        <span class="translatable" data-fr="9 min" data-en="9 min">9 min</span>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-3 leading-snug translatable"
+                        data-fr="Optimiser les performances d'une app React"
+                        data-en="Optimizing a React app's performance">
+                        Optimiser les performances d'une app React
+                    </h3>
+                    <p class="text-navy-muted text-sm leading-relaxed flex-1 translatable"
+                       data-fr="Memoization, code splitting, lazy loading — les techniques pour garder une app fluide."
+                       data-en="Memoization, code splitting, lazy loading — techniques to keep your app smooth.">
+                        Memoization, code splitting, lazy loading — les techniques pour garder une app fluide.
+                    </p>
+                    <div class="flex items-center text-sm font-semibold text-sky-accent gap-2 mt-4">
+                        <span class="translatable" data-fr="Lire" data-en="Read">Lire</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </a>
+
+            <a href="#" class="article-card-3d" data-category="design">
+                <div class="article-image-wrap">
+                    <span class="article-category translatable" data-fr="Design" data-en="Design">Design</span>
+                    <img src="https://images.unsplash.com/photo-1618788372246-79faff0c3742?w=800&h=500&fit=crop" alt="Article">
+                </div>
+                <div class="p-6 flex flex-col flex-1">
+                    <div class="flex items-center gap-3 text-xs text-navy-muted mb-3">
+                        <span class="translatable" data-fr="20 avril 2026" data-en="April 20, 2026">20 avril 2026</span>
+                        <span>•</span>
+                        <span class="translatable" data-fr="6 min" data-en="6 min">6 min</span>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-3 leading-snug translatable"
+                        data-fr="Micro-interactions : la touche qui change tout"
+                        data-en="Micro-interactions: the touch that changes everything">
+                        Micro-interactions : la touche qui change tout
+                    </h3>
+                    <p class="text-navy-muted text-sm leading-relaxed flex-1 translatable"
+                       data-fr="Comment de petits détails d'animation transforment l'expérience utilisateur."
+                       data-en="How small animation details transform the user experience.">
+                        Comment de petits détails d'animation transforment l'expérience utilisateur.
+                    </p>
+                    <div class="flex items-center text-sm font-semibold text-sky-accent gap-2 mt-4">
+                        <span class="translatable" data-fr="Lire" data-en="Read">Lire</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </a>
+
+            <a href="#" class="article-card-3d" data-category="tutorial">
+                <div class="article-image-wrap">
+                    <span class="article-category translatable" data-fr="Tutoriel" data-en="Tutorial">Tutoriel</span>
+                    <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=500&fit=crop" alt="Article">
+                </div>
+                <div class="p-6 flex flex-col flex-1">
+                    <div class="flex items-center gap-3 text-xs text-navy-muted mb-3">
+                        <span class="translatable" data-fr="15 avril 2026" data-en="April 15, 2026">15 avril 2026</span>
+                        <span>•</span>
+                        <span class="translatable" data-fr="12 min" data-en="12 min">12 min</span>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-3 leading-snug translatable"
+                        data-fr="Construire un blog avec Next.js et MDX"
+                        data-en="Build a blog with Next.js and MDX">
+                        Construire un blog avec Next.js et MDX
+                    </h3>
+                    <p class="text-navy-muted text-sm leading-relaxed flex-1 translatable"
+                       data-fr="Guide complet pour créer un blog performant, SEO-friendly et facile à maintenir."
+                       data-en="Complete guide to create a performant, SEO-friendly and easy-to-maintain blog.">
+                        Guide complet pour créer un blog performant, SEO-friendly et facile à maintenir.
+                    </p>
+                    <div class="flex items-center text-sm font-semibold text-sky-accent gap-2 mt-4">
+                        <span class="translatable" data-fr="Lire" data-en="Read">Lire</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </a>
+
+            <a href="#" class="article-card-3d" data-category="tools">
+                <div class="article-image-wrap">
+                    <span class="article-category translatable" data-fr="Outils" data-en="Tools">Outils</span>
+                    <img src="https://images.unsplash.com/photo-1618477247222-acbdb0e159b3?w=800&h=500&fit=crop" alt="Article">
+                </div>
+                <div class="p-6 flex flex-col flex-1">
+                    <div class="flex items-center gap-3 text-xs text-navy-muted mb-3">
+                        <span class="translatable" data-fr="10 avril 2026" data-en="April 10, 2026">10 avril 2026</span>
+                        <span>•</span>
+                        <span class="translatable" data-fr="5 min" data-en="5 min">5 min</span>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-3 leading-snug translatable"
+                        data-fr="VS Code : 15 extensions essentielles en 2026"
+                        data-en="VS Code: 15 essential extensions in 2026">
+                        VS Code : 15 extensions essentielles en 2026
+                    </h3>
+                    <p class="text-navy-muted text-sm leading-relaxed flex-1 translatable"
+                       data-fr="Les extensions qui améliorent vraiment la productivité, testées et approuvées."
+                       data-en="Extensions that truly improve productivity, tested and approved.">
+                        Les extensions qui améliorent vraiment la productivité, testées et approuvées.
+                    </p>
+                    <div class="flex items-center text-sm font-semibold text-sky-accent gap-2 mt-4">
+                        <span class="translatable" data-fr="Lire" data-en="Read">Lire</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+
+        <div class="flex justify-center mt-12">
+            <button class="btn-white">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Charger plus d'articles" data-en="Load more articles">Charger plus d'articles</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- NEWSLETTER -->
+    <section id="newsletter" class="max-w-7xl mx-auto px-6 pb-20">
+        <div class="rounded-3xl p-8 md:p-16 relative overflow-hidden"
+             style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); box-shadow: 0 30px 60px -20px rgba(15, 23, 42, 0.5);">
+            <div class="bg-tech-grid absolute inset-0 opacity-25"></div>
+            <div class="absolute -top-20 -right-20 w-96 h-96 bg-sky-accent rounded-full opacity-15 blur-3xl"></div>
+            <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-sky-buttonDark rounded-full opacity-10 blur-3xl"></div>
+
+            <div class="grid lg:grid-cols-2 gap-10 items-center relative z-10">
+                <div class="space-y-5">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-sky-light text-xs font-bold tracking-widest uppercase backdrop-blur">
+                        <i data-lucide="mail" class="w-3 h-3"></i>
+                        <span class="translatable" data-fr="Newsletter" data-en="Newsletter">Newsletter</span>
+                    </div>
+                    <h2 class="font-display text-3xl md:text-4xl font-bold text-white leading-tight">
+                        <span class="translatable" data-fr="Recevez les nouveaux articles," data-en="Get new articles,">Recevez les nouveaux articles,</span><br>
+                        <span class="translatable" data-fr="une fois par semaine." data-en="once a week.">une fois par semaine.</span>
+                    </h2>
+                    <p class="text-sky-light/80 leading-relaxed translatable"
+                       data-fr="Pas de spam. Juste des articles utiles, des outils et des conseils pratiques pour progresser."
+                       data-en="No spam. Just useful articles, tools and practical tips to improve.">
+                        Pas de spam. Juste des articles utiles, des outils et des conseils pratiques pour progresser.
+                    </p>
+                </div>
+
+                <form class="space-y-3">
+                    <input type="email"
+                           class="newsletter-input translatable"
+                           data-fr-placeholder="ton@email.com"
+                           data-en-placeholder="your@email.com"
+                           placeholder="ton@email.com"
+                           required>
+                    <button type="submit" class="btn-primary w-full justify-center"
+                            style="background: #ffffff; color: #0f172a;">
+                        <span class="translatable" data-fr="S'abonner à la newsletter" data-en="Subscribe to newsletter">S'abonner à la newsletter</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                    <p class="text-center text-sky-light/60 text-xs translatable"
+                       data-fr="Désinscription possible à tout moment."
+                       data-en="Unsubscribe at any time.">
+                        Désinscription possible à tout moment.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white pt-16 pb-8 border-t border-sky-light">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                            <span class="font-display font-bold text-white text-lg">J</span>
+                        </div>
+                        <span class="font-display font-bold text-xl text-navy">JcHub</span>
+                    </div>
+                    <p class="text-navy-muted text-sm leading-relaxed translatable"
+                       data-fr="Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques."
+                       data-en="A clear platform to learn, use useful tools and move forward with your digital projects.">
+                        Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques.
+                    </p>
+                    <div class="space-y-3 pt-2">
+                        <a href="mailto:hello@jchub.dev" class="flex items-center gap-3 text-sm text-navy-muted hover:text-sky-accent transition-colors">
+                            <i data-lucide="mail" class="w-4 h-4"></i> hello@jchub.dev
+                        </a>
+                        <div class="flex items-center gap-3 text-sm text-navy-muted">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span class="translatable" data-fr="Congo Brazzaville" data-en="Congo Brazzaville">Congo Brazzaville</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="Plateforme" data-en="Platform">Plateforme</h3>
+                    <ul class="space-y-3">
+                        <li><a href="outils.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Outils" data-en="Tools">Outils</a></li>
+                        <li><a href="blog.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Blog" data-en="Blog">Blog</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Ressources" data-en="Resources">Ressources</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Nouveautés" data-en="What's new">Nouveautés</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="JcHub" data-en="JcHub">JcHub</h3>
+                    <ul class="space-y-3">
+                        <li><a href="about.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="À propos" data-en="About">À propos</a></li>
+                        <li><a href="contact.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Contact" data-en="Contact">Contact</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Partenaires" data-en="Partners">Partenaires</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Presse" data-en="Press">Presse</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="Légal" data-en="Legal">Légal</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Conditions d'utilisation" data-en="Terms of use">Conditions d'utilisation</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Confidentialité" data-en="Privacy">Confidentialité</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Mentions légales" data-en="Legal notice">Mentions légales</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Cookies" data-en="Cookies">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-sky-light pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-navy-muted text-sm translatable" data-fr="© 2026 JcHub. Tous droits réservés." data-en="© 2026 JcHub. All rights reserved.">© 2026 JcHub. Tous droits réservés.</p>
+                <p class="text-navy-muted text-sm">
+                    <span class="translatable" data-fr="Créé par" data-en="Created by">Créé par</span>
+                    <span class="text-navy font-semibold">Jessy Ngnambongo</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        function setLanguage(lang) {
+            document.documentElement.lang = lang;
+            document.querySelectorAll('.translatable').forEach(el => {
+                const translation = el.getAttribute(`data-${lang}`);
+                if (translation) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = translation;
+                    } else {
+                        if (translation.includes('<')) el.innerHTML = translation;
+                        else el.textContent = translation;
+                    }
+                }
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+            });
+            localStorage.setItem('jchub-lang', lang);
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        }
+
+        let currentFilter = 'all';
+        function filterArticles(btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.getAttribute('data-filter');
+            document.querySelectorAll('.article-card-3d').forEach(card => {
+                const cat = card.getAttribute('data-category');
+                card.style.display = (currentFilter === 'all' || cat === currentFilter) ? 'flex' : 'none';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('jchub-lang') || 'fr';
+            setLanguage(savedLang);
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.article-card-3d').forEach((el) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

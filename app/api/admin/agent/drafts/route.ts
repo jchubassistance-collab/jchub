@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     await requireAdmin(request);
     if (!hasFirebaseAdminConfig()) return NextResponse.json({ error: 'Firebase indisponible.' }, { status: 503 });
-    const snapshot = await getAdminDb().collection('agent_drafts').orderBy('createdAt', 'desc').limit(30).get();
+    const snapshot = await getAdminDb().collection('agent_drafts').orderBy('createdAt', 'desc').get();
     const drafts = snapshot.docs.map((document) => {
       const data = document.data();
       return {
@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
         ...data,
         createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+        scheduledFor: data.scheduledFor?.toDate?.()?.toISOString() || null,
       };
     });
     return NextResponse.json({ drafts });

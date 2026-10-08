@@ -23,7 +23,7 @@ type Lead = {
   downloadedAt: string | null;
 };
 
-type Data = { guides: Guide[]; leads: Lead[] };
+type Data = { guides: Guide[]; leads: Lead[]; totalLeads: number; sentEmails: number };
 
 export default function AdminGuidesPage() {
   const [data, setData] = useState<Data | null>(null);
@@ -68,8 +68,8 @@ export default function AdminGuidesPage() {
     }
   }
 
-  const totalLeads = data?.leads.length || 0;
-  const sentEmails = data?.leads.filter((lead) => lead.guideEmailStatus === 'sent').length || 0;
+  const totalLeads = data?.totalLeads || 0;
+  const sentEmails = data?.sentEmails || 0;
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">

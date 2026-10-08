@@ -5,6 +5,7 @@ import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { plans } from '@/lib/pricing';
 import { z } from 'zod';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 const checkoutSchema = z.object({
   plan: z.enum(['day', 'monthly', 'yearly', 'lifetime']),
@@ -13,6 +14,8 @@ const checkoutSchema = z.object({
 }).strict();
 
 export async function POST(req: NextRequest) {
+  const limited = await enforceRateLimit(req, 'checkout', 5, 60 * 60_000);
+  if (limited) return limited;
   try {
     const parsedBody = checkoutSchema.safeParse(await req.json().catch(() => null));
     if (!parsedBody.success) return NextResponse.json({ error: 'Données de paiement invalides.' }, { status: 400 });
@@ -68,7 +71,7 @@ export async function POST(req: NextRequest) {
 
     if (!payment.success) {
       await getAdminDb().collection('payments').doc(transactionId).update({ status: 'failed', error: payment.error || 'MTN indisponible', updatedAt: FieldValue.serverTimestamp() });
-      return NextResponse.json({ error: payment.error }, { status: 500 });
+      return NextResponse.json({ error: 'Le paiement ne peut pas être démarré pour le moment.' }, { status: 502 });
     }
 
     return NextResponse.json({
@@ -77,6 +80,6 @@ export async function POST(req: NextRequest) {
       transactionId,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Une erreur temporaire est survenue.' }, { status: 500 });
   }
 }

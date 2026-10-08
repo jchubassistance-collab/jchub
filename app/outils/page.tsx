@@ -1,89 +1,92 @@
-import { Activity, ArrowRight, Code2, Command, ShieldCheck, Sparkles, Wrench } from 'lucide-react';
 import Link from 'next/link';
+import { ArrowRight, Check, Grid2X2, Lightbulb, ShieldCheck, Sparkles, Wrench, Zap } from 'lucide-react';
 import { getPublishedTools } from '@/lib/tools';
 import { ToolsCatalog } from '@/components/tools/ToolsCatalog';
 
 export const metadata = {
   title: 'JcHub | Outils pratiques pour développeurs',
-  description:
-    'JcHub propose des outils gratuits et pratiques pour développeurs : générateur de mot de passe, JSON formatter, Base64, UUID, conversion CSV/Excel et bien plus.',
+  description: 'Des outils numériques gratuits, pratiques et accessibles directement depuis ton navigateur.',
 };
 
-export default async function ToolsPage() {
+export default async function ToolsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const tools = await getPublishedTools();
+  const { q = '' } = await searchParams;
 
   return (
-    <div className="min-h-screen bg-[#020b1a] text-white">
-      <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(89,126,255,0.30),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(94,138,230,0.20),_transparent_35%),linear-gradient(135deg,_#020b1a_0%,_#091b3d_32%,_#123f8c_100%)]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.08),_transparent_55%)]" />
-        <div
-          className="absolute inset-0 opacity-50"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px)',
-            backgroundSize: '34px 34px',
-            maskImage: 'radial-gradient(circle at center, black 32%, transparent 100%)',
-          }}
-        />
-        <div className="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full border border-[#9ccbff]/20 bg-[#80b5ff]/10 blur-3xl" />
-        <div className="absolute -left-28 bottom-[-80px] h-80 w-80 rounded-full border border-white/10 bg-[#3a68d9]/10 blur-2xl" />
-        <div className="absolute right-[-60px] top-[-40px] h-72 w-72 rounded-full border border-white/10 bg-[#96c7ff]/10 blur-2xl" />
+    <div className="template-home template-tools-page overflow-hidden bg-[#eff6ff] text-[#0f172a]" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
+      <section className="template-home__hero relative isolate overflow-hidden bg-[radial-gradient(circle_at_12%_20%,rgba(147,197,253,.48),transparent_30%),radial-gradient(circle_at_90%_80%,rgba(191,219,254,.55),transparent_32%),#eff6ff]">
+        <div className="pointer-events-none absolute inset-0 opacity-70" style={{ backgroundImage: 'linear-gradient(rgba(37,99,235,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,.045) 1px,transparent 1px)', backgroundSize: '48px 48px', maskImage: 'radial-gradient(ellipse at center,black 20%,transparent 76%)' }} />
+        <div className="pointer-events-none absolute -left-36 top-32 h-80 w-80 rounded-full bg-blue-200/70 blur-3xl" />
+        <div className="pointer-events-none absolute -right-40 bottom-0 h-96 w-96 rounded-full bg-sky-200/70 blur-3xl" />
+        <span className="template-tools__dot template-tools__dot--one" aria-hidden="true" /><span className="template-tools__dot template-tools__dot--two" aria-hidden="true" /><span className="template-tools__dot template-tools__dot--three" aria-hidden="true" />
 
-        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:gap-12 sm:px-6 sm:py-14 lg:grid-cols-[1fr_390px] lg:items-center lg:py-20">
-          <div className="relative order-last lg:order-first" style={{ transform: 'perspective(1200px) rotateX(1.5deg) rotateY(-2deg)' }}>
-            <div className="mb-5 hidden items-center gap-2 border border-[#9ccbff]/30 bg-[#9ccbff]/10 px-3 py-1.5 text-xs font-black uppercase tracking-[.18em] text-[#dfeeff] sm:inline-flex"><Wrench className="h-4 w-4" />Dev utility lab</div>
-            <h1 className="max-w-3xl text-4xl font-black leading-[.95] tracking-tight sm:text-7xl">JcHub<br /><span className="text-[#9ccbff]">Outils pratiques pour développeurs.</span></h1>
-            <p className="mt-4 hidden max-w-2xl text-lg leading-8 text-slate-300 sm:mt-6 sm:block">Des outils rapides, privés et gratuits pour débloquer les détails qui ralentissent les grands projets et faire avancer ton travail.</p>
-            <div className="mt-5 hidden flex-wrap gap-5 text-sm font-bold text-slate-300 sm:mt-8 sm:flex"><span className="inline-flex items-center gap-2"><Activity className="h-4 w-4 text-[#9ccbff]" />Instantané</span><span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#9ccbff]" />Traitement local</span></div>
+        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 pb-16 pt-14 sm:px-8 sm:pb-20 lg:min-h-[690px] lg:grid-cols-[1.05fr_.95fr] lg:gap-8 lg:px-10 lg:pb-24 lg:pt-20">
+          <div className="template-home__intro order-2 max-w-2xl lg:order-1">
+            <span className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-4 py-2 text-sm font-semibold text-blue-900 shadow-sm"><span className="h-2 w-2 animate-pulse rounded-full bg-blue-600" /> Tous les outils en un seul endroit</span>
+            <h1 className="mt-6 text-4xl font-extrabold leading-[1.08] tracking-[-.045em] sm:text-5xl lg:text-[4.25rem]" style={{ fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif' }}>Des outils simples,<br /><span className="text-blue-700">des résultats immédiats.</span></h1>
+            <p className="mt-6 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">Utilise-les directement dans ton navigateur : aucune installation, aucun compte, et un accès gratuit.</p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a href="#tools" className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#93c5fd] px-7 py-3.5 text-sm font-bold text-[#0f172a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#60a5fa] hover:shadow-lg"><Grid2X2 className="h-4 w-4" /> Voir tous les outils <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></a>
+              <Link href="/contact" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-blue-100 bg-white px-7 py-3.5 text-sm font-bold text-[#0f172a] shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"><Lightbulb className="h-4 w-4 text-blue-600" /> Suggérer un outil</Link>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-slate-600">
+              <span className="inline-flex items-center gap-2"><Zap className="h-4 w-4 text-blue-600" /> Résultats immédiats</span>
+              <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-blue-600" /> Traitement privé</span>
+              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-blue-600" /> Accès gratuit</span>
+            </div>
           </div>
 
-          <div className="relative order-first overflow-hidden rounded-[2rem] border border-[#9ccbff]/20 bg-white/5 p-3 shadow-[0_35px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm lg:order-last sm:p-4" style={{ transform: 'perspective(1200px) rotateX(4deg) rotateY(-5deg)' }}>
-            <div className="tools-terminal relative overflow-hidden border border-[#9ccbff]/20 bg-[#071427]/80 p-5 shadow-2xl backdrop-blur-sm">
-              <div className="flex items-center justify-between border-b border-white/10 pb-4 text-[10px] font-black uppercase tracking-[.18em] text-[#9ccbff]"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_#34d399]" />JcHub tools</span><Command className="h-4 w-4" /></div>
-              <div className="mt-5 space-y-3 font-mono text-xs"><p className="text-slate-400"><span className="text-[#9ccbff]">$</span> choose_your_tool</p><p className="text-[#9ccbff]">{tools.length} utilities loaded</p><div className="tools-terminal-bars"><span /><span /><span /><span /><span /><span /><span /><span /><span /><span /><span /><span /></div><p className="text-slate-400"><span className="text-[#9ccbff]">$</span> build_something_great<span className="tools-cursor" /></p></div>
+          <div className="template-home__visual relative order-1 mx-auto flex w-full max-w-[510px] items-center justify-center lg:order-2 lg:justify-end">
+            <div className="absolute inset-5 rounded-full bg-gradient-to-br from-blue-200 via-sky-100 to-blue-300 opacity-80 blur-2xl" />
+            <span className="template-home__orbit template-home__orbit--one" aria-hidden="true" /><span className="template-home__orbit template-home__orbit--two" aria-hidden="true" />
+            <span className="template-home__tech-dot template-home__tech-dot--one" aria-hidden="true" /><span className="template-home__tech-dot template-home__tech-dot--two" aria-hidden="true" /><span className="template-home__tech-dot template-home__tech-dot--three" aria-hidden="true" />
+            <div className="template-tools__cube template-tools__cube--one" aria-hidden="true">{Array.from({ length: 6 }, (_, index) => <span key={index} />)}</div>
+            <div className="template-tools__cube template-tools__cube--two" aria-hidden="true">{Array.from({ length: 6 }, (_, index) => <span key={index} />)}</div>
+            <div className="template-home__circle relative aspect-square w-[min(82vw,340px)] rounded-full bg-gradient-to-br from-[#dbeafe] to-[#bfdbfe] p-[18px] shadow-[40px_40px_80px_rgba(37,99,235,.2),-15px_-15px_40px_rgba(255,255,255,.9)] ring-1 ring-white/60 sm:w-[380px] lg:w-[440px]">
+              <div className="template-home__circle-image relative h-full w-full overflow-hidden rounded-full border-[10px] border-white bg-white shadow-inner"><img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&h=900&fit=crop" alt="Composants électroniques représentant les outils numériques" className="absolute inset-0 h-full w-full object-cover" fetchPriority="high" /></div>
+              <div className="template-home__badge template-home__badge--bottom absolute -bottom-1 left-0 flex items-center gap-3 rounded-2xl border border-blue-100 bg-white px-4 py-3 shadow-[0_16px_35px_rgba(15,23,42,.12)] sm:-left-8"><span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-700"><Zap className="h-5 w-5" /></span><span><span className="block text-xs font-medium text-slate-500">Instantané</span><strong className="mt-0.5 block text-sm text-[#0f172a]">Sans attente</strong></span></div>
+              <div className="template-home__badge template-home__badge--top absolute -right-1 top-7 hidden items-center gap-3 rounded-2xl border border-blue-100 bg-white px-4 py-3 shadow-[0_16px_35px_rgba(15,23,42,.12)] sm:flex"><span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-700"><ShieldCheck className="h-5 w-5" /></span><span><span className="block text-xs font-medium text-slate-500">Sécurisé</span><strong className="mt-0.5 block text-sm text-[#0f172a]">Données protégées</strong></span></div>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-12">
-
-        <div className="relative mb-12 overflow-hidden rounded-[2rem] border border-white/10 bg-[#17324d] shadow-[0_22px_55px_rgba(10,20,40,0.45)]" style={{ transform: 'perspective(1200px) rotateX(2deg) rotateY(-2deg)' }}>
-          <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=85" alt="Composants électroniques et code" className="h-44 w-full object-cover opacity-40 sm:h-52" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#102a43] via-[#17324d]/80 to-transparent" />
-          <div className="absolute inset-y-0 left-0 flex max-w-xl items-center p-6 text-white sm:p-8"><div><p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#9ccbff]"><Sparkles className="h-4 w-4" />Boîte à outils</p><p className="mt-2 text-2xl font-black sm:text-3xl">Un raccourci pour chaque blocage.</p><p className="mt-2 max-w-md text-sm leading-relaxed text-slate-300">Sécurité, code, données et productivité réunis au même endroit.</p></div></div>
+      <section id="tools" className="mx-auto max-w-7xl scroll-mt-24 px-5 pb-14 sm:px-8 lg:px-10 lg:pb-20">
+        <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-3"><Badge>Bibliothèque</Badge><h2 className="text-3xl font-extrabold leading-tight sm:text-4xl" style={{ fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif' }}>Tous les outils JcHub.</h2><p className="max-w-xl text-sm leading-6 text-slate-600">Recherche un outil, filtre par catégorie et ouvre directement celui qui répond à ton besoin.</p></div>
         </div>
-        <ToolsCatalog tools={tools} />
+        <ToolsCatalog tools={tools} initialQuery={q} />
+      </section>
 
-      <div className="mt-14 flex flex-col justify-between gap-5 rounded-[2rem] border border-[#9ccbff]/20 bg-[rgba(13,28,52,0.8)] p-6 shadow-[0_18px_40px_rgba(7,19,40,0.24)] backdrop-blur-sm sm:flex-row sm:items-center sm:p-8" style={{ transform: 'perspective(1200px) rotateX(2deg) rotateY(-2deg)' }}>
-        <div><h3 className="text-lg font-black text-white">Un outil manque à l’appel ?</h3><p className="mt-1 text-sm text-slate-300">Dis-nous ce qui te ferait gagner du temps.</p></div>
-        <Link href="/contact" className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#4a74d6] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#6fa3ff]">Suggérer un outil <ArrowRight className="h-4 w-4" /></Link>
-      </div>
-      <div className="mt-8 hidden">
-        <h3 className="font-semibold text-lg mb-2">📬 Reçois nos nouveaux outils chaque semaine</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Des mises à jour utiles pour rester productif. Pas de spam, désabonnement en 1 clic.
-        </p>
-        <form className="flex flex-col sm:flex-row gap-2 max-w-md">
-          <input
-            type="email"
-            placeholder="ton@email.com"
-            required
-            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
-          />
-          <button
-            type="submit"
-            className="bg-brand-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-brand-700"
-          >
-            S'inscrire
-          </button>
-        </form>
-      </div>
-      </div>
+      <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8 lg:px-10 lg:pb-20" aria-label="Les outils en chiffres">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5"><Stat value={String(tools.length)} label="Outils disponibles" /><Stat value="100 %" label="Gratuits" /><Stat value="0" label="Inscription requise" /><Stat value="∞" label="Utilisations" /></div>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-5 pb-16 sm:px-8 lg:pb-20">
+        <div className="mb-10 space-y-4 text-center"><Badge>FAQ</Badge><h2 className="text-3xl font-extrabold sm:text-4xl" style={{ fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif' }}>Questions fréquentes.</h2></div>
+        <div className="divide-y divide-blue-100 rounded-[1.5rem] border border-blue-100 bg-white p-6 shadow-[0_10px_40px_rgba(37,99,235,.06)] sm:p-9">
+          <Faq question="Les outils sont-ils vraiment gratuits ?">Oui, les outils JcHub sont gratuits. Aucune inscription n’est nécessaire pour les utiliser.</Faq>
+          <Faq question="Mes données sont-elles envoyées sur un serveur ?">La plupart des outils fonctionnent directement dans ton navigateur. La page de chaque outil précise son fonctionnement.</Faq>
+          <Faq question="Puis-je proposer un nouvel outil ?">Oui. Envoie-nous ton idée depuis la page Contact et nous l’étudierons.</Faq>
+          <Faq question="Les outils fonctionnent-ils hors ligne ?">Certains outils peuvent continuer à fonctionner après le chargement de la page. Cela dépend de l’outil utilisé.</Faq>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8 lg:px-10 lg:pb-20">
+        <div className="relative overflow-hidden rounded-[1.75rem] bg-[#0f172a] px-7 py-10 text-white shadow-[0_24px_55px_rgba(15,23,42,.18)] sm:px-10 sm:py-14 lg:px-14"><div className="pointer-events-none absolute -right-16 -top-28 h-80 w-80 rounded-full bg-blue-500/20 blur-3xl" /><div className="relative flex flex-col gap-7 md:flex-row md:items-center md:justify-between"><div className="max-w-2xl"><span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[.16em] text-blue-200"><Sparkles className="h-3.5 w-3.5" /> Une idée en tête ?</span><h2 className="mt-5 text-3xl font-extrabold leading-tight sm:text-4xl" style={{ fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif' }}>Propose-nous le prochain outil,<br />on le construit ensemble.</h2></div><Link href="/contact" className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-full bg-white px-7 py-4 text-sm font-bold text-[#0f172a] transition hover:-translate-y-0.5 hover:bg-blue-100">Nous contacter <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></Link></div></div>
+      </section>
     </div>
   );
 }
 
-function Stat({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
-  return <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:min-w-32"><span className="text-orange-600">{icon}</span><p className="mt-3 text-2xl font-black text-[#17324d]">{value}</p><p className="text-xs font-bold uppercase tracking-wide text-slate-500">{label}</p></div>;
+function Badge({ children }: { children: React.ReactNode }) {
+  return <span className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-4 py-2 text-xs font-bold uppercase tracking-[.12em] text-blue-800 shadow-sm">{children}</span>;
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return <div className="template-tools__stat rounded-[20px] border border-blue-100 bg-white p-5 text-center shadow-[0_2px_6px_rgba(15,23,42,.04)] sm:p-7"><p className="text-3xl font-extrabold text-blue-700 sm:text-4xl">{value}</p><p className="mt-2 text-xs font-semibold uppercase tracking-wider text-slate-500">{label}</p></div>;
+}
+
+function Faq({ question, children }: { question: string; children: React.ReactNode }) {
+  return <details className="template-tools__faq py-5 first:pt-0 last:pb-0"><summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold text-[#0f172a]">{question}<span className="text-xl text-blue-600 transition-transform">+</span></summary><p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">{children}</p></details>;
 }

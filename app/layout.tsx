@@ -50,11 +50,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const hostname = headers().get('host')?.split(':')[0].toLowerCase();
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const hostname = (await headers()).get('host')?.split(':')[0].toLowerCase();
   const isAdminHost =
     hostname === 'admin.jchub.dev' || hostname === 'admin.localhost';
   const isProduction = process.env.NODE_ENV === 'production';
+  const isVercelDeployment = process.env.VERCEL === '1';
 
   return (
     <html lang="fr">
@@ -79,9 +80,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }),
           }}
         />
-        <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="afterInteractive" data-turnstile="true" />
-        {isProduction && <Analytics />}
-        {isProduction && <SpeedInsights />}
+
+        {isProduction && isVercelDeployment && <Analytics />}
+        {isProduction && isVercelDeployment && <SpeedInsights />}
         <GoogleAnalytics />
         <PwaRegister />
         <AppChrome isAdminHost={isAdminHost}>{children}</AppChrome>

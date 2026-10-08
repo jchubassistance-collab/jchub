@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     await requireAdmin(request);
     if (!hasFirebaseAdminConfig()) return NextResponse.json({ error: 'Firebase indisponible.' }, { status: 503 });
-    const snapshot = await getAdminDb().collection('users').limit(100).get();
+    const snapshot = await getAdminDb().collection('users').get();
     const users = snapshot.docs.map((document) => {
       const data = document.data();
       return { uid: document.id, email: String(data.email || ''), displayName: String(data.displayName || ''), role: String(data.role || 'user'), provider: String(data.provider || ''), createdAt: data.createdAt?.toDate?.()?.toISOString() || null };

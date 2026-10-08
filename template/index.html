@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JcHub - Solutions Digitales</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        sky: {
+                            soft: '#eff6ff',
+                            light: '#dbeafe',
+                            button: '#93c5fd',
+                            buttonDark: '#60a5fa',
+                            accent: '#2563eb',
+                        },
+                        navy: {
+                            DEFAULT: '#0f172a',
+                            soft: '#1e3a8a',
+                            muted: '#475569',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #eff6ff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .bg-tech-grid {
+            background-image: 
+                linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 75%);
+            -webkit-mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 75%);
+            pointer-events: none;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            position: relative;
+        }
+
+        .card:hover {
+            box-shadow: 
+                0 20px 40px rgba(37, 99, 235, 0.12),
+                0 0 0 1px rgba(37, 99, 235, 0.08);
+            transform: translateY(-5px);
+        }
+
+        .btn-primary {
+            background: #93c5fd;
+            color: #0f172a;
+            padding: 14px 32px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            position: relative;
+        }
+
+        .btn-primary:hover {
+            background: #60a5fa;
+            transform: translateY(-3px);
+            box-shadow: 
+                0 12px 25px rgba(37, 99, 235, 0.3),
+                0 4px 10px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-white {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 14px 32px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-white:hover {
+            box-shadow: 
+                0 12px 25px rgba(37, 99, 235, 0.15),
+                0 4px 10px rgba(37, 99, 235, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #1e3a8a;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-link {
+            font-weight: 600;
+            font-size: 15px;
+            color: #0f172a;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: #2563eb;
+        }
+
+        .search-bar {
+            background: #ffffff;
+            border-radius: 999px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .search-bar:focus-within {
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: #0f172a;
+            width: 100%;
+        }
+
+        .search-bar input::placeholder {
+            color: #94a3b8;
+        }
+
+        .icon-soft {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s ease;
+        }
+
+        .card:hover .icon-soft {
+            background: #2563eb;
+            color: #ffffff;
+            transform: scale(1.1) rotate(-5deg);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .logo-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px 30px;
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 
+                0 2px 6px rgba(0, 0, 0, 0.04),
+                0 1px 0 rgba(255, 255, 255, 1) inset;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            color: #0f172a;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.02em;
+            transform-style: preserve-3d;
+            transform: perspective(800px) rotateX(0deg) rotateY(0deg) translateY(0);
+        }
+
+        .logo-item:hover {
+            transform: perspective(800px) rotateX(-4deg) rotateY(4deg) translateY(-6px);
+            box-shadow: 
+                0 20px 40px rgba(37, 99, 235, 0.18),
+                0 10px 20px rgba(37, 99, 235, 0.1),
+                0 0 0 1px rgba(37, 99, 235, 0.15),
+                0 1px 0 rgba(255, 255, 255, 1) inset;
+            color: #2563eb;
+        }
+
+        .logo-item i {
+            color: #93c5fd;
+            transition: all 0.4s ease;
+        }
+
+        .logo-item:hover i {
+            color: #2563eb;
+            transform: scale(1.15) rotate(-8deg);
+        }
+
+        .perspective-wrap {
+            perspective: 1400px;
+        }
+
+        .circle-3d {
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            padding: 18px;
+            position: relative;
+            transform: rotateY(-10deg) rotateX(5deg);
+            transition: transform 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 
+                40px 40px 80px rgba(37, 99, 235, 0.2),
+                -15px -15px 40px rgba(255, 255, 255, 0.9),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+            transform-style: preserve-3d;
+        }
+
+        .circle-3d:hover {
+            transform: rotateY(0deg) rotateX(0deg) scale(1.02);
+            box-shadow: 
+                0 50px 100px rgba(37, 99, 235, 0.25),
+                -15px -15px 40px rgba(255, 255, 255, 0.9),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+        }
+
+        .circle-3d::before {
+            content: '';
+            position: absolute;
+            inset: -15px;
+            border-radius: 50%;
+            border: 1px dashed rgba(37, 99, 235, 0.25);
+            animation: rotateRing 30s linear infinite;
+            pointer-events: none;
+        }
+
+        .circle-3d::after {
+            content: '';
+            position: absolute;
+            inset: -25px;
+            border-radius: 50%;
+            border: 1px solid rgba(37, 99, 235, 0.12);
+            animation: pulseRing 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotateRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulseRing {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.05); opacity: 0.2; }
+        }
+
+        .circle-image {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            position: relative;
+            z-index: 1;
+            box-shadow: inset 0 0 40px rgba(37, 99, 235, 0.15);
+        }
+
+        .circle-image-wrap {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .circle-image-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: 
+                linear-gradient(rgba(37, 99, 235, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.03) 1px, transparent 1px);
+            background-size: 25px 25px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .tech-dot {
+            position: absolute;
+            border-radius: 50%;
+            background: #2563eb;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .float-1 { animation: floatDot 6s ease-in-out infinite; }
+        .float-2 { animation: floatDot 8s ease-in-out infinite 1s; }
+        .float-3 { animation: floatDot 7s ease-in-out infinite 2s; }
+
+        @keyframes floatDot {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-20px) translateX(10px); }
+        }
+
+        .tech-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.15), transparent);
+            pointer-events: none;
+        }
+
+        .title-xl {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            color: #0f172a;
+        }
+
+        .floating-badge {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 
+                0 15px 35px rgba(37, 99, 235, 0.15),
+                0 5px 15px rgba(37, 99, 235, 0.08),
+                0 1px 0 rgba(255, 255, 255, 1) inset;
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            animation: floatBadge 6s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        .floating-badge:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 25px 50px rgba(37, 99, 235, 0.25),
+                0 5px 15px rgba(37, 99, 235, 0.1),
+                0 1px 0 rgba(255, 255, 255, 1) inset;
+        }
+
+        .floating-badge-2 {
+            animation: floatBadge 7s ease-in-out infinite 1s;
+        }
+
+        @keyframes floatBadge {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Langue switcher */
+        .lang-switch {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: #ffffff;
+            border-radius: 999px;
+            padding: 3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .lang-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: none;
+            background: transparent;
+        }
+
+        .lang-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .lang-btn:hover:not(.active) {
+            color: #0f172a;
+        }
+
+        .translatable {
+            transition: opacity 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 bg-sky-soft/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center h-20">
+                
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                        <span class="font-display font-bold text-white text-xl">J</span>
+                    </div>
+                    <span class="font-display font-bold text-2xl text-navy tracking-tight">JcHub</span>
+                </div>
+
+                <div class="hidden lg:flex items-center gap-10">
+                    <a href="#" class="nav-link translatable" data-fr="Accueil" data-en="Home">Accueil</a>
+                    <a href="#" class="nav-link translatable" data-fr="Outils" data-en="Tools">Outils</a>
+                    <a href="about.html" class="nav-link translatable" data-fr="À propos" data-en="About">À propos</a>
+                    <a href="contact.html" class="nav-link translatable" data-fr="Contact" data-en="Contact">Contact</a>
+                </div>
+
+                <div class="hidden lg:flex items-center gap-4">
+                    <div class="search-bar w-56">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                        <input type="text" class="translatable" data-fr-placeholder="Rechercher..." data-en-placeholder="Search..." placeholder="Rechercher...">
+                    </div>
+
+                    <!-- Language Switcher -->
+                    <div class="lang-switch">
+                        <button class="lang-btn active" data-lang="fr" onclick="setLanguage('fr')">
+                            🇫🇷 FR
+                        </button>
+                        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">
+                            🇬🇧 EN
+                        </button>
+                    </div>
+                </div>
+
+                <button class="lg:hidden text-navy">
+                    <i data-lucide="menu" class="w-7 h-7"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-24 overflow-hidden">
+        
+        <div class="bg-tech-grid absolute inset-0 z-0"></div>
+
+        <div class="tech-line" style="top: 30%; left: 0; right: 65%;"></div>
+        <div class="tech-line" style="top: 75%; left: 45%; right: 0;"></div>
+
+        <div class="tech-dot float-1" style="width: 5px; height: 5px; top: 25%; left: 8%;"></div>
+        <div class="tech-dot float-2" style="width: 6px; height: 6px; top: 65%; left: 5%;"></div>
+        <div class="tech-dot float-3" style="width: 4px; height: 4px; top: 45%; left: 12%;"></div>
+
+        <div class="absolute rounded-full bg-sky-light/40 pointer-events-none" style="width: 300px; height: 300px; top: 100px; left: -150px;"></div>
+        <div class="absolute rounded-full bg-sky-light/30 pointer-events-none" style="width: 400px; height: 400px; top: 400px; right: -200px;"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                
+                <div class="space-y-8">
+                    <div class="badge-pill w-fit">
+                        <span class="w-2 h-2 rounded-full bg-sky-accent animate-pulse"></span>
+                        <span class="translatable" data-fr="Nouveaux outils disponibles" data-en="New tools available">Nouveaux outils disponibles</span>
+                    </div>
+
+                    <h1 class="title-xl">
+                        <span class="translatable" data-fr="Découvre, Utilise" data-en="Discover, Use">Découvre, Utilise</span><br>
+                        <span class="translatable" data-fr="& Partage des" data-en="& Share"> &amp; Partage des</span><br>
+                        <span class="text-sky-accent translatable" data-fr="outils utiles." data-en="useful tools.">outils utiles.</span>
+                    </h1>
+
+                    <p class="text-lg text-navy-muted max-w-lg leading-relaxed translatable" 
+                       data-fr="JcHub regroupe des outils pratiques, des ressources claires et des workflows pensés pour gagner du temps dans le quotidien numérique."
+                       data-en="JcHub brings together practical tools, clear resources and workflows designed to save time in everyday digital life.">
+                        JcHub regroupe des outils pratiques, des ressources claires et des workflows pensés pour gagner du temps dans le quotidien numérique.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button class="btn-primary">
+                            <i data-lucide="book-open" class="w-5 h-5"></i>
+                            <span class="translatable" data-fr="Explorer les outils" data-en="Explore tools">Explorer les outils</span>
+                        </button>
+                        
+                        <button class="btn-white">
+                            <i data-lucide="info" class="w-5 h-5"></i>
+                            <span class="translatable" data-fr="En savoir plus" data-en="Learn more">En savoir plus</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-center lg:justify-end perspective-wrap">
+                    <div class="relative">
+                        <div class="circle-3d w-[400px] h-[400px] lg:w-[480px] lg:h-[480px] flex items-center justify-center">
+                            
+                            <div class="circle-image-wrap">
+                                <!-- ⬇️ REMPLACEZ CE SRC PAR VOTRE IMAGE ⬇️ -->
+                                <img 
+                                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=800&fit=crop" 
+                                    alt="JcHub" 
+                                    class="circle-image"
+                                >
+                                <!-- ⬆️ REMPLACEZ CE SRC PAR VOTRE IMAGE ⬆️ -->
+                            </div>
+                        </div>
+
+                        <div class="floating-badge absolute -bottom-4 -left-4">
+                            <div class="w-10 h-10 bg-sky-light rounded-xl flex items-center justify-center">
+                                <i data-lucide="zap" class="w-5 h-5 text-sky-accent"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-navy-muted font-medium translatable" data-fr="Rapide" data-en="Fast">Rapide</div>
+                                <div class="font-display font-bold text-navy text-sm translatable" data-fr="100% gratuit" data-en="100% free">100% gratuit</div>
+                            </div>
+                        </div>
+
+                        <div class="floating-badge floating-badge-2 absolute -top-4 -right-4">
+                            <div class="w-10 h-10 bg-sky-light rounded-xl flex items-center justify-center">
+                                <i data-lucide="users" class="w-5 h-5 text-sky-accent"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-navy-muted font-medium translatable" data-fr="Communauté" data-en="Community">Communauté</div>
+                                <div class="font-display font-bold text-navy text-sm translatable" data-fr="+1 200 users" data-en="+1,200 users">+1 200 users</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Partenaires -->
+    <section class="relative pb-20 overflow-hidden">
+        
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 mb-12">
+                
+                <div class="logo-item">
+                    <i data-lucide="globe" class="w-6 h-6"></i>
+                    njd.web
+                </div>
+
+                <div class="logo-item">
+                    <i data-lucide="award" class="w-6 h-6"></i>
+                    EMO Demain
+                </div>
+
+                <div class="logo-item">
+                    <i data-lucide="rocket" class="w-6 h-6"></i>
+                    Tech Corp
+                </div>
+
+                <div class="logo-item">
+                    <i data-lucide="zap" class="w-6 h-6"></i>
+                    Future Lab
+                </div>
+
+                <div class="logo-item">
+                    <i data-lucide="layers" class="w-6 h-6"></i>
+                    Data Flow
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button class="btn-primary">
+                    <span class="translatable" data-fr="Devenir partenaire" data-en="Become a partner">Devenir partenaire</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Suite -->
+    <section class="max-w-7xl mx-auto px-6 py-20 space-y-24">
+        
+        <!-- Quick Actions -->
+        <div class="grid md:grid-cols-2 gap-6 max-w-3xl">
+            <a href="#" class="card p-6 flex justify-between items-center group">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-sky-light rounded-2xl flex items-center justify-center text-sky-accent">
+                        <i data-lucide="wrench" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-navy translatable" data-fr="Outils gratuits" data-en="Free tools">Outils gratuits</h3>
+                        <p class="text-sm text-navy-muted translatable" data-fr="Résoudre maintenant" data-en="Solve now">Résoudre maintenant</p>
+                    </div>
+                </div>
+                <i data-lucide="arrow-right" class="w-5 h-5 text-sky-accent group-hover:translate-x-1 transition-all"></i>
+            </a>
+
+            <a href="#" class="card p-6 flex justify-between items-center group">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-sky-light rounded-2xl flex items-center justify-center text-sky-accent">
+                        <i data-lucide="mail" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-navy translatable" data-fr="Contact" data-en="Contact">Contact</h3>
+                        <p class="text-sm text-navy-muted translatable" data-fr="Parlons projets" data-en="Let's talk">Parlons projets</p>
+                    </div>
+                </div>
+                <i data-lucide="arrow-right" class="w-5 h-5 text-sky-accent group-hover:translate-x-1 transition-all"></i>
+            </a>
+        </div>
+
+        
+        <!-- Outils Pratiques -->
+        <div class="space-y-10">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
+                <div class="space-y-3">
+                    <div class="badge-pill translatable" data-fr="Outils pratiques" data-en="Practical tools">Outils pratiques</div>
+                    <h2 class="font-display text-3xl md:text-5xl font-bold text-navy leading-tight">
+                        <span class="translatable" data-fr="Ce dont tu as besoin," data-en="What you need,">Ce dont tu as besoin,</span><br>
+                        <span class="text-navy-muted translatable" data-fr="sans distraction." data-en="without distraction.">sans distraction.</span>
+                    </h2>
+                </div>
+                <a href="#" class="text-sm font-semibold text-sky-accent hover:text-navy transition-colors flex items-center gap-2 group">
+                    <span class="translatable" data-fr="Tous les outils" data-en="All tools">Tous les outils</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="#" class="card p-8 block group">
+                    <div class="icon-soft mb-6">
+                        <i data-lucide="lock" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-3 translatable" data-fr="Générateur de mot de passe" data-en="Password Generator">Générateur de mot de passe</h3>
+                    <p class="text-navy-muted text-sm leading-relaxed mb-6 translatable" 
+                       data-fr="Génère des mots de passe forts et aléatoires personnalisés."
+                       data-en="Generate strong and random custom passwords.">
+                        Génère des mots de passe forts et aléatoires personnalisés.
+                    </p>
+                    <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                        <span class="translatable" data-fr="Utiliser" data-en="Use">Utiliser</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </a>
+
+                <a href="#" class="card p-8 block group">
+                    <div class="icon-soft mb-6">
+                        <i data-lucide="file-json" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-3">JSON Formatter</h3>
+                    <p class="text-navy-muted text-sm leading-relaxed mb-6 translatable" 
+                       data-fr="Formate, valide et minifie ton JSON en temps réel."
+                       data-en="Format, validate and minify your JSON in real time.">
+                        Formate, valide et minifie ton JSON en temps réel.
+                    </p>
+                    <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                        <span class="translatable" data-fr="Utiliser" data-en="Use">Utiliser</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </a>
+
+                <a href="#" class="card p-8 block group">
+                    <div class="icon-soft mb-6">
+                        <i data-lucide="binary" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-3">Base64 Encoder</h3>
+                    <p class="text-navy-muted text-sm leading-relaxed mb-6 translatable" 
+                       data-fr="Encode ou décode du texte en Base64 instantanément."
+                       data-en="Encode or decode text in Base64 instantly.">
+                        Encode ou décode du texte en Base64 instantanément.
+                    </p>
+                    <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                        <span class="translatable" data-fr="Utiliser" data-en="Use">Utiliser</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Comment ça marche -->
+        <div class="space-y-10">
+            <div class="text-center max-w-2xl mx-auto space-y-4">
+                <div class="badge-pill mx-auto translatable" data-fr="Comment ça marche" data-en="How it works">Comment ça marche</div>
+                <h2 class="font-display text-3xl md:text-5xl font-bold text-navy leading-tight translatable" 
+                    data-fr="Une expérience simple et efficace." 
+                    data-en="A simple and efficient experience.">
+                    Une expérience simple et efficace.
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="card p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="icon-soft">
+                            <i data-lucide="compass" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-4xl font-display font-bold text-sky-light">01</span>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-2 translatable" data-fr="Explore" data-en="Explore">Explore</h3>
+                    <p class="text-navy-muted text-sm leading-relaxed translatable" 
+                       data-fr="Trouve un outil adapté à ton objectif du moment."
+                       data-en="Find a tool that fits your current goal.">
+                        Trouve un outil adapté à ton objectif du moment.
+                    </p>
+                </div>
+
+                <div class="card p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="icon-soft">
+                            <i data-lucide="zap" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-4xl font-display font-bold text-sky-light">02</span>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-2 translatable" data-fr="Utilise" data-en="Use">Utilise</h3>
+                    <p class="text-navy-muted text-sm leading-relaxed translatable" 
+                       data-fr="Travaille directement dans le navigateur et gagne du temps."
+                       data-en="Work directly in the browser and save time.">
+                        Travaille directement dans le navigateur et gagne du temps.
+                    </p>
+                </div>
+
+                <div class="card p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="icon-soft">
+                            <i data-lucide="trending-up" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-4xl font-display font-bold text-sky-light">03</span>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy mb-2 translatable" data-fr="Progresse" data-en="Progress">Progresse</h3>
+                    <p class="text-navy-muted text-sm leading-relaxed translatable" 
+                       data-fr="Garde ton activité dans ton espace personnel."
+                       data-en="Keep your activity in your personal space.">
+                        Garde ton activité dans ton espace personnel.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pourquoi JcHub -->
+        <div class="card p-8 md:p-12">
+            <div class="grid md:grid-cols-2 gap-12 items-start">
+                <div class="space-y-6">
+                    <div class="badge-pill translatable" data-fr="Pourquoi JcHub" data-en="Why JcHub">Pourquoi JcHub</div>
+                    <h2 class="font-display text-3xl md:text-4xl font-bold text-navy leading-tight">
+                        <span class="translatable" data-fr="Une plateforme utile," data-en="A useful platform,">Une plateforme utile,</span><br>
+                        <span class="translatable" data-fr="sans surplus." data-en="without fluff.">sans surplus.</span>
+                    </h2>
+                    <p class="text-navy-muted leading-relaxed translatable" 
+                       data-fr="Nous privilégions des outils utiles, clairs et fiables pour faire avancer les projets sans friction."
+                       data-en="We favor useful, clear and reliable tools to move projects forward without friction.">
+                        Nous privilégions des outils utiles, clairs et fiables pour faire avancer les projets sans friction.
+                    </p>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="bg-sky-soft rounded-2xl p-5 flex items-center gap-4">
+                        <div class="w-11 h-11 bg-white rounded-xl flex items-center justify-center text-sky-accent flex-shrink-0">
+                            <i data-lucide="shield-check" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-sm font-medium text-navy translatable" 
+                              data-fr="Des outils gratuits utilisables immédiatement"
+                              data-en="Free tools you can use immediately">
+                            Des outils gratuits utilisables immédiatement
+                        </span>
+                    </div>
+                    <div class="bg-sky-soft rounded-2xl p-5 flex items-center gap-4">
+                        <div class="w-11 h-11 bg-white rounded-xl flex items-center justify-center text-sky-accent flex-shrink-0">
+                            <i data-lucide="rocket" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-sm font-medium text-navy translatable" 
+                              data-fr="Des workflows plus rapides"
+                              data-en="Faster workflows">
+                            Des workflows plus rapides
+                        </span>
+                    </div>
+                    <div class="bg-sky-soft rounded-2xl p-5 flex items-center gap-4">
+                        <div class="w-11 h-11 bg-white rounded-xl flex items-center justify-center text-sky-accent flex-shrink-0">
+                            <i data-lucide="code-2" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-sm font-medium text-navy translatable" 
+                              data-fr="Une expérience pensée pour les développeurs"
+                              data-en="An experience designed for developers">
+                            Une expérience pensée pour les développeurs
+                        </span>
+                    </div>
+                    <div class="bg-sky-soft rounded-2xl p-5 flex items-center gap-4">
+                        <div class="w-11 h-11 bg-white rounded-xl flex items-center justify-center text-sky-accent flex-shrink-0">
+                            <i data-lucide="mouse-pointer-click" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-sm font-medium text-navy translatable" 
+                              data-fr="Un accès simple et sans friction"
+                              data-en="Simple, frictionless access">
+                            Un accès simple et sans friction
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Newsletter -->
+        <div class="card p-8 md:p-16">
+            <div class="text-center max-w-2xl mx-auto space-y-5">
+                <div class="badge-pill mx-auto">
+                    <i data-lucide="mail" class="w-3 h-3"></i>
+                    <span class="translatable" data-fr="Newsletter" data-en="Newsletter">Newsletter</span>
+                </div>
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-navy leading-tight translatable" 
+                    data-fr="Une dose utile, pas de bruit." 
+                    data-en="A useful dose, no noise.">
+                    Une dose utile, pas de bruit.
+                </h2>
+                <p class="text-navy-muted leading-relaxed translatable" 
+                   data-fr="Nouveaux outils, ressources utiles et conseils pratiques : directement dans ta boîte mail."
+                   data-en="New tools, useful resources and practical tips: straight to your inbox.">
+                    Nouveaux outils, ressources utiles et conseils pratiques : directement dans ta boîte mail.
+                </p>
+            </div>
+
+            <form class="max-w-lg mx-auto mt-8">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input 
+                        type="email" 
+                        class="flex-1 bg-sky-soft border border-sky-light rounded-full py-4 px-6 text-navy placeholder-navy-muted/60 focus:outline-none focus:border-sky-accent focus:bg-white transition-colors translatable"
+                        data-fr-placeholder="ton@email.com"
+                        data-en-placeholder="your@email.com"
+                        placeholder="ton@email.com"
+                    >
+                    <button type="submit" class="btn-primary justify-center whitespace-nowrap">
+                        <span class="translatable" data-fr="S'inscrire" data-en="Subscribe">S'inscrire</span>
+                    </button>
+                </div>
+                <p class="text-center text-navy-muted text-xs mt-4 translatable" 
+                   data-fr="Tu peux te désinscrire à tout moment."
+                   data-en="You can unsubscribe at any time.">
+                    Tu peux te désinscrire à tout moment.
+                </p>
+            </form>
+        </div>
+
+        <!-- CTA Finale -->
+        <div class="bg-navy rounded-3xl p-8 md:p-16 relative overflow-hidden">
+            <div class="absolute -top-20 -right-20 w-96 h-96 bg-sky-accent rounded-full opacity-10 blur-3xl"></div>
+            
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-8 relative z-10">
+                <div class="space-y-4 max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-sky-light text-xs font-bold tracking-widest uppercase">
+                        <i data-lucide="sparkles" class="w-3 h-3"></i>
+                        <span class="translatable" data-fr="L'aventure continue" data-en="The adventure continues">L'aventure continue</span>
+                    </div>
+                    <h2 class="font-display text-3xl md:text-4xl font-bold text-white leading-tight">
+                        <span class="translatable" data-fr="Des idées concrètes pour avancer," data-en="Concrete ideas to move forward,">Des idées concrètes pour avancer,</span><br>
+                        <span class="translatable" data-fr="un outil à la fois." data-en="one tool at a time.">un outil à la fois.</span>
+                    </h2>
+                </div>
+
+                <div class="flex-shrink-0">
+                    <button class="bg-white text-navy px-8 py-4 rounded-full font-semibold inline-flex items-center gap-2 hover:bg-sky-light transition-colors">
+                        <span class="translatable" data-fr="Explorer les outils" data-en="Explore tools">Explorer les outils</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white pt-16 pb-8 mt-16 border-t border-sky-light">
+        <div class="max-w-7xl mx-auto px-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                            <span class="font-display font-bold text-white text-lg">J</span>
+                        </div>
+                        <span class="font-display font-bold text-xl text-navy">JcHub</span>
+                    </div>
+                    <p class="text-navy-muted text-sm leading-relaxed translatable" 
+                       data-fr="Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques."
+                       data-en="A clear platform to learn, use useful tools and move forward with your digital projects.">
+                        Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques.
+                    </p>
+                    <div class="space-y-3 pt-2">
+                        <a href="mailto:hello@jchub.dev" class="flex items-center gap-3 text-sm text-navy-muted hover:text-sky-accent transition-colors">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                            hello@jchub.dev
+                        </a>
+                        <div class="flex items-center gap-3 text-sm text-navy-muted">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span class="translatable" data-fr="Congo Brazzaville" data-en="Congo Brazzaville">Congo Brazzaville</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="Plateforme" data-en="Platform">Plateforme</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Outils" data-en="Tools">Outils</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Ressources" data-en="Resources">Ressources</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Workflows" data-en="Workflows">Workflows</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Nouveautés" data-en="What's new">Nouveautés</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="JcHub" data-en="JcHub">JcHub</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="À propos" data-en="About">À propos</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Contact" data-en="Contact">Contact</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Blog" data-en="Blog">Blog</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Partenaires" data-en="Partners">Partenaires</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="Légal" data-en="Legal">Légal</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Conditions d'utilisation" data-en="Terms of use">Conditions d'utilisation</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Conditions de vente" data-en="Terms of sale">Conditions de vente</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Confidentialité" data-en="Privacy">Confidentialité</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Mentions légales" data-en="Legal notice">Mentions légales</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-sky-light pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-navy-muted text-sm translatable" data-fr="© 2026 JcHub. Tous droits réservés." data-en="© 2026 JcHub. All rights reserved.">© 2026 JcHub. Tous droits réservés.</p>
+                <p class="text-navy-muted text-sm">
+                    <span class="translatable" data-fr="Créé par" data-en="Created by">Créé par</span>
+                    <span class="text-navy font-semibold">Jessy Ngnambongo</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        // ===== SYSTÈME DE TRADUCTION FR/EN =====
+        function setLanguage(lang) {
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll('.translatable').forEach(el => {
+                const translation = el.getAttribute(`data-${lang}`);
+                if (translation) {
+                    if (el.tagName === 'INPUT') {
+                        el.placeholder = translation;
+                    } else {
+                        if (translation.includes('<')) {
+                            el.innerHTML = translation;
+                        } else {
+                            el.textContent = translation;
+                        }
+                    }
+                }
+            });
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            localStorage.setItem('jchub-lang', lang);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('jchub-lang') || 'fr';
+            setLanguage(savedLang);
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('section > div > div, .card, .logo-item').forEach((el) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(15px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

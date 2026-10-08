@@ -3,8 +3,8 @@ import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { getGuideBySlug } from '@/lib/guides-server';
 import { signedCloudinaryDownloadUrl } from '@/lib/cloudinary';
-import { verifyTurnstileToken } from '@/lib/turnstile';
 import { reportUserError } from '@/lib/user-error';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
@@ -22,11 +22,10 @@ function requiredEnvironment(name: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = await enforceRateLimit(request, 'guide-download', 3, 60 * 60_000);
+  if (limited) return limited;
   try {
-    const body = await request.json() as { email?: unknown; guideSlug?: unknown; newsletterOptIn?: unknown; turnstileToken?: unknown };
-    if (!await verifyTurnstileToken(body.turnstileToken, request)) {
-      return NextResponse.json({ error: 'Vérification anti-abus échouée. Réessaie.' }, { status: 403 });
-    }
+    const body = await request.json() as { email?: unknown; guideSlug?: unknown; newsletterOptIn?: unknown };
     const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
     const guideSlug = typeof body.guideSlug === 'string' ? body.guideSlug : '';
     const guide = await getGuideBySlug(guideSlug);

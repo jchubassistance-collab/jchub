@@ -41,11 +41,11 @@ async function getAccessToken() {
   return { token: data.access_token, propertyId: credentials.propertyId };
 }
 
-async function runReport(access: { token: string; propertyId: string }, dimensions: string[], metrics: string[], limit = 10, startDate = '28daysAgo', endDate = 'yesterday'): Promise<Report> {
+async function runReport(access: { token: string; propertyId: string }, dimensions: string[], metrics: string[], limit = 10, startDate = '28daysAgo', endDate = 'yesterday', chronological = false, dimensionFilter?: unknown): Promise<Report> {
   const response = await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${access.propertyId}:runReport`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${access.token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ dateRanges: [{ startDate, endDate }], dimensions: dimensions.map((name) => ({ name })), metrics: metrics.map((name) => ({ name })), limit: String(limit), orderBys: [{ metric: { metricName: metrics[0] }, desc: true }] }),
+    body: JSON.stringify({ dateRanges: [{ startDate, endDate }], dimensions: dimensions.map((name) => ({ name })), metrics: metrics.map((name) => ({ name })), limit: String(limit), ...(dimensionFilter ? { dimensionFilter } : {}), orderBys: chronological ? [{ dimension: { dimensionName: dimensions[0] }, desc: false }] : [{ metric: { metricName: metrics[0] }, desc: true }] }),
     cache: 'no-store',
   });
   const data = await response.json() as Report & { error?: { message?: string } };
@@ -65,17 +65,21 @@ function rowsToObjects(report: Report) {
 export async function getGa4Overview() {
   const access = await getAccessToken();
   if (!access) return { configured: false as const };
-  const [summary, timeline, dailyViews, monthlyViews, yearlyViews, pages, sources, devices, countries, events] = await Promise.all([
-    runReport(access, [], ['activeUsers', 'sessions', 'conversions', 'eventCount'], 1),
-    runReport(access, ['date'], ['activeUsers', 'sessions'], 31),
-    runReport(access, ['date'], ['screenPageViews'], 366, '365daysAgo', 'yesterday'),
-    runReport(access, ['yearMonth'], ['screenPageViews'], 24, '730daysAgo', 'yesterday'),
-    runReport(access, ['year'], ['screenPageViews'], 10, '1825daysAgo', 'yesterday'),
-    runReport(access, ['pagePath'], ['screenPageViews'], 10),
-    runReport(access, ['sessionSourceMedium'], ['sessions'], 10),
+  const blogPathFilter = { filter: { fieldName: 'pagePath', stringFilter: { matchType: 'BEGINS_WITH', value: '/blog', caseSensitive: true } } };
+  const [summary, timeline, dailyViews, monthlyViews, yearlyViews, pages, sources, channels, devices, countries, events, currentPeriodViews, previousPeriodViews] = await Promise.all([
+    runReport(access, [], ['activeUsers', 'sessions', 'conversions', 'bounceRate', 'averageSessionDuration', 'newUsers'], 1),
+    runReport(access, ['date'], ['activeUsers', 'newUsers', 'conversions'], 31, '28daysAgo', 'yesterday', true),
+    runReport(access, ['date'], ['screenPageViews'], 366, '365daysAgo', 'yesterday', true, blogPathFilter),
+    runReport(access, ['yearMonth'], ['screenPageViews'], 24, '730daysAgo', 'yesterday', true, blogPathFilter),
+    runReport(access, ['year'], ['screenPageViews'], 10, '1825daysAgo', 'yesterday', true, blogPathFilter),
+    runReport(access, ['pagePath'], ['screenPageViews', 'activeUsers'], 10),
+    runReport(access, ['sessionSourceMedium'], ['sessions', 'activeUsers', 'newUsers', 'bounceRate', 'screenPageViewsPerSession', 'averageSessionDuration', 'conversions'], 10),
+    runReport(access, ['sessionDefaultChannelGroup'], ['sessions'], 8),
     runReport(access, ['deviceCategory'], ['activeUsers'], 10),
     runReport(access, ['country'], ['activeUsers'], 10),
     runReport(access, ['eventName'], ['eventCount'], 50),
+    runReport(access, [], ['screenPageViews'], 1, '28daysAgo', 'yesterday', false, blogPathFilter),
+    runReport(access, [], ['screenPageViews'], 1, '56daysAgo', '29daysAgo', false, blogPathFilter),
   ]);
   const summaryData = rowsToObjects(summary)[0] || {};
   const sessions = Number(summaryData.sessions || 0);
@@ -87,16 +91,31 @@ export async function getGa4Overview() {
     visitors: Number(summaryData.activeUsers || 0),
     sessions,
     conversions: Number(summaryData.conversions || 0),
+    bounceRate: Number((Number(summaryData.bounceRate || 0) * 100).toFixed(1)),
+    averageSessionDuration: Number(summaryData.averageSessionDuration || 0),
+    newUsers: Number(summaryData.newUsers || 0),
     conversionRate: sessions ? Number(((Number(summaryData.conversions || 0) / sessions) * 100).toFixed(2)) : 0,
     timeline: rowsToObjects(timeline),
     dailyViews: rowsToObjects(dailyViews),
     monthlyViews: rowsToObjects(monthlyViews),
     yearlyViews: rowsToObjects(yearlyViews),
+    currentPeriodViews: Number(rowsToObjects(currentPeriodViews)[0]?.screenPageViews || 0),
+    previousPeriodViews: Number(rowsToObjects(previousPeriodViews)[0]?.screenPageViews || 0),
     pages: rowsToObjects(pages),
     sources: rowsToObjects(sources),
+    channels: rowsToObjects(channels),
     devices: rowsToObjects(devices),
     countries: rowsToObjects(countries),
     newsletter: eventCount(['newsletter_signup', 'newsletter_subscribe']),
     socialClicks: eventCount(['social_click', 'share']),
   };
+}
+
+export async function getGa4ToolViews(paths: string[]) {
+  const access = await getAccessToken();
+  if (!access || !paths.length) return { configured: Boolean(access), views: {} as Record<string, number> };
+  const report = await runReport(access, ['pagePath'], ['screenPageViews'], Math.min(paths.length, 100), '28daysAgo', 'yesterday', false, {
+    filter: { fieldName: 'pagePath', inListFilter: { values: paths, caseSensitive: true } },
+  });
+  return { configured: true, views: Object.fromEntries(rowsToObjects(report).map((row) => [String(row.pagePath), Number(row.screenPageViews || 0)])) };
 }

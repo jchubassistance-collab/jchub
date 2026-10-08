@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outils - JcHub</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        sky: {
+                            soft: '#eff6ff',
+                            light: '#dbeafe',
+                            button: '#93c5fd',
+                            buttonDark: '#60a5fa',
+                            accent: '#2563eb',
+                        },
+                        navy: {
+                            DEFAULT: '#0f172a',
+                            soft: '#1e3a8a',
+                            muted: '#475569',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #eff6ff;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* ============================================
+           TECH LAYER (≈15% de l'ambiance)
+           ============================================ */
+        .bg-tech-grid {
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(circle at 50% 40%, black 25%, transparent 75%);
+            -webkit-mask-image: radial-gradient(circle at 50% 40%, black 25%, transparent 75%);
+            pointer-events: none;
+        }
+
+        .tech-dot {
+            position: absolute;
+            border-radius: 50%;
+            background: #2563eb;
+            opacity: 0.18;
+            pointer-events: none;
+        }
+
+        .float-1 { animation: floatDot 6s ease-in-out infinite; }
+        .float-2 { animation: floatDot 8s ease-in-out infinite 1s; }
+        .float-3 { animation: floatDot 7s ease-in-out infinite 2s; }
+        .float-4 { animation: floatDot 9s ease-in-out infinite 1.5s; }
+
+        @keyframes floatDot {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-20px) translateX(10px); }
+        }
+
+        .tech-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.2), transparent);
+            pointer-events: none;
+        }
+
+        .tech-node {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #2563eb;
+            box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
+            pointer-events: none;
+        }
+
+        /* ============================================
+           3D LAYER (≈30% du design)
+           ============================================ */
+        .perspective-wrap {
+            perspective: 1400px;
+        }
+
+        .circle-3d {
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            padding: 18px;
+            position: relative;
+            transform: rotateY(-10deg) rotateX(5deg);
+            transition: transform 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow:
+                40px 40px 80px rgba(37, 99, 235, 0.2),
+                -15px -15px 40px rgba(255, 255, 255, 0.9),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+            transform-style: preserve-3d;
+        }
+
+        .circle-3d:hover {
+            transform: rotateY(0deg) rotateX(0deg) scale(1.02);
+            box-shadow:
+                0 50px 100px rgba(37, 99, 235, 0.25),
+                -15px -15px 40px rgba(255, 255, 255, 0.9),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+        }
+
+        .circle-3d::before {
+            content: '';
+            position: absolute;
+            inset: -15px;
+            border-radius: 50%;
+            border: 1px dashed rgba(37, 99, 235, 0.25);
+            animation: rotateRing 30s linear infinite;
+            pointer-events: none;
+        }
+
+        .circle-3d::after {
+            content: '';
+            position: absolute;
+            inset: -25px;
+            border-radius: 50%;
+            border: 1px solid rgba(37, 99, 235, 0.12);
+            animation: pulseRing 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotateRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulseRing {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.05); opacity: 0.2; }
+        }
+
+        .circle-image {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            position: relative;
+            z-index: 1;
+        }
+
+        .circle-image-wrap {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .circle-image-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background:
+                linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+            background-size: 25px 25px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .floating-badge {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow:
+                0 15px 35px rgba(37, 99, 235, 0.15),
+                0 5px 15px rgba(37, 99, 235, 0.08),
+                0 1px 0 rgba(255, 255, 255, 1) inset;
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            animation: floatBadge 6s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        .floating-badge:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow:
+                0 25px 50px rgba(37, 99, 235, 0.25),
+                0 5px 15px rgba(37, 99, 235, 0.1),
+                0 1px 0 rgba(255, 255, 255, 1) inset;
+        }
+
+        .floating-badge-2 { animation: floatBadge 7s ease-in-out infinite 1s; }
+
+        @keyframes floatBadge {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Cube 3D décoratif */
+        .cube-3d {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            transform-style: preserve-3d;
+            animation: rotateCube 20s linear infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(37, 99, 235, 0.08);
+            border: 1.5px solid rgba(37, 99, 235, 0.35);
+            box-shadow: inset 0 0 20px rgba(37, 99, 235, 0.15);
+        }
+
+        .cube-face:nth-child(1) { transform: translateZ(30px); }
+        .cube-face:nth-child(2) { transform: rotateY(180deg) translateZ(30px); }
+        .cube-face:nth-child(3) { transform: rotateY(90deg) translateZ(30px); }
+        .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(30px); }
+        .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(30px); }
+        .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(30px); }
+
+        @keyframes rotateCube {
+            from { transform: rotateX(0) rotateY(0); }
+            to { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        /* Cartes outils 3D */
+        .tool-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 28px;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow:
+                0 2px 6px rgba(15, 23, 42, 0.04),
+                0 1px 0 rgba(255, 255, 255, 1) inset;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0);
+            border: 1px solid rgba(219, 234, 254, 0.8);
+            will-change: transform;
+            animation: cardFadeIn 0.5s ease both;
+        }
+
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 22px;
+            background: radial-gradient(
+                600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(37, 99, 235, 0.08),
+                transparent 40%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .tool-card:hover::before {
+            opacity: 1;
+        }
+
+        .tool-card:hover {
+            transform: perspective(1000px) rotateX(-3deg) rotateY(3deg) translateY(-8px);
+            box-shadow:
+                0 30px 60px rgba(37, 99, 235, 0.18),
+                0 15px 30px rgba(37, 99, 235, 0.1),
+                0 0 0 1px rgba(37, 99, 235, 0.15),
+                0 1px 0 rgba(255, 255, 255, 1) inset;
+        }
+
+        .tool-card:hover .icon-soft {
+            background: #2563eb;
+            color: #ffffff;
+            transform: translateZ(30px) scale(1.12) rotate(-5deg);
+            box-shadow: 0 12px 25px rgba(37, 99, 235, 0.35);
+        }
+
+        .tool-card:hover .tool-tag {
+            transform: translateZ(20px);
+        }
+
+        .tool-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .icon-soft {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+
+        .tool-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .tag-new { background: #dcfce7; color: #166534; }
+        .tag-popular { background: #fef3c7; color: #92400e; }
+        .tag-dev { background: #dbeafe; color: #1e40af; }
+
+        .tool-card.hidden { display: none; }
+
+        /* ============================================
+           UI COMMUNE
+           ============================================ */
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            position: relative;
+        }
+
+        .card:hover {
+            box-shadow:
+                0 20px 40px rgba(37, 99, 235, 0.12),
+                0 0 0 1px rgba(37, 99, 235, 0.08);
+            transform: translateY(-5px);
+        }
+
+        .btn-primary {
+            background: #93c5fd;
+            color: #0f172a;
+            padding: 14px 32px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #60a5fa;
+            transform: translateY(-3px);
+            box-shadow:
+                0 12px 25px rgba(37, 99, 235, 0.3),
+                0 4px 10px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-white {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 14px 32px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-white:hover {
+            box-shadow:
+                0 12px 25px rgba(37, 99, 235, 0.15),
+                0 4px 10px rgba(37, 99, 235, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #1e3a8a;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-link {
+            font-weight: 600;
+            font-size: 15px;
+            color: #0f172a;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active { color: #2563eb; }
+
+        .search-bar {
+            background: #ffffff;
+            border-radius: 999px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .search-bar:focus-within {
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: #0f172a;
+            width: 100%;
+        }
+
+        .search-bar input::placeholder { color: #94a3b8; }
+
+        .title-xl {
+            font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            color: #0f172a;
+        }
+
+        .lang-switch {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: #ffffff;
+            border-radius: 999px;
+            padding: 3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .lang-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: none;
+            background: transparent;
+        }
+
+        .lang-btn.active { background: #2563eb; color: #ffffff; }
+        .lang-btn:hover:not(.active) { color: #0f172a; }
+
+        .translatable { transition: opacity 0.2s ease; }
+
+        /* Filtres */
+        .filter-btn {
+            padding: 10px 20px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            background: #ffffff;
+            border: 1px solid #dbeafe;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            color: #2563eb;
+            border-color: #93c5fd;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 48px;
+        }
+
+        .pagination.hidden {
+            display: none;
+        }
+
+        .page-btn {
+            min-width: 44px;
+            height: 44px;
+            padding: 0 14px;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #0f172a;
+            font-weight: 600;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            border: 1px solid #dbeafe;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .page-btn:hover:not(:disabled):not(.active) {
+            color: #2563eb;
+            border-color: #93c5fd;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.15);
+        }
+
+        .page-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            box-shadow:
+                0 10px 22px rgba(37, 99, 235, 0.3),
+                0 0 0 4px rgba(37, 99, 235, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .page-btn i {
+            width: 16px;
+            height: 16px;
+        }
+
+        .page-ellipsis {
+            color: #94a3b8;
+            font-weight: 700;
+            padding: 0 6px;
+            user-select: none;
+        }
+
+        .results-info {
+            text-align: center;
+            color: #475569;
+            font-size: 14px;
+            margin-top: 24px;
+            font-weight: 500;
+        }
+
+        .results-info strong {
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        @media (max-width: 640px) {
+            .page-btn {
+                min-width: 38px;
+                height: 38px;
+                font-size: 13px;
+                padding: 0 10px;
+            }
+
+            .page-btn .page-label {
+                display: none;
+            }
+        }
+
+        /* FAQ */
+        .faq-item {
+            border-bottom: 1px solid #dbeafe;
+            padding: 20px 0;
+            cursor: pointer;
+        }
+        .faq-item:last-child { border-bottom: none; }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            color: #0f172a;
+            font-size: 15px;
+        }
+
+        .faq-icon { transition: transform 0.3s ease; color: #2563eb; flex-shrink: 0; }
+        .faq-item.open .faq-icon { transform: rotate(180deg); }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .faq-item.open .faq-answer { max-height: 300px; padding-top: 12px; }
+
+        /* Stats 3D */
+        .stat-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            transform-style: preserve-3d;
+            transform: perspective(800px) rotateX(0deg);
+        }
+
+        .stat-card:hover {
+            transform: perspective(800px) rotateX(-6deg) translateY(-6px);
+            box-shadow:
+                0 20px 40px rgba(37, 99, 235, 0.15),
+                0 0 0 1px rgba(37, 99, 235, 0.1);
+        }
+
+        .stat-number {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 2rem;
+            color: #2563eb;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .no-results {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+            color: #475569;
+        }
+        .no-results.show { display: block; }
+
+        @media (max-width: 768px) {
+            .tool-card:hover { transform: translateY(-5px); }
+            .cube-3d { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 bg-sky-soft/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center h-20">
+
+                <a href="index.html" class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                        <span class="font-display font-bold text-white text-xl">J</span>
+                    </div>
+                    <span class="font-display font-bold text-2xl text-navy tracking-tight">JcHub</span>
+                </a>
+
+                <div class="hidden lg:flex items-center gap-10">
+                    <a href="index.html" class="nav-link translatable" data-fr="Accueil" data-en="Home">Accueil</a>
+                    <a href="outils.html" class="nav-link active translatable" data-fr="Outils" data-en="Tools">Outils</a>
+                    <a href="about.html" class="nav-link translatable" data-fr="À propos" data-en="About">À propos</a>
+                    <a href="contact.html" class="nav-link translatable" data-fr="Contact" data-en="Contact">Contact</a>
+                </div>
+
+                <div class="hidden lg:flex items-center gap-4">
+                    <div class="search-bar w-56">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                        <input type="text" id="navSearch" class="translatable" data-fr-placeholder="Rechercher..." data-en-placeholder="Search..." placeholder="Rechercher...">
+                    </div>
+
+                    <div class="lang-switch">
+                        <button class="lang-btn active" data-lang="fr" onclick="setLanguage('fr')">🇫🇷 FR</button>
+                        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇬🇧 EN</button>
+                    </div>
+                </div>
+
+                <button class="lg:hidden text-navy" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" class="w-7 h-7"></i>
+                </button>
+            </div>
+
+            <div id="mobileMenu" class="lg:hidden hidden pb-6 space-y-3">
+                <a href="index.html" class="block nav-link translatable py-2" data-fr="Accueil" data-en="Home">Accueil</a>
+                <a href="outils.html" class="block nav-link active translatable py-2" data-fr="Outils" data-en="Tools">Outils</a>
+                <a href="about.html" class="block nav-link translatable py-2" data-fr="À propos" data-en="About">À propos</a>
+                <a href="contact.html" class="block nav-link translatable py-2" data-fr="Contact" data-en="Contact">Contact</a>
+                <div class="lang-switch w-fit mt-3">
+                    <button class="lang-btn active" data-lang="fr" onclick="setLanguage('fr')">🇫🇷 FR</button>
+                    <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇬🇧 EN</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="relative pt-32 pb-20 overflow-hidden">
+        <div class="bg-tech-grid absolute inset-0 z-0"></div>
+
+        <div class="tech-line" style="top: 30%; left: 0; right: 65%;"></div>
+        <div class="tech-line" style="top: 75%; left: 45%; right: 0;"></div>
+
+        <div class="tech-dot float-1" style="width: 5px; height: 5px; top: 25%; left: 8%;"></div>
+        <div class="tech-dot float-2" style="width: 6px; height: 6px; top: 65%; left: 5%;"></div>
+        <div class="tech-dot float-3" style="width: 4px; height: 4px; top: 45%; left: 12%;"></div>
+        <div class="tech-dot float-4" style="width: 5px; height: 5px; top: 55%; right: 8%;"></div>
+
+        <div class="absolute rounded-full bg-sky-light/40 pointer-events-none" style="width: 300px; height: 300px; top: 100px; left: -150px;"></div>
+        <div class="absolute rounded-full bg-sky-light/30 pointer-events-none" style="width: 400px; height: 400px; top: 400px; right: -200px;"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+                <div class="space-y-8">
+                    <div class="badge-pill w-fit">
+                        <span class="w-2 h-2 rounded-full bg-sky-accent animate-pulse"></span>
+                        <span class="translatable" data-fr="Tous les outils en un seul endroit" data-en="All tools in one place">Tous les outils en un seul endroit</span>
+                    </div>
+
+                    <h1 class="title-xl">
+                        <span class="translatable" data-fr="Des outils simples," data-en="Simple tools,">Des outils simples,</span><br>
+                        <span class="text-sky-accent translatable" data-fr="des résultats immédiats." data-en="instant results.">des résultats immédiats.</span>
+                    </h1>
+
+                    <p class="text-lg text-navy-muted max-w-lg leading-relaxed translatable"
+                       data-fr="Utilisez directement dans le navigateur. Aucune installation, aucun compte, 100% gratuit."
+                       data-en="Use directly in your browser. No installation, no account, 100% free.">
+                        Utilisez directement dans le navigateur. Aucune installation, aucun compte, 100% gratuit.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#tools" class="btn-primary">
+                            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                            <span class="translatable" data-fr="Voir tous les outils" data-en="View all tools">Voir tous les outils</span>
+                        </a>
+
+                        <a href="contact.html" class="btn-white">
+                            <i data-lucide="lightbulb" class="w-5 h-5"></i>
+                            <span class="translatable" data-fr="Suggérer un outil" data-en="Suggest a tool">Suggérer un outil</span>
+                        </a>
+                    </div>
+
+                    <div class="flex flex-wrap gap-6 pt-2">
+                        <div>
+                            <div class="font-display text-2xl font-bold text-navy" id="toolCount">12+</div>
+                            <div class="text-xs text-navy-muted translatable" data-fr="Outils disponibles" data-en="Available tools">Outils disponibles</div>
+                        </div>
+                        <div class="w-px bg-sky-light"></div>
+                        <div>
+                            <div class="font-display text-2xl font-bold text-navy">100%</div>
+                            <div class="text-xs text-navy-muted translatable" data-fr="Gratuit" data-en="Free">Gratuit</div>
+                        </div>
+                        <div class="w-px bg-sky-light"></div>
+                        <div>
+                            <div class="font-display text-2xl font-bold text-navy">0</div>
+                            <div class="text-xs text-navy-muted translatable" data-fr="Inscription" data-en="Signup">Inscription</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center lg:justify-end perspective-wrap">
+                    <div class="relative">
+
+                        <div class="cube-3d" style="top: -30px; right: 20px;">
+                            <div class="cube-face"></div>
+                            <div class="cube-face"></div>
+                            <div class="cube-face"></div>
+                            <div class="cube-face"></div>
+                            <div class="cube-face"></div>
+                            <div class="cube-face"></div>
+                        </div>
+
+                        <div class="cube-3d" style="bottom: -20px; left: 10px; transform: scale(0.6);">
+                            <div class="cube-face"></div>
+                            <div class="cube-face"></div>
+                            <div class="cube-face"></div>
+                            <div class="cube-face"></div>
+                            <div class="cube-face"></div>
+                            <div class="cube-face"></div>
+                        </div>
+
+                        <div class="circle-3d w-[340px] h-[340px] lg:w-[440px] lg:h-[440px] flex items-center justify-center">
+                            <div class="circle-image-wrap">
+                                <img
+                                    src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&h=900&fit=crop"
+                                    alt="Outils JcHub"
+                                    class="circle-image"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="floating-badge absolute -bottom-4 -left-4">
+                            <div class="w-10 h-10 bg-sky-light rounded-xl flex items-center justify-center">
+                                <i data-lucide="zap" class="w-5 h-5 text-sky-accent"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-navy-muted font-medium translatable" data-fr="Instantané" data-en="Instant">Instantané</div>
+                                <div class="font-display font-bold text-navy text-sm translatable" data-fr="Sans attente" data-en="No waiting">Sans attente</div>
+                            </div>
+                        </div>
+
+                        <div class="floating-badge floating-badge-2 absolute -top-4 -right-4">
+                            <div class="w-10 h-10 bg-sky-light rounded-xl flex items-center justify-center">
+                                <i data-lucide="shield-check" class="w-5 h-5 text-sky-accent"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-navy-muted font-medium translatable" data-fr="Sécurisé" data-en="Secure">Sécurisé</div>
+                                <div class="font-display font-bold text-navy text-sm translatable" data-fr="100% local" data-en="100% local">100% local</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION OUTILS -->
+    <section id="tools" class="max-w-7xl mx-auto px-6 pb-20 relative">
+
+        <div class="tech-node float-1" style="top: 0; right: 30px;"></div>
+
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-8">
+            <div class="space-y-3">
+                <div class="badge-pill translatable" data-fr="Bibliothèque" data-en="Library">Bibliothèque</div>
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-navy leading-tight translatable"
+                    data-fr="Tous les outils JcHub."
+                    data-en="All JcHub tools.">
+                    Tous les outils JcHub.
+                </h2>
+            </div>
+
+            <div class="w-full lg:w-80">
+                <div class="search-bar">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                    <input type="text" id="toolSearch"
+                           class="translatable"
+                           data-fr-placeholder="Rechercher un outil..."
+                           data-en-placeholder="Search a tool..."
+                           placeholder="Rechercher un outil...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="flex flex-wrap gap-3 mb-10">
+            <button class="filter-btn active" data-filter="all" onclick="filterTools(this)">
+                <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Tous" data-en="All">Tous</span>
+            </button>
+            <button class="filter-btn" data-filter="dev" onclick="filterTools(this)">
+                <i data-lucide="code-2" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Développement" data-en="Development">Développement</span>
+            </button>
+            <button class="filter-btn" data-filter="text" onclick="filterTools(this)">
+                <i data-lucide="file-text" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Texte" data-en="Text">Texte</span>
+            </button>
+            <button class="filter-btn" data-filter="security" onclick="filterTools(this)">
+                <i data-lucide="shield" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Sécurité" data-en="Security">Sécurité</span>
+            </button>
+            <button class="filter-btn" data-filter="convert" onclick="filterTools(this)">
+                <i data-lucide="repeat" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Conversion" data-en="Conversion">Conversion</span>
+            </button>
+            <button class="filter-btn" data-filter="image" onclick="filterTools(this)">
+                <i data-lucide="image" class="w-4 h-4"></i>
+                <span class="translatable" data-fr="Image" data-en="Image">Image</span>
+            </button>
+        </div>
+
+        <!-- Grille -->
+        <div id="toolsGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- 1 -->
+            <a href="#" class="tool-card" data-category="security" data-name="generateur mot de passe password generator security">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="icon-soft"><i data-lucide="lock" class="w-6 h-6"></i></div>
+                    <span class="tool-tag tag-popular translatable" data-fr="Populaire" data-en="Popular">Populaire</span>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy mb-3 translatable" data-fr="Générateur de mot de passe" data-en="Password Generator">Générateur de mot de passe</h3>
+                <p class="text-navy-muted text-sm leading-relaxed mb-6 flex-1 translatable" data-fr="Génère des mots de passe forts, aléatoires et personnalisables." data-en="Generate strong, random and customizable passwords.">Génère des mots de passe forts, aléatoires et personnalisables.</p>
+                <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                    <span class="translatable" data-fr="Ouvrir" data-en="Open">Ouvrir</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+
+            <!-- 2 -->
+            <a href="#" class="tool-card" data-category="dev" data-name="json formatter validator minify development">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="icon-soft"><i data-lucide="file-json" class="w-6 h-6"></i></div>
+                    <span class="tool-tag tag-dev">Dev</span>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy mb-3">JSON Formatter</h3>
+                <p class="text-navy-muted text-sm leading-relaxed mb-6 flex-1 translatable" data-fr="Formate, valide et minifie votre JSON en temps réel." data-en="Format, validate and minify your JSON in real time.">Formate, valide et minifie votre JSON en temps réel.</p>
+                <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                    <span class="translatable" data-fr="Ouvrir" data-en="Open">Ouvrir</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+
+            <!-- 3 -->
+            <a href="#" class="tool-card" data-category="convert" data-name="base64 encoder decoder conversion">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="icon-soft"><i data-lucide="binary" class="w-6 h-6"></i></div>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy mb-3">Base64 Encoder / Decoder</h3>
+                <p class="text-navy-muted text-sm leading-relaxed mb-6 flex-1 translatable" data-fr="Encode ou décode du texte en Base64 instantanément." data-en="Encode or decode text in Base64 instantly.">Encode ou décode du texte en Base64 instantanément.</p>
+                <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                    <span class="translatable" data-fr="Ouvrir" data-en="Open">Ouvrir</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+
+            <!-- 4 -->
+            <a href="#" class="tool-card" data-category="convert" data-name="url encoder decoder conversion">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="icon-soft"><i data-lucide="link" class="w-6 h-6"></i></div>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy mb-3">URL Encoder / Decoder</h3>
+                <p class="text-navy-muted text-sm leading-relaxed mb-6 flex-1 translatable" data-fr="Encode ou décode vos URL proprement pour vos projets web." data-en="Encode or decode your URLs cleanly for your web projects.">Encode ou décode vos URL proprement pour vos projets web.</p>
+                <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                    <span class="translatable" data-fr="Ouvrir" data-en="Open">Ouvrir</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+
+            <!-- 5 -->
+            <a href="#" class="tool-card" data-category="dev" data-name="uuid generator identifiant development">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="icon-soft"><i data-lucide="fingerprint" class="w-6 h-6"></i></div>
+                    <span class="tool-tag tag-dev">Dev</span>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy mb-3">UUID Generator</h3>
+                <p class="text-navy-muted text-sm leading-relaxed mb-6 flex-1 translatable" data-fr="Génère des UUID v1 et v4 pour vos applications." data-en="Generate UUID v1 and v4 for your applications.">Génère des UUID v1 et v4 pour vos applications.</p>
+                <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                    <span class="translatable" data-fr="Ouvrir" data-en="Open">Ouvrir</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+
+            <!-- 6 -->
+            <a href="#" class="tool-card" data-category="security" data-name="hash md5 sha1 sha256 generator security">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="icon-soft"><i data-lucide="hash" class="w-6 h-6"></i></div>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy mb-3">Hash Generator</h3>
+                <p class="text-navy-muted text-sm leading-relaxed mb-6 flex-1 translatable" data-fr="Calculez les hash MD5, SHA-1, SHA-256 en un clic." data-en="Compute MD5, SHA-1, SHA-256 hashes in one click.">Calculez les hash MD5, SHA-1, SHA-256 en un clic.</p>
+                <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                    <span class="translatable" data-fr="Ouvrir" data-en="Open">Ouvrir</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+
+            <!-- 7 -->
+            <a href="#" class="tool-card" data-category="text" data-name="compteur mots caracteres word counter text">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="icon-soft"><i data-lucide="type" class="w-6 h-6"></i></div>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy mb-3 translatable" data-fr="Compteur de mots" data-en="Word Counter">Compteur de mots</h3>
+                <p class="text-navy-muted text-sm leading-relaxed mb-6 flex-1 translatable" data-fr="Comptez mots, caractères, phrases et paragraphes instantanément." data-en="Count words, characters, sentences and paragraphs instantly.">Comptez mots, caractères, phrases et paragraphes instantanément.</p>
+                <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                    <span class="translatable" data-fr="Ouvrir" data-en="Open">Ouvrir</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+
+            <!-- 8 -->
+            <a href="#" class="tool-card" data-category="text" data-name="convertisseur casse case converter text">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="icon-soft"><i data-lucide="case-sensitive" class="w-6 h-6"></i></div>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy mb-3 translatable" data-fr="Convertisseur de casse" data-en="Case Converter">Convertisseur de casse</h3>
+                <p class="text-navy-muted text-sm leading-relaxed mb-6 flex-1 translatable" data-fr="Transformez votre texte en MAJUSCULES, minuscules, Title Case, etc." data-en="Transform your text into UPPERCASE, lowercase, Title Case, etc.">Transformez votre texte en MAJUSCULES, minuscules, Title Case, etc.</p>
+                <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                    <span class="translatable" data-fr="Ouvrir" data-en="Open">Ouvrir</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+
+            <!-- 9 -->
+            <a href="#" class="tool-card" data-category="image" data-name="color picker convertisseur couleur hex rgb image">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="icon-soft"><i data-lucide="palette" class="w-6 h-6"></i></div>
+                    <span class="tool-tag tag-new translatable" data-fr="Nouveau" data-en="New">Nouveau</span>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy mb-3">Color Picker & Converter</h3>
+                <p class="text-navy-muted text-sm leading-relaxed mb-6 flex-1 translatable" data-fr="Convertissez vos couleurs entre HEX, RGB, HSL et plus." data-en="Convert your colors between HEX, RGB, HSL and more.">Convertissez vos couleurs entre HEX, RGB, HSL et plus.</p>
+                <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                    <span class="translatable" data-fr="Ouvrir" data-en="Open">Ouvrir</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+
+            <!-- 10 -->
+            <a href="#" class="tool-card" data-category="image" data-name="qr code generator image">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="icon-soft"><i data-lucide="qr-code" class="w-6 h-6"></i></div>
+                    <span class="tool-tag tag-popular translatable" data-fr="Populaire" data-en="Popular">Populaire</span>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy mb-3 translatable" data-fr="Générateur de QR Code" data-en="QR Code Generator">Générateur de QR Code</h3>
+                <p class="text-navy-muted text-sm leading-relaxed mb-6 flex-1 translatable" data-fr="Créez des QR codes personnalisés pour vos liens et contenus." data-en="Create custom QR codes for your links and content.">Créez des QR codes personnalisés pour vos liens et contenus.</p>
+                <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                    <span class="translatable" data-fr="Ouvrir" data-en="Open">Ouvrir</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+
+            <!-- 11 -->
+            <a href="#" class="tool-card" data-category="text" data-name="lorem ipsum generator text">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="icon-soft"><i data-lucide="align-left" class="w-6 h-6"></i></div>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy mb-3">Lorem Ipsum Generator</h3>
+                <p class="text-navy-muted text-sm leading-relaxed mb-6 flex-1 translatable" data-fr="Générez du texte de remplissage pour vos maquettes." data-en="Generate placeholder text for your designs.">Générez du texte de remplissage pour vos maquettes.</p>
+                <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                    <span class="translatable" data-fr="Ouvrir" data-en="Open">Ouvrir</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+
+            <!-- 12 -->
+            <a href="#" class="tool-card" data-category="convert" data-name="timestamp converter date time conversion">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="icon-soft"><i data-lucide="clock" class="w-6 h-6"></i></div>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy mb-3">Timestamp Converter</h3>
+                <p class="text-navy-muted text-sm leading-relaxed mb-6 flex-1 translatable" data-fr="Convertissez entre Unix timestamp et dates lisibles." data-en="Convert between Unix timestamp and readable dates.">Convertissez entre Unix timestamp et dates lisibles.</p>
+                <div class="flex items-center text-sm font-semibold text-sky-accent gap-2">
+                    <span class="translatable" data-fr="Ouvrir" data-en="Open">Ouvrir</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- Info résultats -->
+        <div id="resultsInfo" class="results-info">
+            <span class="translatable" data-fr="Affichage de" data-en="Showing">Affichage de</span>
+            <strong id="rangeStart">1</strong>
+            <span>–</span>
+            <strong id="rangeEnd">12</strong>
+            <span class="translatable" data-fr="sur" data-en="of">sur</span>
+            <strong id="rangeTotal">12</strong>
+            <span class="translatable" data-fr="outils" data-en="tools">outils</span>
+        </div>
+
+        <!-- Pagination -->
+        <nav id="pagination" class="pagination" aria-label="Pagination des outils">
+            <button class="page-btn" id="prevPage" onclick="changePage(-1)" aria-label="Page précédente">
+                <i data-lucide="chevron-left"></i>
+                <span class="page-label translatable" data-fr="Précédent" data-en="Previous">Précédent</span>
+            </button>
+
+            <div id="pageNumbers" class="flex items-center gap-2 flex-wrap justify-center"></div>
+
+            <button class="page-btn" id="nextPage" onclick="changePage(1)" aria-label="Page suivante">
+                <span class="page-label translatable" data-fr="Suivant" data-en="Next">Suivant</span>
+                <i data-lucide="chevron-right"></i>
+            </button>
+        </nav>
+
+        <!-- Aucun résultat -->
+        <div id="noResults" class="no-results">
+            <div class="icon-soft mx-auto mb-4"><i data-lucide="search-x" class="w-6 h-6"></i></div>
+            <h3 class="font-display font-bold text-navy mb-2 translatable" data-fr="Aucun outil trouvé" data-en="No tool found">Aucun outil trouvé</h3>
+            <p class="text-sm translatable" data-fr="Essayez un autre mot-clé ou changez de catégorie." data-en="Try another keyword or change category.">Essayez un autre mot-clé ou changez de catégorie.</p>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="max-w-7xl mx-auto px-6 pb-20">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+            <div class="stat-card">
+                <div class="stat-number">12+</div>
+                <div class="text-xs text-navy-muted font-semibold uppercase tracking-wider translatable" data-fr="Outils" data-en="Tools">Outils</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="text-xs text-navy-muted font-semibold uppercase tracking-wider translatable" data-fr="Gratuit" data-en="Free">Gratuit</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div class="text-xs text-navy-muted font-semibold uppercase tracking-wider translatable" data-fr="Inscription" data-en="Signup">Inscription</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">∞</div>
+                <div class="text-xs text-navy-muted font-semibold uppercase tracking-wider translatable" data-fr="Utilisations" data-en="Uses">Utilisations</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="max-w-4xl mx-auto px-6 pb-20">
+        <div class="text-center mb-10 space-y-4">
+            <div class="badge-pill mx-auto translatable" data-fr="FAQ" data-en="FAQ">FAQ</div>
+            <h2 class="font-display text-3xl md:text-4xl font-bold text-navy leading-tight translatable" data-fr="Questions fréquentes." data-en="Frequently asked questions.">Questions fréquentes.</h2>
+        </div>
+
+        <div class="card p-8 md:p-10">
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span class="translatable" data-fr="Les outils sont-ils vraiment gratuits ?" data-en="Are the tools really free?">Les outils sont-ils vraiment gratuits ?</span>
+                    <i data-lucide="chevron-down" class="faq-icon w-5 h-5"></i>
+                </div>
+                <div class="faq-answer translatable" data-fr="Oui, tous les outils JcHub sont 100% gratuits. Aucune inscription requise, aucune limite d'utilisation." data-en="Yes, all JcHub tools are 100% free. No signup required, no usage limits.">Oui, tous les outils JcHub sont 100% gratuits. Aucune inscription requise, aucune limite d'utilisation.</div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span class="translatable" data-fr="Mes données sont-elles envoyées sur un serveur ?" data-en="Is my data sent to a server?">Mes données sont-elles envoyées sur un serveur ?</span>
+                    <i data-lucide="chevron-down" class="faq-icon w-5 h-5"></i>
+                </div>
+                <div class="faq-answer translatable" data-fr="Non. La plupart des outils fonctionnent directement dans votre navigateur. Vos données ne quittent jamais votre appareil." data-en="No. Most tools run directly in your browser. Your data never leaves your device.">Non. La plupart des outils fonctionnent directement dans votre navigateur. Vos données ne quittent jamais votre appareil.</div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span class="translatable" data-fr="Puis-je proposer un nouvel outil ?" data-en="Can I suggest a new tool?">Puis-je proposer un nouvel outil ?</span>
+                    <i data-lucide="chevron-down" class="faq-icon w-5 h-5"></i>
+                </div>
+                <div class="faq-answer translatable" data-fr="Absolument ! Rendez-vous sur la page Contact et décrivez votre idée. Nous étudions chaque suggestion." data-en="Absolutely! Go to the Contact page and describe your idea. We review every suggestion.">Absolument ! Rendez-vous sur la page Contact et décrivez votre idée. Nous étudions chaque suggestion.</div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span class="translatable" data-fr="Les outils fonctionnent-ils hors ligne ?" data-en="Do the tools work offline?">Les outils fonctionnent-ils hors ligne ?</span>
+                    <i data-lucide="chevron-down" class="faq-icon w-5 h-5"></i>
+                </div>
+                <div class="faq-answer translatable" data-fr="Une fois la page chargée, la plupart des outils continuent de fonctionner même sans connexion internet." data-en="Once the page is loaded, most tools continue to work even without an internet connection.">Une fois la page chargée, la plupart des outils continuent de fonctionner même sans connexion internet.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Finale -->
+    <section class="max-w-7xl mx-auto px-6 pb-20">
+        <div class="bg-navy rounded-3xl p-8 md:p-16 relative overflow-hidden">
+            <div class="absolute -top-20 -right-20 w-96 h-96 bg-sky-accent rounded-full opacity-10 blur-3xl"></div>
+            <div class="bg-tech-grid absolute inset-0 opacity-30"></div>
+
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-8 relative z-10">
+                <div class="space-y-4 max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-sky-light text-xs font-bold tracking-widest uppercase">
+                        <i data-lucide="sparkles" class="w-3 h-3"></i>
+                        <span class="translatable" data-fr="Une idée en tête ?" data-en="Got an idea?">Une idée en tête ?</span>
+                    </div>
+                    <h2 class="font-display text-3xl md:text-4xl font-bold text-white leading-tight">
+                        <span class="translatable" data-fr="Proposez-nous le prochain outil," data-en="Suggest the next tool,">Proposez-nous le prochain outil,</span><br>
+                        <span class="translatable" data-fr="on le construit ensemble." data-en="we'll build it together.">on le construit ensemble.</span>
+                    </h2>
+                </div>
+
+                <div class="flex-shrink-0">
+                    <a href="contact.html" class="bg-white text-navy px-8 py-4 rounded-full font-semibold inline-flex items-center gap-2 hover:bg-sky-light transition-colors">
+                        <span class="translatable" data-fr="Nous contacter" data-en="Contact us">Nous contacter</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white pt-16 pb-8 border-t border-sky-light">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 bg-sky-accent rounded-2xl flex items-center justify-center">
+                            <span class="font-display font-bold text-white text-lg">J</span>
+                        </div>
+                        <span class="font-display font-bold text-xl text-navy">JcHub</span>
+                    </div>
+                    <p class="text-navy-muted text-sm leading-relaxed translatable" data-fr="Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques." data-en="A clear platform to learn, use useful tools and move forward with your digital projects.">Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques.</p>
+                    <div class="space-y-3 pt-2">
+                        <a href="mailto:hello@jchub.dev" class="flex items-center gap-3 text-sm text-navy-muted hover:text-sky-accent transition-colors">
+                            <i data-lucide="mail" class="w-4 h-4"></i> hello@jchub.dev
+                        </a>
+                        <div class="flex items-center gap-3 text-sm text-navy-muted">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span class="translatable" data-fr="Congo Brazzaville" data-en="Congo Brazzaville">Congo Brazzaville</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="Plateforme" data-en="Platform">Plateforme</h3>
+                    <ul class="space-y-3">
+                        <li><a href="outils.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Outils" data-en="Tools">Outils</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Ressources" data-en="Resources">Ressources</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Workflows" data-en="Workflows">Workflows</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Nouveautés" data-en="What's new">Nouveautés</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="JcHub" data-en="JcHub">JcHub</h3>
+                    <ul class="space-y-3">
+                        <li><a href="about.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="À propos" data-en="About">À propos</a></li>
+                        <li><a href="contact.html" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Contact" data-en="Contact">Contact</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Blog" data-en="Blog">Blog</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Partenaires" data-en="Partners">Partenaires</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-display text-navy text-sm font-bold uppercase tracking-wider mb-5 translatable" data-fr="Légal" data-en="Legal">Légal</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Conditions d'utilisation" data-en="Terms of use">Conditions d'utilisation</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Conditions de vente" data-en="Terms of sale">Conditions de vente</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Confidentialité" data-en="Privacy">Confidentialité</a></li>
+                        <li><a href="#" class="text-navy-muted hover:text-sky-accent transition-colors text-sm translatable" data-fr="Mentions légales" data-en="Legal notice">Mentions légales</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-sky-light pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-navy-muted text-sm translatable" data-fr="© 2026 JcHub. Tous droits réservés." data-en="© 2026 JcHub. All rights reserved.">© 2026 JcHub. Tous droits réservés.</p>
+                <p class="text-navy-muted text-sm">
+                    <span class="translatable" data-fr="Créé par" data-en="Created by">Créé par</span>
+                    <span class="text-navy font-semibold">Jessy Ngnambongo</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // ===== TRADUCTION =====
+        function setLanguage(lang) {
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll('.translatable').forEach(el => {
+                const translation = el.getAttribute(`data-${lang}`);
+                if (translation) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = translation;
+                    } else if (el.tagName === 'OPTION') {
+                        el.textContent = translation;
+                    } else {
+                        if (translation.includes('<')) {
+                            el.innerHTML = translation;
+                        } else {
+                            el.textContent = translation;
+                        }
+                    }
+                }
+            });
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+            });
+
+            localStorage.setItem('jchub-lang', lang);
+        }
+
+        // ===== MENU MOBILE =====
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // ===== FAQ =====
+        function toggleFaq(el) {
+            const wasOpen = el.classList.contains('open');
+            document.querySelectorAll('.faq-item').forEach(item => item.classList.remove('open'));
+            if (!wasOpen) el.classList.add('open');
+        }
+
+        // ===== FILTRES + PAGINATION =====
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 6;
+
+        function filterTools(btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.getAttribute('data-filter');
+            currentPage = 1;
+            applyFilters();
+        }
+
+        function getVisibleCards() {
+            const cards = Array.from(document.querySelectorAll('.tool-card'));
+            return cards.filter(card => {
+                const category = card.getAttribute('data-category');
+                const name = (card.getAttribute('data-name') || '').toLowerCase();
+                const matchFilter = currentFilter === 'all' || category === currentFilter;
+                const matchSearch = currentSearch === '' || name.includes(currentSearch);
+                return matchFilter && matchSearch;
+            });
+        }
+
+        function applyFilters() {
+            const allCards = document.querySelectorAll('.tool-card');
+            const visibleCards = getVisibleCards();
+            const total = visibleCards.length;
+            const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
+
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            allCards.forEach(card => card.classList.add('hidden'));
+
+            const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIdx = startIdx + ITEMS_PER_PAGE;
+            const pageCards = visibleCards.slice(startIdx, endIdx);
+            pageCards.forEach(card => {
+                card.classList.remove('hidden');
+                // Rejouer l'animation d'apparition
+                card.style.animation = 'none';
+                void card.offsetWidth;
+                card.style.animation = '';
+            });
+
+            const rangeStart = total === 0 ? 0 : startIdx + 1;
+            const rangeEnd = Math.min(endIdx, total);
+            document.getElementById('rangeStart').textContent = rangeStart;
+            document.getElementById('rangeEnd').textContent = rangeEnd;
+            document.getElementById('rangeTotal').textContent = total;
+
+            document.getElementById('noResults').classList.toggle('show', total === 0);
+
+            const pagination = document.getElementById('pagination');
+            if (totalPages <= 1) {
+                pagination.classList.add('hidden');
+            } else {
+                pagination.classList.remove('hidden');
+            }
+
+            renderPagination(totalPages);
+            updatePaginationButtons(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('pageNumbers');
+            container.innerHTML = '';
+
+            const pages = getPaginationRange(currentPage, totalPages);
+
+            pages.forEach(p => {
+                if (p === '...') {
+                    const span = document.createElement('span');
+                    span.className = 'page-ellipsis';
+                    span.textContent = '…';
+                    container.appendChild(span);
+                } else {
+                    const btn = document.createElement('button');
+                    btn.className = 'page-btn' + (p === currentPage ? ' active' : '');
+                    btn.textContent = p;
+                    btn.setAttribute('aria-label', `Page ${p}`);
+                    if (p === currentPage) btn.setAttribute('aria-current', 'page');
+                    btn.onclick = () => goToPage(p);
+                    container.appendChild(btn);
+                }
+            });
+        }
+
+        function getPaginationRange(current, total) {
+            const delta = 1;
+            const range = [];
+            const rangeWithDots = [];
+            let last;
+
+            for (let i = 1; i <= total; i++) {
+                if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+                    range.push(i);
+                }
+            }
+
+            range.forEach(i => {
+                if (last) {
+                    if (i - last === 2) {
+                        rangeWithDots.push(last + 1);
+                    } else if (i - last > 2) {
+                        rangeWithDots.push('...');
+                    }
+                }
+                rangeWithDots.push(i);
+                last = i;
+            });
+
+            return rangeWithDots;
+        }
+
+        function updatePaginationButtons(totalPages) {
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            applyFilters();
+            scrollToTools();
+        }
+
+        function changePage(direction) {
+            const total = getVisibleCards().length;
+            const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
+            const newPage = currentPage + direction;
+            if (newPage < 1 || newPage > totalPages) return;
+            currentPage = newPage;
+            applyFilters();
+            scrollToTools();
+        }
+
+        function scrollToTools() {
+            const section = document.getElementById('tools');
+            const yOffset = -100;
+            const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+
+        // ===== INITIALISATION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('jchub-lang') || 'fr';
+            setLanguage(savedLang);
+
+            // Mise à jour du compteur d'outils dynamiquement
+            const toolCount = document.querySelectorAll('.tool-card').length;
+            document.getElementById('toolCount').textContent = toolCount + '+';
+
+            // Premier rendu (pagination + filtres)
+            applyFilters();
+
+            const toolSearch = document.getElementById('toolSearch');
+            const navSearch = document.getElementById('navSearch');
+
+            toolSearch.addEventListener('input', (e) => {
+                currentSearch = e.target.value.toLowerCase().trim();
+                currentPage = 1;
+                applyFilters();
+            });
+
+            navSearch.addEventListener('input', (e) => {
+                currentSearch = e.target.value.toLowerCase().trim();
+                toolSearch.value = e.target.value;
+                currentPage = 1;
+                applyFilters();
+                if (currentSearch.length > 0) {
+                    document.getElementById('tools').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+
+            // ===== 3D TILT SUR LES CARTES =====
+            const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+
+            if (isDesktop) {
+                document.querySelectorAll('.tool-card').forEach(card => {
+                    card.addEventListener('mousemove', (e) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        const centerX = rect.width / 2;
+                        const centerY = rect.height / 2;
+
+                        const rotateX = ((y - centerY) / centerY) * -5;
+                        const rotateY = ((x - centerX) / centerX) * 5;
+
+                        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+                        card.style.setProperty('--mouse-x', `${x}px`);
+                        card.style.setProperty('--mouse-y', `${y}px`);
+                    });
+
+                    card.addEventListener('mouseleave', () => {
+                        card.style.transform = '';
+                    });
+                });
+            }
+
+            // Animation scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.card, .stat-card, section > div > div').forEach((el) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(15px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

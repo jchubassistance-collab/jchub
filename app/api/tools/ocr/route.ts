@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { convertImageToOcrPdfWithAdobe, hasAdobeImagePdfConfig } from '@/lib/image-to-pdf-services';
 import { extractPdfLayout, joinPdfRuns } from '@/lib/pdf-to-word';
 import { reportUserError } from '@/lib/user-error';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -65,6 +66,8 @@ function mergeOcrLineFragments(lines: Array<{ text: string; bbox: { x0: number; 
 }
 
 export async function POST(request: NextRequest) {
+  const limited = await enforceRateLimit(request, 'ocr', 5, 10 * 60_000);
+  if (limited) return limited;
   const apiKey = process.env.OCR_API_KEY;
   const apiUrl = process.env.OCR_API_URL;
   if (!apiKey || !apiUrl) {
@@ -124,7 +127,7 @@ export async function POST(request: NextRequest) {
     if (!response.ok || payload.IsErroredOnProcessing) {
       const message = Array.isArray(payload.ErrorMessage) ? payload.ErrorMessage.join(' ') : payload.ErrorMessage;
       reportUserError();
-      return NextResponse.json({ error: message || 'OCR.space n’a pas pu analyser ce fichier.' }, { status: 502 });
+      return NextResponse.json({ error: 'Le service OCR n’a pas pu analyser ce fichier.' }, { status: 502 });
     }
 
     const results = payload.ParsedResults ?? [];
