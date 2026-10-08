@@ -49,6 +49,8 @@
 
 - `workflows/editorial-agent.ts` : veille et proposition éditoriale hebdomadaire.
 - `lib/content-agent.ts` : génération et validation des brouillons; aucune publication automatique.
+- La génération utilise Gemini par défaut (`AI_PROVIDER=gemini`, `GEMINI_API_KEY`, `GEMINI_MODEL`) et OpenAI en secours (`OPENAI_API_KEY`, `OPENAI_MODEL`, modèle par défaut `gpt-4o-mini`). `AI_FALLBACK_PROVIDER` permet de choisir le fournisseur de secours.
+- Les clés API doivent rester dans les variables d'environnement locales ou les variables d'environnement Vercel, jamais dans le code source.
 - `app/admin/agent/` : révision, approbation, programmation et audit des contenus.
 - Les articles approuvés peuvent être espacés d'au moins une semaine et restent soumis à l'approbation avant publication.
 - Les notifications de brouillons sont envoyées uniquement à l'adresse d'administration via l'e-mail transactionnel Brevo, jamais à la liste newsletter.

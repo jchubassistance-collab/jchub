@@ -12,13 +12,14 @@ import { notifyAdminOfEditorialDraft } from '@/lib/agent-email';
 
 export { collectTrends } from '@/lib/content-sources';
 
-export type AiProvider = 'gemini' | 'ollama';
+export type AiProvider = 'gemini' | 'openai' | 'ollama';
 
 export type EditorialDraft = {
   title: string;
   slug: string;
   description: string;
   article: string;
+  provider?: AiProvider;
   posts: {
     devto: string;
   };
@@ -51,12 +52,14 @@ export type CatalogItem = {
 };
 
 function getProvider(): AiProvider {
-  return process.env.AI_PROVIDER?.trim().toLowerCase() === 'ollama' ? 'ollama' : 'gemini';
+  const provider = process.env.AI_PROVIDER?.trim().toLowerCase();
+  return provider === 'ollama' || provider === 'openai' ? provider : 'gemini';
 }
 
 function getFallbackProvider(): AiProvider | null {
   const provider = process.env.AI_FALLBACK_PROVIDER?.trim().toLowerCase();
-  return provider === 'ollama' || provider === 'gemini' ? provider : null;
+  if (!provider) return 'openai';
+  return provider === 'ollama' || provider === 'gemini' || provider === 'openai' ? provider : null;
 }
 
 function buildPrompt(candidates: TrendCandidate[], catalog: CatalogItem[], recentlyPromoted: string[]): string {
@@ -165,6 +168,35 @@ async function generateWithOllama(prompt: string): Promise<string> {
   return data.response;
 }
 
+async function generateWithOpenAI(prompt: string): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  if (!apiKey) throw new Error('OPENAI_API_KEY est manquante.');
+  const model = process.env.OPENAI_MODEL?.trim() || 'gpt-4o-mini';
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.4,
+      response_format: { type: 'json_object' },
+    }),
+    cache: 'no-store',
+    signal: AbortSignal.timeout(45_000),
+  });
+  const data = await response.json() as { choices?: Array<{ message?: { content?: string | null } }>; error?: { message?: string } };
+  if (!response.ok) throw new Error(data.error?.message || `OpenAI a répondu ${response.status}.`);
+  const text = data.choices?.[0]?.message?.content;
+  if (!text) throw new Error('OpenAI n’a renvoyé aucun contenu.');
+  return text;
+}
+
+async function generateWithProvider(provider: AiProvider, prompt: string): Promise<string> {
+  if (provider === 'ollama') return generateWithOllama(prompt);
+  if (provider === 'openai') return generateWithOpenAI(prompt);
+  return generateWithGemini(prompt);
+}
+
 export async function collectCatalog(): Promise<CatalogItem[]> {
   const [tools, articles] = await Promise.all([getPublishedTools(), getPublishedArticles()]);
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
@@ -190,14 +222,14 @@ export async function generateEditorialDraft(candidates: TrendCandidate[], catal
   const prompt = buildPrompt(candidates, catalog, await getRecentlyPromoted());
   const provider = getProvider();
   try {
-    const response = provider === 'ollama' ? await generateWithOllama(prompt) : await generateWithGemini(prompt);
-    return parseDraft(response, candidates, catalog);
+    const response = await generateWithProvider(provider, prompt);
+    return { ...parseDraft(response, candidates, catalog), provider };
   } catch (error) {
     const fallback = getFallbackProvider();
     if (!fallback || fallback === provider) throw error;
     reportUserError();
-    const response = fallback === 'ollama' ? await generateWithOllama(prompt) : await generateWithGemini(prompt);
-    return parseDraft(response, candidates, catalog);
+    const response = await generateWithProvider(fallback, prompt);
+    return { ...parseDraft(response, candidates, catalog), provider: fallback };
   }
 }
 
@@ -206,7 +238,7 @@ export async function saveEditorialDraft(draft: EditorialDraft) {
   const importance = assessEditorialImportance(draft.sources, `${draft.title} ${draft.description}`);
   const reference = await db.collection('agent_drafts').add({
     ...draft,
-    provider: getProvider(),
+    provider: draft.provider || getProvider(),
     promotion: draft.promotion,
     recommendations: draft.recommendations,
     importance,
