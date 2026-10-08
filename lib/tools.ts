@@ -351,7 +351,7 @@ export async function getPublishedTools(): Promise<Tool[]> {
   );
 
   if (!hasConfig) {
-    return tools.filter(isToolVisibleToday);
+    return tools.filter((tool) => isToolVisibleToday(tool));
   }
 
   try {
@@ -378,7 +378,7 @@ export async function getPublishedTools(): Promise<Tool[]> {
     return Array.from(mergedBySlug.values()).filter((tool) => tool.status === 'published' && !DISABLED_TOOL_SLUGS.has(tool.slug) && isToolVisibleToday(tool));
   } catch (error) {
     reportUserError();
-    return tools.filter(isToolVisibleToday);
+    return tools.filter((tool) => isToolVisibleToday(tool));
   }
 }
 
