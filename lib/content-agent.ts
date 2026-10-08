@@ -8,6 +8,7 @@ import { getPublishedTools } from '@/lib/tools';
 import type { TrendCandidate } from '@/lib/content-sources';
 import { reportUserError } from '@/lib/user-error';
 import { assessEditorialImportance } from '@/lib/editorial-importance';
+import { notifyAdminOfEditorialDraft } from '@/lib/agent-email';
 
 export { collectTrends } from '@/lib/content-sources';
 
@@ -33,6 +34,8 @@ export type EditorialDraft = {
     reason: string;
     problem?: string;
     targetUser?: string;
+    solution?: string;
+    features?: string[];
     suggestedSlug: string;
   }>;
   sources: TrendCandidate[];
@@ -57,7 +60,7 @@ function getFallbackProvider(): AiProvider | null {
 }
 
 function buildPrompt(candidates: TrendCandidate[], catalog: CatalogItem[], recentlyPromoted: string[]): string {
-  return `Tu es l'éditeur technique de JcHub. Tu dois promouvoir un élément existant de JcHub et proposer des idées de nouveaux contenus à partir des tendances observées.
+  return `Tu es l'éditeur de JcHub, un site qui propose des outils numériques utiles au grand public et aux professionnels. Tu dois promouvoir un élément existant de JcHub et proposer des idées de nouveaux contenus à partir des tendances observées.
 
 Règles obligatoires:
 - Choisis exactement un élément dans le catalogue JcHub pour la promotion.
@@ -65,14 +68,16 @@ Règles obligatoires:
 - Évite les éléments dont les identifiants sont dans la liste récemment promus, sauf si tout le catalogue y figure.
 - The Dev.to post must focus on the promoted JcHub item, offer useful guidance, and include its exact URL.
 - Les recommandations doivent être des idées distinctes d'outils ou d'articles que JcHub pourrait créer.
-- Écris comme un rédacteur technique francophone naturel, précis et utile, avec des exemples concrets.
+- Écris en français naturel, précis et utile, avec des exemples concrets. Évite le jargon lorsqu'il n'est pas nécessaire.
+- Les idées d'outils doivent viser des publics variés : étudiants, familles, entrepreneurs, créateurs, petites entreprises et professionnels, pas seulement les développeurs.
 - Ne mentionne jamais une IA, un modèle, un prompt, une génération automatique ou tes consignes.
 - N'ajoute pas de formule comme "en tant qu'IA", "voici une réponse générée", ni de section méta.
 - Ne fabrique aucune expérience personnelle, citation, statistique ou résultat de test.
 - L'article doit être directement publiable en Markdown, sans JSON, frontmatter ou commentaire destiné à l'éditeur.
 - Réponds uniquement avec un JSON valide.
 
-- For every suggested tool, state the concrete user problem, who has it, and why existing JcHub tools do not solve it. Suggestions are for admin review only; never create a tool automatically.
+- For every suggested tool, state the concrete user problem, who has it, the proposed solution and 2-4 key features. Explain why existing JcHub tools do not solve it. Suggestions are for admin review only; never create or publish a tool automatically.
+- For each tool recommendation, also include a solution string and a features array with 2-4 concrete features. Consider students, families, entrepreneurs, creators, small businesses and professionals, not only developers.
 
 Tendances Internet:
 ${JSON.stringify(candidates, null, 2)}
@@ -91,10 +96,39 @@ function parseDraft(text: string, sources: TrendCandidate[], catalog: CatalogIte
   const cleaned = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
   const parsed = JSON.parse(cleaned) as Omit<EditorialDraft, 'sources'>;
   const promoted = catalog.find((item) => item.slug === parsed.promotion?.slug && item.type === parsed.promotion?.type);
-  if (!parsed.title || !parsed.slug || !parsed.description || !parsed.article || !parsed.posts?.devto || !promoted) {
+  if (typeof parsed.title !== 'string' || !parsed.title.trim() ||
+      typeof parsed.slug !== 'string' || !parsed.slug.trim() ||
+      typeof parsed.description !== 'string' || !parsed.description.trim() ||
+      typeof parsed.article !== 'string' || !parsed.article.trim() ||
+      typeof parsed.posts?.devto !== 'string' || !parsed.posts.devto.trim() || !promoted) {
     throw new Error('La réponse IA ne respecte pas le format éditorial attendu.');
   }
-  return { ...parsed, promotion: { type: promoted.type, slug: promoted.slug, name: promoted.title, url: promoted.url }, sources };
+  if (parsed.promotion.url !== promoted.url || parsed.promotion.name !== promoted.title) {
+    throw new Error('La réponse IA contient des informations de promotion qui ne correspondent pas au catalogue.');
+  }
+  const wordCount = parsed.article.trim().split(/\s+/).length;
+  if (wordCount < 700 || wordCount > 1000) {
+    throw new Error(`L’article généré contient ${wordCount} mots; la longueur attendue est de 700 à 1000 mots.`);
+  }
+  if (!Array.isArray(parsed.recommendations) || parsed.recommendations.some((item) =>
+    !item || typeof item !== 'object' || !['tool', 'article'].includes(item.type) ||
+    typeof item.title !== 'string' || !item.title.trim() ||
+    typeof item.reason !== 'string' || !item.reason.trim() ||
+    typeof item.suggestedSlug !== 'string' || !item.suggestedSlug.trim() ||
+    (item.type === 'tool' && (
+      typeof item.problem !== 'string' || !item.problem.trim() ||
+      typeof item.targetUser !== 'string' || !item.targetUser.trim() ||
+      typeof item.solution !== 'string' || !item.solution.trim() ||
+      !Array.isArray(item.features) || item.features.length < 2 ||
+      item.features.some((feature) => typeof feature !== 'string' || !feature.trim())
+    )))) {
+    throw new Error('Les recommandations IA ne respectent pas le format éditorial attendu.');
+  }
+  const recommendations = parsed.recommendations.map((item) => ({
+    ...item,
+    features: item.features?.slice(0, 4).map((feature) => feature.trim()).filter(Boolean),
+  }));
+  return { ...parsed, recommendations, promotion: { type: promoted.type, slug: promoted.slug, name: promoted.title, url: promoted.url }, sources };
 }
 
 async function generateWithGemini(prompt: string): Promise<string> {
@@ -106,6 +140,7 @@ async function generateWithGemini(prompt: string): Promise<string> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4, responseMimeType: 'application/json' } }),
     cache: 'no-store',
+    signal: AbortSignal.timeout(45_000),
   });
   const data = await response.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>; error?: { message?: string } };
   if (!response.ok) throw new Error(data.error?.message || `Gemini a répondu ${response.status}.`);
@@ -122,6 +157,7 @@ async function generateWithOllama(prompt: string): Promise<string> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ model, prompt, stream: false, format: 'json', options: { temperature: 0.4 } }),
     cache: 'no-store',
+    signal: AbortSignal.timeout(90_000),
   });
   const data = await response.json() as { response?: string; error?: string };
   if (!response.ok) throw new Error(data.error || `Ollama a répondu ${response.status}.`);
@@ -175,35 +211,15 @@ export async function saveEditorialDraft(draft: EditorialDraft) {
     recommendations: draft.recommendations,
     importance,
     status: 'draft',
+    notificationStatus: 'pending',
     createdAt: new Date(),
     updatedAt: new Date(),
   });
-  if (!importance.autoPublish) return { draftId: reference.id, status: 'draft' as const, importance };
-
-  const baseSlug = draft.slug.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '').slice(0, 80) || 'article-jchub';
-  let slug = baseSlug;
-  if ((await db.collection('articles').doc(slug).get()).exists) slug = `${baseSlug}-${reference.id.slice(0, 6)}`;
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
-  const image = `${siteUrl}/api/article-cover?title=${encodeURIComponent(draft.title)}&category=${encodeURIComponent(draft.promotion.name)}`;
-  await db.collection('articles').doc(slug).set({
-    slug,
-    title: draft.title,
-    description: draft.description,
-    excerpt: draft.description,
-    content: draft.article,
-    category: 'Technologie',
-    keywords: ['informatique', 'technologie'],
-    tags: ['Informatique', 'technologie'],
-    author: 'JcHub',
-    image,
-    readTime: '5 min',
-    status: 'published',
-    publishedAt: FieldValue.serverTimestamp(),
+  const notification = await notifyAdminOfEditorialDraft(reference.id, draft.title, draft.description, draft.recommendations);
+  await reference.update({
+    notificationStatus: notification.ok ? 'sent' : 'failed',
+    ...(notification.ok ? { notificationSentAt: FieldValue.serverTimestamp() } : { notificationError: notification.reason }),
     updatedAt: FieldValue.serverTimestamp(),
-    sourceDraftId: reference.id,
-    autoPublished: true,
-    importance,
   });
-  await reference.update({ status: 'published', publishedSlug: slug, publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
-  return { draftId: reference.id, status: 'published' as const, publishedSlug: slug, importance };
+  return { draftId: reference.id, status: 'draft' as const, importance, notificationStatus: notification.ok ? 'sent' as const : 'failed' as const };
 }

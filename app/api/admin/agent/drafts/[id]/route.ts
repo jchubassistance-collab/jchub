@@ -15,6 +15,47 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     await requireAdmin(request);
     if (!hasFirebaseAdminConfig()) return NextResponse.json({ error: 'Firebase indisponible.' }, { status: 503 });
     const body = await request.json() as { status?: string; action?: string; network?: string; scheduledFor?: string; title?: string; description?: string; article?: string };
+    if (body.action === 'approve-and-schedule') {
+      const reference = getAdminDb().collection('agent_drafts').doc(id);
+      const document = await reference.get();
+      if (!document.exists) return NextResponse.json({ error: 'Brouillon introuvable.' }, { status: 404 });
+      const draft = document.data() || {};
+      if (draft.status !== 'draft') return NextResponse.json({ error: 'Seul un brouillon à réviser peut être approuvé et programmé.' }, { status: 409 });
+
+      const scheduledSnapshot = await getAdminDb().collection('articles').where('status', '==', 'scheduled').get();
+      const latestScheduled = scheduledSnapshot.docs.reduce((latest, article) => {
+        const date = article.data().scheduledFor?.toDate?.();
+        return date instanceof Date && date.getTime() > latest ? date.getTime() : latest;
+      }, 0);
+      const scheduledDate = new Date(Math.max(Date.now() + 7 * 24 * 60 * 60 * 1000, latestScheduled + 7 * 24 * 60 * 60 * 1000));
+      const slug = String(draft.slug || id).toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '').slice(0, 90) || id;
+      const articleReference = getAdminDb().collection('articles').doc(slug);
+      const existingArticle = await articleReference.get();
+      if (existingArticle.exists && existingArticle.data()?.sourceDraftId !== id) {
+        return NextResponse.json({ error: 'Un article utilise déjà ce slug. Modifie le slug du brouillon avant de le programmer.' }, { status: 409 });
+      }
+      const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
+      const scheduledFor = Timestamp.fromDate(scheduledDate);
+      await articleReference.set({
+        slug,
+        title: String(draft.title || 'Article JcHub'),
+        description: String(draft.description || ''),
+        excerpt: String(draft.description || ''),
+        content: String(draft.article || ''),
+        category: 'Technologie',
+        keywords: ['informatique', 'technologie'],
+        tags: ['Informatique', 'technologie'],
+        author: 'JcHub',
+        image: `${siteUrl}/api/article-cover?title=${encodeURIComponent(String(draft.title || 'Article JcHub'))}&category=${encodeURIComponent(String(draft.promotion?.name || 'JcHub / Journal'))}`,
+        readTime: '5 min',
+        status: 'scheduled',
+        scheduledFor,
+        updatedAt: FieldValue.serverTimestamp(),
+        sourceDraftId: id,
+      }, { merge: true });
+      await reference.update({ status: 'scheduled', publishedSlug: slug, scheduledFor, approvedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
+      return NextResponse.json({ id, status: 'scheduled', slug, scheduledFor: scheduledDate.toISOString() });
+    }
     if (body.action === 'edit') {
       const reference = getAdminDb().collection('agent_drafts').doc(id);
       const document = await reference.get();

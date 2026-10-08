@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/cron/editorial-agent",
-      "schedule": "0 8 * * *"
+      "schedule": "0 8 * * 1"
     },
     {
       "path": "/api/cron/publish-scheduled",

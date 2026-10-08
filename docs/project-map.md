@@ -45,6 +45,16 @@
 - `app/api/cron/` : tâches planifiées Vercel.
 - `app/api/admin/` : opérations réservées à l'administrateur.
 
+## Agent d'administration
+
+- `workflows/editorial-agent.ts` : veille et proposition éditoriale hebdomadaire.
+- `lib/content-agent.ts` : génération et validation des brouillons; aucune publication automatique.
+- `app/admin/agent/` : révision, approbation, programmation et audit des contenus.
+- Les articles approuvés peuvent être espacés d'au moins une semaine et restent soumis à l'approbation avant publication.
+- Les notifications de brouillons sont envoyées uniquement à l'adresse d'administration via l'e-mail transactionnel Brevo, jamais à la liste newsletter.
+- Les idées d'outils sont enregistrées comme brouillons à compléter; elles ne constituent pas du code fonctionnel et ne sont pas publiées automatiquement.
+- Les réponses suggérées aux messages de partenariat restent modifiables et ne partent qu'après envoi manuel depuis la boîte de réception.
+
 ## Données et scripts
 
 - `content/blog/` : articles Markdown source.

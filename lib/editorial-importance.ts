@@ -34,8 +34,8 @@ export function assessEditorialImportance(sources: TrendCandidate[], articleText
     });
     const sourceCount = new Set([host(source.url), ...corroborating.map((item) => host(item.url))].filter(Boolean)).size;
     if (sourceCount >= 2) {
-      return { autoPublish: true, sourceCount, reason: `Important IT story confirmed by ${sourceCount} separate trend sources.` };
+      return { sourceCount, reason: `Sujet informatique important confirmé par ${sourceCount} sources distinctes; validation humaine requise.` };
     }
   }
-  return { autoPublish: false, sourceCount: 0, reason: 'IT topic without enough corroboration; admin review required.' };
+  return { sourceCount: 0, reason: 'Sujet informatique sans corroboration suffisante; validation humaine requise.' };
 }
