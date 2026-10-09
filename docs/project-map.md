@@ -49,7 +49,8 @@
 
 - `workflows/editorial-agent.ts` : veille et proposition éditoriale hebdomadaire.
 - `lib/content-agent.ts` : génération et validation des brouillons; aucune publication automatique.
-- La génération utilise Gemini par défaut (`AI_PROVIDER=gemini`, `GEMINI_API_KEY`, `GEMINI_MODEL`) et OpenAI en secours (`OPENAI_API_KEY`, `OPENAI_MODEL`, modèle par défaut `gpt-4o-mini`). `AI_FALLBACK_PROVIDER` permet de choisir le fournisseur de secours.
+- La génération utilise Gemini par défaut (`AI_PROVIDER=gemini`, `GEMINI_API_KEY`, `GEMINI_MODEL`). Les secours configurables sont OpenAI (`OPENAI_API_KEY`, modèle `gpt-4o-mini`), OpenRouter (`OPENROUTER_API_KEY`, modèle `openai/gpt-4o`) et DeepSeek (`DEEPSEEK_API_KEY` ou `DEEPSEEK_API`, modèle `deepseek-chat`). Les modèles peuvent être remplacés avec `OPENAI_MODEL`, `OPENROUTER_MODEL` et `DEEPSEEK_MODEL`.
+- `AI_FALLBACK_PROVIDER` accepte une liste ordonnée séparée par des virgules (par exemple `openai,openrouter,deepseek`); sans cette variable, ces trois fournisseurs sont essayés dans cet ordre après Gemini. Chaque clé est facultative et doit être configurée dans l'environnement serveur correspondant, jamais dans le code ni côté navigateur.
 - Les clés API doivent rester dans les variables d'environnement locales ou les variables d'environnement Vercel, jamais dans le code source.
 - `app/admin/agent/` : révision, approbation, programmation et audit des contenus.
 - Les articles approuvés peuvent être espacés d'au moins une semaine et restent soumis à l'approbation avant publication.

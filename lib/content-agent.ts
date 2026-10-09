@@ -9,10 +9,12 @@ import type { TrendCandidate } from '@/lib/content-sources';
 import { reportUserError } from '@/lib/user-error';
 import { assessEditorialImportance } from '@/lib/editorial-importance';
 import { notifyAdminOfEditorialDraft } from '@/lib/agent-email';
+import { generateWithAiProvider, getFallbackAiProviders, getPrimaryAiProvider } from '@/lib/ai-provider';
+import type { AiProvider } from '@/lib/ai-provider';
 
 export { collectTrends } from '@/lib/content-sources';
 
-export type AiProvider = 'gemini' | 'openai' | 'ollama';
+export type { AiProvider } from '@/lib/ai-provider';
 
 export type EditorialDraft = {
   title: string;
@@ -52,14 +54,11 @@ export type CatalogItem = {
 };
 
 function getProvider(): AiProvider {
-  const provider = process.env.AI_PROVIDER?.trim().toLowerCase();
-  return provider === 'ollama' || provider === 'openai' ? provider : 'gemini';
+  return getPrimaryAiProvider();
 }
 
-function getFallbackProvider(): AiProvider | null {
-  const provider = process.env.AI_FALLBACK_PROVIDER?.trim().toLowerCase();
-  if (!provider) return 'openai';
-  return provider === 'ollama' || provider === 'gemini' || provider === 'openai' ? provider : null;
+function getFallbackProviders(): AiProvider[] {
+  return getFallbackAiProviders();
 }
 
 function buildPrompt(candidates: TrendCandidate[], catalog: CatalogItem[], recentlyPromoted: string[]): string {
@@ -192,6 +191,9 @@ async function generateWithOpenAI(prompt: string): Promise<string> {
 }
 
 async function generateWithProvider(provider: AiProvider, prompt: string): Promise<string> {
+  if (provider === 'openrouter' || provider === 'deepseek') {
+    return generateWithAiProvider(provider, prompt, { jsonMode: true });
+  }
   if (provider === 'ollama') return generateWithOllama(prompt);
   if (provider === 'openai') return generateWithOpenAI(prompt);
   return generateWithGemini(prompt);
@@ -225,11 +227,17 @@ export async function generateEditorialDraft(candidates: TrendCandidate[], catal
     const response = await generateWithProvider(provider, prompt);
     return { ...parseDraft(response, candidates, catalog), provider };
   } catch (error) {
-    const fallback = getFallbackProvider();
-    if (!fallback || fallback === provider) throw error;
-    reportUserError();
-    const response = await generateWithProvider(fallback, prompt);
-    return { ...parseDraft(response, candidates, catalog), provider: fallback };
+    let lastError = error;
+    for (const fallback of getFallbackProviders().filter((candidate) => candidate !== provider)) {
+      reportUserError();
+      try {
+        const response = await generateWithProvider(fallback, prompt);
+        return { ...parseDraft(response, candidates, catalog), provider: fallback };
+      } catch (fallbackError) {
+        lastError = fallbackError;
+      }
+    }
+    throw lastError;
   }
 }
 

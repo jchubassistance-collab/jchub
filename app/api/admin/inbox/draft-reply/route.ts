@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { reportUserError } from '@/lib/user-error';
+import { generateWithAiProvider, getFallbackAiProviders } from '@/lib/ai-provider';
 
 export const runtime = 'nodejs';
 
@@ -66,20 +67,24 @@ ${String(contact.message || '').slice(0, 5000)}
 </message>
 Retourne uniquement le texte du courriel, sans objet ni explication.`;
 
-    let draft: string;
+    let draft: string | undefined;
     try {
       draft = await generateWithGemini(prompt);
     } catch {
       reportUserError();
-      if ((process.env.AI_FALLBACK_PROVIDER?.trim().toLowerCase() || 'openai') !== 'openai') {
-        return NextResponse.json({ error: 'Gemini n’a pas pu préparer la réponse.' }, { status: 502 });
+      let generated = false;
+      for (const provider of getFallbackAiProviders().filter((candidate) => candidate !== 'gemini')) {
+        try {
+          draft = provider === 'openai'
+            ? await generateWithOpenAI(prompt)
+            : await generateWithAiProvider(provider, prompt, { temperature: 0.35, timeoutMs: 30_000 });
+          generated = true;
+          break;
+        } catch {
+          reportUserError();
+        }
       }
-      try {
-        draft = await generateWithOpenAI(prompt);
-      } catch {
-        reportUserError();
-        return NextResponse.json({ error: 'Gemini et OpenAI n’ont pas pu préparer la réponse. Vérifie leur configuration.' }, { status: 502 });
-      }
+      if (!generated || !draft) return NextResponse.json({ error: 'Gemini et les fournisseurs de secours n’ont pas pu préparer la réponse. Vérifie leur configuration.' }, { status: 502 });
     }
 
     await reference.update({ aiReplyDraft: draft, aiReplyDraftAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
