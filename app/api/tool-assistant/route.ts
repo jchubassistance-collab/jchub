@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-function catalogAnswer(tools: Tool[]) {
+function catalogAnswer(tools: Tool[], confident: boolean) {
   const suggestions = tools.map((tool) => ({
     slug: tool.slug,
     name: tool.name,
@@ -20,7 +20,9 @@ function catalogAnswer(tools: Tool[]) {
     reason: tool.description,
     icon: tool.icon,
   }));
-  return NextResponse.json({ message: tools.length === 1 ? 'Cet outil correspond à ta recherche.' : 'Voici les outils les plus proches de ta recherche.', suggestions, source: 'catalog' }, { headers: { 'Cache-Control': 'private, no-store' } });
+  // A weak match served because the AI could not answer must not claim to fit the request.
+  const message = !confident ? 'Voici ce qui s’en rapproche le plus dans le catalogue.' : tools.length === 1 ? 'Cet outil correspond à ta recherche.' : 'Voici les outils les plus proches de ta recherche.';
+  return NextResponse.json({ message, suggestions, source: 'catalog' }, { headers: { 'Cache-Control': 'private, no-store' } });
 }
 
 function present(answer: ToolAssistantAnswer, catalog: Tool[]) {
@@ -56,7 +58,7 @@ export async function POST(request: NextRequest) {
   try {
     const catalog = await getPublishedTools();
     keywordMatch = findToolsByKeywords(query, catalog);
-    if (keywordMatch.confident) return catalogAnswer(keywordMatch.tools);
+    if (keywordMatch.confident) return catalogAnswer(keywordMatch.tools, true);
 
     const fingerprint = createHash('sha256').update(JSON.stringify(catalog.map((tool) => [tool.slug, tool.name, tool.description, tool.path, tool.tags]))).digest('hex').slice(0, 16);
     // Ignore case, accents and sentence punctuation so "Regex email ?" reuses the answer to "regex email"; keep symbols like C++ / C#.
@@ -75,7 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     const limited = await enforceDailyToolAssistantQuota(request);
-    if (limited) return keywordMatch.tools.length ? catalogAnswer(keywordMatch.tools) : limited;
+    if (limited) return keywordMatch.tools.length ? catalogAnswer(keywordMatch.tools, false) : limited;
     const answer = present(await recommendToolsWithAi(query, catalog), catalog);
     if (!answer.suggestions.length) answer.message = answer.message || 'Je n’ai pas encore d’outil adapté à cette demande.';
     if (db) {
@@ -87,7 +89,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[tool-assistant] Request failed:', error instanceof Error ? error.message.replaceAll(process.env.MISTRAL_API_KEY || '\u0000', '[redacted]').replaceAll(process.env.OPENROUTER_API_KEY || '\u0000', '[redacted]').replaceAll(process.env.GROQ_API_KEY || '\u0000', '[redacted]').slice(0, 240) : 'unknown error');
     // The closest catalog matches are more useful to the visitor than an error.
-    if (keywordMatch.tools.length) return catalogAnswer(keywordMatch.tools);
+    if (keywordMatch.tools.length) return catalogAnswer(keywordMatch.tools, false);
     const quotaUnavailable = error instanceof Error && /Firebase Admin|Firestore/i.test(error.message);
     return NextResponse.json({ error: quotaUnavailable ? 'La recherche assistée est temporairement indisponible.' : 'Je n’arrive pas à trouver un outil pour le moment. Réessaie dans quelques instants.' }, { status: 502, headers: { 'Cache-Control': 'no-store' } });
   }
