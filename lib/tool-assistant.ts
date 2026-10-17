@@ -79,10 +79,17 @@ const OPENROUTER_FALLBACK_MODELS = ['nvidia/nemotron-3-super-120b-a12b:free', 'g
 // Stays under the route's 60 s limit once the catalog, cache and quota checks are done.
 const AI_BUDGET_MS = 40_000;
 
-async function requestModel(provider: 'mistral' | 'openrouter', model: string, prompt: string, timeoutMs: number): Promise<ToolAssistantAnswer> {
-  const config = provider === 'mistral'
-    ? { key: process.env.MISTRAL_API_KEY?.trim(), url: 'https://api.mistral.ai/v1/chat/completions', maxTokens: 500 }
-    : { key: process.env.OPENROUTER_API_KEY?.trim(), url: 'https://openrouter.ai/api/v1/chat/completions', maxTokens: 1_200 };
+type Provider = 'mistral' | 'groq' | 'openrouter';
+
+const PROVIDERS: Record<Provider, { key: () => string | undefined; url: string; maxTokens: number; extra?: Record<string, unknown> }> = {
+  mistral: { key: () => process.env.MISTRAL_API_KEY?.trim(), url: 'https://api.mistral.ai/v1/chat/completions', maxTokens: 500 },
+  // gpt-oss reasons before answering: a short reasoning keeps the answer around one second.
+  groq: { key: () => process.env.GROQ_API_KEY?.trim(), url: 'https://api.groq.com/openai/v1/chat/completions', maxTokens: 1_200, extra: { reasoning_effort: 'low' } },
+  openrouter: { key: () => process.env.OPENROUTER_API_KEY?.trim(), url: 'https://openrouter.ai/api/v1/chat/completions', maxTokens: 1_200 },
+};
+
+async function requestModel(provider: Provider, model: string, prompt: string, timeoutMs: number): Promise<ToolAssistantAnswer> {
+  const config = { ...PROVIDERS[provider], key: PROVIDERS[provider].key() };
   if (!config.key) throw new Error(`${provider.toUpperCase()}_NOT_CONFIGURED`);
 
   const response = await fetch(config.url, {
@@ -101,6 +108,7 @@ async function requestModel(provider: 'mistral' | 'openrouter', model: string, p
       temperature: 0.2,
       max_tokens: config.maxTokens,
       response_format: { type: 'json_object' },
+      ...config.extra,
     }),
     cache: 'no-store',
     signal: AbortSignal.timeout(timeoutMs),
@@ -122,8 +130,8 @@ async function requestModel(provider: 'mistral' | 'openrouter', model: string, p
 }
 
 /**
- * Mistral first (queued a few seconds if busy), then OpenRouter's free models in order,
- * moving on after an error, an invalid answer or an empty one, within a time budget.
+ * Mistral first (queued a few seconds if busy), then Groq, then OpenRouter's free models
+ * in order, moving on after an error, an invalid answer or an empty one, within a time budget.
  */
 export async function recommendToolsWithAi(query: string, catalog: Tool[]): Promise<ToolAssistantAnswer> {
   const deadline = Date.now() + AI_BUDGET_MS;
@@ -145,6 +153,16 @@ export async function recommendToolsWithAi(query: string, catalog: Tool[]): Prom
       return await requestModel('mistral', process.env.MISTRAL_MODEL?.trim() || 'mistral-small-latest', prompt, 15_000);
     } catch (error) {
       failures.push(`mistral: ${error instanceof Error ? error.message : 'erreur'}`);
+    }
+  }
+  // Groq's free tier allows 1,000 requests a day, enough to carry the search on its own.
+  if (process.env.GROQ_API_KEY?.trim()) {
+    try {
+      // Groq names these models "openai/gpt-oss-…"; accept the short name too.
+      const groqModel = (process.env.GROQ_MODEL?.trim() || 'openai/gpt-oss-120b').replace(/^gpt-oss-/, 'openai/gpt-oss-');
+      return await requestModel('groq', groqModel, prompt, Math.min(deadline - Date.now(), 15_000));
+    } catch (error) {
+      failures.push(`groq: ${error instanceof Error ? error.message : 'erreur'}`);
     }
   }
   const configuredModel = process.env.OPENROUTER_MODEL?.trim();

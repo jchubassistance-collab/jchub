@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json({ ...answer, source: 'ai' }, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
-    console.error('[tool-assistant] Request failed:', error instanceof Error ? error.message.replaceAll(process.env.MISTRAL_API_KEY || '\u0000', '[redacted]').replaceAll(process.env.OPENROUTER_API_KEY || '\u0000', '[redacted]').slice(0, 240) : 'unknown error');
+    console.error('[tool-assistant] Request failed:', error instanceof Error ? error.message.replaceAll(process.env.MISTRAL_API_KEY || '\u0000', '[redacted]').replaceAll(process.env.OPENROUTER_API_KEY || '\u0000', '[redacted]').replaceAll(process.env.GROQ_API_KEY || '\u0000', '[redacted]').slice(0, 240) : 'unknown error');
     // The closest catalog matches are more useful to the visitor than an error.
     if (keywordMatch.tools.length) return catalogAnswer(keywordMatch.tools);
     const quotaUnavailable = error instanceof Error && /Firebase Admin|Firestore/i.test(error.message);

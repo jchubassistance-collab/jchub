@@ -88,7 +88,7 @@ export default function ConfidentialitePage() {
                 <li><strong className="text-slate-900">Cloudflare</strong> : diffusion du site et protection contre les attaques</li>
                 <li><strong className="text-slate-900">Firebase / Google Cloud</strong> : base de données et authentification</li>
                 <li><strong className="text-slate-900">Adobe PDF Services</strong> : conversion PDF vers Word et Word vers PDF</li>
-                <li><strong className="text-slate-900">Mistral AI et OpenRouter</strong> : recherche assistée d&apos;outils (seul le texte de ta recherche leur est transmis, par nos serveurs)</li>
+                <li><strong className="text-slate-900">Mistral AI, Groq et OpenRouter</strong> : recherche assistée d&apos;outils (seul le texte de ta recherche leur est transmis, par nos serveurs)</li>
                 <li><strong className="text-slate-900">Brevo</strong> : envoi d&apos;emails (newsletter, notifications)</li>
                 <li><strong className="text-slate-900">Cloudinary</strong> : stockage des médias du site</li>
                 <li><strong className="text-slate-900">Google Analytics et Metricool</strong> : mesure d&apos;audience, uniquement si tu l&apos;acceptes</li>
