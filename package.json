@@ -16,7 +16,8 @@
     "test:csv": "node --experimental-strip-types --test tests/csv.test.js",
     "test:cm": "node --experimental-strip-types --test tests/cm-metrics.test.js",
     "test:tool-generator": "node --experimental-strip-types --test tests/tool-generation-rules.test.js",
-    "test": "npm run -s test:social && npm run -s test:api-cost-calculator && npm run -s test:pdf && npm run -s test:csv && npm run -s test:cm && npm run -s test:tool-generator"
+    "test:tool-search": "node --experimental-strip-types --test tests/tool-search.test.js",
+    "test": "npm run -s test:social && npm run -s test:api-cost-calculator && npm run -s test:pdf && npm run -s test:csv && npm run -s test:cm && npm run -s test:tool-generator && npm run -s test:tool-search"
   },
   "dependencies": {
     "@adobe/pdfservices-node-sdk": "^4.1.0",
