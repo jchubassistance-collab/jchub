@@ -2,16 +2,21 @@
   "name": "jchub-starter",
   "private": true,
   "engines": {
-    "node": "22.x"
+    "node": "^22.13.0 || >=24"
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint",
+    "create-admin": "node scripts/create-admin.mjs",
+    "lint": "eslint .",
     "test:social": "node --experimental-strip-types --test tests/social-publishing.test.js",
     "test:api-cost-calculator": "node --experimental-strip-types --test tests/api-cost-calculator.test.js",
-    "test:pdf": "node --experimental-strip-types --test tests/pdf-to-word.test.js"
+    "test:pdf": "node --experimental-strip-types --test tests/pdf-to-word.test.js",
+    "test:csv": "node --experimental-strip-types --test tests/csv.test.js",
+    "test:cm": "node --experimental-strip-types --test tests/cm-metrics.test.js",
+    "test:tool-generator": "node --experimental-strip-types --test tests/tool-generation-rules.test.js",
+    "test": "npm run -s test:social && npm run -s test:api-cost-calculator && npm run -s test:pdf && npm run -s test:csv && npm run -s test:cm && npm run -s test:tool-generator"
   },
   "dependencies": {
     "@adobe/pdfservices-node-sdk": "^4.1.0",
@@ -21,18 +26,20 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/qrcode": "^1.5.6",
     "@vercel/analytics": "^1.3.1",
+    "@vercel/blob": "^2.8.1",
     "@vercel/speed-insights": "^1.1.0",
     "better-auth": "^1.7.5",
     "cloudinary": "^2.11.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "docx": "^9.7.1",
+    "exceljs": "^4.4.0",
     "firebase": "^11.3.1",
     "firebase-admin": "13.10.0",
-    "gray-matter": "^4.0.3",
+    "gray-matter": "^2.0.1",
     "jspdf": "^4.2.1",
     "lucide-react": "^0.453.0",
-    "next": "^15.5.27",
+    "next": "^16.4.0",
     "pdf-parse": "^1.1.1",
     "pdfjs-dist": "^6.3.289",
     "qrcode": "^1.5.4",
@@ -40,18 +47,23 @@
     "react-dom": "^19.3.0",
     "react-markdown": "^10.1.0",
     "workflow": "^4.8.9",
-    "xlsx": "^0.18.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^22.7.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "^15.5.27",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.13",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.0",
+    "postcss": "^8.5.29",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.6.3"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.13.6",
+    "devalue": "^5.9.3",
+    "nanoid": "^5.1.16",
+    "uuid": "^11.1.1"
   }
 }

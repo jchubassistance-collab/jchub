@@ -12,13 +12,13 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: 'fr',
     icons: [
       {
-        src: '/favicon-blue.png',
+        src: '/jchub-icon-192.png',
         sizes: '192x192',
         type: 'image/png',
         purpose: 'maskable',
       },
       {
-        src: '/favicon-blue.png',
+        src: '/jchub-icon-512.png',
         sizes: '512x512',
         type: 'image/png',
         purpose: 'maskable',

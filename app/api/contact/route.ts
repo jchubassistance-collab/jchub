@@ -60,7 +60,10 @@ export async function POST(request: NextRequest) {
       cache: 'no-store',
     });
 
-    const [notificationResult, confirmationResult] = await Promise.allSettled([
+    // No confirmation email to the address typed in the form: anyone could otherwise make
+    // JcHub mail arbitrary inboxes with their own text, burning the Brevo sender reputation.
+    // The form shows the confirmation on screen instead.
+    const [notificationResult] = await Promise.allSettled([
       sendEmail({
         sender: { email: senderEmail, name: senderName },
         to: [{ email: notificationEmail }],
@@ -68,44 +71,25 @@ export async function POST(request: NextRequest) {
         subject: `[JcHub] ${subjectLabel}`,
         textContent: `Nouveau message de contact\n\nNom : ${name}\nEmail : ${email}\nSujet : ${subjectLabel}\n\n${message}`,
       }),
-      sendEmail({
-        sender: { email: senderEmail, name: senderName },
-        to: [{ email, name }],
-        replyTo: { email: notificationEmail, name: senderName },
-        subject: 'Nous avons bien reçu ton message - JcHub',
-        textContent: `Bonjour ${name},\n\nNous avons bien reçu ton message concernant « ${subjectLabel} ». Notre équipe reviendra vers toi sous 24h ouvrées.\n\nÀ bientôt,\nL’équipe JcHub`,
-      }),
     ]);
 
     const notificationSent = notificationResult.status === 'fulfilled' && notificationResult.value.ok;
-    const confirmationSent = confirmationResult.status === 'fulfilled' && confirmationResult.value.ok;
-    if (!notificationSent || !confirmationSent) {
-      const details = await Promise.all([
-        notificationSent ? Promise.resolve('') : notificationResult.status === 'fulfilled'
-          ? notificationResult.value.text().then((body) => `Notification Brevo ${notificationResult.value.status}: ${body.slice(0, 500)}`)
-          : Promise.resolve(`Notification erreur réseau: ${String(notificationResult.reason).slice(0, 300)}`),
-        confirmationSent ? Promise.resolve('') : confirmationResult.status === 'fulfilled'
-          ? confirmationResult.value.text().then((body) => `Confirmation Brevo ${confirmationResult.value.status}: ${body.slice(0, 500)}`)
-          : Promise.resolve(`Confirmation erreur réseau: ${String(confirmationResult.reason).slice(0, 300)}`),
-      ]);
-      console.error('Contact email delivery failed:', details.filter(Boolean).join(' | '));
+    if (!notificationSent) {
+      const detail = notificationResult.status === 'fulfilled'
+        ? await notificationResult.value.text().then((body) => `Notification Brevo ${notificationResult.value.status}: ${body.slice(0, 500)}`)
+        : `Notification erreur réseau: ${String(notificationResult.reason).slice(0, 300)}`;
+      console.error('Contact email delivery failed:', detail);
       reportUserError();
     }
 
     await messageRef.update({
       notificationStatus: notificationSent ? 'sent' : 'failed',
-      confirmationStatus: confirmationSent ? 'sent' : 'failed',
       ...(!notificationSent ? { notificationError: 'Échec de livraison Brevo' } : {}),
-      ...(!confirmationSent ? { confirmationError: 'Échec de livraison Brevo' } : {}),
       updatedAt: FieldValue.serverTimestamp(),
     });
 
-    return NextResponse.json({
-      success: true,
-      ...(!notificationSent || !confirmationSent ? {
-        warning: `${notificationSent ? '' : 'La notification pour notre équipe n’a pas été envoyée. '}${confirmationSent ? '' : 'La confirmation pour toi n’a pas été envoyée.'}`.trim(),
-      } : {}),
-    }, { status: notificationSent && confirmationSent ? 200 : 202 });
+    // The message is stored either way and appears in the admin inbox.
+    return NextResponse.json({ success: true }, { status: notificationSent ? 200 : 202 });
   } catch (error) {
     reportUserError();
     return NextResponse.json({ error: 'Impossible d’envoyer ton message pour le moment.' }, { status: 500 });

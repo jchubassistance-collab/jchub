@@ -1,66 +1,106 @@
+
 import type { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import Script from 'next/script';
 import './globals.css';
 import { AppChrome } from '@/components/layout/AppChrome';
-import { GoogleAnalytics } from '@/components/GoogleAnalytics';
+import { AnalyticsConsent } from '@/components/AnalyticsConsent';
 import { PwaRegister } from '@/components/PwaRegister';
 import { headers } from 'next/headers';
+import { getPublicBaseUrl } from '@/lib/site-url';
+import { DEFAULT_SOCIAL_IMAGE } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev'),
-  alternates: {
-    canonical: 'https://jchub.dev',
-  },
+  metadataBase: new URL(getPublicBaseUrl()),
+
   title: {
-    default: 'JcHub | Outils pratiques pour développeurs',
+    default: 'Outils pratiques pour développeurs | JcHub',
     template: '%s | JcHub',
   },
+
   description:
     'JcHub regroupe des outils gratuits, des ressources utiles et des workflows pratiques pour développeurs, créateurs et équipes.',
-  keywords: ['JcHub', 'développeur', 'outils dev', 'outils gratuits', 'ressources développeurs', 'ia', 'Jessy Ngnambongo'],
+
+  keywords: [
+    'JcHub',
+    'développeur',
+    'outils dev',
+    'outils gratuits',
+    'ressources développeurs',
+    'IA',
+    'Jessy Ngnambongo',
+  ],
+
   authors: [{ name: 'Jessy Ngnambongo' }],
   creator: 'Jessy Ngnambongo',
   publisher: 'Jessy Ngnambongo',
+
   verification: {
     google: 'CHtgc4pbKQbkrHEYgwyHs--a3JugPZMg3WTy87vcJm0',
   },
+
   icons: {
     icon: [
-      { url: '/favicon-blue.png?v=2026-09-13', type: 'image/png', sizes: '192x192' },
+      {
+        url: '/jchub-icon-192.png',
+        type: 'image/png',
+        sizes: '192x192',
+      },
+      {
+        url: '/jchub-icon-512.png',
+        type: 'image/png',
+        sizes: '512x512',
+      },
     ],
-    shortcut: '/favicon-blue.png?v=2026-09-13',
-    apple: '/favicon-blue.png?v=2026-09-13',
+    shortcut: '/jchub-icon-192.png',
+    apple: '/jchub-icon-192.png',
   },
+
+  // Inherited by pages without their own openGraph, so no page-specific title or URL here
+  // (they made every such page's link preview show the home page).
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
-    url: 'https://jchub.dev',
     siteName: 'JcHub',
-    title: 'JcHub | Outils pratiques pour développeurs',
-    description:
-      'JcHub regroupe des outils gratuits, des ressources utiles et des workflows pratiques pour développeurs, créateurs et équipes.',
+    images: [DEFAULT_SOCIAL_IMAGE],
   },
+
   twitter: {
     card: 'summary_large_image',
-    title: 'JcHub | Outils pratiques pour développeurs',
-    description:
-      'JcHub regroupe des outils gratuits, des ressources utiles et des workflows pratiques pour développeurs, créateurs et équipes.',
+    images: [DEFAULT_SOCIAL_IMAGE.url],
   },
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const hostname = (await headers()).get('host')?.split(':')[0].toLowerCase();
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const requestHeaders = await headers();
+
+  const hostname = requestHeaders
+    .get('host')
+    ?.split(':')[0]
+    .toLowerCase();
+
+  const nonce = requestHeaders.get('x-nonce') || undefined;
+  const isAdminPath = requestHeaders.get('x-is-admin-path') === '1';
+
   const isAdminHost =
-    hostname === 'admin.jchub.dev' || hostname === 'admin.localhost';
+    hostname === 'admin.jchub.dev' ||
+    hostname === 'admin.localhost';
+
   const isProduction = process.env.NODE_ENV === 'production';
   const isVercelDeployment = process.env.VERCEL === '1';
 
   return (
     <html lang="fr">
+      <head>
+        <link rel="alternate" type="application/rss+xml" href="/rss.xml" />
+      </head>
       <body>
         <script
+          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
@@ -81,11 +121,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }}
         />
 
+        {/* Cookieless Vercel measurement needs no consent; GA4 and Metricool wait for an opt-in. */}
         {isProduction && isVercelDeployment && <Analytics />}
+
         {isProduction && isVercelDeployment && <SpeedInsights />}
-        <GoogleAnalytics />
+
+        {!isAdminHost && !isAdminPath && <AnalyticsConsent nonce={nonce} />}
+
         <PwaRegister />
-        <AppChrome isAdminHost={isAdminHost}>{children}</AppChrome>
+
+        <AppChrome isAdminHost={isAdminHost}>
+          {children}
+        </AppChrome>
       </body>
     </html>
   );

@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import { ChevronLeft, FileText, Mail, ShieldCheck } from 'lucide-react';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: 'Conditions Générales d\'Utilisation (CGU)',
-};
+  description: 'Consulte les conditions qui encadrent l’accès et l’utilisation des services et outils proposés par JcHub.',
+  path: '/cgu',
+});
 
 export default function CGUPage() {
   return (
@@ -91,7 +94,7 @@ export default function CGUPage() {
             <section className="rounded-2xl border border-blue-100 bg-[#f8fbff] p-5 sm:p-6">
               <h2 className="mb-3 text-xl font-black text-[#0f172a] md:text-2xl">6. Propriété intellectuelle</h2>
               <p className="leading-relaxed text-slate-600">
-                Les contenus présents sur JcHub (articles, illustrations, ressources premium) sont protégés par le droit
+                Les contenus présents sur JcHub (articles, illustrations, outils et ressources) sont protégés par le droit
                 d&apos;auteur. Certains contenus sont placés sous licences Creative Commons (CC BY-SA, CC BY-NC-SA) avec
                 mention de l&apos;auteur et de la licence. Toute reproduction non autorisée est interdite.
               </p>

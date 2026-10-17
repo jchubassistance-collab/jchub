@@ -1,4 +1,5 @@
 import type { PublicationRecord, SocialPlatform, SocialSource } from './social-types';
+import { createHmac } from 'node:crypto';
 
 export type AdapterResult = { externalId: string; externalUrl?: string; unchanged?: boolean };
 export class PlatformError extends Error {
@@ -70,7 +71,23 @@ async function publishLinkedIn(record: PublicationRecord, source: SocialSource, 
   const fetcher = dependencies.fetcher || fetch;
   const timeoutMs = dependencies.timeoutMs || 12_000;
   const token = required(env, 'LINKEDIN_ACCESS_TOKEN');
-  const author = required(env, 'LINKEDIN_AUTHOR_URN');
+  let author = env.LINKEDIN_AUTHOR_URN?.trim();
+  if (author && !/^urn:li:person:[A-Za-z0-9_-]+$/.test(author)) throw new PlatformError('LINKEDIN_AUTHOR_URN doit désigner un membre LinkedIn.');
+  if (!author) {
+    let profileResponse: Response;
+    try {
+      profileResponse = await fetcher('https://api.linkedin.com/v2/userinfo', {
+        headers: { Authorization: `Bearer ${token}` }, signal: timeoutSignal(timeoutMs), ...noRedirect,
+      });
+    } catch {
+      throw new PlatformError('Impossible de joindre LinkedIn pour déterminer le profil. Réessaie plus tard.', 'failed', 'PROFILE_LOOKUP_FAILED');
+    }
+    if (profileResponse.status === 401) throw new PlatformError('Le token LinkedIn est invalide ou expiré. Reconnecte le compte et remplace LINKEDIN_ACCESS_TOKEN.', 'failed', 'TOKEN_INVALID');
+    if (profileResponse.status === 403) throw new PlatformError('Le token LinkedIn ne permet pas de lire le profil. Vérifie les scopes OpenID profile.', 'failed', 'PROFILE_PERMISSION_DENIED');
+    const profile = await safeJson(profileResponse);
+    if (profileResponse.ok && typeof profile.sub === 'string' && /^[A-Za-z0-9_-]+$/.test(profile.sub)) author = `urn:li:person:${profile.sub}`;
+    if (!author) throw new PlatformError('Impossible de déterminer le profil LinkedIn. Configure LINKEDIN_AUTHOR_URN ou utilise un token avec les scopes OpenID profile.', 'failed', 'MISSING_AUTHOR_URN');
+  }
   const version = env.LINKEDIN_API_VERSION?.trim() || '202609';
   if (!/^urn:li:person:[A-Za-z0-9_-]+$/.test(author)) throw new PlatformError('LINKEDIN_AUTHOR_URN doit désigner un membre LinkedIn.');
   if (!/^\d{6}$/.test(version)) throw new PlatformError('LINKEDIN_API_VERSION invalide.');
@@ -130,9 +147,12 @@ async function publishFacebook(record: PublicationRecord, source: SocialSource, 
   const image = await fetchApprovedImage(source, env, fetcher, timeoutMs);
   const hasImage = Boolean(image && source.imageUrl);
   const endpoint = `https://graph.facebook.com/${version}/${encodeURIComponent(pageId)}/${hasImage ? 'photos' : 'feed'}`;
+  const appSecret = env.FACEBOOK_APP_SECRET?.trim() || env.META_APP_SECRET?.trim();
+  const url = new URL(endpoint);
+  if (appSecret) url.searchParams.set('appsecret_proof', createHmac('sha256', appSecret).update(token).digest('hex'));
   const body = new URLSearchParams({ access_token: token, ...(hasImage ? { url: source.imageUrl!, caption: normalizePostText(record) } : { message: normalizePostText(record), link: source.url }) });
   let response: Response;
-  try { response = await fetcher(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, signal: timeoutSignal(timeoutMs), ...noRedirect }); }
+  try { response = await fetcher(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, signal: timeoutSignal(timeoutMs), ...noRedirect }); }
   catch { throw new PlatformError('Résultat Facebook incertain après envoi; vérifie la Page avant toute nouvelle tentative.', 'unknown', 'POST_OUTCOME_UNKNOWN'); }
   const data = await safeJson(response);
   if (!response.ok || !data.id) throw responseError(response, data);
@@ -160,8 +180,8 @@ async function publishGitHub(record: PublicationRecord, dependencies: AdapterDep
   const timeoutMs = dependencies.timeoutMs || 12_000;
   const wait = dependencies.wait || defaultWait;
   const token = required(env, 'GITHUB_TOKEN');
-  const owner = required(env, 'GITHUB_OWNER');
-  const repository = required(env, 'GITHUB_REPOSITORY');
+  const owner = env.GITHUB_OWNER?.trim() || 'jchubassistance-collab';
+  const repository = env.GITHUB_REPOSITORY?.trim() || 'jchub';
   const branch = env.GITHUB_BRANCH?.trim() || 'main';
   const filePath = env.GITHUB_PUBLISH_PATH?.trim() || 'docs/social-publications.md';
   if (!/^[A-Za-z0-9_.-]+$/.test(owner) || !/^[A-Za-z0-9_.-]+$/.test(repository) || !/^[A-Za-z0-9_.\-/]+$/.test(branch) || filePath.startsWith('/') || filePath.split('/').some((part) => !part || part === '.' || part === '..')) {

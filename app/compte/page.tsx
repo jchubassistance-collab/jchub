@@ -3,15 +3,14 @@
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { AlertCircle, ArrowLeft, CheckCircle2, Github, KeyRound, Loader2, Lock, Mail, User } from 'lucide-react';
-import { resetPassword, signInWithEmail, signInWithGithub, signInWithGoogle, signUpWithEmail } from '@/lib/firebase-auth';
+import { AlertCircle, ArrowLeft, CheckCircle2, Github, KeyRound, Loader2, Lock, Mail } from 'lucide-react';
+import { resetPassword, signInWithEmail, signInWithGithub, signInWithGoogle } from '@/lib/firebase-auth';
 
-type Screen = 'login' | 'register' | 'forgot';
+type Screen = 'login' | 'forgot';
 
 export default function AccountPage() {
   const router = useRouter();
   const [screen, setScreen] = useState<Screen>('login');
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,18 +42,14 @@ export default function AccountPage() {
       return;
     }
 
-    if (!email.trim() || password.length < 6 || (screen === 'register' && !name.trim())) {
-      setError(screen === 'register' ? 'Indique ton nom, ton e-mail et un mot de passe de 6 caractères minimum.' : 'Indique ton e-mail et ton mot de passe.');
+    if (!email.trim() || password.length < 6) {
+      setError('Indique ton e-mail et un mot de passe de 6 caractères minimum.');
       return;
     }
 
     setLoading(true);
     try {
-      if (screen === 'login') {
-        await signInWithEmail(email.trim(), password);
-      } else {
-        await signUpWithEmail(email.trim(), password, name.trim());
-      }
+      await signInWithEmail(email.trim(), password);
       router.replace('/compte/dashboard');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Une erreur est survenue.');
@@ -76,8 +71,8 @@ export default function AccountPage() {
     }
   };
 
-  const title = screen === 'login' ? 'Bon retour' : screen === 'register' ? 'Créer un compte' : 'Mot de passe oublié';
-  const subtitle = screen === 'login' ? 'Connecte-toi pour retrouver ton espace.' : screen === 'register' ? 'Commence à apprendre à ton rythme.' : 'Nous t’enverrons un lien sécurisé par e-mail.';
+  const title = screen === 'login' ? 'Bon retour' : 'Mot de passe oublié';
+  const subtitle = screen === 'login' ? 'Connecte-toi pour retrouver ton espace.' : 'Nous t’enverrons un lien sécurisé par e-mail.';
 
   return (
     <div className="account-page min-h-screen bg-[#f5f7f5] px-4 py-8 sm:py-12">
@@ -104,7 +99,7 @@ export default function AccountPage() {
           <div className="relative z-10 space-y-4">
             {[
               'Accès aux ressources',
-              'Suivi des achats et abonnements',
+              'Outils et contenus favoris',
               'Progression personnalisée',
             ].map((item) => (
               <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 backdrop-blur-sm">
@@ -153,15 +148,13 @@ export default function AccountPage() {
           </>}
 
           <form onSubmit={submit} className="space-y-3">
-            {screen === 'register' && <Field label="Nom complet" icon={<User className="h-4 w-4" />}><input required value={name} onChange={(event) => setName(event.target.value)} placeholder="Ton nom" className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pl-10 pr-3 text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100" /></Field>}
             <Field label="Adresse e-mail" icon={<Mail className="h-4 w-4" />}><input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="toi@exemple.com" className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pl-10 pr-3 text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100" /></Field>
             {screen !== 'forgot' && <Field label="Mot de passe" icon={<Lock className="h-4 w-4" />}><input required type="password" minLength={6} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="6 caractères minimum" className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pl-10 pr-3 text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100" /></Field>}
-            <button disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#17324d] to-[#1d3d5f] px-4 py-2.5 font-bold text-white transition hover:translate-y-[-1px] hover:shadow-lg hover:shadow-slate-900/15 disabled:cursor-wait disabled:opacity-60">{loading ? <Loader2 className="h-5 w-5 animate-spin" /> : screen === 'login' ? 'Se connecter' : screen === 'register' ? 'Créer mon compte' : 'Envoyer le lien'}</button>
+            <button disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#17324d] to-[#1d3d5f] px-4 py-2.5 font-bold text-white transition hover:translate-y-[-1px] hover:shadow-lg hover:shadow-slate-900/15 disabled:cursor-wait disabled:opacity-60">{loading ? <Loader2 className="h-5 w-5 animate-spin" /> : screen === 'login' ? 'Se connecter' : 'Envoyer le lien'}</button>
           </form>
 
           <div className="mt-6 text-center text-sm text-slate-500">
-            {screen === 'login' && <><button onClick={() => changeScreen('forgot')} className="font-semibold text-orange-600 hover:underline">Mot de passe oublié ?</button><p className="mt-3">Pas encore de compte ? <button onClick={() => changeScreen('register')} className="font-bold text-orange-600 hover:underline">Créer un compte</button></p></>}
-            {screen === 'register' && <>Déjà inscrit ? <button onClick={() => changeScreen('login')} className="font-bold text-orange-600 hover:underline">Se connecter</button></>}
+            {screen === 'login' && <button onClick={() => changeScreen('forgot')} className="font-semibold text-orange-600 hover:underline">Mot de passe oublié ?</button>}
           </div>
         </main>
       </div>

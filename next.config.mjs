@@ -1,7 +1,17 @@
 /** @type {import('next').NextConfig} */
 import { withWorkflow } from 'workflow/next';
 
+const facebookRedirectUri = process.env.FACEBOOK_REDIRECT_URI || process.env.META_REDIRECT_URI;
+let facebookOAuthHost;
+try {
+  const redirect = new URL(facebookRedirectUri);
+  if (redirect.protocol === 'https:') facebookOAuthHost = redirect.hostname;
+} catch {
+  facebookOAuthHost = undefined;
+}
+
 const nextConfig = {
+  allowedDevOrigins: ['127.0.0.1', ...(facebookOAuthHost ? [facebookOAuthHost] : [])],
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
@@ -10,9 +20,20 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   typedRoutes: false,
-  serverExternalPackages: ['@napi-rs/canvas', '@adobe/pdfservices-node-sdk'],
+  serverExternalPackages: ['@napi-rs/canvas', '@adobe/pdfservices-node-sdk', 'gray-matter'],
   outputFileTracingIncludes: {
     '/api/tools/pdf-to-word': ['./node_modules/pdfjs-dist/standard_fonts/**'],
+  },
+  async redirects() {
+    // Former paid-offer pages: keep any indexed links and backlinks useful.
+    return [
+      { source: '/about', destination: '/a-propos', permanent: true },
+      { source: '/pricing', destination: '/outils', permanent: true },
+      { source: '/checkout', destination: '/outils', permanent: true },
+      { source: '/paiement/:path*', destination: '/outils', permanent: true },
+      { source: '/compte/abonnement', destination: '/compte', permanent: true },
+      { source: '/guides', destination: '/blog', permanent: true },
+    ];
   },
   async headers() {
     return [
@@ -24,11 +45,11 @@ const nextConfig = {
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), geolocation=(), microphone=()' },
-          { key: 'Content-Security-Policy', value: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://apis.google.com https://accounts.google.com https://static.cloudflareinsights.com; connect-src 'self' blob: https://*.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.google-analytics.com https://region1.google-analytics.com https://api.cloudinary.com; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data: https:; frame-src 'self' https://accounts.google.com; media-src 'self' blob: https:;" },
         ],
       },
       {
-        source: '/api/:path*',
+        // The social card route sets its own CDN cache headers.
+        source: '/api/:path((?!article-cover$).*)',
         headers: [
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
           { key: 'CDN-Cache-Control', value: 'no-store' },

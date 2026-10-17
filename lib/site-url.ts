@@ -5,6 +5,10 @@ export function getPublicBaseUrl(): string {
 
   try {
     const url = new URL(configuredUrl);
+    if (url.hostname === 'example.com' || url.hostname.endsWith('.example.com')) {
+      return FALLBACK_SITE_URL;
+    }
+
     url.hostname = url.hostname.toLowerCase().replace(/^www\./, '');
     url.pathname = '';
     url.search = '';

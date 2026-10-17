@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import { Building2, ChevronLeft, Mail, Scale } from 'lucide-react';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: 'Mentions Légales',
-};
+  description: 'Informations légales sur l’éditeur, l’hébergement et la publication du site JcHub.',
+  path: '/mentions-legales',
+});
 
 export default function MentionsLegalesPage() {
   return (

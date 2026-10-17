@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import { BadgeCheck, ChevronLeft, CreditCard, Mail, Truck } from 'lucide-react';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: 'Conditions Générales de Vente (CGV)',
-};
+  description: 'Consulte les conditions de vente de JcHub : les services sont actuellement gratuits, sans paiement ni abonnement.',
+  path: '/cgv',
+});
 
 export default function CGVPage() {
   return (

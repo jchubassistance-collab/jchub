@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Info, Mail, Menu, Search, Wrench, X } from 'lucide-react';
+import { CircleHelp, Home, Info, Mail, Menu, Wrench, X } from 'lucide-react';
 import { useState } from 'react';
+import { ToolFinder } from '@/components/layout/ToolFinder';
 
 const links = [
   { href: '/', label: 'Accueil', icon: Home },
@@ -16,7 +17,7 @@ export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const safePathname = pathname ?? '';
-  const isHome = safePathname === '/' || safePathname === '/a-propos' || safePathname === '/outils' || safePathname.startsWith('/outils/') || safePathname.startsWith('/tools/') || safePathname === '/contact' || safePathname === '/blog' || safePathname.startsWith('/blog/') || safePathname === '/pricing' || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(safePathname);
+  const isHome = safePathname === '/' || safePathname === '/a-propos' || safePathname === '/outils' || safePathname.startsWith('/outils/') || safePathname.startsWith('/tools/') || safePathname === '/aide' || safePathname === '/contact' || safePathname === '/blog' || safePathname.startsWith('/blog/') || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(safePathname);
   const homeHref = '/';
   const currentLinks = links;
   const closeMenus = () => setOpen(false);
@@ -25,7 +26,7 @@ export function Header() {
     <header className={`sticky top-0 z-50 border-b backdrop-blur-xl ${isHome ? 'border-blue-100 bg-[#eff6ff]/90 shadow-[0_8px_24px_rgba(37,99,235,.07)]' : 'border-white/10 bg-[#07162d]/80 shadow-[0_12px_30px_rgba(2,11,26,0.28)]'}`}>
       <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-6 px-4 sm:px-6">
         <Link href={homeHref} className="group flex shrink-0 items-center" aria-label="JcHub, accueil">
-          <img src="/icone.svg" alt="JcHub" width="64" height="64" className="h-9 w-auto transition duration-300 group-hover:scale-[1.04] lg:hidden" />
+          <img src="/jchub-icon-192.png" alt="JcHub" width="64" height="64" className="h-9 w-auto transition duration-300 group-hover:scale-[1.04] lg:hidden" />
           <img src="/logo-blue.svg" alt="JcHub" width="320" height="100" className="hidden h-11 w-auto transition duration-300 group-hover:scale-[1.04] lg:block" />
         </Link>
 
@@ -35,12 +36,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 xl:flex">
-          <form action="/outils" className={`flex items-center gap-2 rounded-full border px-3 py-2 ${isHome ? 'border-blue-100 bg-white/80' : 'border-white/10 bg-white/5'}`}>
-            <Search className={`h-4 w-4 ${isHome ? 'text-blue-600' : 'text-slate-300'}`} />
-            <input name="q" aria-label="Rechercher un outil" placeholder="Rechercher un outil..." className={`w-36 bg-transparent text-xs outline-none placeholder:opacity-60 ${isHome ? 'text-slate-800 placeholder:text-slate-500' : 'text-white placeholder:text-slate-300'}`} />
-          </form>
-        </div>
+        <div className="hidden w-[19rem] items-center gap-3 xl:flex"><ToolFinder compact dark={!isHome}/></div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setOpen((value) => !value)}
@@ -80,10 +76,7 @@ export function Header() {
             <MobileNavLink key={link.href} {...link} pathname={safePathname} onClick={closeMenus} isLight={isHome} />
           ))}
         </div>
-        <form action="/outils" className={`mt-5 flex items-center gap-2 rounded-xl border px-3 py-3 ${isHome ? 'border-blue-100 bg-blue-50' : 'border-white/10 bg-white/5'}`}>
-          <Search className={`h-4 w-4 ${isHome ? 'text-blue-600' : 'text-slate-300'}`} />
-          <input name="q" aria-label="Rechercher un outil" placeholder="Rechercher un outil..." className={`min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:opacity-60 ${isHome ? 'text-slate-800 placeholder:text-slate-500' : 'text-white placeholder:text-slate-300'}`} />
-        </form>
+        <div className="mt-5"><ToolFinder dark={!isHome}/></div>
       </nav>
     </header>
   );

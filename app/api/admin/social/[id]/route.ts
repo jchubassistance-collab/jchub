@@ -6,6 +6,7 @@ import { getPublication, schedulePublication, updatePublicationStatus } from '@/
 import { zonedDateTimeToUtc } from '@/lib/social-utils';
 import { getSocialSettings } from '@/lib/social-publications-store';
 import { runSocialPublication } from '@/workflows/social-publishing';
+import { getSocialPlatformReadiness } from '@/lib/social-readiness';
 
 export const runtime = 'nodejs';
 
@@ -35,6 +36,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (action === 'publish') {
       const settings = await getSocialSettings();
       if (settings.dryRun) return NextResponse.json({ ok: true, dryRun: true, wouldPublish: publication.platform, destination: publication.destination });
+      const readiness = getSocialPlatformReadiness(publication.platform, settings);
+      if (!readiness.enabled) return NextResponse.json({ error: 'Cette plateforme est désactivée dans les réglages sociaux.' }, { status: 409 });
+      if (!readiness.configured) return NextResponse.json({ error: `Configuration serveur manquante ou invalide : ${readiness.missing.join(', ')}.` }, { status: 409 });
       const run = await start(runSocialPublication, [id, false]);
       return NextResponse.json({ queued: true, runId: run.runId }, { status: 202 });
     }
@@ -43,11 +47,18 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       if (publication.status === 'UNKNOWN' && parsed.data.confirmNoExternalPost !== true) return NextResponse.json({ error: 'Vérifie la plateforme et confirme l’absence de publication avant de relancer.' }, { status: 409 });
       const settings = await getSocialSettings();
       if (settings.dryRun) return NextResponse.json({ ok: true, dryRun: true, wouldPublish: publication.platform, destination: publication.destination });
+      const readiness = getSocialPlatformReadiness(publication.platform, settings);
+      if (!readiness.enabled) return NextResponse.json({ error: 'Cette plateforme est désactivée dans les réglages sociaux.' }, { status: 409 });
+      if (!readiness.configured) return NextResponse.json({ error: `Configuration serveur manquante ou invalide : ${readiness.missing.join(', ')}.` }, { status: 409 });
       const run = await start(runSocialPublication, [id, true, parsed.data.confirmNoExternalPost === true]);
       return NextResponse.json({ queued: true, runId: run.runId }, { status: 202 });
     }
     if (action === 'schedule') {
       const settings = await getSocialSettings();
+      const readiness = getSocialPlatformReadiness(publication.platform, settings);
+      if (settings.dryRun) return NextResponse.json({ error: 'Désactive le mode dry-run avant de programmer une publication.' }, { status: 409 });
+      if (!readiness.enabled) return NextResponse.json({ error: 'Active cette plateforme avant de programmer une publication.' }, { status: 409 });
+      if (!readiness.configured) return NextResponse.json({ error: `Configuration serveur manquante ou invalide : ${readiness.missing.join(', ')}.` }, { status: 409 });
       let at: Date;
       try { at = zonedDateTimeToUtc(parsed.data.localDateTime, settings.timezone); }
       catch { return NextResponse.json({ error: 'Date ou fuseau horaire invalide.' }, { status: 400 }); }

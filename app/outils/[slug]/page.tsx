@@ -2,49 +2,32 @@ import { notFound } from 'next/navigation';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { ArrowRight, BookOpen, Heart, Share2, ChevronRight, Sparkles, Code2 } from 'lucide-react';
+import { ArrowRight, ChevronRight } from 'lucide-react';
 import { getPublishedTools, getToolBySlug, tools } from '@/lib/tools';
-import { PasswordGenerator } from '@/components/tools/PasswordGenerator';
-import { JsonFormatter } from '@/components/tools/JsonFormatter';
-import { Base64Tool } from '@/components/tools/Base64Tool';
-import { UuidGenerator } from '@/components/tools/UuidGenerator';
-import { RegexTester } from '@/components/tools/RegexTester';
-import { ColorConverter } from '@/app/tools/jchub-tools/ColorConverter';
-import { HashGenerator } from '@/app/tools/jchub-tools/HashGenerator';
-import { JwtDecoder } from '@/app/tools/jchub-tools/JwtDecoder';
-import { MarkdownPreview } from '@/app/tools/jchub-tools/MarkdownPreview';
-import { NumberBaseConverter } from '@/app/tools/jchub-tools/NumberBaseConverter';
-import { QrCodeGenerator } from '@/app/tools/jchub-tools/QrCodeGenerator';
-import { TimestampConverter } from '@/app/tools/jchub-tools/TimestampConverter';
-import { UrlEncoder } from '@/app/tools/jchub-tools/UrlEncoder';
-import { PdfToWord } from '@/components/tools/PdfToWord';
-import { ExcelToCsvTool } from '@/components/tools/ExcelToCsvTool';
-import { CsvToExcelTool } from '@/components/tools/CsvToExcelTool';
-import { WordToPdf } from '@/components/tools/WordToPdf';
-import { ImagesToPdf } from '@/components/tools/ImagesToPdf';
+import { isToolComponentName, SERVER_PROCESSED_TOOLS } from '@/lib/tool-components';
+import { ToolRenderer } from '@/components/tools/ToolRenderer';
+import { ShareButton } from '@/components/tools/ShareButton';
+import { getPublicBaseUrl } from '@/lib/site-url';
+import { DEFAULT_SOCIAL_IMAGE } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
-const componentMap = {
-  PasswordGenerator,
-  JsonFormatter,
-  Base64Tool,
-  UuidGenerator,
-  RegexTester,
-  PdfToWord,
-  ExcelToCsvTool,
-  CsvToExcelTool,
-  WordToPdf,
-  ImagesToPdf,
-  ColorConverter,
-  HashGenerator,
-  JwtDecoder,
-  MarkdownPreview,
-  NumberBaseConverter,
-  QrCodeGenerator,
-  TimestampConverter,
-  UrlEncoder,
-};
+/** Promises shown under the tool: they must match where the file is actually processed. */
+function toolHighlights(component: string) {
+  const serverProcessing = isToolComponentName(component) ? SERVER_PROCESSED_TOOLS[component] : undefined;
+  if (serverProcessing) {
+    return [
+      { emoji: '🔐', title: 'Transfert chiffré', desc: `Ton fichier est envoyé en HTTPS à nos serveurs${serverProcessing.partner ? ` et, selon le format, à notre prestataire ${serverProcessing.partner}` : ''} pour être converti.` },
+      { emoji: '🧹', title: 'Supprimé après usage', desc: 'Le fichier est effacé de nos serveurs dès la fin de la conversion.' },
+      { emoji: '🎁', title: 'Gratuit et sans pub', desc: '5 conversions par jour, sans inscription ni publicité.' },
+    ];
+  }
+  return [
+    { emoji: '🔒', title: '100% privé', desc: 'Tout se passe dans ton navigateur' },
+    { emoji: '⚡', title: 'Instantané', desc: 'Pas d\'attente, pas de serveur' },
+    { emoji: '🎁', title: 'Sans pub', desc: 'Gratuit, sans pub ni inscription' },
+  ];
+}
 
 export async function generateStaticParams() {
   return tools.map((t) => ({ slug: t.slug }));
@@ -54,10 +37,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const tool = await getToolBySlug(slug);
   if (!tool) return {};
-  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
+  const baseUrl = getPublicBaseUrl();
   const toolUrl = `${baseUrl}${tool.path ?? `/outils/${tool.slug}`}`;
   return {
-    title: tool.seo.title,
+    title: { absolute: tool.seo.title },
     description: tool.seo.description,
     keywords: tool.seo.keywords,
     alternates: { canonical: toolUrl },
@@ -66,8 +49,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description: tool.seo.description,
       url: toolUrl,
       type: 'website',
+      siteName: 'JcHub',
+      locale: 'fr_FR',
+      images: [DEFAULT_SOCIAL_IMAGE],
     },
-    twitter: { card: 'summary', title: tool.seo.title, description: tool.seo.description },
+    twitter: { card: 'summary_large_image', title: tool.seo.title, description: tool.seo.description, images: [DEFAULT_SOCIAL_IMAGE.url] },
   };
 }
 
@@ -77,7 +63,10 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
   if (!tool) notFound();
   if (tool.path) redirect(tool.path);
 
-  const Component = componentMap[tool.component as keyof typeof componentMap] ?? componentMap.PasswordGenerator;
+  // A catalog entry pointing to an unknown component used to silently show the password generator.
+  if (!isToolComponentName(tool.component)) notFound();
+  const component = tool.component;
+  const serverProcessed = Boolean(SERVER_PROCESSED_TOOLS[component]);
   const publishedTools = await getPublishedTools();
   const otherTools = publishedTools
     .filter((candidate) => candidate.slug !== tool.slug)
@@ -126,21 +115,14 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
                 <span className="text-xs font-semibold text-blue-800 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
                   {tool.category}
                 </span>
-                <span className="text-xs font-bold text-emerald-300 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-300/20">
+                <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                   ✓ 100% GRATUIT
                 </span>
               </div>
               <h1 className="text-3xl md:text-4xl font-black mb-2 text-[#0f172a]">{tool.name}</h1>
               <p className="text-slate-600 text-lg">{tool.description}</p>
             </div>
-            <div className="flex items-center gap-2">
-              <button className="p-2.5 rounded-full border border-white/10 bg-white/5 text-slate-200 hover:border-[#9ccbff]/40 hover:text-blue-700 transition" aria-label="Favori">
-                <Heart className="w-4 h-4" />
-              </button>
-              <button className="p-2.5 rounded-full border border-white/10 bg-white/5 text-slate-200 hover:border-[#9ccbff]/40 hover:text-blue-700 transition" aria-label="Partager">
-                <Share2 className="w-4 h-4" />
-              </button>
-            </div>
+            <ShareButton title={tool.name} />
           </div>
         </div>
       </section>
@@ -148,15 +130,11 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
       <section className="py-10 bg-[#eff6ff]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-[2rem] border border-blue-100 bg-[rgba(13,28,52,0.8)] p-6 md:p-8 shadow-[0_18px_40px_rgba(7,19,40,0.24)] backdrop-blur-sm" style={{ transform: 'perspective(1200px) rotateX(3deg) rotateY(-3deg)' }}>
-            <Component />
+            <ToolRenderer component={component} />
           </div>
 
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { emoji: '🔒', title: '100% privé', desc: 'Tout se passe dans ton navigateur' },
-              { emoji: '⚡', title: 'Instantané', desc: 'Pas d\'attente, pas de serveur' },
-              { emoji: '🎨', title: 'Sans pub', desc: 'Pas de tracking, pas de pub' },
-            ].map((f) => (
+            {toolHighlights(component).map((f) => (
               <div key={f.title} className="text-center p-4 rounded-[1.25rem] border border-blue-100 bg-white shadow-[0_8px_24px_rgba(37,99,235,.06)]" style={{ transform: 'perspective(1200px) rotateX(2deg) rotateY(-2deg)' }}>
                 <div className="text-3xl mb-2">{f.emoji}</div>
                 <div className="font-bold text-sm mb-1 text-slate-900">{f.title}</div>
@@ -164,6 +142,12 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
               </div>
             ))}
           </div>
+          {serverProcessed && (
+            <p className="mt-4 text-center text-xs text-slate-600">
+              Détails sur le traitement des fichiers dans notre{' '}
+              <Link href="/confidentialite#fichiers" className="font-semibold text-blue-700 underline-offset-2 hover:underline">politique de confidentialité</Link>.
+            </p>
+          )}
         </div>
       </section>
 

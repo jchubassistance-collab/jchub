@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowUpRight, Mail, MapPin, Sparkles } from 'lucide-react';
+import { OPEN_CONSENT_EVENT } from '@/components/AnalyticsConsent';
 
 const groups = [
-  { title: 'Plateforme', links: [['Outils', '/outils']] },
+  { title: 'Plateforme', links: [['Outils', '/outils'], ['Centre d’aide', '/aide']] },
   { title: 'JcHub', links: [['À propos', '/a-propos'], ['Contact', '/contact'], ['Blog', '/blog']] },
   { title: 'Légal', links: [['Conditions d’utilisation', '/cgu'], ['Conditions de vente', '/cgv'], ['Confidentialité', '/confidentialite'], ['Mentions légales', '/mentions-legales']] },
 ];
@@ -13,7 +14,7 @@ const groups = [
 export function Footer() {
   const pathname = usePathname() ?? '';
   const isHome = pathname === '/';
-  const isLightPage = isHome || pathname === '/a-propos' || pathname === '/outils' || pathname.startsWith('/outils/') || pathname.startsWith('/tools/') || pathname === '/contact' || pathname === '/blog' || pathname.startsWith('/blog/') || pathname === '/pricing' || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(pathname);
+  const isLightPage = isHome || pathname === '/a-propos' || pathname === '/outils' || pathname.startsWith('/outils/') || pathname.startsWith('/tools/') || pathname === '/aide' || pathname === '/contact' || pathname === '/blog' || pathname.startsWith('/blog/') || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(pathname);
   const homeHref = '/';
 
   return (
@@ -40,7 +41,7 @@ export function Footer() {
         <div className="grid gap-10 py-12 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:py-14">
           <div>
             <Link href={homeHref} className="group inline-flex items-center" aria-label="JcHub, accueil">
-              <img src="/icone.svg" alt="JcHub" className="h-10 w-auto transition duration-300 group-hover:scale-[1.04] md:hidden" />
+              <img src="/jchub-icon-192.png" alt="JcHub" className="h-10 w-auto transition duration-300 group-hover:scale-[1.04] md:hidden" />
               <img src="/logo-blue.svg" alt="JcHub" className="hidden h-14 w-auto transition duration-300 group-hover:scale-[1.04] md:block" />
             </Link>
             <p className={`mt-5 max-w-sm text-sm leading-relaxed ${isLightPage ? 'text-slate-600' : 'text-slate-300'}`}>Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques.</p>
@@ -72,6 +73,9 @@ export function Footer() {
       <div className={`border-t ${isLightPage ? 'border-blue-100 bg-blue-50/60' : 'border-white/10 bg-[#0c2135]/70'}`}>
         <div className={`mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-xs sm:flex-row sm:justify-between sm:px-6 ${isLightPage ? 'text-slate-500' : 'text-slate-400'}`}>
           <span>© {new Date().getFullYear()} JcHub. Tous droits réservés.</span>
+          <button type="button" onClick={() => window.dispatchEvent(new Event(OPEN_CONSENT_EVENT))} className={`text-left underline-offset-2 hover:underline ${isLightPage ? 'hover:text-blue-800' : 'hover:text-white'}`}>
+            Gérer les cookies
+          </button>
           <span>Créé par Jessy Ngnambongo.</span>
         </div>
       </div>

@@ -1,11 +1,13 @@
 import 'server-only';
 
 import { getPublishedArticleBySlug } from '@/lib/blog';
+import { generateOpenRouterText } from '@/lib/content-agent';
 import { reportUserError } from '@/lib/user-error';
 import { generateSocialCopies } from '@/lib/social-copy';
 import { publishToPlatform, PlatformError } from '@/lib/social-platforms';
 import { createPlatformPublications, destinationFor, finishPublication, getPublication, getSocialSettings, updatePublicationStatus, claimPublication } from '@/lib/social-publications-store';
 import { externalPublishingEnabled, settleIndependently, shouldAutoPublish } from '@/lib/social-utils';
+import { getSocialPlatformReadiness } from '@/lib/social-readiness';
 import type { PublicationRecord, SocialPlatform, SocialSource } from '@/lib/social-types';
 
 function asSocialSource(article: NonNullable<Awaited<ReturnType<typeof getPublishedArticleBySlug>>>): SocialSource {
@@ -25,36 +27,11 @@ function asSocialSource(article: NonNullable<Awaited<ReturnType<typeof getPublis
   };
 }
 
-async function generateWithGemini(prompt: string): Promise<string> {
-  const key = process.env.GEMINI_API_KEY?.trim();
-  if (!key) throw new Error('Le service de rédaction sociale n’est pas configuré.');
-  const model = process.env.GEMINI_MODEL?.trim() || 'gemini-2.5-flash';
-  let response: Response;
-  try {
-    response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.35, responseMimeType: 'application/json' } }),
-      cache: 'no-store', signal: AbortSignal.timeout(30_000),
-    });
-  } catch {
-    reportUserError();
-    throw new Error('La génération de contenu est temporairement indisponible.');
-  }
-  if (!response.ok) {
-    reportUserError();
-    throw new Error('La génération de contenu est temporairement indisponible.');
-  }
-  const data = await response.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error('Aucun texte n’a été généré.');
-  return text;
-}
-
 export async function prepareSocialPublications(sourceContentId: string, allowAutoPublish = true): Promise<PublicationRecord[]> {
   const article = await getPublishedArticleBySlug(sourceContentId);
   if (!article || article.status !== 'published') throw new Error('Choisis un article publié sur JcHub.');
   const source = asSocialSource(article);
-  const copies = await generateSocialCopies(source, generateWithGemini);
+  const copies = await generateSocialCopies(source, generateOpenRouterText);
   const settings = await getSocialSettings();
   const records = await createPlatformPublications(source, copies, 'DRAFT');
   if (!allowAutoPublish || !settings.autoPublish) return records;
@@ -79,8 +56,9 @@ export async function publishPublication(id: string, allowManualRetry = false, c
   if (!record) return { ok: false as const, reason: 'Publication introuvable.' };
   const settings = await getSocialSettings();
   if (!externalPublishingEnabled(settings)) return { ok: true as const, dryRun: true, wouldPublish: record.platform, destination: record.destination };
-  const enabled = record.platform === 'linkedin' ? settings.linkedinEnabled : record.platform === 'facebook' ? settings.facebookEnabled : settings.githubEnabled;
-  if (!enabled) return { ok: false as const, reason: 'Cette plateforme est désactivée.' };
+  const readiness = getSocialPlatformReadiness(record.platform, settings);
+  if (!readiness.enabled) return { ok: false as const, reason: 'Cette plateforme est désactivée.' };
+  if (!readiness.configured) return { ok: false as const, reason: `Configuration serveur manquante ou invalide : ${readiness.missing.join(', ')}.` };
 
   const claim = await claimPublication(id, allowManualRetry, confirmUnknownRetry);
   if (!claim.ok) return { ok: false as const, reason: claim.reason };

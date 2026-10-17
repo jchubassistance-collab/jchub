@@ -49,7 +49,7 @@ BEGIN:VCARD
 VERSION:3.0
 FN:Jean Dupont
 ORG:JcHub
-TEL:+242069550625
+TEL:+242044793800
 EMAIL:jean@jchub.io
 URL:https://jchub.io
 END:VCARD
@@ -59,22 +59,9 @@ Tu mets ça dans un QR code, et le scanner ajoute direct le contact dans le tél
 
 **Cas d'usage** : networking, signatures email, cartes de visite physiques.
 
-## 3. QR Code paiement mobile (le game changer en Afrique)
+## 3. QR Code de paiement mobile
 
-En Afrique, le mobile money (MTN MoMo, Airtel Money) est **massif**. Et beaucoup de commerçants se font payer via QR code.
-
-### Le format USSD (compatible partout)
-
-```
-*150*1*1*numero*montant*code#  (MTN MoMo)
-*501*1*numero*montant#          (Airtel Money)
-```
-
-Tu peux générer un QR code qui contient ce code USSD. Le client scanne → l'app de paiement s'ouvre avec le numéro + montant pré-remplis.
-
-### Avec un service de paiement mobile
-
-Un service de paiement mobile peut générer des QR codes de paiement directement. Tu crées un lien de paiement, tu obtiens un QR code, tu l'imprimes, tes clients scannent et paient.
+Un prestataire de paiement mobile peut fournir un lien de paiement à convertir en QR code. Le client le scanne, vérifie le montant dans l'application officielle, puis confirme la transaction.
 
 **Avantage** : pas besoin que le client tape le numéro, c'est pré-rempli.
 

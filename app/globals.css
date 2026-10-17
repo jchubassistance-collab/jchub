@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../tailwind.config.js";
 
 .article-markdown {
   color: #e2e8f0;
@@ -461,6 +460,10 @@ body {
 @keyframes template-tools-card-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 .template-home__partner { box-shadow: 0 2px 6px rgba(0,0,0,.04), inset 0 1px 0 #fff; transform-style: preserve-3d; transition: transform 400ms cubic-bezier(.23,1,.32,1), box-shadow 400ms cubic-bezier(.23,1,.32,1); }
 .template-home__partner:hover { transform: perspective(800px) rotateX(-4deg) rotateY(4deg) translateY(-6px); box-shadow: 0 20px 40px rgba(37,99,235,.18), 0 10px 20px rgba(37,99,235,.1), 0 0 0 1px rgba(37,99,235,.15), inset 0 1px 0 #fff; }
+.partner-carousel-track { scrollbar-width: none; -ms-overflow-style: none; }
+.partner-carousel-track::-webkit-scrollbar { display: none; }
+.partner-carousel-slide { opacity: .68; transform: scale(.985) translateX(8px); transition: opacity 500ms ease, transform 700ms cubic-bezier(.22,1,.36,1); }
+.partner-carousel-slide[data-active="true"] { opacity: 1; transform: scale(1) translateX(0); }
 .template-home__hero::after { position: absolute; inset: 0; content: ''; pointer-events: none; background: linear-gradient(110deg, transparent 48%, rgba(255,255,255,.24) 62%, transparent 76%); transform: translateX(-100%); animation: template-home-sheen 12s ease-in-out infinite; }
 .template-home__intro { animation: template-home-rise 700ms cubic-bezier(.22,1,.36,1) both; }
 .template-home__visual { perspective: 1000px; }
@@ -488,6 +491,7 @@ body {
 @keyframes template-home-dot { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
 @keyframes template-home-sheen { 0%,65%,100% { transform: translateX(-100%); } 82% { transform: translateX(100%); } }
 @media (prefers-reduced-motion: reduce) { .template-home__hero::after,.template-home__intro,.template-home__circle,.template-home__circle::before,.template-home__circle::after,.template-home__badge,.template-home__tech-dot,.template-tools__dot,.template-tools__cube,.template-tools-page .template-tools__card { animation: none !important; } .template-home__circle,.template-home__badge,.template-home__card,.template-home__icon,.template-home__partner,.template-about__metric,.template-about__timeline-item,.template-about__value,.template-about__value::before,.template-about__value-icon,.template-about__team,.template-about__team > div:first-child,.template-tools__stat,.template-tools__card,.template-tools__card::before { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { .partner-carousel-slide { opacity: 1 !important; transform: none !important; transition: none !important; } .partner-carousel-track { scroll-behavior: auto !important; } }
 
 .footer-shell {
   isolation: isolate;

@@ -8,16 +8,18 @@ import { getPublishedTools } from '@/lib/tools';
 import type { TrendCandidate } from '@/lib/content-sources';
 import { reportUserError } from '@/lib/user-error';
 import { assessEditorialImportance } from '@/lib/editorial-importance';
+import { notifyAdminOfEditorialDraft } from '@/lib/agent-email';
 
 export { collectTrends } from '@/lib/content-sources';
 
-export type AiProvider = 'gemini' | 'ollama';
+export type AiProvider = 'gemini' | 'openai' | 'openrouter' | 'deepseek' | 'ollama';
 
 export type EditorialDraft = {
   title: string;
   slug: string;
   description: string;
   article: string;
+  provider?: AiProvider;
   posts: {
     devto: string;
   };
@@ -33,6 +35,8 @@ export type EditorialDraft = {
     reason: string;
     problem?: string;
     targetUser?: string;
+    solution?: string;
+    features?: string[];
     suggestedSlug: string;
   }>;
   sources: TrendCandidate[];
@@ -48,16 +52,24 @@ export type CatalogItem = {
 };
 
 function getProvider(): AiProvider {
-  return process.env.AI_PROVIDER?.trim().toLowerCase() === 'ollama' ? 'ollama' : 'gemini';
+  const provider = process.env.AI_PROVIDER?.trim().toLowerCase();
+  return provider === 'openai' || provider === 'openrouter' || provider === 'deepseek' || provider === 'ollama'
+    ? provider
+    : 'gemini';
 }
 
-function getFallbackProvider(): AiProvider | null {
-  const provider = process.env.AI_FALLBACK_PROVIDER?.trim().toLowerCase();
-  return provider === 'ollama' || provider === 'gemini' ? provider : null;
+function getFallbackProviders(): AiProvider[] {
+  const configured = process.env.AI_FALLBACK_PROVIDER;
+  const values = configured === undefined ? ['openrouter', 'openai', 'deepseek'] : configured.split(',');
+  const supported: AiProvider[] = ['gemini', 'openai', 'openrouter', 'deepseek', 'ollama'];
+  return Array.from(new Set(values
+    .map((value) => value.trim().toLowerCase())
+    .map((value) => supported.find((provider) => provider === value))
+    .filter((provider): provider is AiProvider => provider !== undefined)));
 }
 
 function buildPrompt(candidates: TrendCandidate[], catalog: CatalogItem[], recentlyPromoted: string[]): string {
-  return `Tu es l'éditeur technique de JcHub. Tu dois promouvoir un élément existant de JcHub et proposer des idées de nouveaux contenus à partir des tendances observées.
+  return `Tu es l'éditeur de JcHub, un site qui propose des outils numériques utiles au grand public et aux professionnels. Tu dois promouvoir un élément existant de JcHub et proposer des idées de nouveaux contenus à partir des tendances observées.
 
 Règles obligatoires:
 - Choisis exactement un élément dans le catalogue JcHub pour la promotion.
@@ -65,14 +77,15 @@ Règles obligatoires:
 - Évite les éléments dont les identifiants sont dans la liste récemment promus, sauf si tout le catalogue y figure.
 - The Dev.to post must focus on the promoted JcHub item, offer useful guidance, and include its exact URL.
 - Les recommandations doivent être des idées distinctes d'outils ou d'articles que JcHub pourrait créer.
-- Écris comme un rédacteur technique francophone naturel, précis et utile, avec des exemples concrets.
+- Écris en français naturel, précis et utile, avec des exemples concrets. Évite le jargon lorsqu'il n'est pas nécessaire.
+- Les idées d'outils doivent viser des publics variés : étudiants, familles, entrepreneurs, créateurs, petites entreprises et professionnels, pas seulement les développeurs.
 - Ne mentionne jamais une IA, un modèle, un prompt, une génération automatique ou tes consignes.
 - N'ajoute pas de formule comme "en tant qu'IA", "voici une réponse générée", ni de section méta.
 - Ne fabrique aucune expérience personnelle, citation, statistique ou résultat de test.
 - L'article doit être directement publiable en Markdown, sans JSON, frontmatter ou commentaire destiné à l'éditeur.
 - Réponds uniquement avec un JSON valide.
 
-- For every suggested tool, state the concrete user problem, who has it, and why existing JcHub tools do not solve it. Suggestions are for admin review only; never create a tool automatically.
+- For every suggested tool, all fields are mandatory: a concrete user problem, the specific target user, a practical solution, 2 to 4 distinct non-empty features, a reason why existing JcHub tools do not solve it, and a URL-safe suggestedSlug. Never omit a field or use an empty value. Suggestions are for admin review only; never create or publish a tool automatically.
 
 Tendances Internet:
 ${JSON.stringify(candidates, null, 2)}
@@ -83,8 +96,8 @@ ${JSON.stringify(catalog, null, 2)}
 Identifiants récemment promus:
 ${JSON.stringify(recentlyPromoted)}
 
-Structure JSON exacte:
-{"title":"...","slug":"...","description":"...","article":"Markdown de 700 à 1000 mots lié à la tendance et à l'élément promu","promotion":{"type":"tool|article","slug":"slug exact du catalogue","name":"nom exact","url":"URL exacte du catalogue"},"recommendations":[{"type":"tool|article","title":"...","problem":"specific user problem","targetUser":"who has the problem","reason":"how the proposal solves it and why the current catalog does not","suggestedSlug":"..."}],"posts":{"devto":"useful introduction with the exact URL"}`;
+Structure JSON exacte (ne retire aucune propriété; pour un article, les champs spécifiques à un outil peuvent être omis):
+{"title":"...","slug":"...","description":"...","article":"Article Markdown en français de 700 à 1000 mots, utile et vérifiable","promotion":{"type":"tool|article","slug":"slug exact du catalogue","name":"nom exact","url":"URL exacte du catalogue"},"recommendations":[{"type":"tool","title":"...","problem":"problème concret rencontré par un utilisateur","targetUser":"public précis concerné","solution":"solution pratique proposée","features":["fonctionnalité concrète 1","fonctionnalité concrète 2"],"reason":"pourquoi les outils JcHub actuels ne résolvent pas ce problème","suggestedSlug":"slug-url-valide"}],"posts":{"devto":"introduction utile avec l'URL exacte"}}`;
 }
 
 function parseDraft(text: string, sources: TrendCandidate[], catalog: CatalogItem[]): EditorialDraft {
@@ -94,7 +107,36 @@ function parseDraft(text: string, sources: TrendCandidate[], catalog: CatalogIte
   if (!parsed.title || !parsed.slug || !parsed.description || !parsed.article || !parsed.posts?.devto || !promoted) {
     throw new Error('La réponse IA ne respecte pas le format éditorial attendu.');
   }
-  return { ...parsed, promotion: { type: promoted.type, slug: promoted.slug, name: promoted.title, url: promoted.url }, sources };
+  if (parsed.promotion.url !== promoted.url || parsed.promotion.name !== promoted.title) {
+    throw new Error('La réponse IA contient des informations de promotion qui ne correspondent pas au catalogue.');
+  }
+  const wordCount = parsed.article.trim().split(/\s+/).length;
+  if (wordCount < 700 || wordCount > 1000) {
+    throw new Error(`L’article généré contient ${wordCount} mots; la longueur attendue est de 700 à 1000 mots.`);
+  }
+  if (!Array.isArray(parsed.recommendations) || parsed.recommendations.some((item) =>
+    !item || !['tool', 'article'].includes(item.type) ||
+    typeof item.title !== 'string' || !item.title.trim() ||
+    typeof item.reason !== 'string' || !item.reason.trim() ||
+    typeof item.suggestedSlug !== 'string' || !item.suggestedSlug.trim() ||
+    (item.type === 'tool' && (
+      typeof item.problem !== 'string' || !item.problem.trim() ||
+      typeof item.targetUser !== 'string' || !item.targetUser.trim() ||
+      typeof item.solution !== 'string' || !item.solution.trim() ||
+      !Array.isArray(item.features) || item.features.length < 2 || item.features.length > 4 ||
+      item.features.some((feature) => typeof feature !== 'string' || !feature.trim())
+    )))) {
+    throw new Error('Les recommandations IA ne respectent pas le format éditorial attendu.');
+  }
+  return {
+    ...parsed,
+    promotion: { type: promoted.type, slug: promoted.slug, name: promoted.title, url: promoted.url },
+    recommendations: parsed.recommendations.map((item) => ({
+      ...item,
+      features: item.features?.slice(0, 4).map((feature) => feature.trim()).filter(Boolean),
+    })),
+    sources,
+  };
 }
 
 async function generateWithGemini(prompt: string): Promise<string> {
@@ -106,6 +148,7 @@ async function generateWithGemini(prompt: string): Promise<string> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4, responseMimeType: 'application/json' } }),
     cache: 'no-store',
+    signal: AbortSignal.timeout(45_000),
   });
   const data = await response.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>; error?: { message?: string } };
   if (!response.ok) throw new Error(data.error?.message || `Gemini a répondu ${response.status}.`);
@@ -122,11 +165,99 @@ async function generateWithOllama(prompt: string): Promise<string> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ model, prompt, stream: false, format: 'json', options: { temperature: 0.4 } }),
     cache: 'no-store',
+    signal: AbortSignal.timeout(90_000),
   });
   const data = await response.json() as { response?: string; error?: string };
   if (!response.ok) throw new Error(data.error || `Ollama a répondu ${response.status}.`);
   if (!data.response) throw new Error('Ollama n’a renvoyé aucun contenu.');
   return data.response;
+}
+
+async function generateWithCompatibleProvider(provider: 'openai' | 'openrouter' | 'deepseek', prompt: string): Promise<string> {
+  const configuration = {
+    openai: {
+      apiKey: process.env.OPENAI_API_KEY?.trim(),
+      model: process.env.OPENAI_MODEL?.trim() || 'gpt-4o-mini',
+      url: 'https://api.openai.com/v1/chat/completions',
+    },
+    openrouter: {
+      apiKey: process.env.OPENROUTER_API_KEY?.trim(),
+      model: process.env.OPENROUTER_MODEL?.trim() || 'openrouter/free',
+      url: 'https://openrouter.ai/api/v1/chat/completions',
+    },
+    deepseek: {
+      apiKey: process.env.DEEPSEEK_API_KEY?.trim() || process.env.DEEPSEEK_API?.trim(),
+      model: process.env.DEEPSEEK_MODEL?.trim() || 'deepseek-chat',
+      url: 'https://api.deepseek.com/chat/completions',
+    },
+  }[provider];
+  if (!configuration.apiKey) {
+    const keyName = provider === 'deepseek' ? 'DEEPSEEK_API_KEY ou DEEPSEEK_API' : `${provider.toUpperCase()}_API_KEY`;
+    throw new Error(`${keyName} est manquante.`);
+  }
+
+  const response = await fetch(configuration.url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${configuration.apiKey}`,
+      ...(provider === 'openrouter' ? {
+        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev',
+        'X-Title': 'JcHub',
+      } : {}),
+    },
+    body: JSON.stringify({
+      model: configuration.model,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.4,
+      // Bound provider cost and avoid OpenRouter's much larger implicit default.
+      // 3,000 tokens is sufficient for the CM kit, planning assist and social copies.
+      ...(provider === 'openrouter' ? { max_tokens: 3000 } : {}),
+      response_format: { type: 'json_object' },
+    }),
+    cache: 'no-store',
+    signal: AbortSignal.timeout(45_000),
+  });
+  const data = await response.json() as {
+    choices?: Array<{ message?: { content?: string | null }; finish_reason?: string | null }>;
+    error?: string | { message?: string };
+  };
+  if (!response.ok) {
+    const message = typeof data.error === 'string' ? data.error : data.error?.message;
+    throw new Error(message || `${provider} a répondu ${response.status}.`);
+  }
+  const choice = data.choices?.[0];
+  if (choice?.finish_reason === 'length') {
+    throw new Error(`${provider.toUpperCase()}_OUTPUT_TRUNCATED`);
+  }
+  const text = choice?.message?.content;
+  if (!text) throw new Error(`${provider} n’a renvoyé aucun contenu.`);
+  return text;
+}
+
+async function generateWithProvider(provider: AiProvider, prompt: string): Promise<string> {
+  if (provider === 'ollama') return generateWithOllama(prompt);
+  if (provider === 'gemini') return generateWithGemini(prompt);
+  return generateWithCompatibleProvider(provider, prompt);
+}
+
+export async function generateOpenRouterText(prompt: string): Promise<string> {
+  return generateWithCompatibleProvider('openrouter', prompt);
+}
+
+export async function generateConfiguredText(prompt: string): Promise<{ text: string; provider: AiProvider }> {
+  const provider = getProvider();
+  let lastError: unknown;
+  const candidates = [provider, ...getFallbackProviders().filter((fallback) => fallback !== provider)];
+  for (const candidate of candidates) {
+    try {
+      return { text: await generateWithProvider(candidate, prompt), provider: candidate };
+    } catch (error) {
+      lastError = error;
+      if (candidate !== candidates[candidates.length - 1]) reportUserError();
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error('Aucun fournisseur IA disponible.');
 }
 
 export async function collectCatalog(): Promise<CatalogItem[]> {
@@ -154,14 +285,20 @@ export async function generateEditorialDraft(candidates: TrendCandidate[], catal
   const prompt = buildPrompt(candidates, catalog, await getRecentlyPromoted());
   const provider = getProvider();
   try {
-    const response = provider === 'ollama' ? await generateWithOllama(prompt) : await generateWithGemini(prompt);
-    return parseDraft(response, candidates, catalog);
+    const response = await generateWithProvider(provider, prompt);
+    return { ...parseDraft(response, candidates, catalog), provider };
   } catch (error) {
-    const fallback = getFallbackProvider();
-    if (!fallback || fallback === provider) throw error;
-    reportUserError();
-    const response = fallback === 'ollama' ? await generateWithOllama(prompt) : await generateWithGemini(prompt);
-    return parseDraft(response, candidates, catalog);
+    let lastError = error;
+    for (const fallback of getFallbackProviders().filter((candidate) => candidate !== provider)) {
+      reportUserError();
+      try {
+        const response = await generateWithProvider(fallback, prompt);
+        return { ...parseDraft(response, candidates, catalog), provider: fallback };
+      } catch (fallbackError) {
+        lastError = fallbackError;
+      }
+    }
+    throw lastError;
   }
 }
 
@@ -170,40 +307,20 @@ export async function saveEditorialDraft(draft: EditorialDraft) {
   const importance = assessEditorialImportance(draft.sources, `${draft.title} ${draft.description}`);
   const reference = await db.collection('agent_drafts').add({
     ...draft,
-    provider: getProvider(),
+    provider: draft.provider || getProvider(),
     promotion: draft.promotion,
     recommendations: draft.recommendations,
     importance,
     status: 'draft',
+    notificationStatus: 'pending',
     createdAt: new Date(),
     updatedAt: new Date(),
   });
-  if (!importance.autoPublish) return { draftId: reference.id, status: 'draft' as const, importance };
-
-  const baseSlug = draft.slug.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '').slice(0, 80) || 'article-jchub';
-  let slug = baseSlug;
-  if ((await db.collection('articles').doc(slug).get()).exists) slug = `${baseSlug}-${reference.id.slice(0, 6)}`;
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
-  const image = `${siteUrl}/api/article-cover?title=${encodeURIComponent(draft.title)}&category=${encodeURIComponent(draft.promotion.name)}`;
-  await db.collection('articles').doc(slug).set({
-    slug,
-    title: draft.title,
-    description: draft.description,
-    excerpt: draft.description,
-    content: draft.article,
-    category: 'Technologie',
-    keywords: ['informatique', 'technologie'],
-    tags: ['Informatique', 'technologie'],
-    author: 'JcHub',
-    image,
-    readTime: '5 min',
-    status: 'published',
-    publishedAt: FieldValue.serverTimestamp(),
+  const notification = await notifyAdminOfEditorialDraft(reference.id, draft.title, draft.description, draft.recommendations);
+  await reference.update({
+    notificationStatus: notification.ok ? 'sent' : 'failed',
+    ...(notification.ok ? { notificationSentAt: FieldValue.serverTimestamp() } : { notificationError: notification.reason }),
     updatedAt: FieldValue.serverTimestamp(),
-    sourceDraftId: reference.id,
-    autoPublished: true,
-    importance,
   });
-  await reference.update({ status: 'published', publishedSlug: slug, publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
-  return { draftId: reference.id, status: 'published' as const, publishedSlug: slug, importance };
+  return { draftId: reference.id, status: 'draft' as const, importance, notificationStatus: notification.ok ? 'sent' as const : 'failed' as const };
 }

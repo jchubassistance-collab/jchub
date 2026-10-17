@@ -5,20 +5,16 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { PageLoader } from '@/components/layout/PageLoader';
 
 /** Keeps the public storefront chrome out of private admin and account pages. */
 export function AppChrome({ children, isAdminHost = false }: { children: React.ReactNode; isAdminHost?: boolean }) {
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [toolLoading, setToolLoading] = useState(false);
   const toolLoadingStartedAt = useRef(0);
   const toolLoadingDestination = useRef('');
 
   useEffect(() => {
-    setMounted(true);
-
     const onScroll = () => {
       setShowBackToTop(window.scrollY > 240);
     };
@@ -47,7 +43,7 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
     };
     document.addEventListener('click', onToolNavigation, true);
     return () => document.removeEventListener('click', onToolNavigation, true);
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (!toolLoading) return;
@@ -68,8 +64,7 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
     safePathname === '/compte' ||
     safePathname.startsWith('/compte/');
 
-  if (!mounted && !isPrivateArea) return <PageLoader />;
-
+  // Public pages must render on the server: crawlers, link previews and slow phones see content before JS loads.
   if (isPrivateArea) {
     return <main className="min-h-screen">{children}</main>;
   }
@@ -83,7 +78,7 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
         <div className="tool-navigation-loader" role="status" aria-label="Chargement de la page">
           <div className="loading-mark">
             <span className="loading-ring" aria-hidden="true" />
-            <img src="/icone.svg" alt="" className="loading-logo" />
+            <img src="/jchub-icon-192.png" alt="" className="loading-logo" />
           </div>
           <span className="sr-only">Chargement de la page…</span>
         </div>

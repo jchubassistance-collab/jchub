@@ -65,7 +65,7 @@ const phoneRegex = /^\+?[1-9]\d{1,14}$/;
 const phoneRegexFR = /^(?:\+?\d{1,3}[\s.-]?)?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,9}$/;
 ```
 
-Le format **E.164** (Jcpp), c'est le standard international : `+242069550625` pour le Congo. Max 15 chiffres.
+Le format **E.164** (Jcpp), c'est le standard international : `+242044793800` pour le Congo. Max 15 chiffres.
 
 ⚠️ Les regex de téléphone sont **toujours** un compromis. Valide côté backend (lib `libphonenumber` de Google par exemple).
 

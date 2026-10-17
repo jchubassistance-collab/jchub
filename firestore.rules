@@ -1,0 +1,45 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Clients may not grant themselves admin/CM roles. Server Admin SDK role
+      // changes bypass rules and are guarded by the admin-only account route.
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && (!('role' in request.resource.data) || request.resource.data.role == 'user');
+      allow update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.get('role', null) == resource.data.get('role', null);
+      allow delete: if false;
+    }
+
+    match /users/{userId}/purchasedBooks/{bookId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false;
+    }
+
+    // CM data is accessed only through server routes with Firebase Admin SDK.
+    // Admin SDK bypasses these rules; each route must authorize its own request.
+    match /cmEditorial/{document} {
+      allow read, write: if false;
+    }
+
+    match /cmReports/{document} {
+      allow read, write: if false;
+    }
+
+    match /cmActivity/{document} {
+      allow read, write: if false;
+    }
+
+    match /cmKits/{document} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

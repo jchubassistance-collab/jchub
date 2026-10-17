@@ -2,8 +2,16 @@ import { createHmac } from 'node:crypto';
 
 export type FacebookPageCandidate = { id: string; name?: string; access_token: string };
 
+export function getFacebookAppId(env: NodeJS.ProcessEnv): string {
+  return env.FACEBOOK_APP_ID?.trim() || env.META_APP_ID?.trim() || '';
+}
+
+export function getFacebookAppSecret(env: NodeJS.ProcessEnv): string {
+  return env.FACEBOOK_APP_SECRET?.trim() || env.META_APP_SECRET?.trim() || '';
+}
+
 export function getFacebookRedirectUri(env: NodeJS.ProcessEnv): string {
-  const value = env.FACEBOOK_REDIRECT_URI?.trim();
+  const value = env.FACEBOOK_REDIRECT_URI?.trim() || env.META_REDIRECT_URI?.trim();
   if (!value) throw new Error('FACEBOOK_REDIRECT_URI is not configured.');
   const uri = new URL(value);
   const localHttp = uri.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(uri.hostname);
@@ -27,7 +35,7 @@ export function facebookAppSecretProof(token: string, appSecret: string): string
 }
 
 export function facebookGraphApiVersion(env: NodeJS.ProcessEnv): string {
-  const version = env.FACEBOOK_GRAPH_API_VERSION?.trim() || 'v26.0';
+  const version = env.FACEBOOK_GRAPH_API_VERSION?.trim() || env.META_GRAPH_API_VERSION?.trim() || 'v26.0';
   if (!/^v\d+\.\d+$/.test(version)) throw new Error('FACEBOOK_GRAPH_API_VERSION is invalid.');
   return version;
 }

@@ -29,11 +29,13 @@ if (!email || !email.includes('@')) {
   process.exit(1);
 }
 
+// Same precedence as Next.js: values in .env.local win over .env.
 loadEnvironmentFile(resolve(process.cwd(), '.env.local'));
+loadEnvironmentFile(resolve(process.cwd(), '.env'));
 
 const { FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY } = process.env;
 if (!FIREBASE_PROJECT_ID || !FIREBASE_CLIENT_EMAIL || !FIREBASE_PRIVATE_KEY) {
-  console.error('Variables Firebase Admin manquantes dans .env.local.');
+  console.error('Variables Firebase Admin manquantes dans .env.local et .env.');
   process.exit(1);
 }
 
@@ -59,8 +61,8 @@ try {
     adminRoleAssignedAt: FieldValue.serverTimestamp(),
   }, { merge: true });
 
-  // Utile pour les futures routes protégées par des custom claims Firebase.
-  await auth.setCustomUserClaims(user.uid, { admin: true });
+  // setCustomUserClaims remplace tous les claims : on conserve ceux déjà présents.
+  await auth.setCustomUserClaims(user.uid, { ...user.customClaims, admin: true });
 
   console.log(`Administrateur configuré : ${user.email} (uid: ${user.uid})`);
   console.log('Déconnecte-toi puis reconnecte-toi afin de rafraîchir le token Firebase.');

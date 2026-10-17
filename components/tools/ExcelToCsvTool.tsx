@@ -1,8 +1,10 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Download, FileSpreadsheet, Loader2, UploadCloud } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import { cleanUpConversionFiles, postConversion, uploadConversionFile } from '@/lib/conversion-upload-client';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export function ExcelToCsvTool() {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -11,6 +13,10 @@ export function ExcelToCsvTool() {
   const [error, setError] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [outputName, setOutputName] = useState('conversion.csv');
+
+  useEffect(() => {
+    if (downloadUrl) return () => URL.revokeObjectURL(downloadUrl);
+  }, [downloadUrl]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextFile = event.target.files?.[0] ?? null;
@@ -23,15 +29,20 @@ export function ExcelToCsvTool() {
     }
 
     const name = nextFile.name.toLowerCase();
-    const isSupported = /\.(xlsx|xls|csv)$/i.test(name);
+    const isSupported = /\.(xlsx|csv)$/i.test(name);
     if (!isSupported) {
-      setError('Le fichier doit être un Excel (.xlsx, .xls) ou un CSV.');
+      setError('Le fichier doit être un classeur Excel .xlsx ou un CSV.');
+      setFile(null);
+      return;
+    }
+    if (nextFile.size > MAX_FILE_SIZE) {
+      setError('Le fichier ne doit pas dépasser 10 Mo.');
       setFile(null);
       return;
     }
 
     setFile(nextFile);
-    setOutputName(nextFile.name.replace(/\.(xlsx|xls|csv)$/i, '') + '.csv');
+    setOutputName(nextFile.name.replace(/\.(xlsx|csv)$/i, '') + '.csv');
   };
 
   const handleConvert = async () => {
@@ -40,28 +51,17 @@ export function ExcelToCsvTool() {
       return;
     }
 
+    const uploadedUrls: string[] = [];
     try {
       setIsLoading(true);
       setError(null);
       setDownloadUrl(null);
 
-      const arrayBuffer = await file.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-
-      const sheets = workbook.SheetNames.map((sheetName) => {
-        const sheet = workbook.Sheets[sheetName];
-        const csv = XLSX.utils.sheet_to_csv(sheet, { FS: ',', RS: '\n' });
-        return csv.trim().length > 0 ? `# Feuille: ${sheetName}\n${csv}` : `# Feuille: ${sheetName}`;
-      });
-
-      const csvContent = sheets.join('\n\n');
-      if (!csvContent.trim()) {
-        throw new Error('Aucune donnée exploitable n’a été trouvée dans le fichier.');
-      }
-
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      setDownloadUrl(url);
+      const uploadUrl = await uploadConversionFile('excel-to-csv', file);
+      uploadedUrls.push(uploadUrl);
+      const response = await postConversion('/api/tools/excel-to-csv', { url: uploadUrl });
+      const blob = await response.blob();
+      setDownloadUrl(URL.createObjectURL(blob));
       setFile(null);
 
       if (inputRef.current) {
@@ -70,6 +70,7 @@ export function ExcelToCsvTool() {
     } catch (convertError) {
       setError(convertError instanceof Error ? convertError.message : 'Erreur inconnue lors de la conversion.');
     } finally {
+      await cleanUpConversionFiles('excel-to-csv', uploadedUrls);
       setIsLoading(false);
     }
   };
@@ -80,7 +81,7 @@ export function ExcelToCsvTool() {
         <input
           ref={inputRef}
           type="file"
-          accept=".xlsx,.xls,.csv"
+          accept=".xlsx,.csv"
           className="hidden"
           onChange={handleFileChange}
         />
@@ -91,7 +92,7 @@ export function ExcelToCsvTool() {
           className="mx-auto flex items-center justify-center gap-2 rounded-xl border border-[#9ccbff]/30 bg-[#0c1d31] px-4 py-3 font-semibold text-[#dfeeff] hover:border-[#9ccbff]/50"
         >
           <UploadCloud className="h-5 w-5" />
-          Choisir un fichier Excel
+          Choisir un fichier .xlsx ou CSV
         </button>
 
         <div className="mt-4 min-h-10 text-sm text-slate-300">
@@ -101,7 +102,7 @@ export function ExcelToCsvTool() {
 
       <div className="rounded-2xl border border-[#9ccbff]/20 bg-[#071526] p-4 text-sm text-slate-300">
         <span className="flex items-center gap-2 font-semibold text-[#dfeeff]"><FileSpreadsheet className="h-4 w-4" /> Conversion Excel → CSV</span>
-        <span className="mt-1 block text-xs">Le fichier est exporté en CSV, feuille par feuille, sans perte de structure.</span>
+        <span className="mt-1 block text-xs">Les classeurs .xlsx sont exportés en CSV, feuille par feuille. Les formules sont remplacées par leur résultat enregistré. Limite : 5 conversions par jour et par adresse IP ; fichier temporaire privé, supprimé après traitement.</span>
       </div>
 
       <button

@@ -2,7 +2,7 @@
 
 import { useRef, useState, type ChangeEvent } from 'react';
 import { Download, FileImage, FileText, Loader2, Trash2, UploadCloud } from 'lucide-react';
-import { jsPDF } from 'jspdf';
+import { cleanUpConversionFiles, postConversion, uploadConversionFile } from '@/lib/conversion-upload-client';
 
 type ImageItem = { file: File; url: string };
 const MAX_FILES = 20;
@@ -39,40 +39,31 @@ export function ImagesToPdf() {
   const convert = async () => {
     if (!images.length) return;
     setBusy(true); setError(''); setDownloadUrl('');
+    const uploadedUrls: string[] = [];
     try {
-      const pdf = new jsPDF({ orientation, unit: 'mm', format: pageSize === 'image' ? 'a4' : pageSize, compress: true });
-      for (let i = 0; i < images.length; i++) {
-        const image = await loadImage(images[i].url);
-        let width: number; let height: number;
-        if (pageSize === 'image') {
-          width = image.naturalWidth * 25.4 / 96; height = image.naturalHeight * 25.4 / 96;
-          if (orientation === 'landscape' && height > width) [width, height] = [height, width];
-          if (orientation === 'portrait' && width > height) [width, height] = [height, width];
-          if (i === 0) pdf.deletePage(1);
-          pdf.addPage([width, height], orientation);
-        } else {
-          if (i > 0) pdf.addPage(pageSize, orientation);
-          const pageW = pdf.internal.pageSize.getWidth(); const pageH = pdf.internal.pageSize.getHeight();
-          const ratio = image.naturalWidth / image.naturalHeight;
-          const boxRatio = pageW / pageH;
-          if ((fit === 'contain' && ratio > boxRatio) || (fit === 'cover' && ratio < boxRatio)) { width = pageW; height = pageW / ratio; }
-          else { height = pageH; width = pageH * ratio; }
-          if (fit === 'contain') { width = Math.min(width, pageW); height = Math.min(height, pageH); }
-        }
-        const x = (pdf.internal.pageSize.getWidth() - width) / 2;
-        const y = (pdf.internal.pageSize.getHeight() - height) / 2;
-        pdf.addImage(image, images[i].file.type === 'image/png' ? 'PNG' : 'JPEG', x, y, width, height, undefined, 'FAST');
+      for (const image of images) {
+        uploadedUrls.push(await uploadConversionFile('images-to-pdf', image.file));
       }
-      setDownloadUrl(URL.createObjectURL(pdf.output('blob')));
-    } catch { setError('La création du PDF a échoué. Vérifie les images puis réessaie.'); }
-    finally { setBusy(false); }
+      const response = await postConversion('/api/tools/images-to-pdf', {
+        urls: uploadedUrls,
+        pageSize,
+        orientation,
+        fit,
+      });
+      setDownloadUrl(URL.createObjectURL(await response.blob()));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'La création du PDF a échoué. Vérifie les images puis réessaie.');
+    } finally {
+      await cleanUpConversionFiles('images-to-pdf', uploadedUrls);
+      setBusy(false);
+    }
   };
 
   return <div className="space-y-5 text-slate-100">
     <div className="rounded-2xl border border-dashed border-[#9ccbff]/40 bg-[#071526] p-6 text-center">
       <input ref={inputRef} type="file" multiple accept="image/jpeg,image/png,.jpg,.jpeg,.png" className="hidden" onChange={addFiles} />
       <button type="button" onClick={() => inputRef.current?.click()} className="mx-auto flex items-center gap-2 rounded-xl border border-[#9ccbff]/30 bg-[#0c1d31] px-4 py-3 font-semibold text-[#dfeeff] hover:border-[#9ccbff]/50"><UploadCloud className="h-5 w-5" /> Ajouter des images</button>
-      <p className="mt-3 text-xs text-slate-400">JPG, JPEG ou PNG · 15 Mo maximum par image · jusqu&apos;à {MAX_FILES} images</p>
+      <p className="mt-3 text-xs text-slate-400">JPG, JPEG ou PNG · 15 Mo maximum par image · 50 Mo au total · jusqu&apos;à {MAX_FILES} images</p>
     </div>
 
     {images.length > 0 && <ol className="max-h-64 space-y-2 overflow-auto rounded-2xl border border-[#9ccbff]/20 bg-[#071526] p-3">
@@ -92,7 +83,6 @@ export function ImagesToPdf() {
     <button type="button" disabled={!images.length || busy} onClick={convert} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4a74d6] to-[#7a5cf7] px-4 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileText className="h-5 w-5" />}{busy ? 'Création du PDF…' : 'Convertir en PDF'}</button>
     {error && <div role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{error}</div>}
     {downloadUrl && <a href={downloadUrl} download="images.pdf" className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 font-bold text-emerald-200"><Download className="h-5 w-5" /> Télécharger le PDF</a>}
-    <p className="text-center text-xs text-slate-400">La conversion se fait dans ton navigateur ; tes images ne sont pas envoyées au serveur.</p>
+    <p className="text-center text-xs text-slate-400">5 conversions par jour et par adresse IP. Les images sont traitées sur le serveur depuis un stockage privé temporaire, puis supprimées.</p>
   </div>;
 }
-function loadImage(url: string): Promise<HTMLImageElement> { return new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = url; }); }

@@ -3,6 +3,15 @@ import Link from 'next/link';
 import { ArrowRight, Check, Code2, Compass, Mail, ShieldCheck, Wrench, Zap } from 'lucide-react';
 import { isToolVisibleToday, tools } from '@/lib/tools';
 import { Newsletter } from '@/components/Newsletter';
+import { PartnerCarousel } from '@/components/home/PartnerCarousel';
+import { pageMetadata } from '@/lib/seo';
+
+export const metadata = pageMetadata({
+  title: 'Outils pratiques pour développeurs | JcHub',
+  description: 'JcHub regroupe des outils gratuits, des ressources utiles et des workflows pratiques pour développeurs, créateurs et équipes.',
+  path: '/',
+  absoluteTitle: true,
+});
 
 export const dynamic = 'force-dynamic';
 
@@ -65,17 +74,63 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section aria-label="Partenaires JcHub" className="template-home__partners relative overflow-hidden pb-20">
+      <section aria-labelledby="partners-title" className="template-home__partners relative overflow-hidden pb-20">
         <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
-          <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-5">
-            <Partner name="njdwebs" logo="/partners/njdweb.svg" href="https://njdwebs.com" />
-            <Partner name="2MD Designer" logo="/partners/2md_designer.png" href="https://2md-designer.com" />
-          </div>
-          <div className="mt-12 text-center">
-            <Link href="/contact" className="group inline-flex items-center gap-2 rounded-full bg-[#93c5fd] px-8 py-3.5 text-sm font-semibold text-[#0f172a] shadow-sm transition hover:-translate-y-1 hover:bg-[#60a5fa] hover:shadow-[0_12px_25px_rgba(37,99,235,.15)]">
-              Devenir partenaire <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+          <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <Badge>PARTENAIRES JCHUB</Badge>
+              <h2 id="partners-title" className="mt-4 text-3xl font-extrabold leading-tight tracking-tight text-[#0f172a] sm:text-4xl" style={{ fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif' }}>
+                Des talents qui font avancer le numérique.
+              </h2>
+            </div>
+            <Link href="/contact" className="group inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-700 hover:text-blue-900">
+              Devenir partenaire <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
+          <PartnerCarousel label="Partenaires JcHub">
+            <Partner
+              name="NJD Web"
+              logo="/partners/njdweb.svg"
+              description="Entreprise technologique africaine basée à Brazzaville, en République du Congo. Fondée par Jonas Ambeto, NJD Web conçoit des solutions numériques innovantes pour le marché mondial."
+              details={
+                <>
+                  <p className="text-sm font-bold text-[#0f172a]">Un écosystème tourné vers l’innovation, l’éducation et la transformation digitale :</p>
+                  <ul className="mt-2 space-y-1.5 text-sm leading-6 text-slate-600">
+                    <li><strong className="text-slate-800">NJD Web Agency</strong> — agence web et applications sur mesure.</li>
+                    <li><strong className="text-slate-800">Bibliothèque numérique</strong> — des eBooks gratuits en PDF.</li>
+                    <li><strong className="text-slate-800">Academy &amp; Community</strong> — formation et partage entre talents tech.</li>
+                    <li><strong className="text-slate-800">NJD Web Apps, Business, Shop &amp; Hosting</strong> — applications et services numériques.</li>
+                  </ul>
+                </>
+              }
+              links={[
+                { label: 'Site officiel', href: 'https://www.njdwebs.com/' },
+                { label: 'Agence', href: 'https://www.instagram.com/njdwebs_com/' },
+                { label: 'LinkedIn', href: 'https://cg.linkedin.com/company/njdweb' },
+                { label: 'X', href: 'https://x.com/njdwebs' },
+                { label: 'Facebook', href: 'https://www.facebook.com/njdwebs/' },
+                { label: 'Jonas Ambeto', href: 'https://cg.linkedin.com/in/jonasambeto' },
+              ]}
+            />
+            <Partner
+              name="2MD Designer officiel"
+              logo="/partners/2md_designer.png"
+              description="Créateur de contenu et graphiste numérique basé à Brazzaville, 2MD Designer réalise notamment des portraits personnalisés et des visuels graphiques."
+              details={
+                <>
+                  <p className="text-sm leading-6 text-slate-600">Studio de création graphique et de personnalisation : portraits sur mesure, objets personnalisés et créations graphiques professionnelles.</p>
+                  <p className="text-sm leading-6 text-slate-600">165 rue Ndolo, arrêt Foulanguengue, quartier Mboualé / Petit Chose, Talangaï, près de l’agence MTN.</p>
+                  <p className="text-sm leading-6 text-slate-600">Portraits personnalisés dès 2 500 FCFA selon le format ; livraison à Brazzaville et expédition dans tout le Congo.</p>
+                  <p className="text-sm font-semibold text-slate-700">Téléphone : <a className="text-blue-700 hover:underline" href="tel:+242064920849">+242 06 492 0849</a></p>
+                </>
+              }
+              links={[
+                { label: 'Site officiel', href: 'https://2md-designer.com' },
+                { label: 'Facebook', href: 'https://www.facebook.com/61585215170141/?locale=fa_IR' },
+                { label: 'TikTok', href: 'https://www.tiktok.com/@2md.designer.offi' },
+              ]}
+            />
+          </PartnerCarousel>
         </div>
       </section>
       <div className="mx-auto max-w-7xl space-y-20 px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
@@ -164,7 +219,36 @@ function Benefit({ text, icon }: { text: string; icon: React.ReactNode }) {
   return <div className="flex items-center gap-4 rounded-2xl bg-[#eff6ff] p-4 text-sm font-semibold text-[#0f172a]"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white text-blue-700 shadow-sm">{icon}</span>{text}</div>;
 }
 
-function Partner({ name, logo, href }: { name: string; logo: string; href: string }) {
-  const desktopPosition = name === 'njdwebs' ? 'lg:col-start-2' : 'lg:col-start-4';
-  return <a href={href} target="_blank" rel="noreferrer" aria-label={`Visiter le site de ${name}`} className={`template-home__partner group flex min-h-[92px] items-center justify-center rounded-[20px] bg-white px-7 py-5 ${desktopPosition}`}><Image src={logo} alt={`Logo ${name}`} width={240} height={96} className="h-12 w-auto max-w-[80%] object-contain transition duration-300 group-hover:scale-[1.04]" /></a>;
+function Partner({
+  name,
+  logo,
+  description,
+  details,
+  links,
+}: {
+  name: string;
+  logo: string;
+  description: string;
+  details: React.ReactNode;
+  links: { label: string; href: string }[];
+}) {
+  return (
+    <article className="template-home__partner grid min-h-[320px] items-center gap-7 rounded-[1.25rem] border border-blue-100 bg-white p-6 shadow-sm sm:p-8 lg:grid-cols-[minmax(0,1fr)_250px] lg:gap-8">
+      <div className="min-w-0">
+        <h3 className="text-lg font-bold text-[#0f172a]">{name}</h3>
+        <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+        <div className="mt-4 space-y-2">{details}</div>
+        <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 border-t border-slate-100 pt-4">
+          {links.map(({ label, href }) => (
+            <a key={label} href={href} target="_blank" rel="noreferrer" className="text-sm font-medium text-blue-700 hover:text-blue-900 hover:underline">
+              {label}
+            </a>
+          ))}
+        </div>
+      </div>
+      <div className="relative mx-auto flex aspect-square w-full max-w-[250px] items-center justify-center rounded-2xl bg-[#eff6ff] p-7">
+        <Image src={logo} alt={`Logo ${name}`} width={240} height={240} className="h-full w-full object-contain" />
+      </div>
+    </article>
+  );
 }

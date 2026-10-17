@@ -1,5 +1,4 @@
 import { collectCatalog, collectTrends, generateEditorialDraft, saveEditorialDraft } from '@/lib/content-agent';
-import { prepareSocialPublications } from '@/lib/publishing-agent';
 
 async function collectTrendsStep() {
   'use step';
@@ -14,12 +13,7 @@ async function generateDraftStep(candidates: Awaited<ReturnType<typeof collectTr
 
 async function saveDraftStep(draft: Awaited<ReturnType<typeof generateEditorialDraft>>) {
   'use step';
-  const saved = await saveEditorialDraft(draft);
-  if (saved.status === 'published' && saved.publishedSlug) {
-    try { await prepareSocialPublications(saved.publishedSlug); }
-    catch { /* A social failure must not roll back the JcHub article. */ }
-  }
-  return saved;
+  return saveEditorialDraft(draft);
 }
 
 export async function runEditorialAgent() {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Mail, MailCheck, MessageSquare, RefreshCw, Send, Users } from 'lucide-react';
+import { Mail, MailCheck, MessageSquare, RefreshCw, Send, Users, Sparkles } from 'lucide-react';
 
 type Reply = { body: string; sentAt: string | null; adminEmail: string };
 type ContactMessage = { id: string; name: string; email: string; subject: string; message: string; status: string; createdAt: string | null; replies: Reply[] };
@@ -21,6 +21,7 @@ export default function AdminInboxPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [drafting, setDrafting] = useState(false);
 
   async function load() {
     setLoading(true); setError('');
@@ -50,6 +51,19 @@ export default function AdminInboxPage() {
     finally { setSending(false); }
   }
 
+  async function draftPartnershipReply() {
+    if (!selected) return;
+    setDrafting(true); setError(''); setNotice('');
+    try {
+      const response = await fetch('/api/admin/inbox/draft-reply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messageId: selected.id }) });
+      const result = await response.json() as { error?: string; draft?: string };
+      if (!response.ok || !result.draft) throw new Error(result.error || 'Rédaction impossible.');
+      setReply(result.draft);
+      setNotice('Proposition préparée. Relis-la et modifie-la si besoin avant de cliquer sur « Envoyer la réponse ».');
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Rédaction impossible.'); }
+    finally { setDrafting(false); }
+  }
+
   const activeSubscribers = data.subscribers.filter((subscriber) => subscriber.status === 'active').length;
   const newMessages = data.messages.filter((message) => message.status !== 'replied').length;
 
@@ -68,7 +82,7 @@ export default function AdminInboxPage() {
       <Stat icon={<Users className="h-5 w-5" />} label="Abonnés actifs" value={activeSubscribers} />
     </div>
 
-    <div className="flex gap-2 border-b border-slate-200">
+    <div className="grid grid-cols-2 gap-2 border-b border-slate-200 sm:flex">
       <TabButton active={tab === 'contact'} onClick={() => setTab('contact')} icon={<MessageSquare className="h-4 w-4" />}>Messages de contact ({data.messages.length})</TabButton>
       <TabButton active={tab === 'newsletter'} onClick={() => setTab('newsletter')} icon={<MailCheck className="h-4 w-4" />}>Abonnés newsletter ({data.subscribers.length})</TabButton>
     </div>
@@ -82,7 +96,7 @@ export default function AdminInboxPage() {
         {selected ? <>
           <div className="border-b border-slate-100 pb-4"><p className="text-xs font-bold uppercase tracking-wider text-blue-600">{selected.subject || 'Message de contact'}</p><h2 className="mt-2 text-xl font-black text-slate-950">{selected.name}</h2><a className="mt-1 inline-block text-sm text-blue-700 hover:underline" href={`mailto:${selected.email}`}>{selected.email}</a><p className="mt-2 text-xs text-slate-400">Reçu le {formatDate(selected.createdAt)}</p></div>
           <div className="flex-1 space-y-4 py-5"><div className="whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">{selected.message}</div>{selected.replies.map((item, index) => <div key={`${item.sentAt}-${index}`} className="ml-5 rounded-xl border border-blue-100 bg-blue-50/70 p-4"><p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-blue-700">Ta réponse · {formatDate(item.sentAt)}</p><p className="whitespace-pre-wrap text-sm leading-6 text-slate-700">{item.body}</p></div>)}</div>
-          <form onSubmit={sendReply} className="border-t border-slate-100 pt-4"><label htmlFor="reply" className="mb-2 block text-sm font-bold text-slate-800">Répondre par e-mail</label><textarea id="reply" required maxLength={5000} rows={4} value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Écris ta réponse…" className="w-full resize-y rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" /><div className="mt-3 flex flex-wrap items-center justify-between gap-3"><span className="text-xs text-slate-400">Envoyée depuis l’adresse configurée dans Brevo.</span><button type="submit" disabled={sending || !reply.trim()} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"><Send className="h-4 w-4" />{sending ? 'Envoi…' : 'Envoyer la réponse'}</button></div></form>
+          <form onSubmit={sendReply} className="border-t border-slate-100 pt-4"><div className="mb-2 flex flex-wrap items-center justify-between gap-2"><label htmlFor="reply" className="text-sm font-bold text-slate-800">Répondre par e-mail</label>{/parten|partnership|sponsor|collab|affiliat/i.test(`${selected.subject} ${selected.message}`) && <button type="button" onClick={() => void draftPartnershipReply()} disabled={drafting} className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 px-3 py-2 text-xs font-bold text-violet-700 hover:bg-violet-50 disabled:opacity-50"><Sparkles className="h-3.5 w-3.5" />{drafting ? 'Préparation…' : 'Préparer une réponse avec l’agent'}</button>}</div><textarea id="reply" required maxLength={5000} rows={4} value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Écris ta réponse…" className="w-full resize-y rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" /><div className="mt-3 flex flex-wrap items-center justify-between gap-3"><span className="text-xs text-slate-400">La proposition de l’agent n’est jamais envoyée automatiquement. Envoi via Brevo après ton clic.</span><button type="submit" disabled={sending || !reply.trim()} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"><Send className="h-4 w-4" />{sending ? 'Envoi…' : 'Envoyer la réponse'}</button></div></form>
         </> : <Empty text={loading ? 'Chargement…' : 'Sélectionne un message pour le lire et y répondre.'} />}
       </section>
     </div> : <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -93,6 +107,6 @@ export default function AdminInboxPage() {
 }
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) { return <div className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><span className="grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-blue-700">{icon}</span><span><span className="block text-2xl font-black text-slate-950">{value}</span><span className="text-xs font-medium text-slate-500">{label}</span></span></div>; }
-function TabButton({ active, onClick, icon, children }: { active: boolean; onClick: () => void; icon: React.ReactNode; children: React.ReactNode }) { return <button type="button" onClick={onClick} className={`inline-flex items-center gap-2 border-b-2 px-3 py-3 text-sm font-bold ${active ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}>{icon}{children}</button>; }
+function TabButton({ active, onClick, icon, children }: { active: boolean; onClick: () => void; icon: React.ReactNode; children: React.ReactNode }) { return <button type="button" onClick={onClick} className={`inline-flex min-w-0 items-center justify-center gap-2 border-b-2 px-2 py-3 text-center text-xs font-bold sm:justify-start sm:px-3 sm:text-sm ${active ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><span className="shrink-0">{icon}</span>{children}</button>; }
 function Empty({ text }: { text: string }) { return <p className="m-auto p-8 text-center text-sm text-slate-500">{text}</p>; }
 function Status({ value }: { value: string }) { const active = value === 'active'; return <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${active ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'}`}>{active ? 'Actif' : value === 'unsubscribed' ? 'Désabonné' : 'En attente'}</span>; }

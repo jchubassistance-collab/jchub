@@ -1,5 +1,6 @@
 // lib/tools.ts — Catalogue des outils JcHub
 import { reportUserError } from '@/lib/user-error';
+import { isToolComponentName } from '@/lib/tool-components';
 
 export type Tool = {
   slug: string;
@@ -13,6 +14,8 @@ export type Tool = {
   status?: 'published' | 'draft' | 'archived';
   /** JavaScript weekday numbers in Africa/Lagos (Sunday = 0). */
   visibleDays?: number[];
+  /** ISO date from which a published tool is shown on the site. */
+  publishAt?: string;
   seo: {
     title: string;
     description: string;
@@ -37,6 +40,21 @@ export const tools: Tool[] = [
       title: 'Convertir des images en PDF gratuitement — JcHub',
       description: 'Assemble des images JPG, JPEG et PNG en PDF. Choisis le format et l’orientation des pages ; chaque image occupe une page.',
       keywords: ['images en pdf', 'jpg en pdf', 'png en pdf', 'convertir image pdf'],
+    },
+  },
+  {
+    slug: 'optimiseur-convertisseur-webp-png',
+    name: 'Optimiseur et Convertisseur d’Images WebP / PNG',
+    description: 'Convertis tes images JPG, PNG ou WebP en WebP ou PNG et réduis leur poids en quelques secondes.',
+    category: 'Design',
+    icon: '🖼️',
+    tags: ['image', 'webp', 'png', 'optimiseur', 'compression', 'conversion'],
+    component: 'ImageOptimizer',
+    status: 'published',
+    seo: {
+      title: 'Optimiseur et Convertisseur d’Images WebP / PNG — JcHub',
+      description: 'Convertis et optimise gratuitement tes images JPG, PNG et WebP. Réglage de la qualité WebP, fichiers supprimés après traitement.',
+      keywords: ['optimiseur image webp', 'convertisseur webp png', 'compresser image', 'convertir png webp'],
     },
   },
   {
@@ -148,7 +166,7 @@ export const tools: Tool[] = [
   {
     slug: 'csv-vers-excel',
     name: 'CSV vers Excel',
-    description: 'Transforme un fichier CSV en tableau Excel .xlsx directement depuis le navigateur.',
+    description: 'Transforme un fichier CSV en tableau Excel .xlsx en quelques secondes.',
     category: 'Document',
     icon: '📈',
     tags: ['csv', 'excel', 'xlsx', 'conversion'],
@@ -163,7 +181,7 @@ export const tools: Tool[] = [
   {
     slug: 'pdf-to-word',
     name: 'PDF vers Word',
-    description: 'Convertis un PDF en document Word DOCX directement depuis le navigateur.',
+    description: 'Convertis un PDF en document Word DOCX modifiable en quelques secondes.',
     category: 'Document',
     icon: '📄',
     tags: ['pdf', 'word', 'docx', 'conversion'],
@@ -188,6 +206,21 @@ export const tools: Tool[] = [
       title: 'Convertir Word en PDF gratuitement — JcHub',
       description: 'Transforme un document Word DOCX en PDF prêt à partager.',
       keywords: ['word vers pdf', 'convertir word en pdf', 'docx en pdf', 'word to pdf'],
+    },
+  },
+  {
+    slug: 'compresser-pdf',
+    name: 'Compresser un PDF gratuitement',
+    description: 'Réduit un document PDF de 15 Mo à moins de 2 Mo pour l’envoyer par e-mail ou le déposer sur un portail.',
+    category: 'Document',
+    icon: '📦',
+    tags: ['pdf', 'compression', 'email', 'portail', 'fichier', 'optimisation'],
+    component: 'PdfCompressor',
+    status: 'published',
+    seo: {
+      title: 'Compresser un PDF gratuitement — JcHub',
+      description: 'Réduit la taille de tes PDFs pour les envoyer plus facilement par e-mail ou les déposer sur un portail.',
+      keywords: ['compresser pdf', 'réduire pdf', 'pdf moins de 2 mo', 'optimiser pdf gratuit'],
     },
   },
   {
@@ -322,6 +355,17 @@ export function isToolVisibleToday(tool: Tool, date = new Date()): boolean {
   return tool.visibleDays.includes(weekdayNumber[weekday]);
 }
 
+/**
+ * A published tool reaches the public catalog once its publication date has passed
+ * and its component exists in the running deployment: a tool merged from the admin
+ * stays hidden until Vercel has deployed its code.
+ */
+function isToolLive(tool: Tool, options: { includeScheduled?: boolean }, now = Date.now()): boolean {
+  const released = options.includeScheduled || !tool.publishAt || Date.parse(tool.publishAt) <= now;
+  const deployable = Boolean(tool.path) || isToolComponentName(tool.component);
+  return released && deployable;
+}
+
 function toToolRecord(data: Record<string, any>): Tool {
   const registeredTool = tools.find((tool) => tool.slug === String(data.slug || ''));
   return {
@@ -335,6 +379,7 @@ function toToolRecord(data: Record<string, any>): Tool {
     component: String(data.component || data.slug || 'GenericTool'),
     status: data.status === 'draft' || data.status === 'archived' ? data.status : 'published',
     visibleDays: Array.isArray(data.visibleDays) ? data.visibleDays.map(Number) : registeredTool?.visibleDays,
+    publishAt: typeof data.publishAt?.toDate === 'function' ? data.publishAt.toDate().toISOString() : undefined,
     seo: {
       title: String(data.seo?.title || data.name || 'Outil JcHub'),
       description: String(data.seo?.description || data.description || ''),
@@ -343,7 +388,13 @@ function toToolRecord(data: Record<string, any>): Tool {
   };
 }
 
-export async function getPublishedTools(): Promise<Tool[]> {
+export async function getPublishedTools(options: { includeScheduled?: boolean } = {}): Promise<Tool[]> {
+  const filterPublished = (list: Tool[]) => list.filter((tool) =>
+    tool.status === 'published'
+    && !DISABLED_TOOL_SLUGS.has(tool.slug)
+    && (options.includeScheduled || isToolVisibleToday(tool))
+    && isToolLive(tool, options),
+  );
   const hasConfig = Boolean(
     process.env.FIREBASE_PROJECT_ID
     && process.env.FIREBASE_CLIENT_EMAIL
@@ -351,7 +402,7 @@ export async function getPublishedTools(): Promise<Tool[]> {
   );
 
   if (!hasConfig) {
-    return tools.filter((tool) => isToolVisibleToday(tool));
+    return filterPublished(tools);
   }
 
   try {
@@ -360,7 +411,7 @@ export async function getPublishedTools(): Promise<Tool[]> {
     const fromFirestore = snapshot.docs.map((document) => toToolRecord(document.data()));
 
     if (fromFirestore.length === 0) {
-      return tools;
+      return filterPublished(tools);
     }
 
     const mergedBySlug = new Map<string, Tool>();
@@ -375,10 +426,10 @@ export async function getPublishedTools(): Promise<Tool[]> {
       }
     }
 
-    return Array.from(mergedBySlug.values()).filter((tool) => tool.status === 'published' && !DISABLED_TOOL_SLUGS.has(tool.slug) && isToolVisibleToday(tool));
+    return filterPublished(Array.from(mergedBySlug.values()));
   } catch (error) {
     reportUserError();
-    return tools.filter((tool) => isToolVisibleToday(tool));
+    return filterPublished(tools);
   }
 }
 

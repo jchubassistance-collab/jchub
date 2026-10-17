@@ -2,6 +2,7 @@
 
 import { useRef, useState, type ChangeEvent } from 'react';
 import { Download, FileText, Loader2, UploadCloud } from 'lucide-react';
+import { cleanUpConversionFiles, postConversion, uploadConversionFile } from '@/lib/conversion-upload-client';
 
 const MAX_WORD_SIZE_BYTES = 10 * 1024 * 1024;
 
@@ -41,20 +42,18 @@ export function WordToPdf() {
     setIsLoading(true);
     setError(null);
     setDownloadUrl(null);
+    const uploadedUrls: string[] = [];
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const response = await fetch('/api/tools/word-to-pdf', { method: 'POST', body: formData });
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.error || 'La conversion a échoué.');
-      }
+      const url = await uploadConversionFile('word-to-pdf', file);
+      uploadedUrls.push(url);
+      const response = await postConversion('/api/tools/word-to-pdf', { url });
       setDownloadUrl(URL.createObjectURL(await response.blob()));
       setFile(null);
       if (inputRef.current) inputRef.current.value = '';
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Erreur inconnue.');
     } finally {
+      await cleanUpConversionFiles('word-to-pdf', uploadedUrls);
       setIsLoading(false);
     }
   };
@@ -81,7 +80,7 @@ export function WordToPdf() {
       </button>
       {error && <div role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{error}</div>}
       {downloadUrl && <a href={downloadUrl} download={fileName} className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 font-bold text-emerald-200 transition hover:bg-emerald-500/20"><Download className="h-5 w-5" /> Télécharger le PDF</a>}
-      <p className="text-center text-xs text-slate-400">Le document est converti côté serveur puis supprimé après traitement.</p>
+      <p className="text-center text-xs text-slate-400">5 conversions par jour et par adresse IP. Le document est transféré dans un espace privé temporaire, puis supprimé après traitement.</p>
     </div>
   );
 }

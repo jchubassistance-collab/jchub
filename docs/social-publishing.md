@@ -25,7 +25,7 @@ Les paramètres fonctionnels sont enregistrés dans `app_config/social_publishin
 | `GEMINI_MODEL` | Modèle Gemini facultatif (défaut `gemini-2.5-flash`). |
 | `LINKEDIN_ENABLED` | Active le canal LinkedIn (défaut `false`). |
 | `LINKEDIN_ACCESS_TOKEN` | OAuth access token côté serveur. |
-| `LINKEDIN_AUTHOR_URN` | URN de membre, format `urn:li:person:…`; les profils personnels sont visés. |
+| `LINKEDIN_AUTHOR_URN` | Facultatif si le token OAuth comprend `openid profile`; sinon, URN de membre au format `urn:li:person:…`. |
 | `LINKEDIN_REDIRECT_URI` | Callback OAuth exact; en local `http://127.0.0.1:3000/api/auth/linkedin/callback`. |
 | `LINKEDIN_API_VERSION` | Version mensuelle LinkedIn `YYYYMM` (défaut `202609`; vérifier la version encore prise en charge au déploiement). |
 | `FACEBOOK_ENABLED` | Active le canal Page Facebook (défaut `false`). |
@@ -60,7 +60,7 @@ Le bouton « Connecter le compte LinkedIn » ouvre `/api/auth/linkedin/login`. L
 
 Dans le portail LinkedIn Developer, ajoute exactement `http://127.0.0.1:3000/api/auth/linkedin/callback` comme Authorized redirect URL. L’application doit avoir l’accès aux produits Sign In with LinkedIn using OpenID Connect et Share on LinkedIn; les permissions disponibles dépendent de l’approbation de l’application. Si le callback échoue, vérifie d’abord l’URL exacte, les identifiants client réels et l’accès à ces produits.
 
-En production, le callback OAuth refuse volontairement l’échange car le processus web ne peut pas modifier ses variables de déploiement de manière persistante. Configure `LINKEDIN_ACCESS_TOKEN` et `LINKEDIN_AUTHOR_URN` dans **Vercel → Project Settings → Environment Variables**, marque le token sensible et redéploie. Ne crée pas de variable Vercel API token dans l’application.
+En production, le callback OAuth refuse volontairement l’échange car le processus web ne peut pas modifier ses variables de déploiement de manière persistante. Configure `LINKEDIN_ACCESS_TOKEN` dans **Vercel → Project Settings → Environment Variables**, marque le token sensible et redéploie. Si ce token ne donne pas accès à `/v2/userinfo`, configure aussi `LINKEDIN_AUTHOR_URN`. Ne crée pas de variable Vercel API token dans l’application.
 
 Référence : [Authorization Code Flow LinkedIn](https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow).
 
@@ -70,23 +70,35 @@ Créer une application Meta et obtenir un Page Access Token avec les permissions
 
 Référence : [API Pages Meta](https://developers.facebook.com/docs/pages-api/posts/).
 
+### Statistiques Facebook et GitHub
+
+L’écran social lit les statistiques de la Page (`page_impressions`, `page_post_engagements` et `page_views_total`) sur les 28 derniers jours, ainsi que le nombre actuel d’abonnés, avec Graph API v26. Si Meta refuse une métrique mais en accepte d’autres, les requêtes individuelles permettent d’afficher les données disponibles et un avertissement pour le reste. Le Page Access Token doit inclure `pages_read_engagement` et `read_insights`; après ajout de ces permissions à la connexion OAuth, renouvelle le token et configure `FACEBOOK_ACCESS_TOKEN` dans l’environnement de déploiement. Le token est envoyé à Meta dans l’en-tête serveur et n’est jamais transmis au navigateur.
+
+Meta limite certains insights aux Pages ayant au moins 100 mentions J’aime, et la plupart des métriques ne sont mises à jour qu’une fois par jour. Les métriques non disponibles sont signalées dans l’admin. Les statistiques LinkedIn ne sont pas fournies par ces intégrations.
+
+Références : [Page Insights Meta](https://developers.facebook.com/docs/graph-api/reference/page/insights/), [permission read_insights](https://developers.facebook.com/docs/permissions/).
+
+Pour GitHub, l’admin affiche les étoiles, forks, watchers et issues/PR ouverts du dépôt configuré. L’API du dépôt utilise `GITHUB_TOKEN` côté serveur; elle ne publie rien et n’expose jamais le token.
+
 ### Connexion OAuth Facebook en local
 
-Le bouton « Connecter une Page Facebook » ouvre `/api/auth/facebook/login`. Les routes exigent une session administrateur et utilisent un `state` aléatoire dans un cookie HttpOnly. Le flux demande `pages_show_list`, `pages_manage_posts` et `pages_read_engagement`, échange le code côté serveur, puis récupère les Pages autorisées et leurs Page Access Tokens via `/me/accounts`. Le jeton sélectionné est enregistré uniquement dans `.env.local` en développement et n’est jamais renvoyé au navigateur.
+Le bouton « Connecter une Page Facebook » ouvre `/api/auth/facebook/login`. Les routes exigent une session administrateur et utilisent un `state` aléatoire dans un cookie HttpOnly. Le flux demande `pages_show_list`, `pages_manage_posts`, `pages_read_engagement` et `read_insights`, échange le code côté serveur, puis récupère les Pages autorisées et leurs Page Access Tokens via `/me/accounts`. Le jeton sélectionné est enregistré uniquement dans `.env.local` en développement et n’est jamais renvoyé au navigateur.
 
-Dans Meta for Developers, configure le Facebook Login et enregistre exactement `http://127.0.0.1:3000/api/auth/facebook/callback` parmi les redirect URIs autorisées. Si le compte ne donne accès qu’à une Page, elle est sélectionnée automatiquement. S’il en retourne plusieurs, définis `FACEBOOK_PAGE_ID` dans `.env.local` avant de relancer la connexion; aucune Page n’est choisie arbitrairement. L’application Meta doit obtenir les permissions avancées et l’approbation requises pour l’usage réel.
+Dans Meta for Developers, configure le Facebook Login et enregistre exactement la même URI HTTPS que `FACEBOOK_REDIRECT_URI` parmi les redirect URIs autorisées. Meta peut refuser un callback HTTP local; dans ce cas, utilise un tunnel HTTPS stable et ouvre aussi l’admin JcHub sur ce même hostname pendant tout le flux OAuth. Redémarre Next.js après changement de hostname; `allowedDevOrigins` autorise le hostname HTTPS configuré pour les ressources de développement. Si le compte ne donne accès qu’à une Page, elle est sélectionnée automatiquement. S’il en retourne plusieurs, définis `FACEBOOK_PAGE_ID` dans `.env.local` avant de relancer la connexion; aucune Page n’est choisie arbitrairement. L’application Meta doit obtenir les permissions avancées et l’approbation requises pour l’usage réel.
+
+Le code accepte aussi les anciens noms `META_APP_ID`, `META_APP_SECRET`, `META_REDIRECT_URI` et `META_GRAPH_API_VERSION` comme alias des variables `FACEBOOK_*`. Le nom d’hôte doit rester le même pendant tout le flux OAuth : `localhost` et `127.0.0.1` sont des origines distinctes, et l’URI doit correspondre exactement à celle autorisée dans Meta.
 
 En production, le flux OAuth local est désactivé. Configure `FACEBOOK_ACCESS_TOKEN` et `FACEBOOK_PAGE_ID` dans **Vercel → Project Settings → Environment Variables**, marque le token sensible et redéploie. Il s’agit d’un Page Access Token, jamais d’un token de profil personnel.
 
 ### GitHub
 
-Créer un fine-grained personal access token limité au dépôt visé, avec `Contents: write`. Vérifier `GITHUB_OWNER`, `GITHUB_REPOSITORY`, `GITHUB_BRANCH` et `GITHUB_PUBLISH_PATH`. Le token a besoin d’un accès de lecture pour vérifier dépôt, branche et fichier. Aucun autre type d’objet GitHub n’est créé.
+Créer un fine-grained personal access token limité au dépôt visé, avec `Contents: write`. Le dépôt par défaut est `jchubassistance-collab/jchub`; configure `GITHUB_OWNER` et `GITHUB_REPOSITORY` seulement pour viser un autre dépôt. Vérifier aussi `GITHUB_BRANCH` et `GITHUB_PUBLISH_PATH`. Le token a besoin d’un accès de lecture pour vérifier dépôt, branche et fichier. Aucun autre type d’objet GitHub n’est créé.
 
 Référence : [GitHub REST Contents API](https://docs.github.com/en/rest/repos/contents).
 
 ## Approbation, planification et cron
 
-Les administrateurs authentifiés peuvent préparer un article, examiner chaque texte, approuver, publier maintenant, planifier ou annuler. Le planificateur Vercel vérifie les publications dues toutes les cinq minutes sur `/api/cron/publish-social`; la route exige `Authorization: Bearer <CRON_SECRET>`. La date choisie est interprétée dans le fuseau IANA configuré et stockée en UTC. Les heures locales inexistantes lors d’un changement d’heure sont rejetées. Le cron est un déclencheur périodique, pas une garantie d’exécution à la seconde exacte.
+Les administrateurs authentifiés peuvent préparer un article, examiner chaque texte, approuver, publier maintenant, planifier ou annuler. Dans la configuration actuelle, Vercel appelle `/api/cron/publish-social` chaque jour à 09:00 UTC; ce cron inspecte les publications arrivées à échéance et exige `Authorization: Bearer <CRON_SECRET>`. La date choisie est interprétée dans le fuseau IANA configuré et stockée en UTC. Les heures locales inexistantes lors d’un changement d’heure sont rejetées. Une programmation peut donc être exécutée en retard selon la cadence du cron; celui-ci ne garantit pas l’exécution à la seconde exacte.
 
 Vercel Cron suit UTC : [documentation Vercel Cron](https://vercel.com/docs/cron-jobs). Vérifiez que `CRON_SECRET` est défini dans les environnements Preview/Production concernés. Les fonctions Workflow du projet doivent être activées et prises en charge par le plan de déploiement utilisé.
 

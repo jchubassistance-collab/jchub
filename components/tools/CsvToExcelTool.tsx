@@ -2,7 +2,9 @@
 
 import { useRef, useState } from 'react';
 import { Download, FileUp, Loader2, TableProperties } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import { cleanUpConversionFiles, postConversion, uploadConversionFile } from '@/lib/conversion-upload-client';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export function CsvToExcelTool() {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -29,6 +31,11 @@ export function CsvToExcelTool() {
       setFile(null);
       return;
     }
+    if (nextFile.size > MAX_FILE_SIZE) {
+      setError('Le fichier ne doit pas dépasser 10 Mo.');
+      setFile(null);
+      return;
+    }
 
     setFile(nextFile);
     setOutputName(nextFile.name.replace(/\.(csv|txt)$/i, '') + '.xlsx');
@@ -40,32 +47,16 @@ export function CsvToExcelTool() {
       return;
     }
 
+    const uploadedUrls: string[] = [];
     try {
       setIsLoading(true);
       setError(null);
       setDownloadUrl(null);
 
-      const csvText = await file.text();
-      const workbook = XLSX.read(csvText, {
-        type: 'string',
-        raw: false,
-        FS: ',',
-      });
-
-      if (!workbook.SheetNames.length) {
-        throw new Error('Le fichier CSV semble vide ou invalide.');
-      }
-
-      const outputBuffer = XLSX.write(workbook, {
-        bookType: 'xlsx',
-        type: 'array',
-      });
-
-      const blob = new Blob([outputBuffer], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      });
-      const url = URL.createObjectURL(blob);
-      setDownloadUrl(url);
+      const uploadUrl = await uploadConversionFile('csv-to-excel', file);
+      uploadedUrls.push(uploadUrl);
+      const response = await postConversion('/api/tools/csv-to-excel', { url: uploadUrl });
+      setDownloadUrl(URL.createObjectURL(await response.blob()));
       setFile(null);
 
       if (inputRef.current) {
@@ -74,6 +65,7 @@ export function CsvToExcelTool() {
     } catch (convertError) {
       setError(convertError instanceof Error ? convertError.message : 'Erreur inconnue lors de la conversion.');
     } finally {
+      await cleanUpConversionFiles('csv-to-excel', uploadedUrls);
       setIsLoading(false);
     }
   };
@@ -105,7 +97,7 @@ export function CsvToExcelTool() {
 
       <div className="rounded-2xl border border-[#9ccbff]/20 bg-[#071526] p-4 text-sm text-slate-300">
         <span className="flex items-center gap-2 font-semibold text-[#dfeeff]"><TableProperties className="h-4 w-4" /> Conversion CSV → Excel</span>
-        <span className="mt-1 block text-xs">Le tableau est transformé en fichier Excel .xlsx prêt à être utilisé.</span>
+        <span className="mt-1 block text-xs">Le tableau est transformé en classeur Excel .xlsx. Les champs CSV entre guillemets et les lignes tabulées sont pris en charge. Limite : 5 conversions par jour et par adresse IP ; fichier temporaire privé, supprimé après traitement.</span>
       </div>
 
       <button

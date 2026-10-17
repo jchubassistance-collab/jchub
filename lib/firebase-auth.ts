@@ -2,14 +2,14 @@
 import {
   GoogleAuthProvider,
   GithubAuthProvider,
+  deleteUser,
+  getAdditionalUserInfo,
   signInWithPopup,
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   signOut as fbSignOut,
   sendPasswordResetEmail,
   verifyPasswordResetCode,
   confirmPasswordReset,
-  updateProfile,
   User as FirebaseUser,
   onAuthStateChanged,
 } from 'firebase/auth';
@@ -32,15 +32,8 @@ export type UserProfile = {
   languages?: string[];
   interests?: string[];
   goal?: string;
-  isPremium?: boolean;
-  premiumUntil?: Date;
   createdAt?: Date;
   provider: 'google' | 'github' | 'email';
-  subscription?: {
-    tier: 'free' | 'day' | 'week' | 'monthly' | 'yearly' | 'lifetime';
-    status: 'active' | 'expired' | 'cancelled' | 'pending';
-    expiresAt?: Date | null;
-  };
 };
 
 async function createOrUpdateUserDoc(user: FirebaseUser, provider: 'google' | 'github' | 'email') {
@@ -59,15 +52,6 @@ async function createOrUpdateUserDoc(user: FirebaseUser, provider: 'google' | 'g
       ...profile,
       ...(user.photoURL ? { photoURL: user.photoURL } : {}),
       role: 'user',
-      subscription: {
-        tier: 'free',
-        status: 'active',
-        expiresAt: null,
-        autoRenew: false,
-        paymentMethod: null,
-        lastPaymentId: '',
-        cancelAt: null,
-      },
       createdAt: serverTimestamp(),
     };
     await setDoc(userRef, profileData);
@@ -80,6 +64,10 @@ async function createOrUpdateUserDoc(user: FirebaseUser, provider: 'google' | 'g
 export async function signInWithGoogle(): Promise<UserProfile> {
   try {
     const result = await signInWithPopup(auth, googleProvider);
+    if (getAdditionalUserInfo(result)?.isNewUser) {
+      await deleteUser(result.user);
+      throw new Error('La création de nouveaux comptes est désactivée.');
+    }
     await createOrUpdateUserDoc(result.user, 'google');
     return {
       uid: result.user.uid,
@@ -96,6 +84,10 @@ export async function signInWithGoogle(): Promise<UserProfile> {
 export async function signInWithGithub(): Promise<UserProfile> {
   try {
     const result = await signInWithPopup(auth, githubProvider);
+    if (getAdditionalUserInfo(result)?.isNewUser) {
+      await deleteUser(result.user);
+      throw new Error('La création de nouveaux comptes est désactivée.');
+    }
     await createOrUpdateUserDoc(result.user, 'github');
     return {
       uid: result.user.uid,
@@ -121,6 +113,10 @@ export async function signInWithEmail(email: string, password: string): Promise<
       provider: 'email',
     };
   } catch (error: any) {
+    if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+      throw new Error('Adresse e-mail ou mot de passe incorrect. Vérifie aussi que ce compte existe dans le projet Firebase configuré.');
+    }
+    if (error.code === 'auth/too-many-requests') throw new Error('Trop de tentatives. Réessaie plus tard ou réinitialise le mot de passe.');
     if (error.code === 'auth/multi-factor-auth-required' || error.code === 'auth/operation-not-allowed') {
       throw error;
     }
@@ -131,50 +127,6 @@ export async function signInWithEmail(email: string, password: string): Promise<
       throw new Error('Mot de passe incorrect');
     }
     throw new Error(error.message || 'Erreur de connexion');
-  }
-}
-
-export async function signUpWithEmail(
-  email: string,
-  password: string,
-  displayName: string
-): Promise<UserProfile> {
-  try {
-    const result = await createUserWithEmailAndPassword(auth, email, password);
-    if (displayName) {
-      await updateProfile(result.user, { displayName });
-    }
-    await createOrUpdateUserDoc(result.user, 'email');
-    return {
-      uid: result.user.uid,
-      email: result.user.email || '',
-      displayName: displayName,
-      photoURL: undefined,
-      provider: 'email',
-    };
-  } catch (error: any) {
-    if (error.code === 'auth/email-already-in-use') {
-      throw new Error('Cet email est déjà utilisé');
-    }
-    if (error.code === 'auth/operation-not-allowed') {
-      throw new Error("L'inscription par e-mail est désactivée dans Firebase. Active le fournisseur « E-mail/Mot de passe » dans Firebase Console > Authentication > Sign-in method.");
-    }
-    if (error.code === 'auth/weak-password') {
-      throw new Error('Mot de passe trop faible (6+ caractères)');
-    }
-    if (error.code === 'auth/invalid-email') {
-      throw new Error('L’adresse e-mail est invalide');
-    }
-    if (error.code === 'auth/invalid-api-key' || error.code === 'auth/api-key-not-valid') {
-      throw new Error("La configuration Firebase est invalide. Vérifie NEXT_PUBLIC_FIREBASE_API_KEY et les variables Firebase dans .env.local.");
-    }
-    if (error.code === 'auth/network-request-failed') {
-      throw new Error("Firebase est momentanément inaccessible. Vérifie ta connexion puis réessaie.");
-    }
-    if (error.code === 'auth/too-many-requests') {
-      throw new Error('Trop de tentatives. Attends quelques minutes avant de réessayer.');
-    }
-    throw new Error(error.message || "Erreur d'inscription");
   }
 }
 

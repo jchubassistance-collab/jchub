@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Activity, AlertCircle, ArrowUpRight, BarChart3, Bell, BookOpen, Bot, CalendarDays, CheckCircle2, Eye, FileText, Inbox, Loader2, Mail, MessageSquare, RefreshCw, TrendingUp, Users, Wrench } from 'lucide-react';
+import { Activity, AlertCircle, ArrowUpRight, BarChart3, Bell, Bot, CalendarDays, CheckCircle2, Eye, FileText, Inbox, Loader2, Mail, MessageSquare, RefreshCw, TrendingUp, Users, Wrench } from 'lucide-react';
 
 type AdminStats = {
   totalUsers: number;
@@ -104,7 +104,6 @@ export default function AdminPage() {
         <QuickCard href="/admin/inbox" title="Messages & newsletter" meta="Consulter les demandes" icon={Inbox} color="from-[#2d7fe0] to-[#2760c6]" />
         <QuickCard href="/admin/agent" title="Agent éditorial" meta={`${stats.approvedDrafts} publication(s) à valider`} icon={Bot} color="from-[#6550c7] to-[#44329f]" />
         <QuickCard href="/admin/tools" title="Outils pratiques" meta={`${stats.totalTools} outils actifs`} icon={Wrench} color="from-[#24a878] to-[#14895f]" />
-        <QuickCard href="/admin/guides" title="Guides & ressources" meta="Gérer les téléchargements" icon={BookOpen} color="from-[#ed8848] to-[#db6544]" />
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[1.2fr_.8fr]">

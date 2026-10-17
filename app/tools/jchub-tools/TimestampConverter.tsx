@@ -6,10 +6,13 @@ import { Clock, Calendar } from 'lucide-react';
 export function TimestampConverter() {
   const [timestamp, setTimestamp] = useState('');
   const [date, setDate] = useState('');
-  const [now, setNow] = useState(Math.floor(Date.now() / 1000));
+  // Starts empty so the server render and the first browser render match; the clock begins after hydration.
+  const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 1000);
+    const tick = () => setNow(Math.floor(Date.now() / 1000));
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -39,7 +42,7 @@ export function TimestampConverter() {
   const formatISO = (d: Date | null) => d ? d.toISOString() : '';
   const formatUTC = (d: Date | null) => d ? d.toUTCString() : '';
   const formatRelative = (ts: number) => {
-    const diff = now - ts;
+    const diff = (now ?? ts) - ts;
     const abs = Math.abs(diff);
     const future = diff < 0;
     const units: [number, string][] = [
@@ -61,9 +64,9 @@ export function TimestampConverter() {
       {/* Now display */}
       <div className="rounded-2xl bg-gradient-to-r from-brand-500 to-purple-600 p-4 text-center text-white">
         <div className="mb-1 text-xs uppercase tracking-wide opacity-80">Timestamp actuel (Unix)</div>
-        <div className="mb-1 font-mono text-3xl font-black">{now}</div>
-        <div className="text-xs opacity-80">{formatDate(new Date(now * 1000))}</div>
-        <button onClick={() => setTimestamp(String(now))} className="mt-2 text-xs underline opacity-80 hover:opacity-100">
+        <div className="mb-1 font-mono text-3xl font-black">{now ?? '—'}</div>
+        <div className="text-xs opacity-80">{now === null ? ' ' : formatDate(new Date(now * 1000))}</div>
+        <button onClick={() => now !== null && setTimestamp(String(now))} className="mt-2 text-xs underline opacity-80 hover:opacity-100">
           Utiliser cette valeur
         </button>
       </div>

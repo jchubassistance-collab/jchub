@@ -7,7 +7,6 @@ import { trackEvent } from '@/lib/analytics-client';
 export function BlogInteractions({ slug, title }: { slug: string; title: string }) {
   const [views, setViews] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
-  const url = typeof window === 'undefined' ? '' : window.location.href;
 
   useEffect(() => {
     fetch(`/api/blog/${slug}/view`, { method: 'POST' })

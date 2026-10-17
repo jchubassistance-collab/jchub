@@ -3,8 +3,13 @@ import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
 import { BlogCatalog } from '@/components/blog/BlogCatalog';
 import { Newsletter } from '@/components/Newsletter';
 import { getPublishedArticles } from '@/lib/blog';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata = { title: 'Blog JcHub — Ressources pour développeurs', description: 'Articles, tutoriels et conseils pratiques pour progresser en informatique.' };
+export const metadata = pageMetadata({
+  title: 'Ressources et conseils pour développeurs',
+  description: 'Guides pratiques, retours d’expérience et tutoriels pour apprendre, créer et progresser dans tes projets numériques.',
+  path: '/blog',
+});
 
 export default async function BlogPage() {
   const articles = await getPublishedArticles();

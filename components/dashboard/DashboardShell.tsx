@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { onAuthChange, signOut, getUserProfile, UserProfile } from '@/lib/firebase-auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
-import { LogOut, BookOpen, Wrench, CreditCard, Settings, User, Bell, Search } from 'lucide-react';
+import { LogOut, Wrench, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 
 export function DashboardShell({ children }: { children: (user: UserProfile) => React.ReactNode }) {
@@ -52,11 +52,6 @@ export function DashboardShell({ children }: { children: (user: UserProfile) => 
               <div className="text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">Bonjour 👋</div>
               <div className="text-lg font-black text-slate-900">{user.displayName}</div>
             </div>
-            {user.subscription?.status === 'active' && user.subscription.tier !== 'free' && (
-              <span className="rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-white shadow-sm">
-                ⭐ JcHub+ {user.subscription.tier}
-              </span>
-            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -80,7 +75,6 @@ export function DashboardShell({ children }: { children: (user: UserProfile) => 
               {[
                 { href: '/compte/dashboard', label: 'Tableau de bord', icon: User },
                 { href: '/outils', label: 'Outils', icon: Wrench },
-                { href: '/compte/abonnement', label: 'Abonnement', icon: CreditCard },
                 { href: '/compte/parametres', label: 'Paramètres', icon: Settings },
               ].map((item) => (
                 <Link

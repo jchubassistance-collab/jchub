@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/admin-auth';
-import { facebookAppSecretProof, facebookGraphApiVersion, getFacebookRedirectUri, selectFacebookPage, type FacebookPageCandidate } from '@/lib/facebook-oauth';
+import { facebookAppSecretProof, facebookGraphApiVersion, getFacebookAppId, getFacebookAppSecret, getFacebookRedirectUri, selectFacebookPage, type FacebookPageCandidate } from '@/lib/facebook-oauth';
 import { saveLocalEnvValues } from '@/lib/local-env-store';
 import { isMatchingOAuthState } from '@/lib/linkedin-oauth';
 import { reportUserError } from '@/lib/user-error';
@@ -14,7 +14,9 @@ function finish(request: NextRequest, result: 'connected' | 'page-required' | 'e
   const response = NextResponse.redirect(url, status);
   response.headers.set('Cache-Control', 'no-store');
   response.headers.set('Referrer-Policy', 'no-referrer');
-  response.cookies.set('facebook_oauth_state', '', { httpOnly: true, secure: false, sameSite: 'lax', maxAge: 0, path: '/api/auth/facebook' });
+  const forwardedProtocol = request.headers.get('x-forwarded-proto')?.split(',')[0].trim();
+  const secure = request.nextUrl.protocol === 'https:' || forwardedProtocol === 'https:';
+  response.cookies.set('facebook_oauth_state', '', { httpOnly: true, secure, sameSite: 'lax', maxAge: 0, path: '/api/auth/facebook' });
   return response;
 }
 
@@ -43,8 +45,8 @@ export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code');
   if (request.nextUrl.searchParams.has('error') || !isMatchingOAuthState(expectedState, returnedState) || !code || code.length > 4096) return finish(request, 'error');
 
-  const appId = process.env.FACEBOOK_APP_ID?.trim();
-  const appSecret = process.env.FACEBOOK_APP_SECRET?.trim();
+  const appId = getFacebookAppId(process.env);
+  const appSecret = getFacebookAppSecret(process.env);
   let redirectUri: string;
   let version: string;
   try { redirectUri = getFacebookRedirectUri(process.env); version = facebookGraphApiVersion(process.env); }

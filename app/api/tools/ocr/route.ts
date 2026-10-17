@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { convertImageToOcrPdfWithAdobe, hasAdobeImagePdfConfig } from '@/lib/image-to-pdf-services';
 import { extractPdfLayout, joinPdfRuns } from '@/lib/pdf-to-word';
 import { reportUserError } from '@/lib/user-error';
-import { enforceRateLimit } from '@/lib/rate-limit';
+import { enforceDailyConversionQuota } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -66,8 +66,6 @@ function mergeOcrLineFragments(lines: Array<{ text: string; bbox: { x0: number; 
 }
 
 export async function POST(request: NextRequest) {
-  const limited = await enforceRateLimit(request, 'ocr', 5, 10 * 60_000);
-  if (limited) return limited;
   const apiKey = process.env.OCR_API_KEY;
   const apiUrl = process.env.OCR_API_URL;
   if (!apiKey || !apiUrl) {
@@ -75,6 +73,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const contentLength = Number(request.headers.get('content-length') || 0);
+    if (contentLength > MAX_IMAGE_SIZE + 128 * 1024) {
+      return NextResponse.json({ error: 'Le fichier ne doit pas dépasser 10 Mo.' }, { status: 413 });
+    }
     const formData = await request.formData();
     const file = formData.get('file');
     if (!(file instanceof File)) {
@@ -86,6 +88,9 @@ export async function POST(request: NextRequest) {
     if (file.size > MAX_IMAGE_SIZE) {
       return NextResponse.json({ error: 'Le fichier ne doit pas dépasser 10 Mo.' }, { status: 400 });
     }
+
+    const limited = await enforceDailyConversionQuota(request, 'ocr');
+    if (limited) return limited;
 
     const requestedProvider = request.nextUrl.searchParams.get('provider');
     if (requestedProvider !== 'ocrspace' && hasAdobeImagePdfConfig() && (file.type === 'image/jpeg' || file.type === 'image/png')) {

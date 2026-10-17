@@ -148,7 +148,7 @@ export function PdfToWord() {
       )}
 
       <p className="text-center text-xs text-slate-400">
-        Le PDF est traité côté serveur, puis supprimé automatiquement après conversion. Seules les stats Firebase sont enregistrées.
+        5 conversions par jour et par adresse IP. Le PDF est traité côté serveur puis supprimé automatiquement ; seule une empreinte hachée de l’adresse IP est conservée pour le quota.
       </p>
     </div>
   );

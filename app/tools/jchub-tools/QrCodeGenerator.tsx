@@ -53,7 +53,7 @@ export function QrCodeGenerator() {
   const presets = [
     { label: 'URL', icon: '🔗', value: 'https://jchub.dev' },
     { label: 'Email', icon: '📧', value: 'mailto:hello@jchub.dev' },
-    { label: 'WhatsApp', icon: '💬', value: 'https://wa.me/242069550625' },
+    { label: 'WhatsApp', icon: '💬', value: 'https://wa.me/242044793800' },
     { label: 'WiFi', icon: '📶', value: 'WIFI:S:JcHub-Guest;T:WPA;P:dev2026;;' },
   ];
 

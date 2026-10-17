@@ -1,5 +1,5 @@
-const CACHE_NAME = 'jchub-v4';
-const APP_SHELL = ['/', '/manifest.webmanifest', '/favicon-blue.png'];
+const CACHE_NAME = 'jchub-v5';
+const APP_SHELL = ['/', '/manifest.webmanifest', '/jchub-icon-192.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));

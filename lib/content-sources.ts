@@ -1,3 +1,5 @@
+import { reportUserError } from '@/lib/user-error';
+
 export type TrendCandidate = {
   title: string;
   url: string;
@@ -7,7 +9,7 @@ export type TrendCandidate = {
 };
 
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, { ...init, cache: 'no-store' });
+  const response = await fetch(url, { ...init, cache: 'no-store', signal: init?.signal || AbortSignal.timeout(12_000) });
   if (!response.ok) throw new Error(`Source indisponible (${response.status}): ${url}`);
   return response.json() as Promise<T>;
 }
@@ -26,11 +28,18 @@ async function collectDevTo(): Promise<TrendCandidate[]> {
 async function collectGitHub(): Promise<TrendCandidate[]> {
   const headers: HeadersInit = { Accept: 'application/vnd.github+json' };
   if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-  const data = await fetchJson<{ items?: Array<{ name?: string; html_url?: string; stargazers_count?: number; description?: string }> }>('https://api.github.com/search/repositories?q=created:%3E2026-09-06&sort=stars&order=desc&per_page=6', { headers });
+  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const data = await fetchJson<{ items?: Array<{ name?: string; html_url?: string; stargazers_count?: number; description?: string }> }>(`https://api.github.com/search/repositories?q=created:%3E${since}&sort=stars&order=desc&per_page=6`, { headers });
   return (data.items || []).filter((repository): repository is { name: string; html_url: string; stargazers_count?: number; description?: string } => Boolean(repository.name && repository.html_url)).map((repository) => ({ title: repository.name, url: repository.html_url, source: 'github', score: repository.stargazers_count || 0, summary: repository.description || 'Projet récemment populaire sur GitHub.' }));
 }
 
 export async function collectTrends(): Promise<TrendCandidate[]> {
   const results = await Promise.allSettled([collectHackerNews(), collectGitHub(), collectDevTo()]);
-  return results.filter((result): result is PromiseFulfilledResult<TrendCandidate[]> => result.status === 'fulfilled').flatMap((result) => result.value).sort((first, second) => second.score - first.score).slice(0, 12);
+  const collected = results.filter((result): result is PromiseFulfilledResult<TrendCandidate[]> => result.status === 'fulfilled').flatMap((result) => result.value);
+  const failedSources = results.filter((result): result is PromiseRejectedResult => result.status === 'rejected').length;
+  if (failedSources > 0) reportUserError();
+  if (!collected.length) {
+    throw new Error(`Aucune source de tendances n’est disponible (${failedSources} source(s) en échec).`);
+  }
+  return collected.sort((first, second) => second.score - first.score).slice(0, 12);
 }

@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { BlogInteractions } from '@/components/blog/BlogInteractions';
 import { GiscusComments } from '@/components/blog/GiscusComments';
 import { getPublishedArticles, getPublishedArticleBySlug, getPublishedArticleSlugs } from '@/lib/blog';
+import { getPublicBaseUrl } from '@/lib/site-url';
 
 export async function generateStaticParams() {
   return getPublishedArticleSlugs();
@@ -15,12 +16,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const article = await getPublishedArticleBySlug(slug);
   if (!article) return {};
-  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
+  const baseUrl = getPublicBaseUrl();
   const articleUrl = `${baseUrl}/blog/${article.slug}`;
-  const imageUrl = article.image.startsWith('http') ? article.image : `${baseUrl}${article.image.startsWith('/') ? '' : '/'}${article.image}`;
+  const imageUrl = `${baseUrl}/api/article-cover?title=${encodeURIComponent(article.title)}&category=${encodeURIComponent(article.category)}`;
   return {
     title: article.title,
-    description: article.description,
+    description: article.description || article.excerpt || article.title,
     keywords: article.keywords,
     authors: [{ name: article.author }],
     alternates: { canonical: articleUrl },

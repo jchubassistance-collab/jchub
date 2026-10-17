@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { AlertCircle, ArrowRight } from 'lucide-react';
 import { getCurrentIdToken, resetPassword, signInWithEmail } from '@/lib/firebase-auth';
 
+const ADMIN_LAST_ACTIVITY_KEY = 'jchub_admin_last_activity';
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -27,7 +29,8 @@ export default function AdminLoginPage() {
       try { data = JSON.parse(responseText) as { error?: string }; }
       catch { throw new Error('Le serveur admin a renvoyé une réponse invalide. Réessaie dans quelques instants.'); }
       if (!response.ok) throw new Error(data.error || 'Accès administrateur refusé.');
-      router.replace('/admin');
+      sessionStorage.setItem(ADMIN_LAST_ACTIVITY_KEY, String(Date.now()));
+      router.replace((data as { role?: string }).role === 'cm' ? '/admin/cm' : '/admin');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Authentification impossible.');
     } finally { setLoading(false); }

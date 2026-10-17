@@ -22,26 +22,6 @@ export type CloudinaryResource = {
   resource_type: 'image' | 'video' | 'raw';
 };
 
-export function signedCloudinaryDownloadUrl(publicId: string, format = 'pdf'): string {
-  if (!API_KEY || !API_SECRET || CLOUD_NAME === 'demo') {
-    throw new Error('Cloudinary non configuré pour les téléchargements privés');
-  }
-
-  cloudinary.config({
-    cloud_name: CLOUD_NAME,
-    api_key: API_KEY,
-    api_secret: API_SECRET,
-    secure: true,
-  });
-
-  const rawPublicId = /\.[a-z0-9]+$/i.test(publicId) ? publicId : `${publicId}.${format}`;
-  return cloudinary.utils.private_download_url(rawPublicId, format, {
-    resource_type: 'raw',
-    type: 'upload',
-    attachment: true,
-  });
-}
-
 /**
  * Construit une URL Cloudinary avec transformations
  */

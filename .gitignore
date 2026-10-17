@@ -5,3 +5,8 @@ node_modules
 .vercel
 .vscode
 *.tsbuildinfo
+
+# Fichier de clés local, jamais versionné
+.api
+# Le modèle de configuration (valeurs fictives) reste versionné
+!.env.exemple

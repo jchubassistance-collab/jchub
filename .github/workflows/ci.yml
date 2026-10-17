@@ -1,0 +1,25 @@
+# Lint and unit tests on every Pull Request, including tools generated from the admin.
+# Type checking happens in the Vercel preview build, which must succeed before the
+# admin can approve a generated tool.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test

@@ -18,7 +18,7 @@ const contactMethods = [
     value: '+242 06 955 06 25',
     description: 'Réponse rapide en journée',
     gradient: 'from-emerald-500 to-teal-600',
-    link: 'https://wa.me/242069550625',
+    link: 'https://wa.me/242044793800',
   },
   {
     icon: Phone,
@@ -26,7 +26,7 @@ const contactMethods = [
     value: '+242 06 955 06 25',
     description: 'Lun-Ven, 9h-18h (GMT+1)',
     gradient: 'from-amber-500 to-orange-600',
-    link: 'tel:+242069550625',
+    link: 'tel:+242044793800',
   },
   {
     icon: MapPin,

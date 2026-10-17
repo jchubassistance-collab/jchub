@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { ArrowRight, ArrowUpRight, Check, Heart, HeartHandshake, Lightbulb, Mail, ShieldCheck, Sparkles, Users, Zap } from 'lucide-react';
 import { getPublishedTools } from '@/lib/tools';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'À propos de JcHub',
+export const metadata = pageMetadata({
+  title: 'À propos',
   description: 'Découvrez JcHub, sa mission et son engagement pour des outils numériques simples et accessibles.',
-};
+  path: '/a-propos',
+});
 
 const values = [
   { icon: Zap, title: 'Simplicité', text: 'Chaque outil doit être compris rapidement. Pas de tutoriel interminable, ni de jargon inutile.' },

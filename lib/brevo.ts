@@ -2,6 +2,7 @@ import 'server-only';
 
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
+import { getPublicBaseUrl } from '@/lib/site-url';
 import { reportUserError } from '@/lib/user-error';
 
 export type PublishedArticlePayload = {
@@ -64,12 +65,13 @@ export async function notifyBrevoNewContent(content: PublishedContentPayload): P
     await notificationReference.set({ type: content.type, slug: content.slug, status: 'sending', updatedAt: FieldValue.serverTimestamp() }, { merge: true });
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://jchub.dev';
-  const contentUrl = `${siteUrl}${content.path}`;
+  const siteUrl = getPublicBaseUrl();
+  const contentUrl = new URL(content.path, siteUrl).toString();
   const title = escapeHtml(content.title);
   const description = escapeHtml(content.description);
-  const image = escapeHtml(content.image || `${siteUrl}/blog/default.svg`);
+  const image = escapeHtml(content.image ? new URL(content.image, siteUrl).toString() : `${siteUrl}/blog/default.svg`);
   const label = escapeHtml(content.label || content.category);
+  const logoUrl = escapeHtml(`${siteUrl}/icon-192.png`);
   const response = await fetch('https://api.brevo.com/v3/emailCampaigns', {
     method: 'POST',
     headers: {
@@ -82,7 +84,7 @@ export async function notifyBrevoNewContent(content: PublishedContentPayload): P
       subject: `${content.type === 'tool' ? 'Nouvel outil' : 'Nouvel article'} : ${content.title}`,
       sender: { name: process.env.BREVO_SENDER_NAME?.trim() || 'JcHub', email: senderEmail },
       recipients: { listIds: [listId] },
-      htmlContent: `<html><body style="font-family:Arial,sans-serif;color:#17324d;max-width:640px;margin:auto"><img src="${image}" alt="${title}" style="width:100%;max-height:320px;object-fit:cover"><p style="color:#64748b;font-size:13px">${label}</p><h1>${title}</h1><p>${description}</p><p><a href="${contentUrl}" style="display:inline-block;background:#2d67f6;color:#fff;padding:12px 18px;text-decoration:none;border-radius:8px">${content.type === 'tool' ? 'Découvrir l’outil' : 'Lire l’article'}</a></p></body></html>`,
+      htmlContent: `<html><body style="margin:0;background:#f4f8ff;font-family:Arial,sans-serif;color:#17324d"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f8ff;padding:24px 12px"><tr><td align="center"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#fff;border:1px solid #dbeafe;border-radius:12px;overflow:hidden"><tr><td style="padding:22px 28px;border-bottom:1px solid #e2e8f0"><a href="${siteUrl}" style="display:inline-flex;align-items:center;color:#0066ff;text-decoration:none"><img src="${logoUrl}" width="44" height="44" alt="" style="display:inline-block;vertical-align:middle;border:0;margin-right:10px"><span style="font-size:26px;font-weight:800;vertical-align:middle">JcHub</span></a></td></tr><tr><td><img src="${image}" alt="${title}" width="640" style="display:block;width:100%;max-height:320px;object-fit:cover;border:0"></td></tr><tr><td style="padding:28px"><p style="margin:0 0 12px;color:#64748b;font-size:13px">${label}</p><h1 style="margin:0 0 16px;color:#102a43;font-size:28px;line-height:1.25">${title}</h1><p style="margin:0 0 24px;color:#475569;font-size:16px;line-height:1.65">${description}</p><p style="margin:0"><a href="${contentUrl}" style="display:inline-block;background:#2d67f6;color:#fff;padding:12px 18px;text-decoration:none;border-radius:8px;font-weight:bold">${content.type === 'tool' ? 'Découvrir l’outil' : 'Lire l’article'}</a></p></td></tr><tr><td style="padding:18px 28px;border-top:1px solid #e2e8f0;color:#64748b;font-size:12px;line-height:1.6">JcHub · Des outils et ressources numériques utiles.<br><a href="${siteUrl}" style="color:#2563eb">jchub.dev</a> · <a href="mailto:hello@jchub.dev" style="color:#2563eb">hello@jchub.dev</a></td></tr></table></td></tr></table></body></html>`,
     }),
     cache: 'no-store',
   });

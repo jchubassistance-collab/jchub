@@ -1,56 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { mkdir, writeFile, unlink } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { createHash, randomUUID } from 'node:crypto';
 import { buildVisuallyFaithfulWordDocument } from '@/lib/pdf-to-word';
 import { convertPdfWithAdobe, hasAdobePdfServicesConfig } from '@/lib/document-services';
 import { reportUserError } from '@/lib/user-error';
+import { enforceDailyConversionQuota } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const PDF_LIMIT = 5;
-const PDF_WINDOW_MS = 60 * 60 * 1000;
 const MAX_PDF_SIZE_BYTES = 4 * 1024 * 1024;
-
-function getClientIp(request: NextRequest) {
-  return request.headers.get('cf-connecting-ip')
-    || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    || request.headers.get('x-real-ip')
-    || '';
-}
-
-async function consumePdfQuota(request: NextRequest) {
-  const clientIp = getClientIp(request);
-  if (!clientIp) return true;
-
-  const { getAdminDb, hasFirebaseAdminConfig } = await import('@/lib/firebase-admin');
-  if (!hasFirebaseAdminConfig()) return true;
-
-  const key = createHash('sha256')
-    .update(`${process.env.PDF_QUOTA_SALT || 'jchub-pdf-quota'}:${clientIp}`)
-    .digest('hex');
-  const quotaRef = getAdminDb().collection('api_rate_limits').doc(`pdf-to-word:${key}`);
-  const now = Date.now();
-  let allowed = false;
-
-  await getAdminDb().runTransaction(async (transaction) => {
-    const snapshot = await transaction.get(quotaRef);
-    const data = snapshot.data() as { count?: number; windowStartedAt?: number } | undefined;
-    const windowStartedAt = Number(data?.windowStartedAt || 0);
-    const count = windowStartedAt && now - windowStartedAt < PDF_WINDOW_MS ? Number(data?.count || 0) : 0;
-    allowed = count < PDF_LIMIT;
-    if (allowed) {
-      transaction.set(quotaRef, { count: count + 1, windowStartedAt: count ? windowStartedAt : now, updatedAt: now });
-    }
-  });
-
-  return allowed;
-}
 
 export async function POST(request: NextRequest) {
   try {
+    const contentLength = Number(request.headers.get('content-length') || 0);
+    if (contentLength > MAX_PDF_SIZE_BYTES + 128 * 1024) {
+      return NextResponse.json({ error: 'Le fichier est trop volumineux. La taille maximale autorisée est de 4 Mo.' }, { status: 413 });
+    }
     const formData = await request.formData();
     const file = formData.get('file');
 
@@ -69,9 +33,9 @@ export async function POST(request: NextRequest) {
     if (bytes.subarray(0, 5).toString('ascii') !== '%PDF-') {
       return NextResponse.json({ error: 'Le fichier reçu n’est pas un PDF valide.' }, { status: 400 });
     }
-    if (!await consumePdfQuota(request)) {
-      return NextResponse.json({ error: 'Limite atteinte : 5 conversions par heure. Réessaie plus tard.' }, { status: 429 });
-    }
+    const limited = await enforceDailyConversionQuota(request, 'pdf-to-word');
+    if (limited) return limited;
+
     let usedAdobe = false;
     let output: Buffer;
 
@@ -86,13 +50,6 @@ export async function POST(request: NextRequest) {
     } else {
       output = await buildVisuallyFaithfulWordDocument(bytes);
     }
-
-    const tempDir = join(tmpdir(), 'jchub-pdf-to-word');
-    const tempFileName = `${randomUUID()}.docx`;
-    const tempPath = join(tempDir, tempFileName);
-
-    await mkdir(tempDir, { recursive: true });
-    await writeFile(tempPath, output);
 
     try {
       const { getAdminDb, hasFirebaseAdminConfig } = await import('@/lib/firebase-admin');
@@ -124,8 +81,6 @@ export async function POST(request: NextRequest) {
         'X-Document-Service': usedAdobe ? 'adobe' : 'local',
       },
     });
-
-    await unlink(tempPath).catch(() => undefined);
 
     return response;
   } catch (error) {

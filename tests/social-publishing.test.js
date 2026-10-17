@@ -5,7 +5,10 @@ import { generateSocialCopies, parseSocialCopies } from '../lib/social-copy.ts';
 import { publishToPlatform, PlatformError } from '../lib/social-platforms.ts';
 import { canRetryPublication, externalPublishingEnabled, isCronBearerAuthorized, publicationGuardId, publicationId, zonedDateTimeToUtc, shouldAutoPublish, settleIndependently } from '../lib/social-utils.ts';
 import { getLinkedInRedirectUri, isMatchingOAuthState, updateEnvFile } from '../lib/linkedin-oauth.ts';
-import { facebookAppSecretProof, facebookGraphApiVersion, getFacebookRedirectUri, selectFacebookPage } from '../lib/facebook-oauth.ts';
+import { facebookAppSecretProof, facebookGraphApiVersion, getFacebookAppId, getFacebookAppSecret, getFacebookRedirectUri, selectFacebookPage } from '../lib/facebook-oauth.ts';
+import { getSocialPlatformReadiness } from '../lib/social-readiness.ts';
+import { FacebookInsightsError, getFacebookInsights } from '../lib/facebook-insights.ts';
+import { GitHubInsightsError, getGitHubInsights } from '../lib/github-insights.ts';
 
 const source = {
   id: 'article-security-2026', title: 'Sécuriser une application web',
@@ -57,6 +60,30 @@ test('AUTO_PUBLISH requiert une plateforme active; DRY_RUN interdit les appels e
   assert.equal(externalPublishingEnabled({ ...settings, dryRun: false }), true);
 });
 
+test('la readiness sociale vérifie activation et variables serveur sans retourner leurs valeurs', () => {
+  const settings = { linkedinEnabled: true, facebookEnabled: true, githubEnabled: true, autoPublish: false, dryRun: false, timezone: 'Africa/Brazzaville' };
+  const env = {
+    LINKEDIN_ACCESS_TOKEN: 'secret-value', LINKEDIN_AUTHOR_URN: 'urn:li:person:123',
+    FACEBOOK_ACCESS_TOKEN: 'another-secret', FACEBOOK_PAGE_ID: '123456',
+    GITHUB_TOKEN: 'github-secret', GITHUB_OWNER: 'jchub', GITHUB_REPOSITORY: 'site',
+  };
+  assert.deepEqual(getSocialPlatformReadiness('linkedin', settings, env), { enabled: true, configured: true, ready: true, missing: [] });
+  assert.deepEqual(getSocialPlatformReadiness('facebook', settings, env), { enabled: true, configured: true, ready: true, missing: [] });
+  assert.deepEqual(getSocialPlatformReadiness('github', settings, env), { enabled: true, configured: true, ready: true, missing: [] });
+  assert.deepEqual(getSocialPlatformReadiness('linkedin', settings, { LINKEDIN_ACCESS_TOKEN: 'secret' }), { enabled: true, configured: true, ready: true, missing: [] });
+  assert.deepEqual(getSocialPlatformReadiness('github', settings, { GITHUB_TOKEN: 'secret' }), { enabled: true, configured: true, ready: true, missing: [] });
+  assert.deepEqual(getSocialPlatformReadiness('facebook', settings, {
+    FACEBOOK_ACCESS_TOKEN: 'secret', FACEBOOK_PAGE_ID: '123', FACEBOOK_GRAPH_API_VERSION: 'latest',
+  }).missing, ['FACEBOOK_GRAPH_API_VERSION']);
+  assert.deepEqual(getSocialPlatformReadiness('facebook', settings, { FACEBOOK_ACCESS_TOKEN: 'secret' }), {
+    enabled: true, configured: false, ready: false, missing: ['FACEBOOK_PAGE_ID'],
+  });
+  assert.deepEqual(getSocialPlatformReadiness('facebook', { ...settings, facebookEnabled: false }, env), {
+    enabled: false, configured: true, ready: false, missing: [],
+  });
+  assert.doesNotMatch(JSON.stringify(getSocialPlatformReadiness('facebook', settings, env)), /secret/);
+});
+
 test('mode approbation garde le contenu en attente; dry-run ne requiert aucun credential', async () => {
   const settings = { autoPublish: false, dryRun: true, linkedinEnabled: false, facebookEnabled: false, githubEnabled: false, timezone: 'Africa/Brazzaville' };
   assert.equal(shouldAutoPublish(settings, 'linkedin'), false);
@@ -79,6 +106,29 @@ test('LinkedIn utilise le Posts API officiel et retourne son identifiant externe
   assert.equal(result.externalId, 'urn:li:share:456');
 });
 
+test('LinkedIn déduit l’URN du membre depuis le profil OpenID si elle n’est pas configurée', async () => {
+  const calls = [];
+  await publishToPlatform('linkedin', record('linkedin'), source, {
+    env: { LINKEDIN_ACCESS_TOKEN: 'mock-token' },
+    fetcher: async (url, init) => {
+      calls.push({ url: String(url), body: init.body });
+      if (String(url).endsWith('/v2/userinfo')) return mockResponse(200, { sub: 'member-789' });
+      return mockResponse(201, {}, { 'x-restli-id': 'urn:li:share:789' });
+    },
+  });
+  assert.equal(calls[0].url, 'https://api.linkedin.com/v2/userinfo');
+  assert.equal(JSON.parse(calls[1].body).author, 'urn:li:person:member-789');
+});
+
+test('LinkedIn signale un token expiré avant de tenter la publication', async () => {
+  let calls = 0;
+  await assert.rejects(publishToPlatform('linkedin', record('linkedin'), source, {
+    env: { LINKEDIN_ACCESS_TOKEN: 'expired-token' },
+    fetcher: async () => { calls += 1; return mockResponse(401); },
+  }), (error) => error instanceof PlatformError && error.code === 'TOKEN_INVALID' && /expiré/.test(error.message));
+  assert.equal(calls, 1);
+});
+
 test('un timeout LinkedIn après envoi devient UNKNOWN sans retry automatique', async () => {
   let calls = 0;
   await assert.rejects(publishToPlatform('linkedin', record('linkedin'), source, {
@@ -96,16 +146,110 @@ test('Facebook publie seulement sur le feed de Page, avec une erreur API expurg�
   let requestUrl = '';
   let requestBody = '';
   const result = await publishToPlatform('facebook', record('facebook'), source, {
-    env: { FACEBOOK_ACCESS_TOKEN: 'mock-page-token', FACEBOOK_PAGE_ID: '123456', FACEBOOK_GRAPH_API_VERSION: 'v26.0' },
+    env: { FACEBOOK_ACCESS_TOKEN: 'mock-page-token', FACEBOOK_PAGE_ID: '123456', FACEBOOK_GRAPH_API_VERSION: 'v26.0', FACEBOOK_APP_SECRET: 'mock-app-secret' },
     fetcher: async (url, init) => { requestUrl = String(url); requestBody = String(init.body); return mockResponse(200, { id: '123456_987' }); },
   });
-  assert.equal(requestUrl, 'https://graph.facebook.com/v26.0/123456/feed');
+  const facebookUrl = new URL(requestUrl);
+  assert.equal(facebookUrl.origin + facebookUrl.pathname, 'https://graph.facebook.com/v26.0/123456/feed');
+  assert.equal(facebookUrl.searchParams.get('appsecret_proof'), facebookAppSecretProof('mock-page-token', 'mock-app-secret'));
   assert.match(requestBody, /message=/);
   assert.equal(result.externalId, '123456_987');
   await assert.rejects(publishToPlatform('facebook', record('facebook'), source, {
     env: { FACEBOOK_ACCESS_TOKEN: 'mock-page-token', FACEBOOK_PAGE_ID: '123456' },
     fetcher: async () => mockResponse(403, { error: { message: 'private-token-detail' } }),
   }), (error) => !error.message.includes('private-token-detail'));
+});
+
+test('Meta Insights agrège les métriques de Page sur 28 jours sans exposer le token', async () => {
+  let request;
+  const result = await getFacebookInsights({ FACEBOOK_ACCESS_TOKEN: 'private-token', FACEBOOK_PAGE_ID: '123456', FACEBOOK_GRAPH_API_VERSION: 'v26.0', FACEBOOK_APP_SECRET: 'mock-app-secret' }, {
+    now: new Date('2026-10-14T12:00:00.000Z'),
+    fetcher: async (url, init) => {
+      const parsedUrl = new URL(String(url));
+      if (parsedUrl.pathname.endsWith('/insights')) {
+        request = { url: parsedUrl, init };
+        return mockResponse(200, { data: [
+          { name: 'page_impressions', values: [{ end_time: '2026-10-13T07:00:00+0000', value: 100 }, { end_time: '2026-10-14T07:00:00+0000', value: 150 }] },
+          { name: 'page_post_engagements', values: [{ end_time: '2026-10-13T07:00:00+0000', value: 12 }, { end_time: '2026-10-14T07:00:00+0000', value: 18 }] },
+          { name: 'page_views_total', values: [{ end_time: '2026-10-14T07:00:00+0000', value: 33 }] },
+        ] });
+      }
+      return mockResponse(200, { followers_count: 842 });
+    },
+  });
+  assert.equal(request.url.pathname, '/v26.0/123456/insights');
+  assert.match(request.url.searchParams.get('metric'), /page_post_engagements/);
+  assert.equal(request.url.searchParams.get('period'), 'day');
+  assert.equal(request.url.searchParams.get('appsecret_proof'), facebookAppSecretProof('private-token', 'mock-app-secret'));
+  assert.equal(request.init.headers.Authorization, 'Bearer private-token');
+  assert.equal(request.url.search.includes('private-token'), false);
+  assert.equal(result.impressions, 250);
+  assert.equal(result.engagements, 30);
+  assert.equal(result.pageViews, 33);
+  assert.equal(result.followers, 842);
+  assert.deepEqual(result.timeline, [
+    { date: '2026-10-13', impressions: 100, engagements: 12 },
+    { date: '2026-10-14', impressions: 150, engagements: 18 },
+  ]);
+  assert.deepEqual(result.warnings, []);
+});
+
+test('Meta Insights isole les métriques obsolètes et conserve les autres statistiques', async () => {
+  const requests = [];
+  const result = await getFacebookInsights({ FACEBOOK_ACCESS_TOKEN: 'private-token', FACEBOOK_PAGE_ID: '123456' }, {
+    now: new Date('2026-10-14T12:00:00.000Z'),
+    fetcher: async (url) => {
+      const parsed = new URL(String(url));
+      requests.push(parsed);
+      if (!parsed.pathname.endsWith('/insights')) return mockResponse(200, { followers_count: 842 });
+      if (parsed.searchParams.get('metric').includes(',')) return mockResponse(400, { error: { code: 100 } });
+      const metric = parsed.searchParams.get('metric');
+      if (metric === 'page_impressions') return mockResponse(400, { error: { code: 100 } });
+      return mockResponse(200, { data: [{ name: metric, values: [{ end_time: '2026-10-14T07:00:00+0000', value: metric === 'page_views_total' ? 22 : 8 }] }] });
+    },
+  });
+  assert.equal(requests.filter((url) => url.pathname.endsWith('/insights')).length, 4);
+  assert.equal(result.engagements, 8);
+  assert.equal(result.pageViews, 22);
+  assert.equal(result.followers, 842);
+  assert.equal(result.impressions, 0);
+  assert.ok(result.warnings.some((warning) => warning.includes('page_impressions')));
+});
+
+test('Meta Insights transforme les permissions refusées en consigne sûre', async () => {
+  await assert.rejects(getFacebookInsights({ FACEBOOK_ACCESS_TOKEN: 'private-token', FACEBOOK_PAGE_ID: '123456' }, {
+    fetcher: async () => mockResponse(403, { error: { code: 200, message: 'sensitive provider detail' } }),
+  }), (error) => error instanceof FacebookInsightsError && /read_insights/.test(error.message) && !error.message.includes('sensitive provider detail'));
+});
+
+test('GitHub Insights retourne les métriques du dépôt sans exposer le token', async () => {
+  let request;
+  const report = await getGitHubInsights({
+    GITHUB_TOKEN: 'private-token',
+    GITHUB_OWNER: 'jchubassistance-collab',
+    GITHUB_REPOSITORY: 'jchub',
+  }, {
+    now: new Date('2026-10-14T12:00:00.000Z'),
+    fetcher: async (url, init) => {
+      request = { url: String(url), init };
+      return mockResponse(200, {
+        full_name: 'jchubassistance-collab/jchub',
+        stargazers_count: 20,
+        forks_count: 5,
+        subscribers_count: 7,
+        open_issues_count: 3,
+        updated_at: '2026-10-13T12:00:00Z',
+      });
+    },
+  });
+  assert.equal(request.url, 'https://api.github.com/repos/jchubassistance-collab/jchub');
+  assert.equal(request.init.headers.Authorization.startsWith('Bearer '), true);
+  assert.equal(report.stars, 20);
+  assert.equal(report.forks, 5);
+  assert.equal(report.watchers, 7);
+  assert.equal(report.openItems, 3);
+  assert.doesNotMatch(JSON.stringify(report), /private-token/);
+  await assert.rejects(getGitHubInsights({}, { fetcher: async () => { throw new Error('unexpected'); } }), (error) => error instanceof GitHubInsightsError);
 });
 
 test('GitHub vérifie dépôt, branche et évite un PUT si le Markdown est identique', async () => {
@@ -155,6 +299,22 @@ test('GitHub refuse une branche inconnue avant toute écriture', async () => {
   assert.equal(puts, 0);
 });
 
+test('GitHub publie vers le dépôt par défaut sans owner ou repository explicites', async () => {
+  const calls = [];
+  await publishToPlatform('github', record('github'), source, {
+    env: { GITHUB_TOKEN: 'mock-token' },
+    fetcher: async (url, init) => {
+      calls.push({ url: String(url), method: init.method || 'GET' });
+      if (calls.length === 1) return mockResponse(200, { full_name: 'jchubassistance-collab/jchub' });
+      if (calls.length === 2) return mockResponse(200, { ref: 'refs/heads/main' });
+      if (calls.length === 3) return mockResponse(404, {});
+      return mockResponse(201, { commit: { sha: 'default-commit', html_url: 'https://github.com/commit/default' }, content: { sha: 'default-blob' } });
+    },
+  });
+  assert.match(calls[0].url, /repos\/jchubassistance-collab\/jchub$/);
+  assert.equal(calls.at(-1).method, 'PUT');
+});
+
 test('une plateforme en échec ne bloque pas le résultat des autres', async () => {
   const result = await settleIndependently(['linkedin', 'facebook', 'github'], async (platform) => {
     if (platform === 'facebook') throw new Error('simulated');
@@ -181,6 +341,7 @@ test('les routes d’administration appellent toutes requireAdmin', async () => 
     '../app/api/admin/social/route.ts',
     '../app/api/admin/social/prepare/route.ts',
     '../app/api/admin/social/[id]/route.ts',
+    '../app/api/admin/social/insights/route.ts',
   ]) {
     const route = await readFile(new URL(path, import.meta.url), 'utf8');
     assert.match(route, /await requireAdmin\(request\)/, `${path} doit vérifier la session admin`);
@@ -206,6 +367,11 @@ test('OAuth LinkedIn impose une URI de callback locale explicite, un state ident
 test('OAuth Facebook exige la callback locale exacte et ne sélectionne jamais arbitrairement une Page', async () => {
   assert.equal(getFacebookRedirectUri({ NODE_ENV: 'development', FACEBOOK_REDIRECT_URI: 'http://127.0.0.1:3000/api/auth/facebook/callback' }), 'http://127.0.0.1:3000/api/auth/facebook/callback');
   assert.throws(() => getFacebookRedirectUri({ NODE_ENV: 'production', FACEBOOK_REDIRECT_URI: 'http://127.0.0.1:3000/api/auth/facebook/callback' }));
+  assert.equal(getFacebookAppId({ META_APP_ID: 'meta-app-id' }), 'meta-app-id');
+  assert.equal(getFacebookAppSecret({ META_APP_SECRET: 'meta-app-secret' }), 'meta-app-secret');
+  assert.equal(getFacebookRedirectUri({ NODE_ENV: 'development', META_REDIRECT_URI: 'http://localhost:3000/api/auth/facebook/callback' }), 'http://localhost:3000/api/auth/facebook/callback');
+  assert.equal(getFacebookRedirectUri({ NODE_ENV: 'development', FACEBOOK_REDIRECT_URI: 'https://jchub-tunnel.example/api/auth/facebook/callback' }), 'https://jchub-tunnel.example/api/auth/facebook/callback');
+  assert.equal(facebookGraphApiVersion({ META_GRAPH_API_VERSION: 'v26.0' }), 'v26.0');
   const pages = [{ id: '123', name: 'Page A', access_token: 'page-token-a' }, { id: '456', name: 'Page B', access_token: 'page-token-b' }];
   assert.equal(selectFacebookPage(pages, ''), 'PAGE_REQUIRED');
   assert.equal(selectFacebookPage(pages, '456'), pages[1]);
@@ -220,4 +386,9 @@ test('OAuth Facebook exige la callback locale exacte et ne sélectionne jamais a
     assert.match(route, /process\.env\.NODE_ENV === 'production'/);
     assert.doesNotMatch(route, /<textarea|access_token=.*html/i);
   }
+  const facebookLogin = await readFile(new URL('../app/api/auth/facebook/login/route.ts', import.meta.url), 'utf8');
+  assert.match(facebookLogin, /pages_show_list,pages_manage_posts,pages_read_engagement,read_insights/);
+  assert.match(facebookLogin, /secure: new URL\(redirectUri\)\.protocol === 'https:'/);
+  const nextConfig = await readFile(new URL('../next.config.mjs', import.meta.url), 'utf8');
+  assert.match(nextConfig, /allowedDevOrigins: \['127\.0\.0\.1', \.\.\.\(facebookOAuthHost \? \[facebookOAuthHost\] : \[\]\)\]/);
 });

@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { ApiCostCalculator } from '@/components/tools/ApiCostCalculator';
+import { getPublicBaseUrl } from '@/lib/site-url';
+import { DEFAULT_SOCIAL_IMAGE } from '@/lib/seo';
 
 const pageTitle = 'API Cost Calculator – Estimate API Usage & Costs | JcHub';
 const pageDescription = "Calculate API costs, estimate monthly usage, simulate request volumes, and monitor API rate limits with JcHub's free API Cost Calculator.";
-const pageUrl = 'https://jchub.dev/tools/api-cost-calculator';
+const pageUrl = `${getPublicBaseUrl()}/tools/api-cost-calculator`;
 
 export const metadata: Metadata = {
   title: { absolute: pageTitle },
@@ -22,9 +24,10 @@ export const metadata: Metadata = {
     url: pageUrl,
     title: pageTitle,
     description: pageDescription,
+    images: [DEFAULT_SOCIAL_IMAGE],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: pageTitle,
     description: pageDescription,
   },

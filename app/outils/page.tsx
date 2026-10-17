@@ -2,11 +2,13 @@ import Link from 'next/link';
 import { ArrowRight, Check, Grid2X2, Lightbulb, ShieldCheck, Sparkles, Wrench, Zap } from 'lucide-react';
 import { getPublishedTools } from '@/lib/tools';
 import { ToolsCatalog } from '@/components/tools/ToolsCatalog';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'JcHub | Outils pratiques pour développeurs',
+export const metadata = pageMetadata({
+  title: 'Outils en ligne gratuits pour développeurs',
   description: 'Des outils numériques gratuits, pratiques et accessibles directement depuis ton navigateur.',
-};
+  path: '/outils',
+});
 
 export default async function ToolsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const tools = await getPublishedTools();

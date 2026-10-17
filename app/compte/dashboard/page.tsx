@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { BookOpen, Headphones, TrendingUp, Sparkles, ArrowRight, Heart, Clock, Download, Wrench } from 'lucide-react';
 import { DashboardShell } from '@/components/dashboard/DashboardShell';
-import { formatXAF } from '@/lib/pricing';
 
 export default function DashboardPage() {
   return (
@@ -58,7 +57,6 @@ export default function DashboardPage() {
 
           <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {[
-              { title: 'Mon abonnement', desc: user.subscription?.status === 'active' && user.subscription.tier !== 'free' ? `Actif (${user.subscription.tier})` : 'Plan gratuit', icon: Sparkles, href: '/compte/abonnement', color: 'from-amber-500 to-orange-500' },
               { title: 'Découvrir les outils', desc: 'Contenus et ressources utiles', icon: Wrench, href: '/outils', color: 'from-blue-500 to-cyan-500' },
               { title: 'Mes favoris', desc: 'Outils sauvegardés', icon: Heart, href: '/compte/favoris', color: 'from-pink-500 to-rose-500' },
             ].map((card) => (
