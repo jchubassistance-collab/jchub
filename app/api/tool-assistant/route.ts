@@ -88,9 +88,6 @@ export async function POST(request: NextRequest) {
     console.error('[tool-assistant] Request failed:', error instanceof Error ? error.message.replaceAll(process.env.MISTRAL_API_KEY || '\u0000', '[redacted]').replaceAll(process.env.OPENROUTER_API_KEY || '\u0000', '[redacted]').slice(0, 240) : 'unknown error');
     // The closest catalog matches are more useful to the visitor than an error.
     if (keywordMatch.tools.length) return catalogAnswer(keywordMatch.tools);
-    if (error instanceof Error && error.message === 'ASSISTANT_OUTPUT_TRUNCATED') {
-      return NextResponse.json({ error: 'La réponse a été interrompue. Reformule ta demande plus simplement, puis réessaie.' }, { status: 502 });
-    }
     const quotaUnavailable = error instanceof Error && /Firebase Admin|Firestore/i.test(error.message);
     return NextResponse.json({ error: quotaUnavailable ? 'La recherche assistée est temporairement indisponible.' : 'Je n’arrive pas à trouver un outil pour le moment. Réessaie dans quelques instants.' }, { status: 502, headers: { 'Cache-Control': 'no-store' } });
   }
