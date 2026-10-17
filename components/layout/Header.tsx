@@ -76,7 +76,7 @@ export function Header() {
             <MobileNavLink key={link.href} {...link} pathname={safePathname} onClick={closeMenus} isLight={isHome} />
           ))}
         </div>
-        <div className="mt-5"><ToolFinder dark={!isHome}/></div>
+        <div className="mt-5"><ToolFinder dark={!isHome} onNavigate={closeMenus}/></div>
       </nav>
     </header>
   );

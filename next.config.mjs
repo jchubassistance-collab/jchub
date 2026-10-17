@@ -48,8 +48,8 @@ const nextConfig = {
         ],
       },
       {
-        // The social card route sets its own CDN cache headers.
-        source: '/api/:path((?!article-cover$).*)',
+        // The social card and the public tool catalog set their own CDN cache headers.
+        source: '/api/:path((?!article-cover$|tool-assistant$).*)',
         headers: [
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
           { key: 'CDN-Cache-Control', value: 'no-store' },

@@ -44,6 +44,29 @@ function present(answer: ToolAssistantAnswer, catalog: Tool[]) {
   return { message: answer.message.trim().slice(0, 400), suggestions };
 }
 
+/**
+ * Public catalog for the instant search: the browser matches keywords on every keystroke
+ * without calling the server, and only asks the AI (POST) when the catalog cannot answer.
+ */
+export async function GET() {
+  try {
+    const tools = (await getPublishedTools()).map((tool) => ({
+      slug: tool.slug,
+      path: tool.path,
+      name: tool.name,
+      description: tool.description,
+      category: tool.category,
+      icon: tool.icon,
+      tags: tool.tags,
+      component: '',
+      seo: { title: '', description: '', keywords: tool.seo.keywords },
+    }));
+    return NextResponse.json({ tools }, { headers: { 'Cache-Control': 'public, max-age=60', 'CDN-Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' } });
+  } catch {
+    return NextResponse.json({ tools: [] }, { status: 503, headers: { 'Cache-Control': 'no-store' } });
+  }
+}
+
 export async function POST(request: NextRequest) {
   let body: unknown;
   try { body = await request.json(); } catch { return NextResponse.json({ error: 'Écris ce que tu veux faire pour chercher un outil.' }, { status: 400 }); }
