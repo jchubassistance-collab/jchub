@@ -35,6 +35,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const article = await getPublishedArticleBySlug(slug);
   if (!article) notFound();
   const relatedArticles = (await getPublishedArticles()).filter((item) => item.slug !== article.slug && item.category === article.category).slice(0, 3);
+  // The hero already shows the title as the page's only <h1>: drop the article's own leading
+  // "# Titre" line, and render any other level-1 heading of the body as <h2>.
+  const body = article.content.replace(/^\s*#\s+[^\n]*\n+/, '');
 
   return (
     <main className="template-home min-h-screen bg-[#eff6ff] text-[#0f172a]">
@@ -68,7 +71,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,760px)_260px] lg:px-8 lg:py-16">
         <article className="min-w-0 rounded-[28px] border border-blue-100 bg-white px-5 py-8 shadow-[0_18px_50px_rgba(37,99,235,.08)] sm:px-10 sm:py-12 sm:px-10 sm:py-12">
-          <div className="article-markdown article-markdown--light"><ReactMarkdown>{article.content}</ReactMarkdown></div>
+          <div className="article-markdown article-markdown--light"><ReactMarkdown components={{ h1: ({ children }) => <h2>{children}</h2> }}>{body}</ReactMarkdown></div>
           <div className="mt-10 flex flex-wrap gap-2 border-t border-blue-100 pt-6">
             {article.tags.map((tag) => (
               <span key={tag} className="rounded-md bg-blue-50 px-3 py-1.5 text-xs font-semibold text-slate-600">#{tag}</span>
