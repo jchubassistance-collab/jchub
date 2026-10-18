@@ -12,7 +12,7 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [toolLoading, setToolLoading] = useState(false);
   const toolLoadingStartedAt = useRef(0);
-  const toolLoadingDestination = useRef('');
+  const toolLoadingOrigin = useRef('');
 
   useEffect(() => {
     const onScroll = () => {
@@ -33,13 +33,11 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
       if (!(anchor instanceof HTMLAnchorElement) || anchor.target === '_blank') return;
       const url = new URL(anchor.href, window.location.href);
       if (url.origin !== window.location.origin || url.pathname === pathname) return;
-      const isToolPage = /^\/outils\/[^/]+\/?$/.test(url.pathname);
-      const isArticlePage = /^\/blog\/[^/]+\/?$/.test(url.pathname);
-      if (anchor.hasAttribute('data-page-loader') || isToolPage || isArticlePage) {
-        toolLoadingStartedAt.current = Date.now();
-        toolLoadingDestination.current = url.pathname.replace(/\/$/, '');
-        setToolLoading(true);
-      }
+      // Downloads, API routes and static files never change the page: the loader would stay forever.
+      if (anchor.hasAttribute('download') || url.pathname.startsWith('/api/') || /\.[a-z0-9]+$/i.test(url.pathname)) return;
+      toolLoadingStartedAt.current = Date.now();
+      toolLoadingOrigin.current = (pathname ?? '').replace(/\/$/, '');
+      setToolLoading(true);
     };
     document.addEventListener('click', onToolNavigation, true);
     return () => document.removeEventListener('click', onToolNavigation, true);
@@ -47,14 +45,21 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
 
   useEffect(() => {
     if (!toolLoading) return;
-    if ((pathname ?? '').replace(/\/$/, '') !== toolLoadingDestination.current) return;
+    // Any new page ends the loader, including a redirect to another address than the clicked one.
+    if ((pathname ?? '').replace(/\/$/, '') === toolLoadingOrigin.current) return;
     const remaining = Math.max(0, 450 - (Date.now() - toolLoadingStartedAt.current));
-    const timeout = window.setTimeout(() => {
-      setToolLoading(false);
-      toolLoadingDestination.current = '';
-    }, remaining);
+    const timeout = window.setTimeout(() => setToolLoading(false), remaining);
     return () => window.clearTimeout(timeout);
   }, [pathname, toolLoading]);
+
+  useEffect(() => {
+    if (!toolLoading) return;
+    // Safety net when a click handler cancels the navigation or the page comes back from the back-forward cache.
+    const timeout = window.setTimeout(() => setToolLoading(false), 10000);
+    const onPageShow = (event: PageTransitionEvent) => { if (event.persisted) setToolLoading(false); };
+    window.addEventListener('pageshow', onPageShow);
+    return () => { window.clearTimeout(timeout); window.removeEventListener('pageshow', onPageShow); };
+  }, [toolLoading]);
 
   const safePathname = pathname ?? '';
   const isPrivateArea =
@@ -66,7 +71,7 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
 
   // Public pages must render on the server: crawlers, link previews and slow phones see content before JS loads.
   if (isPrivateArea) {
-    return <main className="min-h-screen">{children}</main>;
+    return <><main className="min-h-screen">{children}</main>{toolLoading && <PageNavigationLoader />}</>;
   }
 
   return (
@@ -74,15 +79,7 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
       <Header />
       <main className="min-h-screen animate-page-in">{children}</main>
       <Footer />
-      {toolLoading && (
-        <div className="tool-navigation-loader" role="status" aria-label="Chargement de la page">
-          <div className="loading-mark">
-            <span className="loading-ring" aria-hidden="true" />
-            <img src="/jchub-icon-192.png" alt="" className="loading-logo" />
-          </div>
-          <span className="sr-only">Chargement de la page…</span>
-        </div>
-      )}
+      {toolLoading && <PageNavigationLoader />}
       <button
         type="button"
         aria-label="Retour en haut"
@@ -93,4 +90,8 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
       </button>
     </>
   );
+}
+
+function PageNavigationLoader() {
+  return <div className="tool-navigation-loader" role="status" aria-label="Chargement de la page"><div className="loader-atom" aria-hidden="true"><span /><span /><span /><i /><i /><i /></div><span className="sr-only">Chargement de la page…</span></div>;
 }

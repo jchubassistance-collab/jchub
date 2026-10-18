@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, MessageCircle, MapPin, Phone, Send, Sparkles, ArrowRight, Check, Clock } from 'lucide-react';
+import { Facebook, Instagram, Mail, MessageCircle, MapPin, Phone, Send, Sparkles, ArrowRight, Check, Clock } from 'lucide-react';
 
 const contactMethods = [
   {
@@ -162,6 +162,13 @@ export default function ContactPage() {
                 </div>
               </a>
             ))}
+          </div>
+          <div className="mt-8 rounded-2xl border border-blue-100 bg-white p-6 text-center shadow-sm">
+            <h2 className="text-lg font-bold text-[#0f172a]">Retrouve JcHub sur les réseaux</h2>
+            <div className="mt-4 flex flex-wrap justify-center gap-3">
+              <a href="https://www.facebook.com/1393952223791842" target="_blank" rel="noopener noreferrer" aria-label="JcHub sur Facebook" className="inline-flex items-center gap-2 rounded-full bg-blue-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-blue-800"><Facebook className="h-4 w-4" aria-hidden="true" />Facebook</a>
+              <a href="https://www.instagram.com/jchub.tech/" target="_blank" rel="noopener noreferrer" aria-label="JcHub sur Instagram" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 px-5 py-2.5 text-sm font-bold text-white transition hover:brightness-110"><Instagram className="h-4 w-4" aria-hidden="true" />Instagram</a>
+            </div>
           </div>
         </div>
       </section>

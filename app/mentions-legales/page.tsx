@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Building2, ChevronLeft, Mail, Scale } from 'lucide-react';
+import { Building2, ChevronLeft, Facebook, Instagram, Mail, Scale } from 'lucide-react';
 import { pageMetadata } from '@/lib/seo';
 
 export const metadata = pageMetadata({
@@ -93,6 +93,7 @@ export default function MentionsLegalesPage() {
                   contact@jchub.dev
                 </a>
               </p>
+              <p className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-600"><span>Retrouve JcHub :</span><a href="https://www.facebook.com/1393952223791842" target="_blank" rel="noopener noreferrer" aria-label="JcHub sur Facebook" className="text-blue-700 hover:text-blue-900"><Facebook className="h-5 w-5" aria-hidden="true" /></a><a href="https://www.instagram.com/jchub.tech/" target="_blank" rel="noopener noreferrer" aria-label="JcHub sur Instagram" className="text-pink-600 hover:text-pink-800"><Instagram className="h-5 w-5" aria-hidden="true" /></a></p>
             </section>
           </div>
         </div>

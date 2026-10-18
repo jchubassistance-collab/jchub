@@ -74,16 +74,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(239, 246, 255, .58);
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
+  background: #fff;
   animation: tool-loader-in 160ms ease-out both;
 }
+
+.loader-atom { position: relative; width: 190px; height: 190px; animation: loader-atom-spin 12s linear infinite; }
+.loader-atom span { position: absolute; inset: 24px 0; border: 3px dotted transparent; border-radius: 50%; background: linear-gradient(#fff, #fff) padding-box, conic-gradient(#f0f, #253bff, #00edc2, #64f000, #ffdf00, #ff4b00, #f0f) border-box; }
+.loader-atom span:nth-child(1) { transform: rotate(0deg) scaleY(.48); }
+.loader-atom span:nth-child(2) { transform: rotate(60deg) scaleY(.48); }
+.loader-atom span:nth-child(3) { transform: rotate(120deg) scaleY(.48); }
+.loader-atom i { position: absolute; top: 50%; left: 50%; width: 11px; height: 11px; margin: -5.5px; border-radius: 50%; color: #ff1689; background: currentColor; box-shadow: 0 0 12px currentColor; animation: loader-atom-dot 2.4s linear infinite; }
+.loader-atom i:nth-of-type(2) { color: #00d6ff; animation-delay: -.8s; }
+.loader-atom i:nth-of-type(3) { color: #ffb000; animation-delay: -1.6s; }
 
 @keyframes tool-loader-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+@keyframes loader-atom-spin { to { transform: rotate(360deg); } }
+@keyframes loader-atom-dot { from { transform: rotate(0deg) translateX(86px) scale(.75); } 50% { transform: rotate(180deg) translateX(86px) scale(1.2); } to { transform: rotate(360deg) translateX(86px) scale(.75); } }
 
 /* Le loader Next est enfant de main, alors que le chrome public est son voisin. */
 body:has(.loading-screen) header,

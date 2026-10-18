@@ -62,7 +62,7 @@ export const tools: Tool[] = [
     path: '/tools/api-cost-calculator',
     name: 'API Cost Calculator',
     description: 'Estimate API request volumes, monthly costs, quotas, retries, and rate limits.',
-    category: 'Development',
+    category: 'Développement',
     icon: '💸',
     tags: ['api', 'pricing', 'cost', 'usage', 'rate limit', 'developer tools', 'json', 'http'],
     component: 'ApiCostCalculator',

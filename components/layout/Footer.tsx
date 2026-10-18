@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowUpRight, Mail, MapPin, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Facebook, Instagram, Mail, MapPin, Sparkles } from 'lucide-react';
 import { OPEN_CONSENT_EVENT } from '@/components/AnalyticsConsent';
 
 const groups = [
@@ -52,6 +52,10 @@ export function Footer() {
               </a>
               <span className="flex items-center gap-2"><MapPin className={`h-4 w-4 ${isLightPage ? 'text-blue-600' : 'text-orange-400'}`} aria-hidden="true" />Congo Brazzaville</span>
             </div>
+            <nav aria-label="Réseaux sociaux JcHub" className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+              <a href="https://www.facebook.com/1393952223791842" target="_blank" rel="noopener noreferrer" aria-label="JcHub sur Facebook" title="Facebook" className={`transition hover:scale-110 ${isLightPage ? 'text-blue-700 hover:text-blue-900' : 'text-slate-300 hover:text-white'}`}><Facebook className="h-5 w-5" aria-hidden="true" /></a>
+              <a href="https://www.instagram.com/jchub.tech/" target="_blank" rel="noopener noreferrer" aria-label="JcHub sur Instagram" title="Instagram" className={`transition hover:scale-110 ${isLightPage ? 'text-pink-600 hover:text-pink-800' : 'text-slate-300 hover:text-white'}`}><Instagram className="h-5 w-5" aria-hidden="true" /></a>
+            </nav>
           </div>
           {groups.map((group) => (
             <div key={group.title}>
