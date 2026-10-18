@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { ArrowRight, ChevronRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, ChevronRight, Gift, Lock, ShieldCheck, Trash2, Zap, type LucideIcon } from 'lucide-react';
 import { getPublishedTools, getToolBySlug, tools } from '@/lib/tools';
 import { isToolComponentName, SERVER_PROCESSED_TOOLS } from '@/lib/tool-components';
 import { ToolRenderer } from '@/components/tools/ToolRenderer';
@@ -12,20 +12,22 @@ import { DEFAULT_SOCIAL_IMAGE } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
+type Highlight = { icon: LucideIcon; title: string; desc: string };
+
 /** Promises shown under the tool: they must match where the file is actually processed. */
-function toolHighlights(component: string) {
+function toolHighlights(component: string): Highlight[] {
   const serverProcessing = isToolComponentName(component) ? SERVER_PROCESSED_TOOLS[component] : undefined;
   if (serverProcessing) {
     return [
-      { emoji: '🔐', title: 'Transfert chiffré', desc: `Ton fichier est envoyé en HTTPS à nos serveurs${serverProcessing.partner ? ` et, selon le format, à notre prestataire ${serverProcessing.partner}` : ''} pour être converti.` },
-      { emoji: '🧹', title: 'Supprimé après usage', desc: 'Le fichier est effacé de nos serveurs dès la fin de la conversion.' },
-      { emoji: '🎁', title: 'Gratuit et sans pub', desc: '5 conversions par jour, sans inscription ni publicité.' },
+      { icon: Lock, title: 'Transfert chiffré', desc: `Ton fichier est envoyé en HTTPS à nos serveurs${serverProcessing.partner ? ` et, selon le format, à notre prestataire ${serverProcessing.partner}` : ''} pour être converti.` },
+      { icon: Trash2, title: 'Supprimé après usage', desc: 'Le fichier est effacé de nos serveurs dès la fin de la conversion.' },
+      { icon: Gift, title: 'Gratuit et sans pub', desc: '5 conversions par jour, sans inscription ni publicité.' },
     ];
   }
   return [
-    { emoji: '🔒', title: '100% privé', desc: 'Tout se passe dans ton navigateur' },
-    { emoji: '⚡', title: 'Instantané', desc: 'Pas d\'attente, pas de serveur' },
-    { emoji: '🎁', title: 'Sans pub', desc: 'Gratuit, sans pub ni inscription' },
+    { icon: ShieldCheck, title: '100% privé', desc: 'Tout se passe dans ton navigateur' },
+    { icon: Zap, title: 'Instantané', desc: 'Pas d\'attente, pas de serveur' },
+    { icon: Gift, title: 'Sans pub', desc: 'Gratuit, sans pub ni inscription' },
   ];
 }
 
@@ -67,6 +69,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
   if (!isToolComponentName(tool.component)) notFound();
   const component = tool.component;
   const serverProcessed = Boolean(SERVER_PROCESSED_TOOLS[component]);
+  const ProcessingIcon = serverProcessed ? Lock : ShieldCheck;
   const publishedTools = await getPublishedTools();
   const otherTools = publishedTools
     .filter((candidate) => candidate.slug !== tool.slug)
@@ -82,102 +85,110 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div className="template-home min-h-screen bg-[#eff6ff] text-[#0f172a]">
-      <section className="relative overflow-hidden bg-[radial-gradient(circle_at_12%_20%,rgba(147,197,253,.48),transparent_30%),radial-gradient(circle_at_90%_80%,rgba(191,219,254,.55),transparent_32%),#eff6ff] py-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.08),_transparent_55%)]" />
+      <section className="relative overflow-hidden border-b border-blue-100/80 bg-[radial-gradient(circle_at_12%_15%,rgba(147,197,253,.45),transparent_32%),radial-gradient(circle_at_88%_85%,rgba(191,219,254,.6),transparent_34%),#eff6ff]">
         <div
-          className="absolute inset-0 opacity-50"
+          aria-hidden="true"
+          className="absolute inset-0 opacity-60"
           style={{
             backgroundImage:
               'linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px)',
             backgroundSize: '34px 34px',
-            maskImage: 'radial-gradient(circle at center, black 32%, transparent 100%)',
+            maskImage: 'radial-gradient(circle at center, black 30%, transparent 100%)',
           }}
         />
-        <div className="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full border border-blue-100 bg-[#80b5ff]/10 blur-3xl" />
-        <div className="absolute -left-28 bottom-[-80px] h-80 w-80 rounded-full border border-white/10 bg-[#3a68d9]/10 blur-2xl" />
-        <div className="absolute right-[-60px] top-[-40px] h-72 w-72 rounded-full border border-white/10 bg-[#96c7ff]/10 blur-2xl" />
 
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="text-sm text-slate-600 mb-4 flex items-center gap-1.5">
+        <div className="relative mx-auto max-w-5xl px-4 pb-10 pt-8 sm:px-6 lg:px-8">
+          <nav aria-label="Fil d’Ariane" className="flex flex-wrap items-center gap-1.5 text-sm text-slate-600">
             <Link href="/" className="hover:text-blue-700">Accueil</Link>
-            <ChevronRight className="w-3 h-3 text-slate-500" />
+            <ChevronRight className="h-3 w-3 text-slate-400" aria-hidden="true" />
             <Link href="/outils" className="hover:text-blue-700">Outils</Link>
-            <ChevronRight className="w-3 h-3 text-slate-500" />
-            <span className="text-[#0f172a] font-semibold">{tool.name}</span>
+            <ChevronRight className="h-3 w-3 text-slate-400" aria-hidden="true" />
+            <span className="font-semibold text-[#0f172a]">{tool.name}</span>
           </nav>
 
-          <div className="flex items-start gap-4 flex-wrap" style={{ transform: 'perspective(1200px) rotateX(1.5deg) rotateY(-2deg)' }}>
-            <div className="w-16 h-16 rounded-2xl border border-blue-100 bg-[#9ccbff]/10 flex items-center justify-center text-3xl shadow-lg flex-shrink-0">
+          <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-start">
+            <div aria-hidden="true" className="hidden h-16 w-16 shrink-0 place-items-center rounded-2xl border border-blue-100 bg-white text-3xl shadow-[0_12px_30px_rgba(37,99,235,.14)] sm:grid">
               {tool.icon}
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <span className="text-xs font-semibold text-blue-800 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
-                  {tool.category}
-                </span>
-                <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  ✓ 100% GRATUIT
-                </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Sur mobile, l'icône rejoint les badges au lieu d'occuper une ligne. */}
+                <span aria-hidden="true" className="mr-1 grid h-11 w-11 place-items-center rounded-xl border border-blue-100 bg-white text-2xl shadow-[0_8px_20px_rgba(37,99,235,.12)] sm:hidden">{tool.icon}</span>
+                <span className="rounded-full border border-blue-100 bg-white/80 px-2.5 py-0.5 text-xs font-semibold text-blue-800">{tool.category}</span>
+                <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-800">✓ 100% gratuit</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-black mb-2 text-[#0f172a]">{tool.name}</h1>
-              <p className="text-slate-600 text-lg">{tool.description}</p>
+              <h1 className="mt-3 text-3xl font-black tracking-tight text-[#0f172a] [text-wrap:balance] md:text-4xl">{tool.name}</h1>
+              <p className="mt-2 max-w-2xl text-base leading-7 text-slate-600 md:text-lg">{tool.description}</p>
             </div>
-            <ShareButton title={tool.name} />
+            <div className="sm:pt-1">
+              <ShareButton title={tool.name} />
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="py-10 bg-[#eff6ff]">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-[2rem] border border-blue-100 bg-[rgba(13,28,52,0.8)] p-6 md:p-8 shadow-[0_18px_40px_rgba(7,19,40,0.24)] backdrop-blur-sm" style={{ transform: 'perspective(1200px) rotateX(3deg) rotateY(-3deg)' }}>
+      <section className="mx-auto max-w-4xl px-4 py-8 sm:px-6 md:py-10 lg:px-8">
+        <div className="overflow-hidden rounded-[1.75rem] bg-[#0d1c34] shadow-[0_24px_60px_rgba(7,19,40,.28)] ring-1 ring-blue-950/20">
+          <div className="flex items-center gap-2 border-b border-white/10 px-5 py-3 sm:px-8">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-300">
+              <ProcessingIcon className="h-3.5 w-3.5" aria-hidden="true" />
+              {serverProcessed ? 'Transfert chiffré, fichier supprimé après conversion' : 'Traité dans ton navigateur'}
+            </span>
+          </div>
+          <div className="p-5 sm:p-8">
             <ToolRenderer component={component} />
           </div>
-
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-            {toolHighlights(component).map((f) => (
-              <div key={f.title} className="text-center p-4 rounded-[1.25rem] border border-blue-100 bg-white shadow-[0_8px_24px_rgba(37,99,235,.06)]" style={{ transform: 'perspective(1200px) rotateX(2deg) rotateY(-2deg)' }}>
-                <div className="text-3xl mb-2">{f.emoji}</div>
-                <div className="font-bold text-sm mb-1 text-slate-900">{f.title}</div>
-                <div className="text-xs text-slate-600">{f.desc}</div>
-              </div>
-            ))}
-          </div>
-          {serverProcessed && (
-            <p className="mt-4 text-center text-xs text-slate-600">
-              Détails sur le traitement des fichiers dans notre{' '}
-              <Link href="/confidentialite#fichiers" className="font-semibold text-blue-700 underline-offset-2 hover:underline">politique de confidentialité</Link>.
-            </p>
-          )}
         </div>
+
+        <ul className="mt-6 grid gap-3 sm:grid-cols-3">
+          {toolHighlights(component).map(({ icon: Icon, title, desc }) => (
+            <li key={title} className="flex gap-3 rounded-2xl border border-blue-100 bg-white p-4 shadow-[0_8px_24px_rgba(37,99,235,.05)]">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700">
+                <Icon className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <span className="min-w-0">
+                <strong className="block text-sm text-slate-900">{title}</strong>
+                <span className="mt-0.5 block text-xs leading-5 text-slate-600">{desc}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        {serverProcessed && (
+          <p className="mt-4 text-center text-xs text-slate-600">
+            Détails sur le traitement des fichiers dans notre{' '}
+            <Link href="/confidentialite#fichiers" className="font-semibold text-blue-700 underline-offset-2 hover:underline">politique de confidentialité</Link>.
+          </p>
+        )}
       </section>
 
-      <section className="py-12 bg-[#eff6ff] border-t border-blue-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
+      <section className="border-t border-blue-100 py-12">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-2xl font-black text-[#0f172a]">Autres outils utiles</h2>
-            <Link href="/outils" className="text-blue-700 font-semibold hover:text-blue-900 flex items-center gap-1">
+            <Link href="/outils" className="flex items-center gap-1 font-semibold text-blue-700 hover:text-blue-900">
               Tous les outils
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             {otherTools.map((t) => (
               <Link
                 key={t.slug}
                 href={`/outils/${t.slug}`}
                 data-page-loader
-                className="group p-4 rounded-[1.5rem] border border-blue-100 bg-white shadow-[0_8px_24px_rgba(37,99,235,.06)] hover:border-blue-300 hover:shadow-[0_18px_40px_rgba(37,99,235,.12)] transition"
-                style={{ transform: 'perspective(1200px) rotateX(2deg) rotateY(-2deg)' }}
+                className="template-home__partner group flex items-center gap-3 rounded-2xl border border-blue-100 bg-white p-4 hover:border-blue-300"
               >
-                <div className="text-2xl mb-2">{t.icon}</div>
-                <div className="font-semibold text-sm text-slate-900 group-hover:text-blue-700 transition">{t.name}</div>
-                <div className="text-xs text-slate-500 mt-0.5">{t.category}</div>
+                <span aria-hidden="true" className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-blue-50 text-xl">{t.icon}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-slate-900 transition group-hover:text-blue-700">{t.name}</span>
+                  <span className="mt-0.5 block text-xs text-slate-500">{t.category}</span>
+                </span>
+                <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-blue-700" aria-hidden="true" />
               </Link>
             ))}
           </div>
         </div>
       </section>
-
     </div>
   );
 }
