@@ -241,6 +241,7 @@ const kitImage = 'https://jchub.dev/api/kit-image/kit123?format=instagram&v=1';
 const instagramSource = { ...source, portraitImageUrl: kitImage };
 const instagramEnv = { FACEBOOK_ACCESS_TOKEN: 'mock-page-token', INSTAGRAM_USER_ID: '17841400000000000', FACEBOOK_GRAPH_API_VERSION: 'v26.0', FACEBOOK_APP_SECRET: 'mock-app-secret', NEXT_PUBLIC_SITE_URL: 'https://jchub.dev' };
 const noWait = async () => {};
+const jpegResponse = () => new Response(new Uint8Array([0xff, 0xd8, 0xff, 0xdb]), { status: 200, headers: { 'Content-Type': 'image/jpeg', 'Content-Length': '4' } });
 
 test('Instagram crée un conteneur avec le visuel JPEG, attend son traitement puis publie', async () => {
   const calls = [];
@@ -250,13 +251,15 @@ test('Instagram crée un conteneur avec le visuel JPEG, attend son traitement pu
     fetcher: async (url, init = {}) => {
       const parsed = new URL(String(url));
       calls.push({ url: parsed, method: init.method || 'GET', body: init.body ? new URLSearchParams(String(init.body)) : null, headers: init.headers });
+      if (parsed.hostname === 'jchub.dev') return jpegResponse();
       if (parsed.pathname.endsWith('/media')) return mockResponse(200, { id: '900' });
       if (parsed.pathname.endsWith('/900')) { statusChecks += 1; return mockResponse(200, { status_code: statusChecks === 1 ? 'IN_PROGRESS' : 'FINISHED' }); }
       if (parsed.pathname.endsWith('/media_publish')) return mockResponse(200, { id: '901' });
       return mockResponse(200, { permalink: 'https://www.instagram.com/p/abc123/' });
     },
   });
-  const container = calls[0];
+  assert.equal(calls[0].url.toString(), kitImage);
+  const container = calls.find((call) => call.url.pathname.endsWith('/media'));
   assert.equal(container.url.origin + container.url.pathname, 'https://graph.facebook.com/v26.0/17841400000000000/media');
   assert.equal(container.method, 'POST');
   assert.equal(container.body.get('image_url'), kitImage);
@@ -265,7 +268,7 @@ test('Instagram crée un conteneur avec le visuel JPEG, attend son traitement pu
   assert.equal(statusChecks, 2);
   const publish = calls.find((call) => call.url.pathname.endsWith('/media_publish'));
   assert.equal(publish.body.get('creation_id'), '900');
-  assert.ok(calls.filter((call) => call.method === 'GET').every((call) => call.headers.Authorization === 'Bearer mock-page-token' && !call.url.search.includes('mock-page-token')));
+  assert.ok(calls.filter((call) => call.method === 'GET' && call.url.hostname === 'graph.facebook.com').every((call) => call.headers.Authorization === 'Bearer mock-page-token' && !call.url.search.includes('mock-page-token')));
   assert.deepEqual(result, { externalId: '901', externalUrl: 'https://www.instagram.com/p/abc123/' });
 });
 
@@ -274,6 +277,7 @@ test('Instagram ne publie pas quand Meta rejette le visuel; l’échec reste rel
   await assert.rejects(publishToPlatform('instagram', record('instagram'), instagramSource, {
     env: instagramEnv, wait: noWait,
     fetcher: async (url) => {
+      if (new URL(String(url)).hostname === 'jchub.dev') return jpegResponse();
       const path = new URL(String(url)).pathname;
       if (path.endsWith('/media')) return mockResponse(200, { id: '900' });
       if (path.endsWith('/media_publish')) publishCalls += 1;
@@ -284,7 +288,7 @@ test('Instagram ne publie pas quand Meta rejette le visuel; l’échec reste rel
   assert.equal(canRetryPublication('FAILED', 'IG_CONTAINER_ERROR'), true);
   await assert.rejects(publishToPlatform('instagram', record('instagram'), instagramSource, {
     env: instagramEnv, wait: noWait,
-    fetcher: async () => mockResponse(400, { error: { message: 'private-provider-detail' } }),
+    fetcher: async (url) => new URL(String(url)).hostname === 'jchub.dev' ? jpegResponse() : mockResponse(400, { error: { message: 'private-provider-detail' } }),
   }), (error) => error.outcome === 'failed' && !error.message.includes('private-provider-detail'));
 });
 
@@ -292,12 +296,72 @@ test('un timeout Instagram pendant media_publish devient UNKNOWN', async () => {
   await assert.rejects(publishToPlatform('instagram', record('instagram'), instagramSource, {
     env: instagramEnv, wait: noWait,
     fetcher: async (url) => {
+      if (new URL(String(url)).hostname === 'jchub.dev') return jpegResponse();
       const path = new URL(String(url)).pathname;
       if (path.endsWith('/media')) return mockResponse(200, { id: '900' });
       if (path.endsWith('/media_publish')) throw new Error('timeout');
       return mockResponse(200, { status_code: 'FINISHED' });
     },
   }), (error) => error instanceof PlatformError && error.outcome === 'unknown' && error.code === 'POST_OUTCOME_UNKNOWN');
+});
+
+test('Instagram retente quand Meta n’a pas pu télécharger le visuel, puis explique le refus sans détail brut', async () => {
+  let mediaCalls = 0;
+  const fetchFailure = { error: { code: 100, error_subcode: 2207052, message: 'detail-brut-fournisseur' } };
+  const result = await publishToPlatform('instagram', record('instagram'), instagramSource, {
+    env: instagramEnv, wait: noWait,
+    fetcher: async (url) => {
+      const parsed = new URL(String(url));
+      if (parsed.hostname === 'jchub.dev') return jpegResponse();
+      if (parsed.pathname.endsWith('/media')) { mediaCalls += 1; return mediaCalls === 1 ? mockResponse(400, fetchFailure) : mockResponse(200, { id: '900' }); }
+      if (parsed.pathname.endsWith('/media_publish')) return mockResponse(200, { id: '901' });
+      if (parsed.pathname.endsWith('/900')) return mockResponse(200, { status_code: 'FINISHED' });
+      return mockResponse(200, { permalink: 'https://www.instagram.com/p/abc123/' });
+    },
+  });
+  assert.equal(mediaCalls, 2);
+  assert.equal(result.externalId, '901');
+  mediaCalls = 0;
+  await assert.rejects(publishToPlatform('instagram', record('instagram'), instagramSource, {
+    env: instagramEnv, wait: noWait,
+    fetcher: async (url) => {
+      if (new URL(String(url)).hostname === 'jchub.dev') return jpegResponse();
+      mediaCalls += 1;
+      return mockResponse(400, fetchFailure);
+    },
+  }), (error) => error.outcome === 'failed' && /code Meta 100\/2207052 : Instagram n’a pas pu télécharger le visuel/.test(error.message) && !error.message.includes('detail-brut-fournisseur'));
+  assert.equal(mediaCalls, 3);
+});
+
+test('Instagram s’arrête avant Meta si le visuel n’est pas accessible', async () => {
+  const hosts = [];
+  await assert.rejects(publishToPlatform('instagram', record('instagram'), instagramSource, {
+    env: instagramEnv, wait: noWait,
+    fetcher: async (url) => { hosts.push(new URL(String(url)).hostname); return mockResponse(404, { error: 'Visuel introuvable.' }); },
+  }), (error) => error.code === 'IMAGE_UNREACHABLE' && /HTTP 404/.test(error.message));
+  assert.deepEqual(hosts, ['jchub.dev']);
+});
+
+test('Facebook retente une photo dont le visuel n’a pas pu être lu et traduit les codes Meta', async () => {
+  const photoSource = { ...source, imageUrl: 'https://jchub.dev/api/kit-image/kit123?format=facebook&v=1' };
+  const env = { FACEBOOK_ACCESS_TOKEN: 'mock-page-token', FACEBOOK_PAGE_ID: '123456' };
+  let photoCalls = 0;
+  const result = await publishToPlatform('facebook', record('facebook'), photoSource, {
+    env, wait: noWait,
+    fetcher: async (url) => {
+      const parsed = new URL(String(url));
+      if (parsed.hostname === 'jchub.dev') return jpegResponse();
+      photoCalls += 1;
+      assert.equal(parsed.pathname, '/v26.0/123456/photos');
+      return photoCalls === 1 ? mockResponse(400, { error: { code: 324, message: 'Missing or invalid image file' } }) : mockResponse(200, { id: '123456_42' });
+    },
+  });
+  assert.equal(photoCalls, 2);
+  assert.equal(result.externalId, '123456_42');
+  await assert.rejects(publishToPlatform('facebook', record('facebook'), photoSource, {
+    env, wait: noWait,
+    fetcher: async (url) => new URL(String(url)).hostname === 'jchub.dev' ? jpegResponse() : mockResponse(403, { error: { code: 200, message: 'detail-brut-fournisseur' } }),
+  }), (error) => /code Meta 200 : permission manquante sur le jeton/.test(error.message) && !error.message.includes('detail-brut-fournisseur'));
 });
 
 test('Instagram exige un visuel public servi par le site et des identifiants avant tout appel', async () => {

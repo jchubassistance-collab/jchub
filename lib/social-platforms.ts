@@ -30,10 +30,49 @@ async function safeJson(response: Response): Promise<Record<string, any>> {
   catch { return {}; }
 }
 
-function responseError(response: Response, _data: Record<string, any>): PlatformError {
+// Codes d'erreur Meta traduits pour le CM. Le message brut n'est jamais renvoyé au navigateur.
+const META_ERROR_HINTS: Record<string, string> = {
+  '1': 'erreur temporaire de Meta, réessaie',
+  '2': 'erreur temporaire de Meta, réessaie',
+  '4': 'trop d’appels, réessaie plus tard',
+  '17': 'trop d’appels, réessaie plus tard',
+  '32': 'trop d’appels, réessaie plus tard',
+  '613': 'trop d’appels, réessaie plus tard',
+  '10': 'permission manquante sur le jeton',
+  '190': 'jeton invalide ou expiré, reconnecte la Page',
+  '324': 'Facebook n’a pas pu lire le visuel',
+  '368': 'action temporairement bloquée par Facebook',
+  '9004': 'Instagram n’a pas pu télécharger le visuel',
+  '36003': 'format du visuel refusé',
+  '100/2207052': 'Instagram n’a pas pu télécharger le visuel',
+  '100/2207003': 'le visuel a mis trop de temps à se télécharger',
+  '100/2207026': 'format du visuel refusé',
+  '100': 'paramètre refusé par Meta',
+};
+
+export function metaErrorDetail(data: Record<string, any>): string {
+  const error = data?.error;
+  const code = Number(error?.code) || 0;
+  if (!code) return '';
+  const subcode = Number(error.error_subcode) || 0;
+  const hint = META_ERROR_HINTS[`${code}/${subcode}`] || META_ERROR_HINTS[String(code)] || (code >= 200 && code < 300 ? 'permission manquante sur le jeton' : '');
+  console.error('[social] Erreur Meta', code, subcode, String(error.message || '').slice(0, 300));
+  return `code Meta ${code}${subcode ? `/${subcode}` : ''}${hint ? ` : ${hint}` : ''}`;
+}
+
+// Meta n'a pas pu télécharger le visuel : rien n'a été publié, une nouvelle tentative est sans risque.
+function isImageFetchError(response: Response, data: Record<string, any>): boolean {
+  const code = Number(data?.error?.code) || 0;
+  const subcode = Number(data?.error?.error_subcode) || 0;
+  return response.status === 400 && (code === 324 || code === 9004 || subcode === 2207052 || subcode === 2207003);
+}
+const IMAGE_RETRY_DELAYS = [0, 3_000, 6_000];
+
+function responseError(response: Response, data: Record<string, any>): PlatformError {
   if (response.ok) return new PlatformError('La plateforme a répondu sans identifiant de publication; vérifie le résultat avant toute nouvelle tentative.', 'unknown', 'POST_OUTCOME_UNKNOWN');
+  const detail = metaErrorDetail(data);
   return new PlatformError(
-    `La plateforme a refusé la publication (HTTP ${response.status}).`,
+    `La plateforme a refusé la publication (HTTP ${response.status}${detail ? `, ${detail}` : ''}).`,
     response.status >= 500 ? 'unknown' : 'failed',
     `HTTP_${response.status}`,
   );
@@ -151,10 +190,16 @@ async function publishFacebook(record: PublicationRecord, source: SocialSource, 
   const url = new URL(endpoint);
   if (appSecret) url.searchParams.set('appsecret_proof', createHmac('sha256', appSecret).update(token).digest('hex'));
   const body = new URLSearchParams({ access_token: token, ...(hasImage ? { url: source.imageUrl!, caption: normalizePostText(record) } : { message: normalizePostText(record), link: source.url }) });
-  let response: Response;
-  try { response = await fetcher(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, signal: timeoutSignal(timeoutMs), ...noRedirect }); }
-  catch { throw new PlatformError('Résultat Facebook incertain après envoi; vérifie la Page avant toute nouvelle tentative.', 'unknown', 'POST_OUTCOME_UNKNOWN'); }
-  const data = await safeJson(response);
+  const wait = dependencies.wait || defaultWait;
+  let response!: Response;
+  let data: Record<string, any> = {};
+  for (const delay of IMAGE_RETRY_DELAYS) {
+    if (delay) await wait(delay);
+    try { response = await fetcher(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, signal: timeoutSignal(timeoutMs), ...noRedirect }); }
+    catch { throw new PlatformError('Résultat Facebook incertain après envoi; vérifie la Page avant toute nouvelle tentative.', 'unknown', 'POST_OUTCOME_UNKNOWN'); }
+    data = await safeJson(response);
+    if (!hasImage || !isImageFetchError(response, data)) break;
+  }
   if (!response.ok || !data.id) throw responseError(response, data);
   return { externalId: String(data.id), externalUrl: `https://www.facebook.com/${encodeURIComponent(String(data.id))}` };
 }
@@ -195,23 +240,37 @@ async function publishInstagram(record: PublicationRecord, source: SocialSource,
   });
   const get = (url: URL) => fetcher(url, { headers: { Authorization: `Bearer ${token}` }, signal: timeoutSignal(timeoutMs), ...noRedirect });
 
-  // 1. Conteneur : aucune publication n'existe encore, un échec ici peut être relancé sans risque de doublon.
+  // 1. Le visuel doit répondre avant que Meta le télécharge; cette lecture réveille aussi la fonction et le cache.
   const imageUrl = publicImageUrl(source.portraitImageUrl, env);
-  let containerResponse: Response;
-  try {
-    containerResponse = await post(graphUrl(`${igUserId}/media`), {
-      image_url: imageUrl,
-      caption: normalizePostText(record),
-      alt_text: `Visuel JcHub présentant l’article « ${source.title} »`.slice(0, 1000),
-    });
-  } catch { throw new PlatformError('Instagram n’a pas pu préparer le visuel. Réessaie plus tard.', 'failed', 'IG_CONTAINER_FAILED'); }
-  const containerData = await safeJson(containerResponse);
+  let imageCheck: Response;
+  try { imageCheck = await fetcher(imageUrl, { signal: timeoutSignal(timeoutMs * 2), ...noRedirect }); }
+  catch { throw new PlatformError('Le visuel du post ne répond pas. Réessaie dans un instant.', 'failed', 'IMAGE_UNREACHABLE'); }
+  const imageType = (imageCheck.headers.get('content-type') || '').split(';')[0];
+  if (!imageCheck.ok || imageType !== 'image/jpeg') throw new PlatformError(`Le visuel du post n’est pas accessible publiquement (HTTP ${imageCheck.status}).`, 'failed', 'IMAGE_UNREACHABLE');
+  await imageCheck.arrayBuffer().catch(() => undefined);
+
+  // 2. Conteneur : aucune publication n'existe encore, un échec ici peut être relancé sans risque de doublon.
+  let containerResponse!: Response;
+  let containerData: Record<string, any> = {};
+  for (const delay of IMAGE_RETRY_DELAYS) {
+    if (delay) await wait(delay);
+    try {
+      containerResponse = await post(graphUrl(`${igUserId}/media`), {
+        image_url: imageUrl,
+        caption: normalizePostText(record),
+        alt_text: `Visuel JcHub présentant « ${source.title} »`.slice(0, 1000),
+      });
+    } catch { throw new PlatformError('Instagram n’a pas pu préparer le visuel. Réessaie plus tard.', 'failed', 'IG_CONTAINER_FAILED'); }
+    containerData = await safeJson(containerResponse);
+    if (!isImageFetchError(containerResponse, containerData)) break;
+  }
   const containerId = String(containerData.id || '');
   if (!containerResponse.ok || !/^[0-9]+$/.test(containerId)) {
-    throw new PlatformError(`Instagram a refusé le visuel ou la légende (HTTP ${containerResponse.status}).`, 'failed', `IG_CONTAINER_HTTP_${containerResponse.status}`);
+    const detail = metaErrorDetail(containerData);
+    throw new PlatformError(`Instagram a refusé le visuel ou la légende (HTTP ${containerResponse.status}${detail ? `, ${detail}` : ''}).`, 'failed', `IG_CONTAINER_HTTP_${containerResponse.status}`);
   }
 
-  // 2. Meta télécharge et traite l'image de façon asynchrone.
+  // 3. Meta télécharge et traite l'image de façon asynchrone.
   let status = '';
   for (const delay of INSTAGRAM_STATUS_DELAYS) {
     if (delay) await wait(delay);
@@ -224,7 +283,7 @@ async function publishInstagram(record: PublicationRecord, source: SocialSource,
   if (status === 'ERROR' || status === 'EXPIRED') throw new PlatformError('Instagram n’a pas pu traiter le visuel.', 'failed', `IG_CONTAINER_${status}`);
   if (status !== 'FINISHED') throw new PlatformError('Instagram traite encore le visuel; réessaie dans quelques minutes.', 'failed', 'IG_CONTAINER_NOT_READY');
 
-  // 3. Publication : à partir d'ici, un résultat ambigu doit être vérifié manuellement.
+  // 4. Publication : à partir d'ici, un résultat ambigu doit être vérifié manuellement.
   let publishResponse: Response;
   try { publishResponse = await post(graphUrl(`${igUserId}/media_publish`), { creation_id: containerId }); }
   catch { throw new PlatformError('Résultat Instagram incertain après envoi; vérifie le compte avant toute nouvelle tentative.', 'unknown', 'POST_OUTCOME_UNKNOWN'); }
