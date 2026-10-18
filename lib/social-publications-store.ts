@@ -3,9 +3,8 @@ import 'server-only';
 import { randomUUID } from 'node:crypto';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/lib/firebase-admin';
-import { contentHash, publicationGuardId, publicationId } from '@/lib/social-utils';
-import { canRetryPublication } from '@/lib/social-utils';
-import type { PublicationCopy, PublicationRecord, PublicationStatus, SocialPlatform, SocialSettings, SocialSource } from '@/lib/social-types';
+import { canRetryPublication, contentHash, publicationGuardId, publicationId } from '@/lib/social-utils';
+import type { PublicationRecord, PublicationStatus, SocialPlatform, SocialSettings } from '@/lib/social-types';
 
 const COLLECTION = 'social_publications';
 const SETTINGS_DOC = 'social_publishing';
@@ -15,6 +14,7 @@ export function defaultSocialSettings(): SocialSettings {
   return {
     linkedinEnabled: boolEnv('LINKEDIN_ENABLED', false),
     facebookEnabled: boolEnv('FACEBOOK_ENABLED', false),
+    instagramEnabled: boolEnv('INSTAGRAM_ENABLED', false),
     githubEnabled: boolEnv('GITHUB_ENABLED', false),
     autoPublish: boolEnv('AUTO_PUBLISH', false),
     dryRun: boolEnv('DRY_RUN', true),
@@ -29,6 +29,7 @@ export async function getSocialSettings(): Promise<SocialSettings> {
   const settings: SocialSettings = {
     linkedinEnabled: typeof data.linkedinEnabled === 'boolean' ? data.linkedinEnabled : defaults.linkedinEnabled,
     facebookEnabled: typeof data.facebookEnabled === 'boolean' ? data.facebookEnabled : defaults.facebookEnabled,
+    instagramEnabled: typeof data.instagramEnabled === 'boolean' ? data.instagramEnabled : defaults.instagramEnabled,
     githubEnabled: typeof data.githubEnabled === 'boolean' ? data.githubEnabled : defaults.githubEnabled,
     autoPublish: typeof data.autoPublish === 'boolean' ? data.autoPublish : defaults.autoPublish,
     dryRun: typeof data.dryRun === 'boolean' ? data.dryRun : defaults.dryRun,
@@ -46,6 +47,7 @@ export async function saveSocialSettings(settings: SocialSettings): Promise<void
 export function destinationFor(platform: SocialPlatform): string {
   if (platform === 'linkedin') return `member:${process.env.LINKEDIN_AUTHOR_URN?.trim() || 'unconfigured'}`;
   if (platform === 'facebook') return `page:${process.env.FACEBOOK_PAGE_ID?.trim() || 'unconfigured'}`;
+  if (platform === 'instagram') return `instagram:${process.env.INSTAGRAM_USER_ID?.trim() || 'unconfigured'}`;
   const owner = process.env.GITHUB_OWNER?.trim() || 'jchubassistance-collab';
   const repo = process.env.GITHUB_REPOSITORY?.trim() || 'jchub';
   const branch = process.env.GITHUB_BRANCH?.trim() || 'main';
@@ -83,48 +85,47 @@ export function toPublicationRecord(id: string, data: Record<string, any>): Publ
     retryCount: Number(data.retryCount || 0),
     lastAttemptAt: asIso(data.lastAttemptAt),
     dryRun: Boolean(data.dryRun),
+    kitId: data.kitId ? String(data.kitId) : null,
   };
 }
 
-export async function createPlatformPublications(source: SocialSource, copies: PublicationCopy, initialStatus: 'DRAFT' | 'APPROVED' = 'DRAFT') {
+// Post d'un kit pour un réseau. Le garde (contenu source + réseau + destination) empêche de publier deux fois
+// le même article ou outil au même endroit, même depuis deux kits. Un post pas encore parti reprend le texte du kit.
+export async function upsertKitPublication(kit: { id: string; kind: string; slug: string; title: string; imageSubtitle: string; url: string }, platform: SocialPlatform, content: string): Promise<PublicationRecord> {
   const db = getAdminDb();
-  const platforms: SocialPlatform[] = ['linkedin', 'facebook', 'github'];
-  return Promise.all(platforms.map(async (platform) => {
-    const content = copies[platform].trim();
-    const hash = contentHash(content);
-    const destination = destinationFor(platform);
-    const id = publicationId(source.id, platform, destination, hash);
-    const ref = db.collection(COLLECTION).doc(id);
-    const guardRef = db.collection('social_publication_guards').doc(publicationGuardId(source.id, platform, destination));
-    const canonicalId = await db.runTransaction(async (transaction) => {
-      const guard = await transaction.get(guardRef);
-      const existing = await transaction.get(ref);
-      if (guard.exists) return String(guard.data()?.publicationId || id);
+  const sourceContentId = `${kit.kind}:${kit.slug}`;
+  const destination = destinationFor(platform);
+  const hash = contentHash(content);
+  const guardRef = db.collection('social_publication_guards').doc(publicationGuardId(sourceContentId, platform, destination));
+  const id = await db.runTransaction(async (transaction) => {
+    const guard = await transaction.get(guardRef);
+    const guardedId = guard.exists ? String(guard.data()?.publicationId || '') : '';
+    if (guardedId) {
+      const existingRef = db.collection(COLLECTION).doc(guardedId);
+      const existing = await transaction.get(existingRef);
       if (existing.exists) {
-        transaction.create(guardRef, { publicationId: id, createdAt: FieldValue.serverTimestamp() });
-        return id;
+        const data = existing.data() || {};
+        const reusable = ['DRAFT', 'APPROVED', 'CANCELLED'].includes(data.status) || (data.status === 'FAILED' && data.errorCode !== 'POST_OUTCOME_UNKNOWN');
+        if (reusable) {
+          transaction.update(existingRef, {
+            content: content.trim(), contentHash: hash, kitId: kit.id, status: 'APPROVED',
+            error: null, errorCode: null, scheduledAt: FieldValue.delete(), updatedAt: FieldValue.serverTimestamp(),
+          });
+        }
+        return guardedId;
       }
-      transaction.create(ref, {
-        sourceContentId: source.id,
-        sourceTitle: source.title,
-        sourceDescription: source.description,
-        sourceUrl: source.url,
-        imageUrl: source.imageUrl || null,
-        platform,
-        destination,
-        content,
-        contentHash: hash,
-        status: initialStatus,
-        retryCount: 0,
-        createdAt: FieldValue.serverTimestamp(),
-        updatedAt: FieldValue.serverTimestamp(),
-      });
-      transaction.create(guardRef, { publicationId: id, createdAt: FieldValue.serverTimestamp() });
-      return id;
+    }
+    const newId = publicationId(sourceContentId, platform, destination, hash);
+    transaction.set(db.collection(COLLECTION).doc(newId), {
+      sourceContentId, sourceTitle: kit.title, sourceDescription: kit.imageSubtitle, sourceUrl: kit.url,
+      platform, destination, content: content.trim(), contentHash: hash, kitId: kit.id, status: 'APPROVED', retryCount: 0,
+      createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
     });
-    const snapshot = await db.collection(COLLECTION).doc(canonicalId).get();
-    return toPublicationRecord(canonicalId, snapshot.data() || {});
-  }));
+    transaction.set(guardRef, { publicationId: newId, createdAt: FieldValue.serverTimestamp() });
+    return newId;
+  });
+  const snapshot = await db.collection(COLLECTION).doc(id).get();
+  return toPublicationRecord(id, snapshot.data() || {});
 }
 
 export async function getPublication(id: string): Promise<PublicationRecord | null> {
@@ -132,36 +133,11 @@ export async function getPublication(id: string): Promise<PublicationRecord | nu
   return snapshot.exists ? toPublicationRecord(snapshot.id, snapshot.data() || {}) : null;
 }
 
-export async function listPublications(limit = 100): Promise<PublicationRecord[]> {
-  const snapshot = await getAdminDb().collection(COLLECTION).orderBy('createdAt', 'desc').limit(Math.min(200, Math.max(1, limit))).get();
-  return snapshot.docs.map((document) => toPublicationRecord(document.id, document.data()));
-}
-
 export async function listDuePublications(limit = 50): Promise<PublicationRecord[]> {
   const snapshot = await getAdminDb().collection(COLLECTION)
     .where('scheduledAt', '<=', Timestamp.now()).orderBy('scheduledAt', 'asc').limit(limit).get();
   return snapshot.docs.filter((document) => document.data().status === 'SCHEDULED')
     .map((document) => toPublicationRecord(document.id, document.data()));
-}
-
-export async function updatePublicationStatus(id: string, from: PublicationStatus[], status: PublicationStatus, extra: Record<string, unknown> = {}) {
-  const ref = getAdminDb().collection(COLLECTION).doc(id);
-  return getAdminDb().runTransaction(async (transaction) => {
-    const snapshot = await transaction.get(ref);
-    if (!snapshot.exists || !from.includes(snapshot.data()?.status)) return false;
-    transaction.update(ref, { status, ...extra, ...(status === 'CANCELLED' ? { scheduledAt: FieldValue.delete() } : {}), updatedAt: FieldValue.serverTimestamp() });
-    return true;
-  });
-}
-
-export async function schedulePublication(id: string, at: Date): Promise<boolean> {
-  const ref = getAdminDb().collection(COLLECTION).doc(id);
-  return getAdminDb().runTransaction(async (transaction) => {
-    const snapshot = await transaction.get(ref);
-    if (!snapshot.exists || snapshot.data()?.status !== 'APPROVED') return false;
-    transaction.update(ref, { status: 'SCHEDULED', scheduledAt: Timestamp.fromDate(at), updatedAt: FieldValue.serverTimestamp(), error: null, errorCode: null });
-    return true;
-  });
 }
 
 export type PublicationClaim = { ok: true; leaseId: string; record: PublicationRecord } | { ok: false; reason: string };

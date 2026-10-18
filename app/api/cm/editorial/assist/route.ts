@@ -11,7 +11,7 @@ const requestSchema = z.object({
   title: z.string().trim().min(3).max(160),
   description: z.string().max(3000).default(''),
   objective: z.string().max(500).default(''),
-  platforms: z.array(z.enum(['instagram', 'snapchat'])).min(1).max(2),
+  platforms: z.array(z.enum(['instagram', 'facebook'])).min(1).max(2),
   format: z.enum(['publication', 'story', 'video', 'carousel', 'other']),
 }).strict();
 

@@ -41,7 +41,8 @@ export async function requireAdmin(request: NextRequest) {
   return decodedToken;
 }
 
-export async function requireCm(request: NextRequest) {
+// Espace CM : rôle cm ou administrateur. isAdmin réserve certaines actions (réglages, canaux non CM) aux administrateurs.
+export async function requireCmActor(request: NextRequest) {
   const sessionCookie = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
   if (!sessionCookie) throw new Error('UNAUTHORIZED');
   let decodedToken;
@@ -52,6 +53,11 @@ export async function requireCm(request: NextRequest) {
   }
   const profile = await getAdminDb().collection('users').doc(decodedToken.uid).get();
   const role = (decodedToken as typeof decodedToken & { role?: string }).role;
-  if (role === 'cm' || role === 'admin' || decodedToken.admin === true || profile.data()?.role === 'admin' || isConfiguredAdmin(decodedToken)) return decodedToken;
+  const isAdmin = role === 'admin' || decodedToken.admin === true || profile.data()?.role === 'admin' || isConfiguredAdmin(decodedToken);
+  if (isAdmin || role === 'cm') return { token: decodedToken, isAdmin };
   throw new Error('FORBIDDEN');
+}
+
+export async function requireCm(request: NextRequest) {
+  return (await requireCmActor(request)).token;
 }

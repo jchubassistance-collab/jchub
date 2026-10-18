@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { generateSocialCopies, parseSocialCopies } from '../lib/social-copy.ts';
-import { publishToPlatform, PlatformError } from '../lib/social-platforms.ts';
-import { canRetryPublication, externalPublishingEnabled, isCronBearerAuthorized, publicationGuardId, publicationId, zonedDateTimeToUtc, shouldAutoPublish, settleIndependently } from '../lib/social-utils.ts';
+import { buildKitCopyPrompt, buildSocialVisualPrompt, generateKitCopy, generateSocialVisual, kitPostText, parseKitCopy, parseSocialVisual, readSocialVisual, usesFormalAddress, validateKitPost } from '../lib/social-copy.ts';
+import { publicImageUrl, publishToPlatform, PlatformError } from '../lib/social-platforms.ts';
+import { canRetryPublication, externalPublishingEnabled, isCronBearerAuthorized, isPlatformEnabled, publicationGuardId, publicationId, zonedDateTimeToUtc, shouldAutoPublish, settleIndependently } from '../lib/social-utils.ts';
 import { getLinkedInRedirectUri, isMatchingOAuthState, updateEnvFile } from '../lib/linkedin-oauth.ts';
 import { facebookAppSecretProof, facebookGraphApiVersion, getFacebookAppId, getFacebookAppSecret, getFacebookRedirectUri, selectFacebookPage } from '../lib/facebook-oauth.ts';
 import { getSocialPlatformReadiness } from '../lib/social-readiness.ts';
@@ -18,6 +18,7 @@ const source = {
 const copies = {
   linkedin: `Les erreurs de sécurité web commencent souvent par une validation absente.\n\nValide les entrées côté serveur et ajoute des limites adaptées.\n\nÀ lire : ${source.url}\n#Cybersecurite #WebDev`,
   facebook: `Un formulaire accepte-t-il tout ce qu’on lui envoie ? La validation doit aussi se faire côté serveur.\n\nDécouvre les conseils : ${source.url} #Sécurité`,
+  instagram: `Ton formulaire fait-il confiance à tout le monde ? 🔐\n\nLa validation côté serveur reste ta meilleure défense.\n\nL’article complet est sur jchub.dev (lien en bio).\n\n#sécurité #webdev #javascript #dev #jchub`,
   github: `## Sécuriser une application web\n\nValider les données reçues côté serveur évite plusieurs erreurs fréquentes.\n\n[Lire l’article](${source.url})\n\nTags : sécurité, Web`,
 };
 
@@ -29,18 +30,86 @@ function record(platform, content = copies[platform]) {
   return { id: 'a'.repeat(64), sourceContentId: source.id, sourceTitle: source.title, sourceUrl: source.url, imageUrl: undefined, platform, destination: platform === 'github' ? 'jchubassistance-collab/jchub@main:docs/social-publications.md' : 'configured', content, contentHash: 'hash123', status: 'APPROVED', retryCount: 0 };
 }
 
-test('génère et valide trois textes distincts, spécifiques et liés à la source', async () => {
-  let prompt = '';
-  const generated = await generateSocialCopies(source, async (value) => { prompt = value; return JSON.stringify(copies); });
-  assert.deepEqual(generated, copies);
-  assert.match(prompt, /Aucun issue, release/);
-  assert.match(prompt, /2 à 4 points/);
+const kitSource = { kind: 'article', title: source.title, description: source.description, category: 'Web', url: source.url, tags: ['sécurité'] };
+const kitCopy = {
+  imageTitle: 'Valide tes entrées côté serveur',
+  imageSubtitle: 'Les bases pour ne plus faire confiance aux données reçues.',
+  instagramCaption: 'Ton formulaire fait-il confiance à tout le monde ? La validation côté serveur reste ta meilleure défense. Lien en bio.',
+  instagramHashtags: ['#securite', 'webdev', '#jchub'],
+  facebookCaption: 'Un formulaire accepte-t-il tout ce qu’on lui envoie ? Découvre comment valider côté serveur.',
+  facebookHashtags: ['#securite', '#webdev'],
+};
+
+test('les textes du kit sont générés en JSON, tutoient le lecteur et normalisent les hashtags', async () => {
+  const prompt = buildKitCopyPrompt(kitSource);
+  assert.match(prompt, /Tutoie toujours le lecteur/);
+  assert.match(prompt, /sans coller l'URL : le lien est ajouté automatiquement/);
+  assert.match(prompt, /"facebookCaption"/);
+  const parsed = parseKitCopy(JSON.stringify(kitCopy));
+  assert.deepEqual(parsed.instagramHashtags, ['#securite', '#webdev', '#jchub']);
+  assert.throws(() => parseKitCopy(JSON.stringify({ ...kitCopy, facebookCaption: 'Découvrez comment valider vos formulaires côté serveur.' })), /tutoyer/);
+  assert.throws(() => parseKitCopy(JSON.stringify({ ...kitCopy, instagramCaption: 'x'.repeat(1001) })));
+  assert.throws(() => parseKitCopy(JSON.stringify({ ...kitCopy, snapchatCaption: 'ancien champ' })));
 });
 
-test('rejette les copies répétées, le lien manquant et les textes trop longs', () => {
-  assert.throws(() => parseSocialCopies(JSON.stringify({ ...copies, facebook: copies.linkedin }), source.url));
-  assert.throws(() => parseSocialCopies(JSON.stringify({ ...copies, github: copies.github.replace(source.url, 'https://example.com') }), source.url));
-  assert.throws(() => parseSocialCopies(JSON.stringify({ ...copies, linkedin: 'x'.repeat(3001) }), source.url));
+test('redemande une génération après une sortie tronquée ou invalide, dans la limite des essais', async () => {
+  const outputs = [() => { throw new Error('OPENROUTER_OUTPUT_TRUNCATED'); }, () => 'User Safety: safe', () => JSON.stringify(kitCopy)];
+  let calls = 0;
+  const generated = await generateKitCopy(kitSource, async () => outputs[calls++](), 3);
+  assert.equal(generated.imageTitle, kitCopy.imageTitle);
+  assert.equal(calls, 3);
+  calls = 0;
+  await assert.rejects(generateKitCopy(kitSource, async () => outputs[calls++](), 2), /JSON/);
+  assert.equal(calls, 2);
+});
+
+test('le texte publié depuis un kit ajoute les hashtags et garde un lien cliquable sur Facebook', () => {
+  const kit = { ...parseKitCopy(JSON.stringify(kitCopy)), url: source.url };
+  assert.equal(kitPostText(kit, 'instagram'), `${kitCopy.instagramCaption}\n\n#securite #webdev #jchub`);
+  assert.equal(kitPostText(kit, 'facebook'), `${kitCopy.facebookCaption}\n\n${source.url}\n\n#securite #webdev`);
+  assert.equal(kitPostText({ ...kit, facebookCaption: `À lire : ${source.url}` }, 'facebook'), `À lire : ${source.url}\n\n#securite #webdev`);
+  assert.equal(validateKitPost('instagram', kitPostText(kit, 'instagram')), null);
+  assert.match(validateKitPost('instagram', Array.from({ length: 31 }, (_, i) => `#t${i}`).join(' ')), /30 hashtags/);
+  assert.match(validateKitPost('facebook', ' '), /vide/);
+});
+
+const jwtVisual = {
+  badge: 'Technique',
+  subtitle: 'Comprends et débogue tes tokens JWT sans quitter ton navigateur',
+  diagram: { kind: 'flow', blocks: [
+    { label: 'header', lines: [], tone: 'red' },
+    { label: 'payload', lines: ['{', '  "userId": "12345",', '  "role": "admin",', '  "exp": 1625184000', '}'], tone: 'green' },
+    { label: 'signature', lines: [], tone: 'violet' },
+  ] },
+};
+
+test('le schéma du visuel est validé pour tenir dans l’image et tutoyer le lecteur', async () => {
+  assert.deepEqual(parseSocialVisual(JSON.stringify(jwtVisual)), jwtVisual);
+  const prompt = buildSocialVisualPrompt(source);
+  assert.match(prompt, /"flow"/);
+  assert.match(prompt, /"code"/);
+  assert.match(prompt, /"steps"/);
+  const longLine = structuredClone(jwtVisual);
+  longLine.diagram.blocks[1].lines.push('"email": "john.doe@example.com", "ok": 1');
+  assert.throws(() => parseSocialVisual(JSON.stringify(longLine)), /30 caractères/);
+  const twoBlocks = structuredClone(jwtVisual);
+  twoBlocks.diagram.blocks = [twoBlocks.diagram.blocks[0], { ...twoBlocks.diagram.blocks[1], lines: ['"email": "john.doe@example.com", "ok": 1'] }];
+  assert.equal(parseSocialVisual(JSON.stringify(twoBlocks)).diagram.blocks.length, 2);
+  assert.throws(() => parseSocialVisual(JSON.stringify({ ...jwtVisual, subtitle: 'Comprenez et déboguez vos tokens JWT facilement' })), /tutoyer/);
+  assert.throws(() => parseSocialVisual(JSON.stringify({ ...jwtVisual, diagram: { kind: 'steps', items: [{ title: 'Un', text: 'a', tone: 'blue' }] } })));
+  assert.throws(() => parseSocialVisual(JSON.stringify({ ...jwtVisual, diagram: { kind: 'chart' } })));
+  assert.equal(readSocialVisual({ badge: 'x' }), null);
+  let calls = 0;
+  const generated = await generateSocialVisual(source, async () => (calls++ === 0 ? 'pas du JSON' : JSON.stringify(jwtVisual)), 2);
+  assert.equal(calls, 2);
+  assert.equal(generated.diagram.kind, 'flow');
+});
+
+test('repère le vouvoiement sans confondre « Chez » ni les impératifs tutoyés', () => {
+  assert.equal(usesFormalAddress('Standardisez vos fichiers.'), true);
+  assert.equal(usesFormalAddress('Prêt ? Essayez l’outil.'), true);
+  assert.equal(usesFormalAddress('Chez JcHub, découvre et adopte les bonnes pratiques.'), false);
+  assert.equal(usesFormalAddress(copies.instagram), false);
 });
 
 test('identifiant de publication stable; l’empreinte et le garde source/destination ont leur rôle', () => {
@@ -57,6 +126,9 @@ test('AUTO_PUBLISH requiert une plateforme active; DRY_RUN interdit les appels e
   assert.equal(externalPublishingEnabled(settings), false);
   assert.equal(shouldAutoPublish({ ...settings, autoPublish: true }, 'linkedin'), true);
   assert.equal(shouldAutoPublish({ ...settings, autoPublish: true }, 'facebook'), false);
+  assert.equal(shouldAutoPublish({ ...settings, autoPublish: true }, 'instagram'), false);
+  assert.equal(shouldAutoPublish({ ...settings, autoPublish: true, instagramEnabled: true }, 'instagram'), true);
+  assert.equal(isPlatformEnabled({ ...settings, instagramEnabled: true }, 'instagram'), true);
   assert.equal(externalPublishingEnabled({ ...settings, dryRun: false }), true);
 });
 
@@ -82,6 +154,11 @@ test('la readiness sociale vérifie activation et variables serveur sans retourn
     enabled: false, configured: true, ready: false, missing: [],
   });
   assert.doesNotMatch(JSON.stringify(getSocialPlatformReadiness('facebook', settings, env)), /secret/);
+  const instagramSettings = { ...settings, instagramEnabled: true };
+  assert.deepEqual(getSocialPlatformReadiness('instagram', instagramSettings, { FACEBOOK_ACCESS_TOKEN: 'secret', INSTAGRAM_USER_ID: '17841400000000000' }), { enabled: true, configured: true, ready: true, missing: [] });
+  assert.deepEqual(getSocialPlatformReadiness('instagram', instagramSettings, { FACEBOOK_ACCESS_TOKEN: 'secret' }).missing, ['INSTAGRAM_USER_ID']);
+  assert.deepEqual(getSocialPlatformReadiness('instagram', instagramSettings, { FACEBOOK_ACCESS_TOKEN: 'secret', INSTAGRAM_USER_ID: '178', NEXT_PUBLIC_SITE_URL: 'http://localhost:3000' }).missing, ['NEXT_PUBLIC_SITE_URL']);
+  assert.equal(getSocialPlatformReadiness('instagram', settings, { FACEBOOK_ACCESS_TOKEN: 'secret', INSTAGRAM_USER_ID: '178' }).ready, false);
 });
 
 test('mode approbation garde le contenu en attente; dry-run ne requiert aucun credential', async () => {
@@ -158,6 +235,81 @@ test('Facebook publie seulement sur le feed de Page, avec une erreur API expurg�
     env: { FACEBOOK_ACCESS_TOKEN: 'mock-page-token', FACEBOOK_PAGE_ID: '123456' },
     fetcher: async () => mockResponse(403, { error: { message: 'private-token-detail' } }),
   }), (error) => !error.message.includes('private-token-detail'));
+});
+
+const kitImage = 'https://jchub.dev/api/kit-image/kit123?format=instagram&v=1';
+const instagramSource = { ...source, portraitImageUrl: kitImage };
+const instagramEnv = { FACEBOOK_ACCESS_TOKEN: 'mock-page-token', INSTAGRAM_USER_ID: '17841400000000000', FACEBOOK_GRAPH_API_VERSION: 'v26.0', FACEBOOK_APP_SECRET: 'mock-app-secret', NEXT_PUBLIC_SITE_URL: 'https://jchub.dev' };
+const noWait = async () => {};
+
+test('Instagram crée un conteneur avec le visuel JPEG, attend son traitement puis publie', async () => {
+  const calls = [];
+  let statusChecks = 0;
+  const result = await publishToPlatform('instagram', record('instagram'), instagramSource, {
+    env: instagramEnv, wait: noWait,
+    fetcher: async (url, init = {}) => {
+      const parsed = new URL(String(url));
+      calls.push({ url: parsed, method: init.method || 'GET', body: init.body ? new URLSearchParams(String(init.body)) : null, headers: init.headers });
+      if (parsed.pathname.endsWith('/media')) return mockResponse(200, { id: '900' });
+      if (parsed.pathname.endsWith('/900')) { statusChecks += 1; return mockResponse(200, { status_code: statusChecks === 1 ? 'IN_PROGRESS' : 'FINISHED' }); }
+      if (parsed.pathname.endsWith('/media_publish')) return mockResponse(200, { id: '901' });
+      return mockResponse(200, { permalink: 'https://www.instagram.com/p/abc123/' });
+    },
+  });
+  const container = calls[0];
+  assert.equal(container.url.origin + container.url.pathname, 'https://graph.facebook.com/v26.0/17841400000000000/media');
+  assert.equal(container.method, 'POST');
+  assert.equal(container.body.get('image_url'), kitImage);
+  assert.equal(container.body.get('caption'), copies.instagram);
+  assert.equal(container.url.searchParams.get('appsecret_proof'), facebookAppSecretProof('mock-page-token', 'mock-app-secret'));
+  assert.equal(statusChecks, 2);
+  const publish = calls.find((call) => call.url.pathname.endsWith('/media_publish'));
+  assert.equal(publish.body.get('creation_id'), '900');
+  assert.ok(calls.filter((call) => call.method === 'GET').every((call) => call.headers.Authorization === 'Bearer mock-page-token' && !call.url.search.includes('mock-page-token')));
+  assert.deepEqual(result, { externalId: '901', externalUrl: 'https://www.instagram.com/p/abc123/' });
+});
+
+test('Instagram ne publie pas quand Meta rejette le visuel; l’échec reste relançable', async () => {
+  let publishCalls = 0;
+  await assert.rejects(publishToPlatform('instagram', record('instagram'), instagramSource, {
+    env: instagramEnv, wait: noWait,
+    fetcher: async (url) => {
+      const path = new URL(String(url)).pathname;
+      if (path.endsWith('/media')) return mockResponse(200, { id: '900' });
+      if (path.endsWith('/media_publish')) publishCalls += 1;
+      return mockResponse(200, { status_code: 'ERROR' });
+    },
+  }), (error) => error instanceof PlatformError && error.outcome === 'failed' && error.code === 'IG_CONTAINER_ERROR');
+  assert.equal(publishCalls, 0);
+  assert.equal(canRetryPublication('FAILED', 'IG_CONTAINER_ERROR'), true);
+  await assert.rejects(publishToPlatform('instagram', record('instagram'), instagramSource, {
+    env: instagramEnv, wait: noWait,
+    fetcher: async () => mockResponse(400, { error: { message: 'private-provider-detail' } }),
+  }), (error) => error.outcome === 'failed' && !error.message.includes('private-provider-detail'));
+});
+
+test('un timeout Instagram pendant media_publish devient UNKNOWN', async () => {
+  await assert.rejects(publishToPlatform('instagram', record('instagram'), instagramSource, {
+    env: instagramEnv, wait: noWait,
+    fetcher: async (url) => {
+      const path = new URL(String(url)).pathname;
+      if (path.endsWith('/media')) return mockResponse(200, { id: '900' });
+      if (path.endsWith('/media_publish')) throw new Error('timeout');
+      return mockResponse(200, { status_code: 'FINISHED' });
+    },
+  }), (error) => error instanceof PlatformError && error.outcome === 'unknown' && error.code === 'POST_OUTCOME_UNKNOWN');
+});
+
+test('Instagram exige un visuel public servi par le site et des identifiants avant tout appel', async () => {
+  assert.equal(publicImageUrl(kitImage, {}), kitImage);
+  assert.throws(() => publicImageUrl(kitImage, { NEXT_PUBLIC_SITE_URL: 'http://localhost:3000' }), (error) => error.code === 'IMAGE_URL_NOT_PUBLIC');
+  assert.throws(() => publicImageUrl('https://autre-site.example/image.jpg', {}), (error) => error.code === 'IMAGE_URL_NOT_PUBLIC');
+  assert.throws(() => publicImageUrl(undefined, {}), (error) => error.code === 'IMAGE_MISSING');
+  let calls = 0;
+  const fetcher = async () => { calls += 1; return mockResponse(200, {}); };
+  await assert.rejects(publishToPlatform('instagram', record('instagram'), source, { env: instagramEnv, fetcher }), (error) => error.code === 'IMAGE_MISSING');
+  await assert.rejects(publishToPlatform('instagram', record('instagram'), instagramSource, { env: { FACEBOOK_ACCESS_TOKEN: 'mock' }, fetcher }), (error) => error.code === 'MISSING_CREDENTIALS');
+  assert.equal(calls, 0);
 });
 
 test('Meta Insights agrège les métriques de Page sur 28 jours sans exposer le token', async () => {
@@ -336,16 +488,16 @@ test('la route cron refuse les secrets absents ou incorrects', async () => {
   assert.match(route, /isCronBearerAuthorized\(request\.headers\.get\('authorization'\), process\.env\.CRON_SECRET\)/);
 });
 
-test('les routes d’administration appellent toutes requireAdmin', async () => {
-  for (const path of [
-    '../app/api/admin/social/route.ts',
-    '../app/api/admin/social/prepare/route.ts',
-    '../app/api/admin/social/[id]/route.ts',
-    '../app/api/admin/social/insights/route.ts',
-  ]) {
-    const route = await readFile(new URL(path, import.meta.url), 'utf8');
-    assert.match(route, /await requireAdmin\(request\)/, `${path} doit vérifier la session admin`);
-  }
+test('les routes des kits vérifient la session CM et l’origine; les réglages restent aux administrateurs', async () => {
+  const read = (path) => readFile(new URL(path, import.meta.url), 'utf8');
+  const publishRoute = await read('../app/api/cm/kits/[id]/publish/route.ts');
+  assert.match(publishRoute, /await requireCm\(request\); requireSameOrigin\(request\)/);
+  assert.match(await read('../app/api/cm/kits/[id]/image/route.ts'), /await requireCm\(request\)/);
+  const settingsRoute = await read('../app/api/cm/publishing/route.ts');
+  assert.match(settingsRoute, /export async function GET[\s\S]*await requireCmActor\(request\)/);
+  assert.match(settingsRoute, /export async function PATCH[\s\S]*await requireAdmin\(request\); requireSameOrigin\(request\)/);
+  // Le visuel public d'un kit n'est servi qu'après une demande de publication.
+  assert.match(await read('../app/api/kit-image/[id]/route.ts'), /if \(!kit\?\.publishRequestedAt\)/);
 });
 
 test('OAuth LinkedIn impose une URI de callback locale explicite, un state identique et une mise à jour dotenv sans exposer le jeton', async () => {
@@ -387,7 +539,9 @@ test('OAuth Facebook exige la callback locale exacte et ne sélectionne jamais a
     assert.doesNotMatch(route, /<textarea|access_token=.*html/i);
   }
   const facebookLogin = await readFile(new URL('../app/api/auth/facebook/login/route.ts', import.meta.url), 'utf8');
-  assert.match(facebookLogin, /pages_show_list,pages_manage_posts,pages_read_engagement,read_insights/);
+  assert.match(facebookLogin, /pages_show_list,pages_manage_posts,pages_read_engagement,read_insights,instagram_basic,instagram_content_publish/);
+  const facebookCallback = await readFile(new URL('../app/api/auth/facebook/callback/route.ts', import.meta.url), 'utf8');
+  assert.match(facebookCallback, /fields', 'instagram_business_account'/);
   assert.match(facebookLogin, /secure: new URL\(redirectUri\)\.protocol === 'https:'/);
   const nextConfig = await readFile(new URL('../next.config.mjs', import.meta.url), 'utf8');
   assert.match(nextConfig, /allowedDevOrigins: \['127\.0\.0\.1', \.\.\.\(facebookOAuthHost \? \[facebookOAuthHost\] : \[\]\)\]/);

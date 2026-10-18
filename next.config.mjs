@@ -23,6 +23,8 @@ const nextConfig = {
   serverExternalPackages: ['@napi-rs/canvas', '@adobe/pdfservices-node-sdk', 'gray-matter'],
   outputFileTracingIncludes: {
     '/api/tools/pdf-to-word': ['./node_modules/pdfjs-dist/standard_fonts/**'],
+    '/api/cm/kits/[id]/image': ['./assets/fonts/**', './public/jchub-icon-192.png'],
+    '/api/kit-image/[id]': ['./assets/fonts/**', './public/jchub-icon-192.png'],
   },
   async redirects() {
     // Former paid-offer pages: keep any indexed links and backlinks useful.
@@ -48,8 +50,8 @@ const nextConfig = {
         ],
       },
       {
-        // The social card and the public tool catalog set their own CDN cache headers.
-        source: '/api/:path((?!article-cover$|tool-assistant$).*)',
+        // The social cards and the public tool catalog set their own CDN cache headers.
+        source: '/api/:path((?!article-cover$|tool-assistant$|kit-image/).*)',
         headers: [
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
           { key: 'CDN-Cache-Control', value: 'no-store' },

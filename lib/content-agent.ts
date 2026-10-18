@@ -173,7 +173,7 @@ async function generateWithOllama(prompt: string): Promise<string> {
   return data.response;
 }
 
-async function generateWithCompatibleProvider(provider: 'openai' | 'openrouter' | 'deepseek', prompt: string): Promise<string> {
+async function generateWithCompatibleProvider(provider: 'openai' | 'openrouter' | 'deepseek', prompt: string, maxTokens = 3000): Promise<string> {
   const configuration = {
     openai: {
       apiKey: process.env.OPENAI_API_KEY?.trim(),
@@ -211,8 +211,8 @@ async function generateWithCompatibleProvider(provider: 'openai' | 'openrouter' 
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.4,
       // Bound provider cost and avoid OpenRouter's much larger implicit default.
-      // 3,000 tokens is sufficient for the CM kit, planning assist and social copies.
-      ...(provider === 'openrouter' ? { max_tokens: 3000 } : {}),
+      // 3,000 tokens is sufficient for the CM kit and planning assist; social copies ask for more.
+      ...(provider === 'openrouter' ? { max_tokens: maxTokens } : {}),
       response_format: { type: 'json_object' },
     }),
     cache: 'no-store',
@@ -241,8 +241,8 @@ async function generateWithProvider(provider: AiProvider, prompt: string): Promi
   return generateWithCompatibleProvider(provider, prompt);
 }
 
-export async function generateOpenRouterText(prompt: string): Promise<string> {
-  return generateWithCompatibleProvider('openrouter', prompt);
+export async function generateOpenRouterText(prompt: string, maxTokens?: number): Promise<string> {
+  return generateWithCompatibleProvider('openrouter', prompt, maxTokens);
 }
 
 export async function generateConfiguredText(prompt: string): Promise<{ text: string; provider: AiProvider }> {

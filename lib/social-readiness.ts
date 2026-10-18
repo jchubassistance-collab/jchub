@@ -5,7 +5,16 @@ export type PlatformReadiness = { enabled: boolean; configured: boolean; ready: 
 const platformEnabled = (platform: SocialPlatform, settings: SocialSettings) => {
   if (platform === 'linkedin') return settings.linkedinEnabled;
   if (platform === 'facebook') return settings.facebookEnabled;
+  if (platform === 'instagram') return Boolean(settings.instagramEnabled);
   return settings.githubEnabled;
+};
+
+// Meta télécharge lui-même le visuel Instagram : le site doit être joignable publiquement en HTTPS.
+const isPublicHttpsUrl = (value: string) => {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+  } catch { return false; }
 };
 
 export function getSocialPlatformReadiness(
@@ -26,6 +35,11 @@ export function getSocialPlatformReadiness(
     check('FACEBOOK_ACCESS_TOKEN');
     check('FACEBOOK_PAGE_ID', /^[0-9]+$/.test(env.FACEBOOK_PAGE_ID?.trim() || ''));
     if (env.FACEBOOK_GRAPH_API_VERSION?.trim() && !/^v\d+\.\d+$/.test(env.FACEBOOK_GRAPH_API_VERSION.trim())) missing.push('FACEBOOK_GRAPH_API_VERSION');
+  } else if (platform === 'instagram') {
+    check('FACEBOOK_ACCESS_TOKEN');
+    check('INSTAGRAM_USER_ID', /^[0-9]+$/.test(env.INSTAGRAM_USER_ID?.trim() || ''));
+    if (env.FACEBOOK_GRAPH_API_VERSION?.trim() && !/^v\d+\.\d+$/.test(env.FACEBOOK_GRAPH_API_VERSION.trim())) missing.push('FACEBOOK_GRAPH_API_VERSION');
+    if (env.NEXT_PUBLIC_SITE_URL?.trim() && !isPublicHttpsUrl(env.NEXT_PUBLIC_SITE_URL.trim())) missing.push('NEXT_PUBLIC_SITE_URL');
   } else {
     check('GITHUB_TOKEN');
     const owner = env.GITHUB_OWNER?.trim() || 'jchubassistance-collab';

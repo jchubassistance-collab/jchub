@@ -3,7 +3,7 @@ import { start } from 'workflow/api';
 import { listDuePublications, getSocialSettings } from '@/lib/social-publications-store';
 import { runSocialPublication } from '@/workflows/social-publishing';
 import { reportUserError } from '@/lib/user-error';
-import { isCronBearerAuthorized } from '@/lib/social-utils';
+import { isCronBearerAuthorized, isPlatformEnabled } from '@/lib/social-utils';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,8 +14,7 @@ export async function GET(request: NextRequest) {
     const settings = await getSocialSettings();
     const due = await listDuePublications(10);
     if (settings.dryRun) return NextResponse.json({ queued: 0, dryRun: true, due: due.length });
-    const enabled = (platform: string) => platform === 'linkedin' ? settings.linkedinEnabled : platform === 'facebook' ? settings.facebookEnabled : settings.githubEnabled;
-    const results = await Promise.all(due.filter((item) => enabled(item.platform)).map(async (item) => {
+    const results = await Promise.all(due.filter((item) => isPlatformEnabled(settings, item.platform)).map(async (item) => {
       try {
         const run = await start(runSocialPublication, [item.id, false]);
         return { id: item.id, queued: true, runId: run.runId };

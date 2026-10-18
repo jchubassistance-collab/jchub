@@ -8,9 +8,11 @@ import { reportUserError } from '@/lib/user-error';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-function finish(request: NextRequest, result: 'connected' | 'page-required' | 'error', status = 303) {
-  const url = new URL('/admin/social', request.url);
+function finish(request: NextRequest, result: 'connected' | 'page-required' | 'error', instagram?: 'connected' | 'missing', status = 303) {
+  const url = new URL('/admin/cm', request.url);
+  url.hash = 'kits';
   url.searchParams.set('facebook', result);
+  if (instagram) url.searchParams.set('instagram', instagram);
   const response = NextResponse.redirect(url, status);
   response.headers.set('Cache-Control', 'no-store');
   response.headers.set('Referrer-Policy', 'no-referrer');
@@ -22,6 +24,7 @@ function finish(request: NextRequest, result: 'connected' | 'page-required' | 'e
 
 type TokenResponse = { access_token?: string; expires_in?: number };
 type PagesResponse = { data?: FacebookPageCandidate[] };
+type PageInstagramResponse = { instagram_business_account?: { id?: string } };
 
 async function readJson<T>(response: Response): Promise<T | null> {
   try { return await response.json() as T; } catch { return null; }
@@ -104,9 +107,20 @@ export async function GET(request: NextRequest) {
   if (!selected) return finish(request, 'error');
 
   const values: Record<string, string> = { FACEBOOK_PAGE_ID: selected.id, FACEBOOK_ACCESS_TOKEN: selected.access_token };
+
+  // Compte Instagram professionnel lié à la Page : il partage le Page Access Token.
+  const instagramUrl = new URL(`https://graph.facebook.com/${version}/${encodeURIComponent(selected.id)}`);
+  instagramUrl.searchParams.set('fields', 'instagram_business_account');
+  instagramUrl.searchParams.set('appsecret_proof', facebookAppSecretProof(selected.access_token, appSecret));
+  try {
+    const instagramResponse = await fetch(instagramUrl, { headers: { Authorization: `Bearer ${selected.access_token}` }, cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(12_000) });
+    const instagramId = (await readJson<PageInstagramResponse>(instagramResponse))?.instagram_business_account?.id;
+    if (instagramResponse.ok && typeof instagramId === 'string' && /^[0-9]+$/.test(instagramId)) values.INSTAGRAM_USER_ID = instagramId;
+  } catch { reportUserError(); }
+
   try {
     await saveLocalEnvValues(values);
-    return finish(request, 'connected');
+    return finish(request, 'connected', values.INSTAGRAM_USER_ID ? 'connected' : 'missing');
   } catch {
     reportUserError();
     return finish(request, 'error');

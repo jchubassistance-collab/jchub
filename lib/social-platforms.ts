@@ -159,6 +159,87 @@ async function publishFacebook(record: PublicationRecord, source: SocialSource, 
   return { externalId: String(data.id), externalUrl: `https://www.facebook.com/${encodeURIComponent(String(data.id))}` };
 }
 
+// Meta télécharge lui-même le visuel Instagram : il doit être servi en HTTPS public par le site JcHub.
+export function publicImageUrl(value: string | undefined, env: NodeJS.ProcessEnv = process.env): string {
+  const site = new URL(env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://jchub.dev');
+  let url: URL;
+  try { url = new URL(value || ''); } catch { throw new PlatformError('Aucun visuel Instagram n’est disponible pour ce post.', 'failed', 'IMAGE_MISSING'); }
+  if (url.protocol !== 'https:' || url.hostname !== site.hostname || ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)) {
+    throw new PlatformError('Instagram doit pouvoir télécharger le visuel : NEXT_PUBLIC_SITE_URL doit être une URL HTTPS publique.', 'failed', 'IMAGE_URL_NOT_PUBLIC');
+  }
+  return url.toString();
+}
+
+const INSTAGRAM_STATUS_DELAYS = [0, 2_000, 3_000, 5_000, 5_000];
+
+async function publishInstagram(record: PublicationRecord, source: SocialSource, dependencies: AdapterDependencies): Promise<AdapterResult> {
+  const env = dependencies.env || process.env;
+  const fetcher = dependencies.fetcher || fetch;
+  const timeoutMs = dependencies.timeoutMs || 12_000;
+  const wait = dependencies.wait || defaultWait;
+  const token = required(env, 'FACEBOOK_ACCESS_TOKEN');
+  const igUserId = required(env, 'INSTAGRAM_USER_ID');
+  if (!/^[0-9]+$/.test(igUserId)) throw new PlatformError('INSTAGRAM_USER_ID invalide.');
+  const version = env.FACEBOOK_GRAPH_API_VERSION?.trim() || 'v26.0';
+  if (!/^v\d+\.\d+$/.test(version)) throw new PlatformError('FACEBOOK_GRAPH_API_VERSION invalide.');
+  const appSecret = env.FACEBOOK_APP_SECRET?.trim() || env.META_APP_SECRET?.trim();
+  const graphUrl = (path: string, params: Record<string, string> = {}) => {
+    const url = new URL(`https://graph.facebook.com/${version}/${path}`);
+    for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
+    if (appSecret) url.searchParams.set('appsecret_proof', createHmac('sha256', appSecret).update(token).digest('hex'));
+    return url;
+  };
+  const post = (url: URL, values: Record<string, string>) => fetcher(url, {
+    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ ...values, access_token: token }), signal: timeoutSignal(timeoutMs), ...noRedirect,
+  });
+  const get = (url: URL) => fetcher(url, { headers: { Authorization: `Bearer ${token}` }, signal: timeoutSignal(timeoutMs), ...noRedirect });
+
+  // 1. Conteneur : aucune publication n'existe encore, un échec ici peut être relancé sans risque de doublon.
+  const imageUrl = publicImageUrl(source.portraitImageUrl, env);
+  let containerResponse: Response;
+  try {
+    containerResponse = await post(graphUrl(`${igUserId}/media`), {
+      image_url: imageUrl,
+      caption: normalizePostText(record),
+      alt_text: `Visuel JcHub présentant l’article « ${source.title} »`.slice(0, 1000),
+    });
+  } catch { throw new PlatformError('Instagram n’a pas pu préparer le visuel. Réessaie plus tard.', 'failed', 'IG_CONTAINER_FAILED'); }
+  const containerData = await safeJson(containerResponse);
+  const containerId = String(containerData.id || '');
+  if (!containerResponse.ok || !/^[0-9]+$/.test(containerId)) {
+    throw new PlatformError(`Instagram a refusé le visuel ou la légende (HTTP ${containerResponse.status}).`, 'failed', `IG_CONTAINER_HTTP_${containerResponse.status}`);
+  }
+
+  // 2. Meta télécharge et traite l'image de façon asynchrone.
+  let status = '';
+  for (const delay of INSTAGRAM_STATUS_DELAYS) {
+    if (delay) await wait(delay);
+    try {
+      const statusResponse = await get(graphUrl(containerId, { fields: 'status_code' }));
+      status = String((await safeJson(statusResponse)).status_code || '');
+    } catch { status = ''; }
+    if (status === 'FINISHED' || status === 'ERROR' || status === 'EXPIRED') break;
+  }
+  if (status === 'ERROR' || status === 'EXPIRED') throw new PlatformError('Instagram n’a pas pu traiter le visuel.', 'failed', `IG_CONTAINER_${status}`);
+  if (status !== 'FINISHED') throw new PlatformError('Instagram traite encore le visuel; réessaie dans quelques minutes.', 'failed', 'IG_CONTAINER_NOT_READY');
+
+  // 3. Publication : à partir d'ici, un résultat ambigu doit être vérifié manuellement.
+  let publishResponse: Response;
+  try { publishResponse = await post(graphUrl(`${igUserId}/media_publish`), { creation_id: containerId }); }
+  catch { throw new PlatformError('Résultat Instagram incertain après envoi; vérifie le compte avant toute nouvelle tentative.', 'unknown', 'POST_OUTCOME_UNKNOWN'); }
+  const publishData = await safeJson(publishResponse);
+  const mediaId = String(publishData.id || '');
+  if (!publishResponse.ok || !/^[0-9]+$/.test(mediaId)) throw responseError(publishResponse, publishData);
+
+  let externalUrl: string | undefined;
+  try {
+    const permalink = String((await safeJson(await get(graphUrl(mediaId, { fields: 'permalink' })))).permalink || '');
+    if (/^https:\/\/(www\.)?instagram\.com\//.test(permalink)) externalUrl = permalink;
+  } catch { externalUrl = undefined; }
+  return { externalId: mediaId, externalUrl };
+}
+
 async function githubRequest(url: string, init: RequestInit, fetcher: typeof fetch, timeoutMs: number, wait: (ms: number) => Promise<void>, safeToRetry: boolean): Promise<Response> {
   const delays = safeToRetry ? [0, 250, 750] : [0];
   let lastError: unknown;
@@ -223,5 +304,6 @@ export async function publishToPlatform(
 ): Promise<AdapterResult> {
   if (platform === 'linkedin') return publishLinkedIn(record, source, dependencies);
   if (platform === 'facebook') return publishFacebook(record, source, dependencies);
+  if (platform === 'instagram') return publishInstagram(record, source, dependencies);
   return publishGitHub(record, dependencies);
 }

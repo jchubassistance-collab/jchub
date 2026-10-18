@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     authorization.searchParams.set('redirect_uri', redirectUri);
     authorization.searchParams.set('response_type', 'code');
     authorization.searchParams.set('state', state);
-    authorization.searchParams.set('scope', 'pages_show_list,pages_manage_posts,pages_read_engagement,read_insights');
+    authorization.searchParams.set('scope', 'pages_show_list,pages_manage_posts,pages_read_engagement,read_insights,instagram_basic,instagram_content_publish');
 
     const response = NextResponse.redirect(authorization);
     response.headers.set('Cache-Control', 'no-store');

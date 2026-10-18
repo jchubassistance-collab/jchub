@@ -2,7 +2,9 @@
 
 ## Architecture
 
-Le tableau de bord `Admin > Publication sociale` prépare des publications depuis les articles publiés du blog. `lib/publishing-agent.ts` transforme le contenu en trois textes adaptés via Gemini, puis l’outbox Firestore (`social_publications`) conserve une entrée par plateforme. Les gardes atomiques (`social_publication_guards`) empêchent de republier le même article vers la même destination, même si le texte généré varie. Une transaction réserve chaque publication avant l’appel réseau.
+Les posts Facebook et Instagram se préparent et se publient depuis `Espace CM > Kits de publication` (`/admin/cm#kits`); l'ancienne page `/admin/social` y redirige. Un kit (`cmKits`) contient le titre et le sous-titre du visuel, la légende et les hashtags Instagram, le texte et les hashtags Facebook, le schéma du visuel et l'état de publication par réseau. Le bouton « Publier sur Facebook et Instagram » enregistre le kit puis crée une entrée par réseau dans l'outbox Firestore (`social_publications`, lien `kitId`). Les gardes atomiques (`social_publication_guards`, clé contenu source + réseau + destination) empêchent de publier deux fois le même article ou outil au même endroit, même depuis deux kits. Une transaction réserve chaque publication avant l'appel réseau, et l'état de chaque réseau (en cours, publié, échec, à vérifier) est recopié dans le kit.
+
+Quand un article est publié (validation d'un brouillon de l'agent ou cron `publish-scheduled`), le workflow `runSocialPreparation` crée son kit, ou reprend celui que le CM a déjà préparé. Si la publication automatique est active et le mode test désactivé, le kit part sur les réseaux actifs; sinon il attend le CM. LinkedIn et GitHub ne sont plus alimentés par ce flux : leurs adaptateurs restent disponibles dans `lib/social-platforms.ts`.
 
 Les workflows durables exécutent la préparation et les appels réseau. Les canaux échouent indépendamment. Les réponses inconnues après un POST passent à `UNKNOWN`; elles ne sont jamais réessayées automatiquement. Un administrateur doit vérifier la destination et confirmer explicitement l’absence de publication avant de réessayer.
 
@@ -21,8 +23,9 @@ Les paramètres fonctionnels sont enregistrés dans `app_config/social_publishin
 | `DRY_RUN` | Bloque tous les appels de publication si `true` (défaut). |
 | `AUTO_PUBLISH` | Autorise la publication automatique des nouvelles entrées (défaut `false`). |
 | `PUBLISH_TIMEZONE` | Fuseau IANA initial (défaut `Africa/Lagos`). |
-| `GEMINI_API_KEY` | Clé serveur déjà utilisée par les fonctions IA; requise pour générer les variantes. |
-| `GEMINI_MODEL` | Modèle Gemini facultatif (défaut `gemini-2.5-flash`). |
+| `AI_PROVIDER` / `GEMINI_API_KEY` | Fournisseur IA principal des variantes sociales (Gemini par défaut, avec la chaîne de secours `AI_FALLBACK_PROVIDER`). |
+| `OPENROUTER_API_KEY` | Secours OpenRouter si le fournisseur principal échoue deux fois. |
+| `OPENROUTER_MODEL` | Modèle OpenRouter facultatif (défaut `openrouter/free`). |
 | `LINKEDIN_ENABLED` | Active le canal LinkedIn (défaut `false`). |
 | `LINKEDIN_ACCESS_TOKEN` | OAuth access token côté serveur. |
 | `LINKEDIN_AUTHOR_URN` | Facultatif si le token OAuth comprend `openid profile`; sinon, URN de membre au format `urn:li:person:…`. |
@@ -35,6 +38,8 @@ Les paramètres fonctionnels sont enregistrés dans `app_config/social_publishin
 | `FACEBOOK_APP_SECRET` | Secret de l’application Meta, conservé côté serveur. |
 | `FACEBOOK_REDIRECT_URI` | Callback OAuth exact; en local `http://127.0.0.1:3000/api/auth/facebook/callback`. |
 | `FACEBOOK_GRAPH_API_VERSION` | Version Graph API (défaut `v26.0`; vérifier la version disponible au déploiement). |
+| `INSTAGRAM_ENABLED` | Active le canal Instagram (défaut `false`). |
+| `INSTAGRAM_USER_ID` | ID numérique du compte Instagram professionnel relié à la Page. Utilise le même `FACEBOOK_ACCESS_TOKEN`. |
 | `GITHUB_ENABLED` | Active la publication Markdown (défaut `false`). |
 | `GITHUB_TOKEN` | Token à permissions minimales, `Contents: write` uniquement sur le dépôt cible. |
 | `GITHUB_OWNER` | Propriétaire du dépôt; défaut `jchubassistance-collab`. |
@@ -44,7 +49,7 @@ Les paramètres fonctionnels sont enregistrés dans `app_config/social_publishin
 | `GITHUB_API_VERSION` | Version REST GitHub (défaut `2026-03-10`). |
 | `CRON_SECRET` | Secret serveur partagé qui protège les routes cron; configurez-le dans l’environnement de déploiement. |
 
-Les trois interrupteurs de plateformes et les modes auto/dry-run peuvent ensuite être pilotés depuis le tableau de bord administrateur. Conservez les tokens uniquement dans les variables serveur du déploiement; ne les préfixez jamais avec `NEXT_PUBLIC_`.
+Les interrupteurs de plateformes et les modes auto/dry-run se pilotent dans le panneau « Réglages de publication » en haut des kits, visible des administrateurs seulement. Conservez les tokens uniquement dans les variables serveur du déploiement; ne les préfixez jamais avec `NEXT_PUBLIC_`.
 
 ## Connexion des plateformes
 
@@ -90,15 +95,43 @@ Le code accepte aussi les anciens noms `META_APP_ID`, `META_APP_SECRET`, `META_R
 
 En production, le flux OAuth local est désactivé. Configure `FACEBOOK_ACCESS_TOKEN` et `FACEBOOK_PAGE_ID` dans **Vercel → Project Settings → Environment Variables**, marque le token sensible et redéploie. Il s’agit d’un Page Access Token, jamais d’un token de profil personnel.
 
+### Instagram
+
+Instagram publie via l'API Instagram avec Facebook Login, sur un compte **professionnel** (Business ou Creator) relié à la Page Facebook. Il réutilise le Page Access Token `FACEBOOK_ACCESS_TOKEN`, qui doit inclure `instagram_basic` et `instagram_content_publish` en plus des permissions de la Page. Le bouton « Connecter Facebook et Instagram » demande ces permissions et enregistre `INSTAGRAM_USER_ID` dans `.env.local` lorsque la Page a un compte Instagram lié (`/{page-id}?fields=instagram_business_account`). En production, renseigne `INSTAGRAM_USER_ID` dans Vercel.
+
+Instagram n'accepte pas de publication texte seule. Chaque post utilise le visuel portrait JPEG 1080×1350 (4:5) du kit, servi par `/api/kit-image/{id}` (voir « Visuels des posts »). Meta télécharge ce visuel lui-même : `NEXT_PUBLIC_SITE_URL` doit pointer vers le site public en HTTPS et la route doit être déployée. La publication se fait en trois temps : création du conteneur (`/{ig-user-id}/media`), attente du statut `FINISHED`, puis `/{ig-user-id}/media_publish`. Un échec avant `media_publish` reste relançable; un résultat ambigu de `media_publish` passe à `UNKNOWN`.
+
+La légende fait 2200 caractères au maximum, avec 30 hashtags et 20 mentions au plus. Les liens n'y sont pas cliquables : l'IA renvoie vers jchub.dev (« lien en bio ») au lieu d'insérer l'URL. Meta limite chaque compte à 100 publications par API sur 24 heures glissantes.
+
+Références : [Content Publishing Instagram](https://developers.facebook.com/docs/instagram-platform/content-publishing), [IG User Media](https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-user/media).
+
 ### GitHub
 
 Créer un fine-grained personal access token limité au dépôt visé, avec `Contents: write`. Le dépôt par défaut est `jchubassistance-collab/jchub`; configure `GITHUB_OWNER` et `GITHUB_REPOSITORY` seulement pour viser un autre dépôt. Vérifier aussi `GITHUB_BRANCH` et `GITHUB_PUBLISH_PATH`. Le token a besoin d’un accès de lecture pour vérifier dépôt, branche et fichier. Aucun autre type d’objet GitHub n’est créé.
 
 Référence : [GitHub REST Contents API](https://docs.github.com/en/rest/repos/contents).
 
+## Génération des textes
+
+Les textes du kit sont générés par le fournisseur IA configuré (`generateConfiguredText`, Gemini par défaut), avec deux essais. En cas d'échec, OpenRouter prend le relais avec trois essais et une limite de 5 000 tokens. `openrouter/free` choisit un modèle gratuit au hasard, et beaucoup échouent : raisonnement qui épuise la limite, JSON absent, consigne oubliée. Chaque essai est validé côté serveur (JSON, longueurs, hashtags, tutoiement) et une sortie refusée déclenche l'essai suivant.
+
+Le prompt impose le tutoiement et interdit les étiquettes « Source : » ou « Hashtags : ». Le texte publié sur Facebook reçoit automatiquement le lien du contenu s'il n'y figure pas; Instagram renvoie vers le lien en bio.
+
+## Visuels des posts
+
+Chaque kit est illustré par un visuel JcHub qui explique le contenu : logo, badge thématique, titre et sous-titre du kit, schéma central, puis « Temps de lecture » et `jchub.dev/blog` pour un article, ou « Outil gratuit » et `jchub.dev/outils` pour un outil. L'IA ne dessine pas l'image. Elle choisit et remplit un schéma parmi trois types, et le gabarit `lib/social-card.tsx` le dessine avec les polices embarquées, ce qui garantit un texte net et sans faute :
+
+- `flow` : 2 à 4 blocs reliés (composants, étapes d'un traitement, avant/après), avec des lignes de code ou de texte;
+- `code` : un extrait de code ou une commande, 8 lignes au plus;
+- `steps` : 3 ou 4 étapes ou conseils.
+
+Le schéma est généré à la création du kit, en parallèle des textes (fournisseur configuré, puis OpenRouter en secours), validé (limites de longueur adaptées à la place disponible), puis enregistré dans le kit. Si la génération échoue, le visuel s'affiche sans schéma. Les kits créés avant cette version n'ont pas de schéma.
+
+`/api/cm/kits/{id}/image` sert l'aperçu et le téléchargement au CM (`?format=instagram`, portrait 1080×1350, ou `?format=facebook`, paysage 1200×630). `/api/kit-image/{id}` sert la même image publiquement pour que Meta la télécharge, uniquement après une demande de publication; son URL porte la version du kit (`v`) pour qu'une modification ne soit pas masquée par le cache. Les polices Inter et JetBrains Mono (licence OFL) sont dans `assets/fonts` et déclarées dans `outputFileTracingIncludes`.
+
 ## Approbation, planification et cron
 
-Les administrateurs authentifiés peuvent préparer un article, examiner chaque texte, approuver, publier maintenant, planifier ou annuler. Dans la configuration actuelle, Vercel appelle `/api/cron/publish-social` chaque jour à 09:00 UTC; ce cron inspecte les publications arrivées à échéance et exige `Authorization: Bearer <CRON_SECRET>`. La date choisie est interprétée dans le fuseau IANA configuré et stockée en UTC. Les heures locales inexistantes lors d’un changement d’heure sont rejetées. Une programmation peut donc être exécutée en retard selon la cadence du cron; celui-ci ne garantit pas l’exécution à la seconde exacte.
+Le CM et les administrateurs créent un kit depuis un article ou un outil, le relisent, le corrigent, puis le publient sur Facebook et Instagram. Les réglages (réseaux actifs, mode test, publication automatique, connexion Meta) sont réservés aux administrateurs, et le serveur applique cette règle. Un envoi au résultat incertain (`UNKNOWN`) n'est relancé qu'après confirmation explicite dans le kit. Dans la configuration actuelle, Vercel appelle `/api/cron/publish-social` chaque jour à 09:00 UTC; ce cron inspecte les publications arrivées à échéance et exige `Authorization: Bearer <CRON_SECRET>`. La date choisie est interprétée dans le fuseau IANA configuré et stockée en UTC. Les heures locales inexistantes lors d’un changement d’heure sont rejetées. Une programmation peut donc être exécutée en retard selon la cadence du cron; celui-ci ne garantit pas l’exécution à la seconde exacte.
 
 Vercel Cron suit UTC : [documentation Vercel Cron](https://vercel.com/docs/cron-jobs). Vérifiez que `CRON_SECRET` est défini dans les environnements Preview/Production concernés. Les fonctions Workflow du projet doivent être activées et prises en charge par le plan de déploiement utilisé.
 
@@ -109,13 +142,13 @@ Vercel Cron suit UTC : [documentation Vercel Cron](https://vercel.com/docs/cron-
 - GitHub peut relire les ressources GET avec un backoff limité. Les PUT ne sont jamais réessayés à l’aveugle.
 - Une publication `UNKNOWN` exige une vérification manuelle avant toute reprise.
 - Les images ne sont récupérées que depuis le domaine du site et `res.cloudinary.com`, en HTTPS, sans redirection et avec limite de 5 Mo. Un format image non pris en charge provoque un repli vers le texte/lien.
-- Les API d’administration passent par `requireAdmin`; la route cron utilise un secret comparé en temps constant.
-- Les textes sont validés côté serveur, comprennent le lien de l’article, sont distincts et limités en taille.
+- Les API des kits (`/api/cm/kits/*`) et la lecture des réglages (`/api/cm/publishing`) exigent une session CM ou administrateur et refusent les écritures d'une autre origine; la modification des réglages exige `requireAdmin`. Chaque action est journalisée dans `cmActivity`. La route cron utilise un secret comparé en temps constant.
+- Les textes sont validés côté serveur et limités en taille; le texte Facebook garde le lien du contenu.
 - La file Firestore suppose que Firebase Admin est correctement configuré. Restreignez l’accès Firestore à l’identité serveur et configurez vos règles pour refuser l’accès client aux collections internes.
 
 ## Dépannage
 
-- **Génération non disponible** : vérifier `GEMINI_API_KEY`, le modèle sélectionné et la disponibilité Gemini; les détails fournisseur ne sont pas renvoyés dans l’interface.
+- **Génération non disponible** : vérifier `GEMINI_API_KEY` (ou le fournisseur de `AI_PROVIDER`), puis `OPENROUTER_API_KEY` pour le secours; les détails fournisseur ne sont pas renvoyés dans l’interface.
 - **Credentials manquants** : contrôler les noms des variables serveur dans le déploiement; l’interface indique uniquement leur présence.
 - **LinkedIn/Meta refusent le POST** : vérifier la version d’API, l’expiration du token, les permissions et l’approbation de l’application.
 - **Publication UNKNOWN** : vérifier manuellement la destination. Ne confirmer une reprise que si le post ou commit n’existe pas.

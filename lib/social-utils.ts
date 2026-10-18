@@ -18,9 +18,18 @@ export function canRetryPublication(status: string, errorCode?: string | null, c
   return status === 'UNKNOWN' && confirmUnknown;
 }
 
+export function isPlatformEnabled(settings: SocialSettings, platform: SocialPlatform): boolean {
+  const enabled: Record<SocialPlatform, boolean> = {
+    linkedin: settings.linkedinEnabled,
+    facebook: settings.facebookEnabled,
+    instagram: settings.instagramEnabled,
+    github: settings.githubEnabled,
+  };
+  return Boolean(enabled[platform]);
+}
+
 export function shouldAutoPublish(settings: SocialSettings, platform: SocialPlatform): boolean {
-  if (!settings.autoPublish) return false;
-  return platform === 'linkedin' ? settings.linkedinEnabled : platform === 'facebook' ? settings.facebookEnabled : settings.githubEnabled;
+  return settings.autoPublish && isPlatformEnabled(settings, platform);
 }
 
 export function externalPublishingEnabled(settings: SocialSettings): boolean { return !settings.dryRun; }

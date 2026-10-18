@@ -7,7 +7,7 @@ import { cmError, requireSameOrigin, writeCmActivity } from '@/lib/cm-server';
 
 const text = z.string().trim();
 const hashtags = z.array(z.string().trim().min(2).max(40)).min(1).max(8);
-const saveSchema = z.object({ action: z.literal('save'), imageTitle: text.min(3).max(64), imageSubtitle: text.min(3).max(150), instagramCaption: text.min(30).max(2200), instagramHashtags: hashtags, snapchatCaption: text.min(20).max(1000), snapchatHashtags: hashtags }).strict();
+const saveSchema = z.object({ action: z.literal('save'), imageTitle: text.min(3).max(64), imageSubtitle: text.min(3).max(150), instagramCaption: text.min(30).max(2200), instagramHashtags: hashtags, facebookCaption: text.min(20).max(1000), facebookHashtags: hashtags }).strict();
 const statusSchema = z.object({ action: z.literal('status'), status: z.enum(['ready', 'published']) }).strict();
 
 export async function PATCH(request: NextRequest, context: { params: Promise<{ id: string }> }) {

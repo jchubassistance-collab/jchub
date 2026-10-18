@@ -10,7 +10,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function finish(request: NextRequest, result: 'connected' | 'error', status = 303) {
-  const url = new URL('/admin/social', request.url);
+  const url = new URL('/admin/cm', request.url);
+  url.hash = 'kits';
   url.searchParams.set('linkedin', result);
   const response = NextResponse.redirect(url, status);
   response.headers.set('Cache-Control', 'no-store');
