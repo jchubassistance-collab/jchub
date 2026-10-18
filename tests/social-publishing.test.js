@@ -7,7 +7,7 @@ import { canRetryPublication, externalPublishingEnabled, isCronBearerAuthorized,
 import { getLinkedInRedirectUri, isMatchingOAuthState, updateEnvFile } from '../lib/linkedin-oauth.ts';
 import { facebookAppSecretProof, facebookGraphApiVersion, getFacebookAppId, getFacebookAppSecret, getFacebookRedirectUri, selectFacebookPage } from '../lib/facebook-oauth.ts';
 import { getSocialPlatformReadiness } from '../lib/social-readiness.ts';
-import { FacebookInsightsError, getFacebookInsights } from '../lib/facebook-insights.ts';
+import { FacebookInsightsError, getFacebookInsights, getFacebookPostInsights } from '../lib/facebook-insights.ts';
 import { GitHubInsightsError, getGitHubInsights } from '../lib/github-insights.ts';
 
 const source = {
@@ -353,11 +353,12 @@ test('Facebook retente une photo dont le visuel n’a pas pu être lu et traduit
       if (parsed.hostname === 'jchub.dev') return jpegResponse();
       photoCalls += 1;
       assert.equal(parsed.pathname, '/v26.0/123456/photos');
-      return photoCalls === 1 ? mockResponse(400, { error: { code: 324, message: 'Missing or invalid image file' } }) : mockResponse(200, { id: '123456_42' });
+      return photoCalls === 1 ? mockResponse(400, { error: { code: 324, message: 'Missing or invalid image file' } }) : mockResponse(200, { id: '42', post_id: '123456_42' });
     },
   });
   assert.equal(photoCalls, 2);
   assert.equal(result.externalId, '123456_42');
+  assert.equal(result.externalUrl, 'https://www.facebook.com/123456_42');
   await assert.rejects(publishToPlatform('facebook', record('facebook'), photoSource, {
     env, wait: noWait,
     fetcher: async (url) => new URL(String(url)).hostname === 'jchub.dev' ? jpegResponse() : mockResponse(403, { error: { code: 200, message: 'detail-brut-fournisseur' } }),
@@ -378,14 +379,19 @@ test('Instagram exige un visuel public servi par le site et des identifiants ava
 
 test('Meta Insights agrège les métriques de Page sur 28 jours sans exposer le token', async () => {
   let request;
+  let reachRequest;
   const result = await getFacebookInsights({ FACEBOOK_ACCESS_TOKEN: 'private-token', FACEBOOK_PAGE_ID: '123456', FACEBOOK_GRAPH_API_VERSION: 'v26.0', FACEBOOK_APP_SECRET: 'mock-app-secret' }, {
     now: new Date('2026-10-14T12:00:00.000Z'),
     fetcher: async (url, init) => {
       const parsedUrl = new URL(String(url));
+      if (parsedUrl.pathname.endsWith('/insights') && parsedUrl.searchParams.get('metric') === 'page_total_media_view_unique') {
+        reachRequest = parsedUrl;
+        return mockResponse(200, { data: [{ name: 'page_total_media_view_unique', values: [{ end_time: '2026-10-13T07:00:00+0000', value: 180 }, { end_time: '2026-10-14T07:00:00+0000', value: 210 }] }] });
+      }
       if (parsedUrl.pathname.endsWith('/insights')) {
         request = { url: parsedUrl, init };
         return mockResponse(200, { data: [
-          { name: 'page_impressions', values: [{ end_time: '2026-10-13T07:00:00+0000', value: 100 }, { end_time: '2026-10-14T07:00:00+0000', value: 150 }] },
+          { name: 'page_media_view', values: [{ end_time: '2026-10-13T07:00:00+0000', value: 100 }, { end_time: '2026-10-14T07:00:00+0000', value: 150 }] },
           { name: 'page_post_engagements', values: [{ end_time: '2026-10-13T07:00:00+0000', value: 12 }, { end_time: '2026-10-14T07:00:00+0000', value: 18 }] },
           { name: 'page_views_total', values: [{ end_time: '2026-10-14T07:00:00+0000', value: 33 }] },
         ] });
@@ -394,20 +400,37 @@ test('Meta Insights agrège les métriques de Page sur 28 jours sans exposer le 
     },
   });
   assert.equal(request.url.pathname, '/v26.0/123456/insights');
-  assert.match(request.url.searchParams.get('metric'), /page_post_engagements/);
+  assert.match(request.url.searchParams.get('metric'), /page_media_view/);
+  assert.doesNotMatch(request.url.searchParams.get('metric'), /page_impressions/);
   assert.equal(request.url.searchParams.get('period'), 'day');
+  assert.equal(Number(request.url.searchParams.get('until')) - Number(request.url.searchParams.get('since')), 28 * 86400);
+  assert.equal(reachRequest.searchParams.get('period'), 'days_28');
   assert.equal(request.url.searchParams.get('appsecret_proof'), facebookAppSecretProof('private-token', 'mock-app-secret'));
   assert.equal(request.init.headers.Authorization, 'Bearer private-token');
   assert.equal(request.url.search.includes('private-token'), false);
-  assert.equal(result.impressions, 250);
+  assert.equal(result.views, 250);
+  assert.equal(result.reach, 210);
   assert.equal(result.engagements, 30);
   assert.equal(result.pageViews, 33);
   assert.equal(result.followers, 842);
   assert.deepEqual(result.timeline, [
-    { date: '2026-10-13', impressions: 100, engagements: 12 },
-    { date: '2026-10-14', impressions: 150, engagements: 18 },
+    { date: '2026-10-13', views: 100, engagements: 12 },
+    { date: '2026-10-14', views: 150, engagements: 18 },
   ]);
   assert.deepEqual(result.warnings, []);
+});
+
+test('Meta Insights demande une portée sur 7 jours pour un rapport hebdomadaire', async () => {
+  const periods = [];
+  await getFacebookInsights({ FACEBOOK_ACCESS_TOKEN: 'private-token', FACEBOOK_PAGE_ID: '123456' }, {
+    now: new Date('2026-10-19T00:00:00.000Z'),
+    fetcher: async (url) => {
+      const parsed = new URL(String(url));
+      if (parsed.pathname.endsWith('/insights')) periods.push([parsed.searchParams.get('metric'), parsed.searchParams.get('period'), Number(parsed.searchParams.get('until')) - Number(parsed.searchParams.get('since'))]);
+      return mockResponse(200, parsed.pathname.endsWith('/insights') ? { data: [] } : { followers_count: 10 });
+    },
+  }, 7).catch(() => undefined);
+  assert.deepEqual(periods.find(([metric]) => metric === 'page_total_media_view_unique'), ['page_total_media_view_unique', 'week', 7 * 86400]);
 });
 
 test('Meta Insights isole les métriques obsolètes et conserve les autres statistiques', async () => {
@@ -420,16 +443,40 @@ test('Meta Insights isole les métriques obsolètes et conserve les autres stati
       if (!parsed.pathname.endsWith('/insights')) return mockResponse(200, { followers_count: 842 });
       if (parsed.searchParams.get('metric').includes(',')) return mockResponse(400, { error: { code: 100 } });
       const metric = parsed.searchParams.get('metric');
-      if (metric === 'page_impressions') return mockResponse(400, { error: { code: 100 } });
+      if (metric === 'page_media_view' || metric === 'page_total_media_view_unique') return mockResponse(400, { error: { code: 100 } });
       return mockResponse(200, { data: [{ name: metric, values: [{ end_time: '2026-10-14T07:00:00+0000', value: metric === 'page_views_total' ? 22 : 8 }] }] });
     },
   });
-  assert.equal(requests.filter((url) => url.pathname.endsWith('/insights')).length, 4);
+  // Requête groupée, puis une par métrique (vues, interactions, visites, abonnés), puis la portée.
+  assert.equal(requests.filter((url) => url.pathname.endsWith('/insights')).length, 6);
   assert.equal(result.engagements, 8);
   assert.equal(result.pageViews, 22);
   assert.equal(result.followers, 842);
-  assert.equal(result.impressions, 0);
-  assert.ok(result.warnings.some((warning) => warning.includes('page_impressions')));
+  assert.equal(result.views, 0);
+  assert.equal(result.reach, null);
+  assert.ok(result.warnings.some((warning) => warning.includes('page_media_view')));
+});
+
+test('les statistiques d’un post Facebook convertissent la photo en post et lisent les métriques disponibles', async () => {
+  const paths = [];
+  const metrics = await getFacebookPostInsights('777', { FACEBOOK_ACCESS_TOKEN: 'private-token', FACEBOOK_APP_SECRET: 'mock-app-secret' }, async (url, init) => {
+    const parsed = new URL(String(url));
+    paths.push(`${parsed.pathname}?${parsed.searchParams.get('fields') || parsed.searchParams.get('metric')}`);
+    assert.equal(init.headers.Authorization, 'Bearer private-token');
+    if (parsed.pathname === '/v26.0/777') return mockResponse(200, { page_story_id: '123456_777', id: '777' });
+    if (parsed.pathname === '/v26.0/123456_777') return mockResponse(200, { shares: { count: 4 }, id: '123456_777' });
+    return mockResponse(200, { data: [
+      { name: 'post_activity_by_action_type', values: [{ value: { share: 4, comment: 3, like: 9 } }] },
+      { name: 'post_reactions_by_type_total', values: [{ value: { like: 9, love: 2 } }] },
+      { name: 'post_media_view', values: [{ value: 120 }] },
+      { name: 'post_total_media_view_unique', values: [{ value: 80 }] },
+    ] });
+  });
+  assert.deepEqual(metrics, { likes: 11, comments: 3, shares: 4, saves: null, reach: 80, views: 120 });
+  assert.deepEqual(paths, ['/v26.0/777?page_story_id', '/v26.0/123456_777?shares', '/v26.0/123456_777/insights?post_activity_by_action_type,post_reactions_by_type_total,post_media_view,post_total_media_view_unique']);
+  assert.ok(!paths.some((path) => /post_impressions|post_engaged_users|likes\.summary|comments\.summary/.test(path)));
+  const empty = await getFacebookPostInsights('pas-un-id', { FACEBOOK_ACCESS_TOKEN: 'private-token' }, async () => { throw new Error('ne doit pas appeler Meta'); });
+  assert.deepEqual(empty, { likes: null, comments: null, shares: null, saves: null, reach: null, views: null });
 });
 
 test('Meta Insights transforme les permissions refusées en consigne sûre', async () => {

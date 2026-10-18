@@ -15,7 +15,22 @@ export async function GET(request: NextRequest) {
   try {
     await requireCm(request);
     const snapshot = await getAdminDb().collection('cmKits').orderBy('createdAt', 'desc').limit(100).get();
-    const kits = snapshot.docs.map((doc) => toKit(doc.id, doc.data()));
+    const publicationSnapshot = await getAdminDb().collection('social_publications').where('status', '==', 'PUBLISHED').limit(200).get();
+    const results = new Map<string, Array<Record<string, unknown>>>();
+    for (const publication of publicationSnapshot.docs) {
+      const data = publication.data();
+      if (!data.kitId || !data.externalId || data.dryRun) continue;
+      const rows = results.get(String(data.kitId)) || [];
+      rows.push({ platform: data.platform, publishedAt: data.publishedAt?.toDate?.()?.toISOString?.() || null, externalUrl: data.externalUrl || null, insights: data.insights || null, insightsFetchedAt: data.insightsFetchedAt || null });
+      results.set(String(data.kitId), rows);
+    }
+    const kits = snapshot.docs.map((doc) => ({ ...toKit(doc.id, doc.data()), socialResults: (results.get(doc.id) || []).sort((a, b) => {
+      const score = (row: Record<string, unknown>) => {
+        const insights = row.insights as Record<string, number | null> | null;
+        return (insights?.likes || 0) + (insights?.comments || 0) + (insights?.shares || 0) + (insights?.saves || 0);
+      };
+      return score(b) - score(a);
+    }) }));
     return NextResponse.json({ kits }, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) { return cmError(error); }
 }

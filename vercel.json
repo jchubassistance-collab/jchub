@@ -18,6 +18,10 @@
       "schedule": "0 9 * * *"
     },
     {
+      "path": "/api/cron/cm-weekly-insights",
+      "schedule": "0 8 * * 1"
+    },
+    {
       "path": "/api/cron/cleanup-conversion-blobs",
       "schedule": "0 0 * * *"
     }

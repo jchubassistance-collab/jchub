@@ -201,7 +201,9 @@ async function publishFacebook(record: PublicationRecord, source: SocialSource, 
     if (!hasImage || !isImageFetchError(response, data)) break;
   }
   if (!response.ok || !data.id) throw responseError(response, data);
-  return { externalId: String(data.id), externalUrl: `https://www.facebook.com/${encodeURIComponent(String(data.id))}` };
+  // Une photo de Page renvoie aussi post_id : c'est l'identifiant du post, nécessaire pour ses statistiques.
+  const postId = String(data.post_id || data.id);
+  return { externalId: postId, externalUrl: `https://www.facebook.com/${encodeURIComponent(postId)}` };
 }
 
 // Meta télécharge lui-même le visuel Instagram : il doit être servi en HTTPS public par le site JcHub.
