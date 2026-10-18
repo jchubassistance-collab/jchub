@@ -2,8 +2,31 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Copy, Check, RefreshCw, Shield } from 'lucide-react';
+import { useLocale } from 'next-intl';
+import { bilingual } from '@/i18n/copy';
+
+const strings = bilingual({
+  length: 'Longueur',
+  options: { uppercase: 'Majuscules (A-Z)', lowercase: 'Minuscules (a-z)', numbers: 'Chiffres (0-9)', symbols: 'Symboles (!@#)' },
+  regenerate: 'Régénérer',
+  copied: 'Copié',
+  copy: 'Copier',
+  strength: 'Force',
+  strengthLabels: ['Faible', 'Moyen', 'Bon', 'Fort', 'Très fort'],
+  privacy: '🔒 Génération 100% locale (Web Crypto API). Aucun mot de passe n’est envoyé sur internet.',
+}, {
+  length: 'Length',
+  options: { uppercase: 'Uppercase (A-Z)', lowercase: 'Lowercase (a-z)', numbers: 'Numbers (0-9)', symbols: 'Symbols (!@#)' },
+  regenerate: 'Regenerate',
+  copied: 'Copied',
+  copy: 'Copy',
+  strength: 'Strength',
+  strengthLabels: ['Weak', 'Fair', 'Good', 'Strong', 'Very strong'],
+  privacy: '🔒 100% local generation (Web Crypto API). No password is ever sent over the internet.',
+});
 
 export function PasswordGenerator() {
+  const t = strings[useLocale()];
   const [length, setLength] = useState(16);
   const [options, setOptions] = useState({
     uppercase: true,
@@ -55,14 +78,14 @@ export function PasswordGenerator() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const strengthLabels = ['Faible', 'Moyen', 'Bon', 'Fort', 'Très fort'];
+  const strengthLabels = t.strengthLabels;
   const strengthColors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-emerald-500', 'bg-emerald-600'];
 
   return (
     <div className="space-y-5 text-slate-100">
       <div>
         <label className="mb-2 flex items-center justify-between text-sm font-semibold text-slate-200">
-          <span>Longueur</span>
+          <span>{t.length}</span>
           <span className="text-2xl font-black text-[#9ccbff]">{length}</span>
         </label>
         <input
@@ -79,12 +102,7 @@ export function PasswordGenerator() {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        {[
-          { key: 'uppercase', label: 'Majuscules (A-Z)' },
-          { key: 'lowercase', label: 'Minuscules (a-z)' },
-          { key: 'numbers', label: 'Chiffres (0-9)' },
-          { key: 'symbols', label: 'Symboles (!@#)' },
-        ].map(({ key, label }) => (
+        {(Object.keys(t.options) as (keyof typeof t.options)[]).map((key) => ({ key, label: t.options[key] })).map(({ key, label }) => (
           <label key={key} className="flex cursor-pointer items-center gap-2 rounded-lg border border-transparent p-3 transition hover:border-[#9ccbff]/30 hover:bg-[#0b1830]/80">
             <input
               type="checkbox"
@@ -102,7 +120,7 @@ export function PasswordGenerator() {
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-purple-600 py-3 font-semibold text-white transition hover:shadow-lg"
       >
         <RefreshCw className="w-4 h-4" />
-        Régénérer
+        {t.regenerate}
       </button>
 
       {password && (
@@ -118,7 +136,7 @@ export function PasswordGenerator() {
               className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-purple-600 px-4 py-3 font-semibold text-white transition hover:shadow-lg"
             >
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              {copied ? 'Copié' : 'Copier'}
+              {copied ? t.copied : t.copy}
             </button>
           </div>
 
@@ -126,7 +144,7 @@ export function PasswordGenerator() {
             <div className="mb-1.5 flex items-center justify-between">
               <span className="flex items-center gap-1 text-sm font-semibold text-slate-200">
                 <Shield className="w-3.5 h-3.5 text-[#9ccbff]" />
-                Force
+                {t.strength}
               </span>
               <span className="text-sm font-bold text-slate-100">{strengthLabels[strength]}</span>
             </div>
@@ -143,7 +161,7 @@ export function PasswordGenerator() {
       )}
 
       <p className="text-center text-xs text-slate-400">
-        🔒 Génération 100% locale (Web Crypto API). Aucun mot de passe n&apos;est envoyé sur internet.
+        {t.privacy}
       </p>
     </div>
   );

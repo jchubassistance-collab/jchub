@@ -1,6 +1,19 @@
 'use client';
 
 import { upload } from '@vercel/blob/client';
+import { LOCALE_HEADER } from '@/i18n/request-locale';
+
+/** Language of the page, set on <html lang> by the root layout. */
+export function pageLocale(): 'fr' | 'en' {
+  return typeof document !== 'undefined' && document.documentElement.lang === 'en' ? 'en' : 'fr';
+}
+
+/** A failed conversion, with the HTTP status so callers can tell a reached quota (429) apart. */
+export class ConversionError extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message);
+  }
+}
 
 export type ConversionUploadTool =
   | 'image-optimizer'
@@ -33,9 +46,9 @@ export async function uploadConversionFile(tool: ConversionUploadTool, file: Fil
     return blob.url;
   } catch (error) {
     if (error instanceof Error && /Failed to\s+retrieve the client token/i.test(error.message)) {
-      throw new Error(
-        'Le téléversement ne peut pas obtenir de jeton Vercel Blob. Vérifie qu’un Blob Store est associé au projet et que BLOB_READ_WRITE_TOKEN est configuré pour cet environnement Vercel, puis redéploie.',
-      );
+      throw new Error(pageLocale() === 'en'
+        ? 'The upload cannot get a Vercel Blob token. Check that a Blob Store is linked to the project and that BLOB_READ_WRITE_TOKEN is set for this Vercel environment, then redeploy.'
+        : 'Le téléversement ne peut pas obtenir de jeton Vercel Blob. Vérifie qu’un Blob Store est associé au projet et que BLOB_READ_WRITE_TOKEN est configuré pour cet environnement Vercel, puis redéploie.');
     }
     throw error;
   }
@@ -44,7 +57,7 @@ export async function uploadConversionFile(tool: ConversionUploadTool, file: Fil
 export async function postConversion(endpoint: string, payload: unknown): Promise<Response> {
   const response = await fetch(endpoint, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', [LOCALE_HEADER]: pageLocale() },
     body: JSON.stringify(payload),
   });
   if (response.ok) return response;
@@ -56,14 +69,14 @@ export async function postConversion(endpoint: string, payload: unknown): Promis
   } catch {
     message = undefined;
   }
-  throw new Error(message || 'La conversion a échoué.');
+  throw new ConversionError(message || (pageLocale() === 'en' ? 'The conversion failed.' : 'La conversion a échoué.'), response.status);
 }
 
 export async function cleanUpConversionFiles(tool: ConversionUploadTool, urls: string[]): Promise<void> {
   if (!urls.length) return;
   const response = await fetch('/api/tools/upload', {
     method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', [LOCALE_HEADER]: pageLocale() },
     body: JSON.stringify({ tool, urls }),
   });
   if (!response.ok) {

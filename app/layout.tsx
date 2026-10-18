@@ -2,6 +2,8 @@
 import type { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale } from 'next-intl/server';
 import './globals.css';
 import { AppChrome } from '@/components/layout/AppChrome';
 import { AnalyticsConsent } from '@/components/AnalyticsConsent';
@@ -10,6 +12,8 @@ import { headers } from 'next/headers';
 import { getPublicBaseUrl } from '@/lib/site-url';
 import { DEFAULT_SOCIAL_IMAGE } from '@/lib/seo';
 
+// French defaults, used as is by the admin. Public pages get their language's
+// version from app/[locale]/layout.tsx.
 export const metadata: Metadata = {
   metadataBase: new URL(getPublicBaseUrl()),
 
@@ -30,6 +34,8 @@ export const metadata: Metadata = {
     'IA',
     'Jessy Ngnambongo',
   ],
+
+  manifest: '/manifest.webmanifest',
 
   authors: [{ name: 'Jessy Ngnambongo' }],
   creator: 'Jessy Ngnambongo',
@@ -77,6 +83,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const requestHeaders = await headers();
+  // Set by the locale proxy for public pages; French for the admin.
+  const locale = await getLocale();
 
   const hostname = requestHeaders
     .get('host')
@@ -94,9 +102,9 @@ export default async function RootLayout({
   const isVercelDeployment = process.env.VERCEL === '1';
 
   return (
-    <html lang="fr">
+    <html lang={locale}>
       <head>
-        <link rel="alternate" type="application/rss+xml" href="/rss.xml" />
+        <link rel="alternate" type="application/rss+xml" href={locale === 'en' ? '/en/rss.xml' : '/rss.xml'} />
       </head>
       <body>
         <script
@@ -107,8 +115,9 @@ export default async function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'WebSite',
               name: 'JcHub',
-              alternateName: 'JcHub — Outils pour développeurs',
-              url: 'https://jchub.dev',
+              alternateName: locale === 'en' ? 'JcHub — Developer tools' : 'JcHub — Outils pour développeurs',
+              url: locale === 'en' ? 'https://jchub.dev/en' : 'https://jchub.dev',
+              inLanguage: locale,
               author: {
                 '@type': 'Person',
                 name: 'Jessy Ngnambongo',
@@ -126,13 +135,17 @@ export default async function RootLayout({
 
         {isProduction && isVercelDeployment && <SpeedInsights />}
 
-        {!isAdminHost && !isAdminPath && <AnalyticsConsent nonce={nonce} />}
+        {/* Client components read the language with useLocale(). The page changes language
+            only through a full page load (see LanguageSwitcher), so this stays in sync. */}
+        <NextIntlClientProvider locale={locale}>
+          {!isAdminHost && !isAdminPath && <AnalyticsConsent nonce={nonce} />}
 
-        <PwaRegister />
+          <PwaRegister />
 
-        <AppChrome isAdminHost={isAdminHost}>
-          {children}
-        </AppChrome>
+          <AppChrome isAdminHost={isAdminHost}>
+            {children}
+          </AppChrome>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

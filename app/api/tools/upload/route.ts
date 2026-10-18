@@ -1,3 +1,4 @@
+import { apiMessage } from '@/lib/api-messages';
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { enforceRateLimit } from '@/lib/rate-limit';
@@ -18,14 +19,14 @@ function isTemporaryConversionTool(value: string): value is TemporaryConversionT
 
 export async function POST(request: NextRequest) {
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return NextResponse.json({ error: 'Le stockage temporaire des fichiers n’est pas configuré.' }, { status: 503 });
+    return NextResponse.json({ error: apiMessage(request, 'Le stockage temporaire des fichiers n’est pas configuré.') }, { status: 503 });
   }
 
   let body: HandleUploadBody;
   try {
     body = await request.clone().json() as HandleUploadBody;
   } catch {
-    return NextResponse.json({ error: 'Demande de transfert invalide.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Demande de transfert invalide.') }, { status: 400 });
   }
 
   let invalidUpload = false;
@@ -73,9 +74,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     if (rateLimitResponse) return rateLimitResponse;
-    if (invalidUpload) return NextResponse.json({ error: 'Paramètres de transfert invalides.' }, { status: 400 });
+    if (invalidUpload) return NextResponse.json({ error: apiMessage(request, 'Paramètres de transfert invalides.') }, { status: 400 });
     reportUserError();
-    return NextResponse.json({ error: 'Impossible de transférer le fichier temporairement.' }, { status: 503 });
+    return NextResponse.json({ error: apiMessage(request, 'Impossible de transférer le fichier temporairement.') }, { status: 503 });
   }
 }
 
@@ -84,7 +85,7 @@ export async function DELETE(request: NextRequest) {
   try {
     body = await request.json() as { tool?: unknown; urls?: unknown };
   } catch {
-    return NextResponse.json({ error: 'Demande de suppression invalide.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Demande de suppression invalide.') }, { status: 400 });
   }
 
   const tool = body.tool;
@@ -96,16 +97,16 @@ export async function DELETE(request: NextRequest) {
       body.urls.length > 20 ||
       !body.urls.every((url): url is string => typeof url === 'string')
     ) {
-      return NextResponse.json({ error: 'Demande de suppression invalide.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Demande de suppression invalide.') }, { status: 400 });
     }
 
     await Promise.all(body.urls.map((url) => deleteTemporaryBlob(url, tool)));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     if (error instanceof TemporaryBlobError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
     reportUserError();
-    return NextResponse.json({ error: 'Impossible de supprimer le fichier temporaire.' }, { status: 503 });
+    return NextResponse.json({ error: apiMessage(request, 'Impossible de supprimer le fichier temporaire.') }, { status: 503 });
   }
 }

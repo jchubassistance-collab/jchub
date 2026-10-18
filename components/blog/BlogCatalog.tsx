@@ -1,18 +1,69 @@
 'use client';
 
-import Link from 'next/link';
+import { useLocale } from 'next-intl';
 import { ArrowRight, Grid2X2, Grid3X3, List, Search, Tag, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { BlogArticle } from '@/lib/blog';
+import { Link } from '@/i18n/navigation';
+import { bilingual } from '@/i18n/copy';
+
+const ALL = '__all__';
+
+const copy = bilingual({
+  all: 'Tous',
+  searchPlaceholder: 'Rechercher un article...',
+  searchLabel: 'Rechercher un article',
+  clearSearch: 'Effacer la recherche',
+  filterByExpertise: 'Filtrer par expertise',
+  chooseView: 'Choisir la vue',
+  gridView: 'Vue standard',
+  compactView: 'Vue compacte',
+  listView: 'Vue en liste',
+  filterArticles: 'Filtrer les articles',
+  found: (count: number) => ` article${count > 1 ? 's' : ''} trouvé${count > 1 ? 's' : ''}`,
+  readArticle: 'Lire l’article',
+  noResult: 'Aucun article ne correspond à ta recherche.',
+  resetFilters: 'Réinitialiser les filtres',
+  pagination: 'Pagination des articles',
+  previousPage: 'Page précédente',
+  previousShort: 'Préc.',
+  previous: 'Précédent',
+  nextPage: 'Page suivante',
+  nextShort: 'Suiv.',
+  next: 'Suivant',
+}, {
+  all: 'All',
+  searchPlaceholder: 'Search for an article...',
+  searchLabel: 'Search for an article',
+  clearSearch: 'Clear search',
+  filterByExpertise: 'Filter by expertise',
+  chooseView: 'Choose the view',
+  gridView: 'Standard view',
+  compactView: 'Compact view',
+  listView: 'List view',
+  filterArticles: 'Filter articles',
+  found: (count: number) => ` article${count === 1 ? '' : 's'} found`,
+  readArticle: 'Read the article',
+  noResult: 'No article matches your search.',
+  resetFilters: 'Reset filters',
+  pagination: 'Articles pagination',
+  previousPage: 'Previous page',
+  previousShort: 'Prev.',
+  previous: 'Previous',
+  nextPage: 'Next page',
+  nextShort: 'Next',
+  next: 'Next',
+});
 
 export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
+  const t = copy[useLocale()];
   const pageSize = 8;
-  const categories = ['Tous', ...Array.from(new Set(articles.map((article) => article.category)))];
-  const [category, setCategory] = useState('Tous');
+  const categories = [ALL, ...Array.from(new Set(articles.map((article) => article.category)))];
+  const [category, setCategory] = useState(ALL);
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [view, setView] = useState<'grid' | 'compact' | 'list'>('grid');
-  const filteredArticles = (category === 'Tous' ? articles : articles.filter((article) => article.category === category)).filter((article) => `${article.title} ${article.description} ${article.keywords.join(' ')}`.toLowerCase().includes(query.toLowerCase().trim()));
+  const filteredArticles = (category === ALL ? articles : articles.filter((article) => article.category === category)).filter((article) => `${article.title} ${article.description} ${article.keywords.join(' ')}`.toLowerCase().includes(query.toLowerCase().trim()));
   const pageCount = Math.max(1, Math.ceil(filteredArticles.length / pageSize));
   const currentPage = Math.min(page, pageCount);
   const visibleArticles = filteredArticles.slice((currentPage - 1) * pageSize, currentPage * pageSize);
@@ -27,28 +78,28 @@ export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Rechercher un article..."
-            aria-label="Rechercher un article"
+            placeholder={t.searchPlaceholder}
+            aria-label={t.searchLabel}
             className="w-full rounded-2xl border border-blue-100 bg-white py-3 pl-11 pr-10 text-sm text-slate-800 outline-none transition focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/10"
           />
           {query && (
-            <button type="button" onClick={() => setQuery('')} aria-label="Effacer la recherche" className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-700">
+            <button type="button" onClick={() => setQuery('')} aria-label={t.clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-700">
               <X className="h-4 w-4" />
             </button>
           )}
         </label>
 
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-bold uppercase tracking-[.14em] text-slate-500">Filtrer par expertise</p>
-          <div className="flex shrink-0 rounded-xl border border-blue-100 bg-white p-1" aria-label="Choisir la vue">
-            <button type="button" onClick={() => setView('grid')} aria-label="Vue standard" aria-pressed={view === 'grid'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><Grid2X2 className="h-4 w-4" /></button>
-            <button type="button" onClick={() => setView('compact')} aria-label="Vue compacte" aria-pressed={view === 'compact'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'compact' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><Grid3X3 className="h-4 w-4" /></button>
-            <button type="button" onClick={() => setView('list')} aria-label="Vue en liste" aria-pressed={view === 'list'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><List className="h-4 w-4" /></button>
+          <p className="text-xs font-bold uppercase tracking-[.14em] text-slate-500">{t.filterByExpertise}</p>
+          <div className="flex shrink-0 rounded-xl border border-blue-100 bg-white p-1" aria-label={t.chooseView}>
+            <button type="button" onClick={() => setView('grid')} aria-label={t.gridView} aria-pressed={view === 'grid'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><Grid2X2 className="h-4 w-4" /></button>
+            <button type="button" onClick={() => setView('compact')} aria-label={t.compactView} aria-pressed={view === 'compact'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'compact' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><Grid3X3 className="h-4 w-4" /></button>
+            <button type="button" onClick={() => setView('list')} aria-label={t.listView} aria-pressed={view === 'list'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><List className="h-4 w-4" /></button>
           </div>
         </div>
       </div>
 
-      <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2" aria-label="Filtrer les articles">
+      <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2" aria-label={t.filterArticles}>
         {categories.map((item) => (
           <button
             key={item}
@@ -56,20 +107,20 @@ export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
             onClick={() => setCategory(item)}
             className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition ${category === item ? 'border-blue-600 bg-blue-600 text-white shadow-lg' : 'border-blue-100 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-700'}`}
           >
-            {item}
+            {item === ALL ? t.all : item}
           </button>
         ))}
       </div>
 
       <p className="mb-5 text-sm text-slate-500">
-        <span className="font-black text-slate-900">{filteredArticles.length}</span> article{filteredArticles.length > 1 ? 's' : ''} trouvé{filteredArticles.length > 1 ? 's' : ''}
+        <span className="font-black text-slate-900">{filteredArticles.length}</span>{t.found(filteredArticles.length)}
       </p>
 
       <div className={view === 'list' ? 'grid grid-cols-1 gap-3' : view === 'compact' ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4' : 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}>
         {visibleArticles.map((article, index) => (
           <Link
             key={article.slug}
-            href={`/blog/${article.slug}`}
+            href={{ pathname: '/blog/[slug]', params: { slug: article.slug } }}
             style={{ animationDelay: `${index * 70}ms` }}
             className={`group relative overflow-hidden rounded-[20px] border border-blue-100 bg-white shadow-[0_8px_24px_rgba(37,99,235,.06)] transition-all duration-300 ease-out will-change-transform hover:-translate-y-1 hover:translate-x-0.5 hover:border-blue-300 hover:shadow-[0_18px_40px_rgba(37,99,235,.12)] motion-safe:animate-[fadeIn_0.5s_ease-out] ${view === 'list' ? 'flex items-center gap-3 p-2.5 sm:gap-4 sm:p-3' : 'hover:shadow-[0_20px_50px_rgba(50,140,255,0.18)]'}`}
           >
@@ -89,7 +140,7 @@ export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
                   </span>
                 ))}
               </div>
-              <span className="inline-flex items-center gap-1 text-xs font-bold text-blue-700">Lire l&apos;article <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" /></span>
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-blue-700">{t.readArticle} <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" /></span>
             </div>
           </Link>
         ))}
@@ -98,14 +149,14 @@ export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
       {!visibleArticles.length && (
         <div className="border border-dashed border-white/10 bg-[#071526] px-6 py-14 text-center">
           <Search className="mx-auto mb-3 h-7 w-7 text-slate-500" />
-          <p className="font-bold text-white">Aucun article ne correspond à ta recherche.</p>
-          <button type="button" onClick={() => { setQuery(''); setCategory('Tous'); }} className="mt-3 text-sm font-bold text-cyan-300 hover:text-cyan-200">Réinitialiser les filtres</button>
+          <p className="font-bold text-white">{t.noResult}</p>
+          <button type="button" onClick={() => { setQuery(''); setCategory(ALL); }} className="mt-3 text-sm font-bold text-cyan-300 hover:text-cyan-200">{t.resetFilters}</button>
         </div>
       )}
 
       {pageCount > 1 && (
-        <nav className="mt-8 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2" aria-label="Pagination des articles">
-          <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1} aria-label="Page précédente" className="shrink-0 rounded-lg border border-white/10 bg-[#071526] px-2.5 py-2 text-xs font-semibold text-slate-200 disabled:opacity-40 sm:px-3 sm:text-sm"><span className="sm:hidden">Préc.</span><span className="hidden sm:inline">Précédent</span></button>
+        <nav className="mt-8 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2" aria-label={t.pagination}>
+          <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1} aria-label={t.previousPage} className="shrink-0 rounded-lg border border-white/10 bg-[#071526] px-2.5 py-2 text-xs font-semibold text-slate-200 disabled:opacity-40 sm:px-3 sm:text-sm"><span className="sm:hidden">{t.previousShort}</span><span className="hidden sm:inline">{t.previous}</span></button>
           {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
             <button
               key={pageNumber}
@@ -117,7 +168,7 @@ export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
               {pageNumber}
             </button>
           ))}
-          <button type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage === pageCount} aria-label="Page suivante" className="shrink-0 rounded-lg border border-white/10 bg-[#071526] px-2.5 py-2 text-xs font-semibold text-slate-200 disabled:opacity-40 sm:px-3 sm:text-sm"><span className="sm:hidden">Suiv.</span><span className="hidden sm:inline">Suivant</span></button>
+          <button type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage === pageCount} aria-label={t.nextPage} className="shrink-0 rounded-lg border border-white/10 bg-[#071526] px-2.5 py-2 text-xs font-semibold text-slate-200 disabled:opacity-40 sm:px-3 sm:text-sm"><span className="sm:hidden">{t.nextShort}</span><span className="hidden sm:inline">{t.next}</span></button>
         </nav>
       )}
     </>

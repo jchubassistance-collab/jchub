@@ -1,44 +1,64 @@
 import type { MetadataRoute } from 'next';
-import { getPublishedArticles } from '@/lib/blog';
-import { getPublishedTools } from '@/lib/tools';
+import { getPublishedArticlesByLocale } from '@/lib/blog';
+import { getPublishedTools, toolPath } from '@/lib/tools';
 import { getPublicBaseUrl } from '@/lib/site-url';
+import { localizedPaths, type LocalizedPaths } from '@/lib/seo';
+import type { StaticPathname } from '@/i18n/routing';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
+type Entry = MetadataRoute.Sitemap[number];
+
+/**
+ * Every public page in French and in English. Each address lists its other-language
+ * version, so search engines index both as translations of one page.
+ */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getPublicBaseUrl();
-  const [articles, tools] = await Promise.all([getPublishedArticles(), getPublishedTools()]);
-  const publicPages = [
-    { path: '', changeFrequency: 'weekly' as const, priority: 1 },
-    { path: '/blog', changeFrequency: 'daily' as const, priority: 0.8 },
-    { path: '/a-propos', changeFrequency: 'monthly' as const, priority: 0.5 },
-    { path: '/outils', changeFrequency: 'weekly' as const, priority: 0.9 },
-    { path: '/aide', changeFrequency: 'monthly' as const, priority: 0.6 },
-    { path: '/contact', changeFrequency: 'monthly' as const, priority: 0.5 },
-    { path: '/cgu', changeFrequency: 'yearly' as const, priority: 0.2 },
-    { path: '/cgv', changeFrequency: 'yearly' as const, priority: 0.2 },
-    { path: '/confidentialite', changeFrequency: 'yearly' as const, priority: 0.2 },
-    { path: '/mentions-legales', changeFrequency: 'yearly' as const, priority: 0.2 },
+  // One Firestore query gives the articles in both languages.
+  const [{ fr: articles, en: englishArticles }, tools] = await Promise.all([getPublishedArticlesByLocale(), getPublishedTools()]);
+  const publicPages: { href: StaticPathname; changeFrequency: Entry['changeFrequency']; priority: number }[] = [
+    { href: '/', changeFrequency: 'weekly', priority: 1 },
+    { href: '/blog', changeFrequency: 'daily', priority: 0.8 },
+    { href: '/a-propos', changeFrequency: 'monthly', priority: 0.5 },
+    { href: '/outils', changeFrequency: 'weekly', priority: 0.9 },
+    { href: '/aide', changeFrequency: 'monthly', priority: 0.6 },
+    { href: '/contact', changeFrequency: 'monthly', priority: 0.5 },
+    { href: '/cgu', changeFrequency: 'yearly', priority: 0.2 },
+    { href: '/cgv', changeFrequency: 'yearly', priority: 0.2 },
+    { href: '/confidentialite', changeFrequency: 'yearly', priority: 0.2 },
+    { href: '/mentions-legales', changeFrequency: 'yearly', priority: 0.2 },
   ];
 
+  // The home page stays listed as https://jchub.dev, without a trailing slash.
+  const absolute = (path: string) => `${baseUrl}${path === '/' ? '' : path}`;
+  const bothLanguages = (paths: LocalizedPaths, entry: Omit<Entry, 'url' | 'alternates'>, english = true): MetadataRoute.Sitemap => {
+    const languages = english
+      ? { fr: absolute(paths.fr), en: absolute(paths.en), 'x-default': absolute(paths.fr) }
+      : undefined;
+    return [
+      { ...entry, url: absolute(paths.fr), ...(languages ? { alternates: { languages } } : {}) },
+      ...(english ? [{ ...entry, url: absolute(paths.en), alternates: { languages: languages! } }] : []),
+    ];
+  };
+
+  const englishById = new Map(englishArticles.map((article) => [article.id, article]));
   const entries: MetadataRoute.Sitemap = [
-    ...publicPages.map((page) => ({
-      url: `${baseUrl}${page.path}`,
-      changeFrequency: page.changeFrequency,
-      priority: page.priority,
-    })),
-    ...articles.filter((article) => article.slug.trim()).map((article) => ({
-      url: `${baseUrl}/blog/${article.slug}`,
-      lastModified: article.updatedAt || article.publishedAt || undefined,
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    })),
-    ...tools.filter((tool) => tool.slug.trim()).map((tool) => ({
-      url: `${baseUrl}${tool.path ?? `/outils/${tool.slug}`}`,
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    })),
+    ...publicPages.flatMap((page) => bothLanguages(localizedPaths(page.href), { changeFrequency: page.changeFrequency, priority: page.priority })),
+    ...articles.filter((article) => article.slug.trim()).flatMap((article) => {
+      const english = englishById.get(article.id);
+      // An article not translated yet is listed in French only: its English address shows the French text.
+      return bothLanguages(
+        { fr: `/blog/${article.slug}`, en: `/en/blog/${english?.slug ?? article.slug}` },
+        { lastModified: article.updatedAt || article.publishedAt || undefined, changeFrequency: 'monthly', priority: 0.7 },
+        Boolean(english?.translated),
+      );
+    }),
+    ...tools.filter((tool) => tool.slug.trim()).flatMap((tool) => bothLanguages(
+      { fr: toolPath(tool, 'fr'), en: toolPath(tool, 'en') },
+      { changeFrequency: 'monthly', priority: 0.7 },
+    )),
   ];
 
   const uniqueEntries = new Map(entries.map((entry) => [entry.url, entry]));

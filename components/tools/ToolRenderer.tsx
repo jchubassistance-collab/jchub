@@ -20,14 +20,14 @@ const tools: Record<ToolComponentName, ComponentType> = {
   WordToPdf: dynamic(() => import('@/components/tools/WordToPdf').then((m) => m.WordToPdf)),
   ImagesToPdf: dynamic(() => import('@/components/tools/ImagesToPdf').then((m) => m.ImagesToPdf)),
   ImageOptimizer: dynamic(() => import('@/components/tools/ImageOptimizer').then((m) => m.ImageOptimizer)),
-  ColorConverter: dynamic(() => import('@/app/tools/jchub-tools/ColorConverter').then((m) => m.ColorConverter)),
-  HashGenerator: dynamic(() => import('@/app/tools/jchub-tools/HashGenerator').then((m) => m.HashGenerator)),
-  JwtDecoder: dynamic(() => import('@/app/tools/jchub-tools/JwtDecoder').then((m) => m.JwtDecoder)),
-  MarkdownPreview: dynamic(() => import('@/app/tools/jchub-tools/MarkdownPreview').then((m) => m.MarkdownPreview)),
-  NumberBaseConverter: dynamic(() => import('@/app/tools/jchub-tools/NumberBaseConverter').then((m) => m.NumberBaseConverter)),
-  QrCodeGenerator: dynamic(() => import('@/app/tools/jchub-tools/QrCodeGenerator').then((m) => m.QrCodeGenerator)),
-  TimestampConverter: dynamic(() => import('@/app/tools/jchub-tools/TimestampConverter').then((m) => m.TimestampConverter)),
-  UrlEncoder: dynamic(() => import('@/app/tools/jchub-tools/UrlEncoder').then((m) => m.UrlEncoder)),
+  ColorConverter: dynamic(() => import('@/components/tools/jchub-tools/ColorConverter').then((m) => m.ColorConverter)),
+  HashGenerator: dynamic(() => import('@/components/tools/jchub-tools/HashGenerator').then((m) => m.HashGenerator)),
+  JwtDecoder: dynamic(() => import('@/components/tools/jchub-tools/JwtDecoder').then((m) => m.JwtDecoder)),
+  MarkdownPreview: dynamic(() => import('@/components/tools/jchub-tools/MarkdownPreview').then((m) => m.MarkdownPreview)),
+  NumberBaseConverter: dynamic(() => import('@/components/tools/jchub-tools/NumberBaseConverter').then((m) => m.NumberBaseConverter)),
+  QrCodeGenerator: dynamic(() => import('@/components/tools/jchub-tools/QrCodeGenerator').then((m) => m.QrCodeGenerator)),
+  TimestampConverter: dynamic(() => import('@/components/tools/jchub-tools/TimestampConverter').then((m) => m.TimestampConverter)),
+  UrlEncoder: dynamic(() => import('@/components/tools/jchub-tools/UrlEncoder').then((m) => m.UrlEncoder)),
   // @generated-tools: components created from the admin are inserted above this line.
 };
 

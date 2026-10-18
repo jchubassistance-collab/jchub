@@ -1,4 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
+import { ensureToolTranslation } from '@/lib/content-translation';
+import { reportUserError } from '@/lib/user-error';
 import { FieldValue } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
@@ -59,6 +61,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       ...(publishAt === null ? { publishAt: FieldValue.delete() } : publishAt ? { publishAt } : {}),
       updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true });
+    // A published tool gets (or refreshes) its English version for the English site.
+    if (status === 'published') after(() => ensureToolTranslation(id).then(() => undefined, () => reportUserError()));
     return NextResponse.json({ id, slug: nextSlug, status });
   } catch (error) {
     const code = error instanceof Error ? error.message : 'INTERNAL_ERROR';

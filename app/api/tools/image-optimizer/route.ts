@@ -1,3 +1,4 @@
+import { apiMessage } from '@/lib/api-messages';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { NextRequest, NextResponse } from 'next/server';
 import { enforceDailyConversionQuota } from '@/lib/rate-limit';
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Demande de conversion invalide.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Demande de conversion invalide.') }, { status: 400 });
   }
 
   if (
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
     body.quality < 10 ||
     body.quality > 100
   ) {
-    return NextResponse.json({ error: 'Paramètres de conversion invalides.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Paramètres de conversion invalides.') }, { status: 400 });
   }
 
   const url = body.url;
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
     try {
       const image = await loadImage(file.buffer);
       if (image.width * image.height > MAX_IMAGE_PIXELS) {
-        return NextResponse.json({ error: 'La résolution de cette image est trop élevée.' }, { status: 413 });
+        return NextResponse.json({ error: apiMessage(request, 'La résolution de cette image est trop élevée.') }, { status: 413 });
       }
 
       const limited = await enforceDailyConversionQuota(request, 'image-optimizer');
@@ -83,17 +84,17 @@ export async function POST(request: NextRequest) {
       });
     } catch (error) {
       if (error instanceof TemporaryBlobError) {
-        return NextResponse.json({ error: error.message }, { status: error.status });
+        return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
       }
       reportUserError();
-      return NextResponse.json({ error: 'La conversion de cette image a échoué.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'La conversion de cette image a échoué.') }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof TemporaryBlobError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
     reportUserError();
-    return NextResponse.json({ error: 'Impossible de lire le fichier temporaire.' }, { status: 503 });
+    return NextResponse.json({ error: apiMessage(request, 'Impossible de lire le fichier temporaire.') }, { status: 503 });
   } finally {
     await cleanUpTemporaryBlobs([url], 'image-optimizer');
   }

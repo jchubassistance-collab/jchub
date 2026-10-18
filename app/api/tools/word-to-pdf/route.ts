@@ -1,3 +1,4 @@
+import { apiMessage } from '@/lib/api-messages';
 import { NextRequest, NextResponse } from 'next/server';
 import { convertWordWithAdobe, hasAdobePdfServicesConfig } from '@/lib/document-services';
 import { reportUserError } from '@/lib/user-error';
@@ -16,28 +17,28 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Demande de conversion invalide.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Demande de conversion invalide.') }, { status: 400 });
   }
   if (!body || typeof body !== 'object' || !('url' in body) || typeof body.url !== 'string') {
-    return NextResponse.json({ error: 'Fichier temporaire manquant.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Fichier temporaire manquant.') }, { status: 400 });
   }
 
   const url = body.url;
   try {
     const file = await readTemporaryBlob(url, 'word-to-pdf');
     if (!/\.docx$/i.test(file.pathname)) {
-      return NextResponse.json({ error: 'Sélectionne un document Word au format .docx.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Sélectionne un document Word au format .docx.') }, { status: 400 });
     }
     if (file.size === 0) {
-      return NextResponse.json({ error: 'Le fichier doit peser moins de 10 Mo.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Le fichier doit peser moins de 10 Mo.') }, { status: 400 });
     }
     const bytes = file.buffer;
     // DOCX is a ZIP archive and starts with the ZIP local-file signature.
     if (bytes.subarray(0, 4).toString('hex') !== '504b0304') {
-      return NextResponse.json({ error: 'Le fichier reçu ne semble pas être un document DOCX valide.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Le fichier reçu ne semble pas être un document DOCX valide.') }, { status: 400 });
     }
     if (!hasAdobePdfServicesConfig()) {
-      return NextResponse.json({ error: 'La conversion Word vers PDF est momentanément indisponible.' }, { status: 503 });
+      return NextResponse.json({ error: apiMessage(request, 'La conversion Word vers PDF est momentanément indisponible.') }, { status: 503 });
     }
     const limited = await enforceDailyConversionQuota(request, 'word-to-pdf');
     if (limited) return limited;
@@ -72,10 +73,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     if (error instanceof TemporaryBlobError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
     reportUserError();
-    return NextResponse.json({ error: 'Erreur pendant la conversion du document Word en PDF.' }, { status: 500 });
+    return NextResponse.json({ error: apiMessage(request, 'Erreur pendant la conversion du document Word en PDF.') }, { status: 500 });
   } finally {
     await cleanUpTemporaryBlobs([url], 'word-to-pdf');
   }

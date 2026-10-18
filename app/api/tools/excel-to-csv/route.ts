@@ -1,3 +1,4 @@
+import { apiMessage } from '@/lib/api-messages';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseDelimitedText, stringifyCsvRows, toCsvCellValue } from '@/lib/csv';
 import { enforceDailyConversionQuota } from '@/lib/rate-limit';
@@ -16,10 +17,10 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Demande de conversion invalide.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Demande de conversion invalide.') }, { status: 400 });
   }
   if (!body || typeof body !== 'object' || !('url' in body) || typeof body.url !== 'string') {
-    return NextResponse.json({ error: 'Fichier temporaire manquant.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Fichier temporaire manquant.') }, { status: 400 });
   }
 
   const url = body.url;
@@ -47,11 +48,11 @@ export async function POST(request: NextRequest) {
       });
       csvContent = sheets.join('\n\n');
     } else {
-      return NextResponse.json({ error: 'Le fichier doit être un classeur Excel .xlsx ou un CSV.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Le fichier doit être un classeur Excel .xlsx ou un CSV.') }, { status: 400 });
     }
 
     if (!csvContent.trim()) {
-      return NextResponse.json({ error: 'Aucune donnée exploitable n’a été trouvée dans le fichier.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Aucune donnée exploitable n’a été trouvée dans le fichier.') }, { status: 400 });
     }
     const limited = await enforceDailyConversionQuota(request, 'excel-to-csv');
     if (limited) return limited;
@@ -61,10 +62,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     if (error instanceof TemporaryBlobError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
     reportUserError();
-    return NextResponse.json({ error: 'Erreur lors de la conversion en CSV.' }, { status: 500 });
+    return NextResponse.json({ error: apiMessage(request, 'Erreur lors de la conversion en CSV.') }, { status: 500 });
   } finally {
     await cleanUpTemporaryBlobs([url], 'excel-to-csv');
   }

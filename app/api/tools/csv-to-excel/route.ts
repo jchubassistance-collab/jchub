@@ -1,3 +1,4 @@
+import { apiMessage } from '@/lib/api-messages';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseDelimitedText } from '@/lib/csv';
 import { enforceDailyConversionQuota } from '@/lib/rate-limit';
@@ -16,22 +17,22 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Demande de conversion invalide.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Demande de conversion invalide.') }, { status: 400 });
   }
   if (!body || typeof body !== 'object' || !('url' in body) || typeof body.url !== 'string') {
-    return NextResponse.json({ error: 'Fichier temporaire manquant.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Fichier temporaire manquant.') }, { status: 400 });
   }
 
   const url = body.url;
   try {
     const file = await readTemporaryBlob(url, 'csv-to-excel');
     if (!/\.csv$|\.txt$/i.test(file.pathname)) {
-      return NextResponse.json({ error: 'Le fichier doit être un CSV (.csv) ou un fichier texte tabulé.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Le fichier doit être un CSV (.csv) ou un fichier texte tabulé.') }, { status: 400 });
     }
     const csvText = file.buffer.toString('utf8');
     const rows = parseDelimitedText(csvText, /\.txt$/i.test(file.pathname) ? '\t' : ',');
     if (!rows.length || !rows.some((row) => row.some((cell) => cell.length > 0))) {
-      return NextResponse.json({ error: 'Le fichier CSV semble vide ou invalide.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Le fichier CSV semble vide ou invalide.') }, { status: 400 });
     }
 
     const limited = await enforceDailyConversionQuota(request, 'csv-to-excel');
@@ -49,10 +50,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     if (error instanceof TemporaryBlobError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
     reportUserError();
-    return NextResponse.json({ error: 'Erreur lors de la conversion en Excel.' }, { status: 500 });
+    return NextResponse.json({ error: apiMessage(request, 'Erreur lors de la conversion en Excel.') }, { status: 500 });
   } finally {
     await cleanUpTemporaryBlobs([url], 'csv-to-excel');
   }

@@ -1,9 +1,23 @@
+import { apiMessage } from '@/lib/api-messages';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { z } from 'zod';
 import { reportUserError } from '@/lib/user-error';
 import { enforceRateLimit } from '@/lib/rate-limit';
+import { newsletterListId } from '@/lib/brevo';
+import { requestLocale } from '@/i18n/request-locale';
+
+const WELCOME_EMAIL = {
+  fr: {
+    subject: 'Bienvenue dans la newsletter JcHub',
+    text: `Bonjour,\n\nTon inscription à la newsletter JcHub est confirmée.\nTu recevras nos nouveaux outils et articles directement par email.\n\nÀ bientôt,\nL’équipe JcHub`,
+  },
+  en: {
+    subject: 'Welcome to the JcHub newsletter',
+    text: `Hello,\n\nYour subscription to the JcHub newsletter is confirmed.\nYou will receive our new tools and articles straight to your inbox.\n\nSee you soon,\nThe JcHub team`,
+  },
+};
 
 const newsletterSchema = z.object({
   email: z.string().trim().email().max(254),
@@ -21,7 +35,7 @@ export async function POST(request: NextRequest) {
   try {
     if (!hasFirebaseAdminConfig()) {
       return NextResponse.json(
-        { error: 'Le service newsletter est temporairement indisponible.' },
+        { error: apiMessage(request, 'Le service newsletter est temporairement indisponible.') },
         { status: 503 }
       );
     }
@@ -31,11 +45,12 @@ export async function POST(request: NextRequest) {
     const parsedBody = newsletterSchema.safeParse(await request.json().catch(() => null));
     if (!parsedBody.success) {
       return NextResponse.json(
-        { error: 'Adresse e-mail invalide.' },
+        { error: apiMessage(request, 'Adresse e-mail invalide.') },
         { status: 400 }
       );
     }
     const normalizedEmail = parsedBody.data.email.toLowerCase();
+    const locale = requestLocale(request);
 
     const subscriberRef = adminDb
       .collection('newsletter_subscribers')
@@ -46,6 +61,7 @@ export async function POST(request: NextRequest) {
     await subscriberRef.set(
       {
         email: normalizedEmail,
+        locale,
         status: 'pending',
         brevoStatus: 'pending',
         subscribedAt: FieldValue.serverTimestamp(),
@@ -54,8 +70,10 @@ export async function POST(request: NextRequest) {
       { merge: true }
     );
 
-    const listId = Number(getRequiredEnvironment('BREVO_NEWSLETTER_LIST_ID'));
-    if (!Number.isInteger(listId) || listId < 1) {
+    getRequiredEnvironment('BREVO_NEWSLETTER_LIST_ID');
+    // English subscribers join the English list when it exists, the French one otherwise.
+    const listId = newsletterListId(locale) ?? newsletterListId('fr');
+    if (listId === null) {
       throw new Error('BREVO_LIST_ID invalide');
     }
 
@@ -85,7 +103,7 @@ export async function POST(request: NextRequest) {
       });
       return NextResponse.json({
         success: true,
-        warning: 'Inscription enregistrée. La synchronisation newsletter sera retentée prochainement.',
+        warning: apiMessage(request, 'Inscription enregistrée. La synchronisation newsletter sera retentée prochainement.'),
       }, { status: 202 });
     }
 
@@ -112,8 +130,8 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         sender: { email: senderEmail, name: senderName },
         to: [{ email: normalizedEmail }],
-        subject: 'Bienvenue dans la newsletter JcHub',
-        textContent: `Bonjour,\n\nTon inscription à la newsletter JcHub est confirmée.\nTu recevras nos nouveaux outils et articles directement par email.\n\nÀ bientôt,\nL’équipe JcHub`,
+        subject: WELCOME_EMAIL[locale].subject,
+        textContent: WELCOME_EMAIL[locale].text,
       }),
       cache: 'no-store',
     });

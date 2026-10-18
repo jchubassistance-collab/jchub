@@ -2,10 +2,51 @@
 
 import { useRef, useState, type ChangeEvent } from 'react';
 import { Download, FileText, Loader2, ScanLine, UploadCloud } from 'lucide-react';
+import { useLocale } from 'next-intl';
+import { bilingual } from '@/i18n/copy';
+import { LOCALE_HEADER } from '@/i18n/request-locale';
+
+const copy = bilingual({
+  mustBePdf: 'Le fichier doit être un PDF.',
+  tooLarge: 'Le fichier est trop volumineux. La taille maximale autorisée est de 4 Mo.',
+  selectPdf: 'Sélectionne un fichier PDF pour commencer.',
+  failed: 'La conversion a échoué.',
+  unknown: 'Erreur inconnue.',
+  choose: 'Choisir un fichier PDF',
+  selected: 'Fichier sélectionné : ',
+  noFile: 'Aucun fichier sélectionné',
+  fidelity: 'Fidélité visuelle',
+  fidelityText: 'Le design du PDF est conservé dans le document Word.',
+  maxSize: 'Taille maximale du fichier : 4 Mo.',
+  converting: 'Conversion en cours…',
+  convert: 'Convertir en Word',
+  note: 'Le document Word conserve le rendu visuel du PDF. Le texte peut être moins facilement modifiable.',
+  download: 'Télécharger le document Word',
+  quota: '5 conversions par jour et par adresse IP. Le PDF est traité côté serveur puis supprimé automatiquement ; seule une empreinte hachée de l’adresse IP est conservée pour le quota.',
+}, {
+  mustBePdf: 'The file must be a PDF.',
+  tooLarge: 'The file is too large. The maximum allowed size is 4 MB.',
+  selectPdf: 'Select a PDF file to get started.',
+  failed: 'The conversion failed.',
+  unknown: 'Unknown error.',
+  choose: 'Choose a PDF file',
+  selected: 'Selected file: ',
+  noFile: 'No file selected',
+  fidelity: 'Visual fidelity',
+  fidelityText: 'The PDF design is kept in the Word document.',
+  maxSize: 'Maximum file size: 4 MB.',
+  converting: 'Converting…',
+  convert: 'Convert to Word',
+  note: 'The Word document keeps the visual rendering of the PDF. The text may be harder to edit.',
+  download: 'Download the Word document',
+  quota: '5 conversions per day per IP address. The PDF is processed on the server then deleted automatically; only a hashed fingerprint of the IP address is kept for the quota.',
+});
 
 const MAX_PDF_SIZE_BYTES = 4 * 1024 * 1024;
 
 export function PdfToWord() {
+  const locale = useLocale();
+  const t = copy[locale];
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,13 +67,13 @@ export function PdfToWord() {
     }
 
     if (!nextFile.name.toLowerCase().endsWith('.pdf')) {
-      setError('Le fichier doit être un PDF.');
+      setError(t.mustBePdf);
       setFile(null);
       return;
     }
 
     if (nextFile.size > MAX_PDF_SIZE_BYTES) {
-      setError('Le fichier est trop volumineux. La taille maximale autorisée est de 4 Mo.');
+      setError(t.tooLarge);
       setFile(null);
       if (inputRef.current) inputRef.current.value = '';
       return;
@@ -44,12 +85,12 @@ export function PdfToWord() {
 
   const handleSubmit = async () => {
     if (!file) {
-      setError('Sélectionne un fichier PDF pour commencer.');
+      setError(t.selectPdf);
       return;
     }
 
     if (file.size > MAX_PDF_SIZE_BYTES) {
-      setError('Le fichier est trop volumineux. La taille maximale autorisée est de 4 Mo.');
+      setError(t.tooLarge);
       setFile(null);
       if (inputRef.current) inputRef.current.value = '';
       return;
@@ -66,12 +107,13 @@ export function PdfToWord() {
 
       const response = await fetch('/api/tools/pdf-to-word', {
         method: 'POST',
+        headers: { [LOCALE_HEADER]: locale },
         body: formData,
       });
 
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.error || 'La conversion a échoué.');
+        throw new Error(payload.error || t.failed);
       }
 
       const blob = await response.blob();
@@ -81,7 +123,7 @@ export function PdfToWord() {
       setFile(null);
       if (inputRef.current) inputRef.current.value = '';
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Erreur inconnue.');
+      setError(submitError instanceof Error ? submitError.message : t.unknown);
     } finally {
       setIsLoading(false);
     }
@@ -104,18 +146,18 @@ export function PdfToWord() {
           className="mx-auto flex items-center justify-center gap-2 rounded-xl border border-[#9ccbff]/30 bg-[#0c1d31] px-4 py-3 font-semibold text-[#dfeeff] hover:border-[#9ccbff]/50"
         >
           <UploadCloud className="h-5 w-5" />
-          Choisir un fichier PDF
+          {t.choose}
         </button>
 
         <div className="mt-4 min-h-10 text-sm text-slate-300">
-          {file ? <span className="font-medium text-white">Fichier sélectionné : {file.name}</span> : 'Aucun fichier sélectionné'}
+          {file ? <span className="font-medium text-white">{t.selected}{file.name}</span> : t.noFile}
         </div>
       </div>
 
       <div className="rounded-2xl border border-[#9ccbff]/20 bg-[#071526] p-4 text-sm text-slate-300">
-        <span className="flex items-center gap-2 font-semibold text-[#dfeeff]"><ScanLine className="h-4 w-4" /> Fidélité visuelle</span>
-        <span className="mt-1 block text-xs">Le design du PDF est conservé dans le document Word.</span>
-        <span className="mt-2 block text-[11px] text-slate-400">Taille maximale du fichier : 4 Mo.</span>
+        <span className="flex items-center gap-2 font-semibold text-[#dfeeff]"><ScanLine className="h-4 w-4" /> {t.fidelity}</span>
+        <span className="mt-1 block text-xs">{t.fidelityText}</span>
+        <span className="mt-2 block text-[11px] text-slate-400">{t.maxSize}</span>
       </div>
 
       <button
@@ -125,14 +167,14 @@ export function PdfToWord() {
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4a74d6] to-[#7a5cf7] px-4 py-3 font-bold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileText className="h-5 w-5" />}
-        {isLoading ? 'Conversion en cours…' : 'Convertir en Word'}
+        {isLoading ? t.converting : t.convert}
       </button>
 
       {error && <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{error}</div>}
 
       {hasConverted && (
         <div className="rounded-2xl border border-sky-400/30 bg-sky-400/10 px-4 py-3 text-sm text-sky-100">
-          Le document Word conserve le rendu visuel du PDF. Le texte peut être moins facilement modifiable.
+          {t.note}
         </div>
       )}
 
@@ -143,12 +185,12 @@ export function PdfToWord() {
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 font-bold text-emerald-200 transition hover:bg-emerald-500/20"
         >
           <Download className="h-5 w-5" />
-          Télécharger le document Word
+          {t.download}
         </a>
       )}
 
       <p className="text-center text-xs text-slate-400">
-        5 conversions par jour et par adresse IP. Le PDF est traité côté serveur puis supprimé automatiquement ; seule une empreinte hachée de l’adresse IP est conservée pour le quota.
+        {t.quota}
       </p>
     </div>
   );

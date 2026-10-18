@@ -9,7 +9,8 @@ export const STYLE_REFERENCE_PATH = 'components/tools/Base64Tool.tsx';
 export const REGISTRY_MARKER = '// @generated-tools:';
 
 const MAX_SOURCE_LENGTH = 60_000;
-const ALLOWED_IMPORTS = new Set(['react', 'lucide-react']);
+// next-intl and @/i18n/copy give the component its French and English texts, like every tool of the site.
+const ALLOWED_IMPORTS = new Set(['react', 'lucide-react', 'next-intl', '@/i18n/copy']);
 export const TOOL_CATEGORIES = ['Développement', 'Design', 'Document', 'Productivité', 'Sécurité', 'Texte'] as const;
 
 /**
@@ -57,8 +58,12 @@ export function checkGeneratedSource(source: string, componentName: string): str
   if (/export\s+(?:\*|\{[^}]*\})\s+from\b/.test(source)) problems.push('Pas de réexport depuis un autre module.');
   const imports = Array.from(source.matchAll(/^\s*import\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"]/gm), (match) => match[1]);
   imports.filter((module) => !ALLOWED_IMPORTS.has(module)).forEach((module) => {
-    problems.push(`Import interdit : « ${module} » (seuls react et lucide-react sont autorisés).`);
+    problems.push(`Import interdit : « ${module} » (seuls react, lucide-react, next-intl et @/i18n/copy sont autorisés).`);
   });
+  // The site exists in French and English: the interface follows the visitor's language.
+  if (!/\buseLocale\s*\(/.test(source) || !/\bbilingual\s*\(/.test(source)) {
+    problems.push('L’interface doit être bilingue : textes dans bilingual() de @/i18n/copy, langue lue avec useLocale() de next-intl.');
+  }
   for (const [pattern, label] of FORBIDDEN_PATTERNS) {
     if (pattern.test(source)) problems.push(`Interdit : ${label}.`);
   }

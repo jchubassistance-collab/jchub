@@ -2,6 +2,20 @@
 
 import { Children, useEffect, useRef, useState, type ReactNode } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLocale } from 'next-intl';
+import { bilingual } from '@/i18n/copy';
+
+const copy = bilingual({
+  carousel: 'carrousel',
+  position: (current: number, total: number) => `Partenaire ${current} sur ${total}`,
+  previous: 'Partenaire précédent',
+  next: 'Partenaire suivant',
+}, {
+  carousel: 'carousel',
+  position: (current: number, total: number) => `Partner ${current} of ${total}`,
+  previous: 'Previous partner',
+  next: 'Next partner',
+});
 
 function getNearestSlideIndex(track: HTMLElement): number {
   const slides = Array.from(track.children) as HTMLElement[];
@@ -15,6 +29,7 @@ function getNearestSlideIndex(track: HTMLElement): number {
 }
 
 export function PartnerCarousel({ children, label }: { children: ReactNode; label: string }) {
+  const t = copy[useLocale()];
   const trackRef = useRef<HTMLDivElement>(null);
   const isPausedRef = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -68,7 +83,7 @@ export function PartnerCarousel({ children, label }: { children: ReactNode; labe
   return (
     <div
       aria-label={label}
-      aria-roledescription="carrousel"
+      aria-roledescription={t.carousel}
       role="region"
       onMouseEnter={() => { isPausedRef.current = true; }}
       onMouseLeave={() => { isPausedRef.current = false; }}
@@ -96,13 +111,13 @@ export function PartnerCarousel({ children, label }: { children: ReactNode; labe
       </div>
       <div className="mt-3 flex items-center justify-between">
         <span aria-live="off" className="text-sm font-medium text-slate-500">
-          Partenaire {activeIndex + 1} sur {slideCount}
+          {t.position(activeIndex + 1, slideCount)}
         </span>
         <div className="flex gap-2">
           <button
             type="button"
-            aria-label="Partenaire précédent"
-            title="Partenaire précédent"
+            aria-label={t.previous}
+            title={t.previous}
             disabled={activeIndex === 0}
             onClick={() => scrollToSlide(activeIndex - 1)}
             className="grid h-10 w-10 place-items-center rounded-full border border-blue-200 bg-white text-blue-800 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40"
@@ -111,8 +126,8 @@ export function PartnerCarousel({ children, label }: { children: ReactNode; labe
           </button>
           <button
             type="button"
-            aria-label="Partenaire suivant"
-            title="Partenaire suivant"
+            aria-label={t.next}
+            title={t.next}
             disabled={activeIndex >= slideCount - 1}
             onClick={() => scrollToSlide(activeIndex + 1)}
             className="grid h-10 w-10 place-items-center rounded-full border border-blue-200 bg-white text-blue-800 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40"

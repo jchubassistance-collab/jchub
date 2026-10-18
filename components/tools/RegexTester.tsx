@@ -2,8 +2,37 @@
 
 import { useState, useMemo } from 'react';
 import { AlertCircle, Trash2 } from 'lucide-react';
+import { useLocale } from 'next-intl';
+import { bilingual } from '@/i18n/copy';
+
+const copy = bilingual({
+  pattern: 'Expression régulière',
+  flags: 'Drapeaux',
+  textToTest: 'Texte à tester',
+  pasteText: 'Colle ton texte ici...',
+  matchCount: (count: number) => `${count} match${count > 1 ? 's' : ''} trouvé${count > 1 ? 's' : ''}`,
+  reset: 'Reset',
+  highlighted: 'Résultat surligné',
+  matchLine: (index: number) => `#${index} : `,
+  atIndex: (position: number) => ` à l'index ${position}`,
+  groups: 'Groupes : ',
+  more: (count: number) => `+ ${count} autres matches`,
+}, {
+  pattern: 'Regular expression',
+  flags: 'Flags',
+  textToTest: 'Text to test',
+  pasteText: 'Paste your text here...',
+  matchCount: (count: number) => `${count} match${count > 1 ? 'es' : ''} found`,
+  reset: 'Reset',
+  highlighted: 'Highlighted result',
+  matchLine: (index: number) => `#${index}: `,
+  atIndex: (position: number) => ` at index ${position}`,
+  groups: 'Groups: ',
+  more: (count: number) => `+ ${count} more matches`,
+});
 
 export function RegexTester() {
+  const t = copy[useLocale()];
   const [pattern, setPattern] = useState('');
   const [flags, setFlags] = useState('g');
   const [text, setText] = useState('');
@@ -62,6 +91,7 @@ export function RegexTester() {
           value={pattern}
           onChange={(e) => setPattern(e.target.value)}
           placeholder="[a-z]+"
+          aria-label={t.pattern}
           className="col-span-2 rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-4 py-2.5 font-mono text-white focus:outline-none focus:border-[#9ccbff]/60"
         />
         <input
@@ -69,28 +99,29 @@ export function RegexTester() {
           value={flags}
           onChange={(e) => setFlags(e.target.value)}
           placeholder="g"
+          aria-label={t.flags}
           className="rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-4 py-2.5 font-mono text-white focus:outline-none focus:border-[#9ccbff]/60"
         />
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-semibold text-slate-200">Texte à tester</label>
+        <label className="mb-2 block text-sm font-semibold text-slate-200">{t.textToTest}</label>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={6}
-          placeholder="Colle ton texte ici..."
+          placeholder={t.pasteText}
           className="w-full resize-y rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-4 py-3 font-mono text-sm text-white focus:outline-none focus:border-[#9ccbff]/60"
         />
       </div>
 
       <div className="flex items-center justify-between">
         <span className="text-sm text-slate-400">
-          {matches.length > 0 && `${matches.length} match${matches.length > 1 ? 's' : ''} trouvé${matches.length > 1 ? 's' : ''}`}
+          {matches.length > 0 && t.matchCount(matches.length)}
         </span>
         <button onClick={clear} className="flex items-center gap-1 rounded-lg bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-200 transition hover:bg-red-500/20">
           <Trash2 className="w-3.5 h-3.5" />
-          Reset
+          {t.reset}
         </button>
       </div>
 
@@ -104,7 +135,7 @@ export function RegexTester() {
       {matches.length > 0 && (
         <>
           <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-200">Résultat surligné</label>
+            <label className="mb-2 block text-sm font-semibold text-slate-200">{t.highlighted}</label>
             <div
               className="min-h-[100px] whitespace-pre-wrap break-all rounded-xl border border-[#9ccbff]/20 bg-[#071526] p-4 font-mono text-sm text-slate-100"
               dangerouslySetInnerHTML={{ __html: highlighted }}
@@ -114,16 +145,16 @@ export function RegexTester() {
           <div className="space-y-1.5">
             {matches.slice(0, 10).map((m, i) => (
               <div key={i} className="rounded-lg border border-yellow-400/30 bg-yellow-500/10 p-2.5 text-sm text-yellow-100">
-                <div className="font-semibold">#{i + 1} : <span className="font-mono">&quot;{m.match}&quot;</span> à l&apos;index {m.index}</div>
+                <div className="font-semibold">{t.matchLine(i + 1)}<span className="font-mono">&quot;{m.match}&quot;</span>{t.atIndex(m.index)}</div>
                 {m.groups.length > 0 && (
                   <div className="mt-1 text-xs text-slate-300">
-                    Groupes : <span className="font-mono">{m.groups.join(', ')}</span>
+                    {t.groups}<span className="font-mono">{m.groups.join(', ')}</span>
                   </div>
                 )}
               </div>
             ))}
             {matches.length > 10 && (
-              <p className="text-center text-xs text-slate-400">+ {matches.length - 10} autres matches</p>
+              <p className="text-center text-xs text-slate-400">{t.more(matches.length - 10)}</p>
             )}
           </div>
         </>

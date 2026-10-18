@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useLocale } from 'next-intl';
+import { bilingual } from '@/i18n/copy';
 import { AlertTriangle, ArrowUpRight, Braces, KeyRound, Link2, RotateCcw } from 'lucide-react';
 import {
   calculateApiCost,
@@ -28,6 +30,23 @@ const INITIAL_INPUTS: ApiCostInputs = {
 };
 
 type FormValues = Record<keyof ApiCostInputs, string | TrafficSource | TrafficPeriod | PricingUnit>;
+
+// The calculator itself is in English on both sites; only these blocks follow the site language.
+const copy = bilingual({
+  benefits: [
+    { icon: '🔒', title: '100% privé', description: 'Tout se passe dans ton navigateur' },
+    { icon: '⚡', title: 'Instantané', description: "Pas d'attente, pas de serveur" },
+    { icon: '🎨', title: 'Sans pub', description: 'Pas de tracking, pas de pub' },
+  ],
+  relatedHrefs: ['/outils/json-formatter', '/outils/encodeur-url', '/outils/decodeur-jwt'],
+}, {
+  benefits: [
+    { icon: '🔒', title: '100% private', description: 'Everything happens in your browser' },
+    { icon: '⚡', title: 'Instant', description: 'No waiting, no server' },
+    { icon: '🎨', title: 'Ad-free', description: 'No tracking, no ads' },
+  ],
+  relatedHrefs: ['/en/tools/json-formatter', '/en/tools/url-encoder', '/en/tools/jwt-decoder'],
+});
 
 const PERIODS: { value: TrafficPeriod; label: string }[] = [
   { value: 'minute', label: 'Requests per minute' },
@@ -188,6 +207,7 @@ function UsageMeter({
 }
 
 export function ApiCostCalculator() {
+  const t = copy[useLocale()];
   const [values, setValues] = useState<FormValues>(() => toFormValues(INITIAL_INPUTS));
   const [formVersion, setFormVersion] = useState(0);
 
@@ -403,11 +423,7 @@ export function ApiCostCalculator() {
       </section>
 
       <section aria-label="Calculator benefits" className="grid gap-4 sm:grid-cols-3">
-        {[
-          { icon: '🔒', title: '100% privé', description: 'Tout se passe dans ton navigateur' },
-          { icon: '⚡', title: 'Instantané', description: "Pas d'attente, pas de serveur" },
-          { icon: '🎨', title: 'Sans pub', description: 'Pas de tracking, pas de pub' },
-        ].map((benefit) => (
+        {t.benefits.map((benefit) => (
           <div key={benefit.title} className="flex min-h-36 flex-col items-center justify-center rounded-3xl border border-blue-100 bg-white px-5 py-6 text-center shadow-[0_8px_24px_rgba(37,99,235,.06)]">
             <span aria-hidden="true" className="text-3xl leading-none">{benefit.icon}</span>
             <h2 className="mt-3 text-lg font-extrabold text-slate-900">{benefit.title}</h2>
@@ -420,9 +436,9 @@ export function ApiCostCalculator() {
         <h2 className="text-lg font-bold text-slate-900">Related developer tools</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { label: 'JSON Formatter & Validator', href: '/outils/json-formatter', description: 'Format and validate JSON.', Icon: Braces },
-            { label: 'URL Encoder / Decoder', href: '/outils/encodeur-url', description: 'Encode or decode URL values.', Icon: Link2 },
-            { label: 'JWT Decoder', href: '/outils/decodeur-jwt', description: 'Inspect JWT headers and payloads.', Icon: KeyRound },
+            { label: 'JSON Formatter & Validator', href: t.relatedHrefs[0], description: 'Format and validate JSON.', Icon: Braces },
+            { label: 'URL Encoder / Decoder', href: t.relatedHrefs[1], description: 'Encode or decode URL values.', Icon: Link2 },
+            { label: 'JWT Decoder', href: t.relatedHrefs[2], description: 'Inspect JWT headers and payloads.', Icon: KeyRound },
           ].map(({ label, href, description, Icon }) => (
             <Link key={href} href={href} className="group flex min-h-24 items-center gap-3 rounded-xl border border-blue-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700 transition group-hover:bg-blue-100">

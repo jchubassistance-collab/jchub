@@ -1,6 +1,22 @@
 // lib/tools.ts — Catalogue des outils JcHub
+import { cache } from 'react';
 import { reportUserError } from '@/lib/user-error';
 import { isToolComponentName } from '@/lib/tool-components';
+import type { Locale } from '@/i18n/routing';
+import { categoryLabel } from '@/lib/categories';
+
+/** English version of a tool: its own address slug, texts and search keywords. */
+export type ToolTranslation = {
+  slug: string;
+  name: string;
+  description: string;
+  tags: string[];
+  seo: {
+    title: string;
+    description: string;
+    keywords: string[];
+  };
+};
 
 export type Tool = {
   slug: string;
@@ -21,7 +37,41 @@ export type Tool = {
     description: string;
     keywords: string[];
   };
+  /** The French fields above are the reference; `slug` stays the tool's identifier in every language. */
+  translations?: { en?: ToolTranslation };
+  /** Address slug in the language the tool was localized for (see localizeTool). */
+  localSlug?: string;
 };
+
+/**
+ * The tool as shown in `locale`: translated texts and address slug, same identifier,
+ * component and schedule. A tool not yet translated keeps its French texts.
+ */
+export function localizeTool(tool: Tool, locale: Locale): Tool {
+  const translation = locale === 'en' ? tool.translations?.en : undefined;
+  if (!translation) return { ...tool, category: categoryLabel(tool.category, locale), localSlug: tool.slug };
+  return {
+    ...tool,
+    name: translation.name || tool.name,
+    description: translation.description || tool.description,
+    category: categoryLabel(tool.category, locale),
+    tags: translation.tags.length ? translation.tags : tool.tags,
+    seo: {
+      title: translation.seo.title || tool.seo.title,
+      description: translation.seo.description || tool.seo.description,
+      keywords: translation.seo.keywords.length ? translation.seo.keywords : tool.seo.keywords,
+    },
+    localSlug: translation.slug || tool.slug,
+  };
+}
+
+/** Address of the tool page in `locale`: /outils/<slug> in French, /en/tools/<english-slug> in English. */
+export function toolPath(tool: Tool, locale: Locale): string {
+  const prefix = locale === 'en' ? '/en' : '';
+  if (tool.path) return `${prefix}${tool.path}`;
+  const slug = locale === 'en' ? tool.translations?.en?.slug || tool.slug : tool.slug;
+  return `${prefix}${locale === 'en' ? '/tools' : '/outils'}/${encodeURIComponent(slug)}`;
+}
 
 const DISABLED_TOOL_SLUGS = new Set<string>();
 
@@ -34,6 +84,19 @@ export const tools: Tool[] = [
     icon: '🖼️',
     tags: ['image', 'jpg', 'jpeg', 'png', 'pdf', 'conversion'],
     component: 'ImagesToPdf',
+    translations: {
+      en: {
+        slug: 'images-to-pdf',
+        name: 'Images to PDF',
+        description: 'Convert several JPG, JPEG or PNG images into one PDF, with one image per page and the page size of your choice.',
+        tags: ['image', 'jpg', 'jpeg', 'png', 'pdf', 'conversion'],
+        seo: {
+          title: 'Convert images to PDF for free — JcHub',
+          description: 'Combine JPG, JPEG and PNG images into a PDF. Choose the page size and orientation; each image fills one page.',
+          keywords: ['images to pdf', 'jpg to pdf', 'png to pdf', 'convert image to pdf'],
+        },
+      },
+    },
     status: 'published',
     visibleDays: [5],
     seo: {
@@ -50,6 +113,19 @@ export const tools: Tool[] = [
     icon: '🖼️',
     tags: ['image', 'webp', 'png', 'optimiseur', 'compression', 'conversion'],
     component: 'ImageOptimizer',
+    translations: {
+      en: {
+        slug: 'webp-png-image-optimizer',
+        name: 'WebP / PNG Image Optimizer and Converter',
+        description: 'Convert your JPG, PNG or WebP images to WebP or PNG and shrink their file size in seconds.',
+        tags: ['image', 'webp', 'png', 'optimizer', 'compression', 'conversion'],
+        seo: {
+          title: 'WebP / PNG Image Optimizer and Converter — JcHub',
+          description: 'Convert and optimize your JPG, PNG and WebP images for free. Adjustable WebP quality, files deleted after processing.',
+          keywords: ['webp image optimizer', 'webp png converter', 'compress image', 'convert png to webp'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Optimiseur et Convertisseur d’Images WebP / PNG — JcHub',
@@ -66,6 +142,19 @@ export const tools: Tool[] = [
     icon: '💸',
     tags: ['api', 'pricing', 'cost', 'usage', 'rate limit', 'developer tools', 'json', 'http'],
     component: 'ApiCostCalculator',
+    translations: {
+      en: {
+        slug: 'api-cost-calculator',
+        name: 'API Cost Calculator',
+        description: 'Estimate API request volumes, monthly costs, quotas, retries, and rate limits.',
+        tags: ['api', 'pricing', 'cost', 'usage', 'rate limit', 'developer tools', 'json', 'http'],
+        seo: {
+          title: 'API Cost Calculator – Estimate API Usage & Costs | JcHub',
+          description: "Calculate API costs, estimate monthly usage, simulate request volumes, and monitor API rate limits with JcHub's free API Cost Calculator.",
+          keywords: ['API Cost Calculator', 'API Pricing Calculator', 'API Usage Calculator', 'API Budget Calculator', 'API Rate Limit Calculator', 'API Cost Estimator'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'API Cost Calculator – Estimate API Usage & Costs | JcHub',
@@ -81,6 +170,19 @@ export const tools: Tool[] = [
     icon: '🔐',
     tags: ['password', 'security', 'random'],
     component: 'PasswordGenerator',
+    translations: {
+      en: {
+        slug: 'password-generator',
+        name: 'Secure password generator',
+        description: 'Generate strong, random, customized passwords.',
+        tags: ['password', 'security', 'random', 'generator'],
+        seo: {
+          title: 'Free secure password generator — JcHub',
+          description: 'Create strong, random passwords in one click.',
+          keywords: ['password generator', 'secure password', 'random password'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Générateur de mot de passe sécurisé gratuit — JcHub',
@@ -96,6 +198,19 @@ export const tools: Tool[] = [
     icon: '📋',
     tags: ['json', 'formatter', 'validator'],
     component: 'JsonFormatter',
+    translations: {
+      en: {
+        slug: 'json-formatter',
+        name: 'JSON Formatter & Validator',
+        description: 'Format, validate and minify your JSON in real time.',
+        tags: ['json', 'formatter', 'validator'],
+        seo: {
+          title: 'Free JSON Formatter & Validator — JcHub',
+          description: 'Format and validate your JSON code instantly.',
+          keywords: ['json formatter', 'json validator'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'JSON Formatter & Validator gratuit — JcHub',
@@ -111,6 +226,19 @@ export const tools: Tool[] = [
     icon: '🔄',
     tags: ['base64', 'encode', 'decode'],
     component: 'Base64Tool',
+    translations: {
+      en: {
+        slug: 'base64-encoder',
+        name: 'Base64 Encoder / Decoder',
+        description: 'Encode or decode text to and from Base64.',
+        tags: ['base64', 'encode', 'decode'],
+        seo: {
+          title: 'Online Base64 Encoder / Decoder — JcHub',
+          description: 'Encode and decode text in Base64 for free.',
+          keywords: ['base64 encoder', 'base64 decoder'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Base64 Encoder / Decoder en ligne — JcHub',
@@ -126,6 +254,19 @@ export const tools: Tool[] = [
     icon: '🆔',
     tags: ['uuid', 'guid', 'random'],
     component: 'UuidGenerator',
+    translations: {
+      en: {
+        slug: 'uuid-generator',
+        name: 'UUID Generator',
+        description: 'Generate v1, v4 and v7 UUIDs in bulk.',
+        tags: ['uuid', 'guid', 'random'],
+        seo: {
+          title: 'Free UUID Generator (v1, v4, v7) — JcHub',
+          description: 'Generate v1, v4 and v7 UUIDs in bulk.',
+          keywords: ['uuid generator', 'guid generator'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'UUID Generator gratuit (v1, v4, v7) — JcHub',
@@ -141,6 +282,19 @@ export const tools: Tool[] = [
     icon: '🎯',
     tags: ['regex', 'regexp', 'tester'],
     component: 'RegexTester',
+    translations: {
+      en: {
+        slug: 'regex-tester',
+        name: 'Visual Regex Tester',
+        description: 'Test your regular expressions with real-time highlighting.',
+        tags: ['regex', 'regexp', 'tester'],
+        seo: {
+          title: 'Free online Regex Tester — JcHub',
+          description: 'Test and debug your regular expressions with highlighting.',
+          keywords: ['regex tester', 'test regex'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Regex Tester en ligne gratuit — JcHub',
@@ -156,6 +310,19 @@ export const tools: Tool[] = [
     icon: '📊',
     tags: ['excel', 'csv', 'tableur', 'conversion'],
     component: 'ExcelToCsvTool',
+    translations: {
+      en: {
+        slug: 'excel-to-csv',
+        name: 'Excel to CSV',
+        description: 'Convert an Excel file to CSV while keeping the table data structured.',
+        tags: ['excel', 'csv', 'spreadsheet', 'conversion'],
+        seo: {
+          title: 'Convert Excel to CSV for free — JcHub',
+          description: 'Turn an Excel file into a cleanly structured CSV in seconds.',
+          keywords: ['excel to csv', 'convert excel to csv', 'xlsx csv'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Convertir Excel en CSV gratuitement — JcHub',
@@ -171,6 +338,19 @@ export const tools: Tool[] = [
     icon: '📈',
     tags: ['csv', 'excel', 'xlsx', 'conversion'],
     component: 'CsvToExcelTool',
+    translations: {
+      en: {
+        slug: 'csv-to-excel',
+        name: 'CSV to Excel',
+        description: 'Turn a CSV file into an Excel .xlsx spreadsheet in seconds.',
+        tags: ['csv', 'excel', 'xlsx', 'conversion'],
+        seo: {
+          title: 'Convert CSV to Excel for free — JcHub',
+          description: 'Create an Excel file from a CSV while keeping its columns and rows.',
+          keywords: ['csv to excel', 'convert csv to excel', 'csv xlsx'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Convertir CSV en Excel gratuitement — JcHub',
@@ -186,6 +366,19 @@ export const tools: Tool[] = [
     icon: '📄',
     tags: ['pdf', 'word', 'docx', 'conversion'],
     component: 'PdfToWord',
+    translations: {
+      en: {
+        slug: 'pdf-to-word',
+        name: 'PDF to Word',
+        description: 'Convert a PDF into an editable Word DOCX document in seconds.',
+        tags: ['pdf', 'word', 'docx', 'conversion'],
+        seo: {
+          title: 'Convert PDF to Word for free — JcHub',
+          description: 'Easily turn a PDF file into a Word DOCX document in seconds.',
+          keywords: ['pdf to word', 'convert pdf to word', 'docx', 'pdf to docx'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Convertir PDF en Word gratuitement — JcHub',
@@ -201,6 +394,19 @@ export const tools: Tool[] = [
     icon: '📄',
     tags: ['word', 'pdf', 'docx', 'conversion'],
     component: 'WordToPdf',
+    translations: {
+      en: {
+        slug: 'word-to-pdf',
+        name: 'Word to PDF',
+        description: 'Convert a Word DOCX document to PDF while keeping its layout.',
+        tags: ['word', 'pdf', 'docx', 'conversion'],
+        seo: {
+          title: 'Convert Word to PDF for free — JcHub',
+          description: 'Turn a Word DOCX document into a PDF ready to share.',
+          keywords: ['word to pdf', 'convert word to pdf', 'docx to pdf'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Convertir Word en PDF gratuitement — JcHub',
@@ -216,6 +422,19 @@ export const tools: Tool[] = [
     icon: '📦',
     tags: ['pdf', 'compression', 'email', 'portail', 'fichier', 'optimisation'],
     component: 'PdfCompressor',
+    translations: {
+      en: {
+        slug: 'compress-pdf',
+        name: 'Compress a PDF for free',
+        description: 'Shrink a PDF document from 15 MB to under 2 MB to email it or upload it to a portal.',
+        tags: ['pdf', 'compression', 'email', 'portal', 'file', 'optimization'],
+        seo: {
+          title: 'Compress a PDF for free — JcHub',
+          description: 'Reduce the size of your PDFs to email them or upload them to a portal more easily.',
+          keywords: ['compress pdf', 'reduce pdf size', 'pdf under 2 mb', 'optimize pdf free'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Compresser un PDF gratuitement — JcHub',
@@ -231,6 +450,19 @@ export const tools: Tool[] = [
     icon: '🎨',
     tags: ['couleur', 'hex', 'rgb', 'hsl'],
     component: 'ColorConverter',
+    translations: {
+      en: {
+        slug: 'color-converter',
+        name: 'Color converter',
+        description: 'Convert colors between HEX, RGB, HSL and other formats.',
+        tags: ['color', 'hex', 'rgb', 'hsl'],
+        seo: {
+          title: 'HEX RGB HSL color converter — JcHub',
+          description: 'Easily convert your colors between HEX, RGB and HSL.',
+          keywords: ['color converter', 'hex to rgb', 'hsl'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Convertisseur de couleurs HEX RGB HSL — JcHub',
@@ -246,6 +478,19 @@ export const tools: Tool[] = [
     icon: '#️⃣',
     tags: ['hash', 'md5', 'sha256', 'cryptographie'],
     component: 'HashGenerator',
+    translations: {
+      en: {
+        slug: 'hash-generator',
+        name: 'Hash generator',
+        description: 'Generate MD5, SHA-1, SHA-256 and SHA-512 digests.',
+        tags: ['hash', 'md5', 'sha256', 'cryptography'],
+        seo: {
+          title: 'Online MD5 and SHA hash generator — JcHub',
+          description: 'Generate MD5, SHA-1, SHA-256 and SHA-512 hashes right in your browser.',
+          keywords: ['hash generator', 'md5', 'sha256'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Générateur de hash MD5 et SHA en ligne — JcHub',
@@ -261,6 +506,19 @@ export const tools: Tool[] = [
     icon: '🔑',
     tags: ['jwt', 'json web token', 'authentification'],
     component: 'JwtDecoder',
+    translations: {
+      en: {
+        slug: 'jwt-decoder',
+        name: 'JWT Decoder',
+        description: 'Decode and inspect the header and payload of your JWT tokens.',
+        tags: ['jwt', 'json web token', 'authentication'],
+        seo: {
+          title: 'Free online JWT Decoder — JcHub',
+          description: 'Quickly decode and inspect your JSON Web Tokens.',
+          keywords: ['jwt decoder', 'decode jwt', 'json web token'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Décodeur JWT en ligne gratuit — JcHub',
@@ -276,6 +534,19 @@ export const tools: Tool[] = [
     icon: '📝',
     tags: ['markdown', 'preview', 'html'],
     component: 'MarkdownPreview',
+    translations: {
+      en: {
+        slug: 'markdown-preview',
+        name: 'Markdown Preview',
+        description: 'Preview your Markdown in real time and export the HTML.',
+        tags: ['markdown', 'preview', 'html'],
+        seo: {
+          title: 'Online Markdown Preview — JcHub',
+          description: 'Write and preview your Markdown in real time in your browser.',
+          keywords: ['markdown preview', 'markdown editor', 'markdown to html'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Aperçu Markdown en ligne — JcHub',
@@ -291,6 +562,19 @@ export const tools: Tool[] = [
     icon: '🔢',
     tags: ['binaire', 'hexadécimal', 'octal', 'conversion'],
     component: 'NumberBaseConverter',
+    translations: {
+      en: {
+        slug: 'number-base-converter',
+        name: 'Number base converter',
+        description: 'Convert numbers between binary, octal, decimal and hexadecimal.',
+        tags: ['binary', 'hexadecimal', 'octal', 'conversion'],
+        seo: {
+          title: 'Binary, decimal, hexadecimal converter — JcHub',
+          description: 'Instantly convert numbers between bases 2, 8, 10 and 16.',
+          keywords: ['base converter', 'binary to decimal', 'hexadecimal'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Convertisseur binaire, décimal, hexadécimal — JcHub',
@@ -306,6 +590,19 @@ export const tools: Tool[] = [
     icon: '📱',
     tags: ['qr code', 'qrcode', 'url'],
     component: 'QrCodeGenerator',
+    translations: {
+      en: {
+        slug: 'qr-code-generator',
+        name: 'QR code generator',
+        description: 'Create and download QR codes from text or a URL.',
+        tags: ['qr code', 'qrcode', 'url'],
+        seo: {
+          title: 'Free QR code generator — JcHub',
+          description: 'Create custom QR codes to download for free.',
+          keywords: ['qr code generator', 'free qr code', 'url qr code'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Générateur de QR code gratuit — JcHub',
@@ -321,6 +618,19 @@ export const tools: Tool[] = [
     icon: '🕒',
     tags: ['timestamp', 'unix', 'date'],
     component: 'TimestampConverter',
+    translations: {
+      en: {
+        slug: 'timestamp-converter',
+        name: 'Timestamp Converter',
+        description: 'Convert Unix timestamps to dates and back.',
+        tags: ['timestamp', 'unix', 'date'],
+        seo: {
+          title: 'Online Unix Timestamp Converter — JcHub',
+          description: 'Convert Unix timestamps into readable dates and back.',
+          keywords: ['timestamp converter', 'unix timestamp', 'date converter'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Convertisseur Timestamp Unix en ligne — JcHub',
@@ -336,6 +646,19 @@ export const tools: Tool[] = [
     icon: '🔗',
     tags: ['url', 'encode', 'decode', 'uri'],
     component: 'UrlEncoder',
+    translations: {
+      en: {
+        slug: 'url-encoder',
+        name: 'URL Encoder / Decoder',
+        description: 'Encode or decode URLs and parameters with ease.',
+        tags: ['url', 'encode', 'decode', 'uri'],
+        seo: {
+          title: 'Online URL encoder and decoder — JcHub',
+          description: 'Quickly encode and decode URLs and their parameters.',
+          keywords: ['url encoder', 'url decoder', 'encode url'],
+        },
+      },
+    },
     status: 'published',
     seo: {
       title: 'Encodeur et décodeur URL en ligne — JcHub',
@@ -385,8 +708,36 @@ function toToolRecord(data: Record<string, any>): Tool {
       description: String(data.seo?.description || data.description || ''),
       keywords: Array.isArray(data.seo?.keywords) ? data.seo.keywords.map(String) : [],
     },
+    // A Firestore copy of a built-in tool keeps the English version written in this file.
+    translations: { en: toToolTranslation(data.translations?.en) ?? registeredTool?.translations?.en },
   };
 }
+
+export function toToolTranslation(data: unknown): ToolTranslation | undefined {
+  if (!data || typeof data !== 'object') return undefined;
+  const value = data as Record<string, any>;
+  const slug = String(value.slug || '').trim();
+  const name = String(value.name || '').trim();
+  if (!slug || !name) return undefined;
+  return {
+    slug,
+    name,
+    description: String(value.description || ''),
+    tags: Array.isArray(value.tags) ? value.tags.map(String) : [],
+    seo: {
+      title: String(value.seo?.title || name),
+      description: String(value.seo?.description || value.description || ''),
+      keywords: Array.isArray(value.seo?.keywords) ? value.seo.keywords.map(String) : [],
+    },
+  };
+}
+
+/** The tools collection, read once per page render however many components need it. */
+const readToolDocuments = cache(async () => {
+  const { getAdminDb } = await import('@/lib/firebase-admin');
+  const snapshot = await getAdminDb().collection('tools').get();
+  return snapshot.docs.map((document) => toToolRecord(document.data()));
+});
 
 export async function getPublishedTools(options: { includeScheduled?: boolean } = {}): Promise<Tool[]> {
   const filterPublished = (list: Tool[]) => list.filter((tool) =>
@@ -406,9 +757,7 @@ export async function getPublishedTools(options: { includeScheduled?: boolean } 
   }
 
   try {
-    const { getAdminDb } = await import('@/lib/firebase-admin');
-    const snapshot = await getAdminDb().collection('tools').get();
-    const fromFirestore = snapshot.docs.map((document) => toToolRecord(document.data()));
+    const fromFirestore = await readToolDocuments();
 
     if (fromFirestore.length === 0) {
       return filterPublished(tools);
@@ -433,8 +782,15 @@ export async function getPublishedTools(options: { includeScheduled?: boolean } 
   }
 }
 
-export async function getToolBySlug(slug: string): Promise<Tool | null> {
-  if (DISABLED_TOOL_SLUGS.has(slug)) return null;
+/**
+ * Finds a tool by the slug of its address in `locale`. In English the French slug is
+ * accepted too, so the page can redirect old or shared links to the English address.
+ */
+export async function getToolBySlug(slug: string, locale: Locale = 'fr'): Promise<Tool | null> {
   const toolList = await getPublishedTools();
-  return toolList.find((tool) => tool.slug === slug) ?? null;
+  const tool = locale === 'en'
+    ? toolList.find((candidate) => candidate.translations?.en?.slug === slug) ?? toolList.find((candidate) => candidate.slug === slug)
+    : toolList.find((candidate) => candidate.slug === slug);
+  if (!tool || DISABLED_TOOL_SLUGS.has(tool.slug)) return null;
+  return tool;
 }

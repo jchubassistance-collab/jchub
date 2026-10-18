@@ -1,7 +1,7 @@
 import type { Tool } from '@/lib/tools';
 
-// French function words and request phrasing: they say nothing about the tool wanted, and
-// short ones such as "de" used to match multi-word tags like "mot de passe".
+// French and English function words and request phrasing: they say nothing about the tool
+// wanted, and short ones such as "de" used to match multi-word tags like "mot de passe".
 const STOP_WORDS = new Set([
   'au', 'aux', 'avec', 'ce', 'ces', 'cet', 'cette', 'dans', 'de', 'des', 'du', 'en', 'et', 'la', 'le', 'les', 'leur', 'leurs',
   'ma', 'mais', 'me', 'mes', 'moi', 'mon', 'ne', 'nos', 'notre', 'nous', 'ou', 'par', 'pas', 'pour', 'qu', 'que', 'qui', 'quoi',
@@ -10,6 +10,10 @@ const STOP_WORDS = new Set([
   'etre', 'faire', 'fait', 'veux', 'voudrais', 'voulais', 'peux', 'pouvoir', 'dois', 'doit', 'savoir', 'sais', 'besoin', 'aide',
   'aider', 'aidez', 'comment', 'pourquoi', 'outil', 'outils', 'truc', 'chose', 'moyen', 'facon', 'plus', 'moins', 'tres', 'bien',
   'tout', 'tous', 'toute', 'toutes', 'bonjour', 'salut', 'merci', 'stp', 'svp', 'clair', 'simple', 'rapide', 'gratuit', 'ligne',
+  'the', 'and', 'for', 'with', 'without', 'how', 'what', 'which', 'who', 'why', 'when', 'where', 'want', 'need', 'would', 'could',
+  'should', 'can', 'you', 'your', 'this', 'that', 'these', 'those', 'are', 'was', 'were', 'been', 'have', 'has', 'had', 'does',
+  'did', 'get', 'some', 'any', 'all', 'tool', 'tools', 'thing', 'way', 'please', 'thanks', 'hello', 'online', 'free', 'quick',
+  'fast', 'easy', 'into', 'from', 'about', 'just', 'very', 'also', 'help', 'make',
 ]);
 // Short technical terms worth matching despite having fewer than three letters.
 const SHORT_TERMS = new Set(['qr', 'js', 'ts', 'ip', 'id', 'md', 'ui', 'ux', 'db', 'ia', 'go']);

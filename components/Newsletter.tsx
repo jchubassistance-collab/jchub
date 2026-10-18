@@ -2,10 +2,29 @@
 
 import { FormEvent, useState } from 'react';
 import { CheckCircle2, Loader2, Mail } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { trackEvent } from '@/lib/analytics-client';
+import { bilingual } from '@/i18n/copy';
+import { LOCALE_HEADER } from '@/i18n/request-locale';
+
+const copy = bilingual({
+  failed: 'Impossible de t’inscrire pour le moment.',
+  generic: 'Une erreur est survenue.',
+  success: 'Merci, ton inscription est confirmée.',
+  placeholder: 'ton@email.com',
+  subscribe: 'S’inscrire',
+}, {
+  failed: 'We can’t subscribe you right now.',
+  generic: 'Something went wrong.',
+  success: 'Thanks, your subscription is confirmed.',
+  placeholder: 'you@email.com',
+  subscribe: 'Subscribe',
+});
 
 export function Newsletter({ appearance = 'default' }: { appearance?: 'default' | 'light' }) {
   const isLight = appearance === 'light';
+  const locale = useLocale();
+  const t = copy[locale];
   const [email, setEmail] = useState('');
   const [state, setState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [error, setError] = useState('');
@@ -18,26 +37,26 @@ export function Newsletter({ appearance = 'default' }: { appearance?: 'default' 
     setWarning('');
 
     try {
-      const response = await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+      const response = await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json', [LOCALE_HEADER]: locale }, body: JSON.stringify({ email }) });
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.error || 'Impossible de t’inscrire pour le moment.');
+        throw new Error(data.error || t.failed);
       }
       setWarning(data.warning || '');
       setState('success');
       trackEvent('newsletter_signup', { method: 'website' });
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Une erreur est survenue.');
+      setError(cause instanceof Error ? cause.message : t.generic);
       setState('error');
     }
   };
 
-  if (state === 'success') return <div className="space-y-2"><div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-bold text-white"><CheckCircle2 className="h-5 w-5" /> Merci, ton inscription est confirmée.</div>{warning && <p className="text-center text-xs text-amber-200" role="status">{warning}</p>}</div>;
+  if (state === 'success') return <div className="space-y-2"><div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-bold text-white"><CheckCircle2 className="h-5 w-5" /> {t.success}</div>{warning && <p className="text-center text-xs text-amber-200" role="status">{warning}</p>}</div>;
 
   return (
     <form onSubmit={submit} className="relative mx-auto mt-7 flex max-w-lg flex-col gap-3 sm:flex-row">
-      <label className="relative flex-1"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="ton@email.com" className={`w-full rounded-xl border border-slate-300 bg-white py-3 pl-10 pr-3 text-slate-900 outline-none focus:ring-4 ${isLight ? 'focus:border-blue-500 focus:ring-blue-100' : 'focus:border-orange-400 focus:ring-orange-100'}`} /></label>
-      <button disabled={state === 'loading'} className={`rounded-xl px-5 py-3 text-sm font-bold text-white transition disabled:opacity-60 ${isLight ? 'bg-blue-600 hover:bg-blue-500' : 'bg-orange-500 hover:bg-orange-400'}`}>{state === 'loading' ? <Loader2 className="h-5 w-5 animate-spin" /> : 'S’inscrire'}</button>
+      <label className="relative flex-1"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder={t.placeholder} className={`w-full rounded-xl border border-slate-300 bg-white py-3 pl-10 pr-3 text-slate-900 outline-none focus:ring-4 ${isLight ? 'focus:border-blue-500 focus:ring-blue-100' : 'focus:border-orange-400 focus:ring-orange-100'}`} /></label>
+      <button disabled={state === 'loading'} className={`rounded-xl px-5 py-3 text-sm font-bold text-white transition disabled:opacity-60 ${isLight ? 'bg-blue-600 hover:bg-blue-500' : 'bg-orange-500 hover:bg-orange-400'}`}>{state === 'loading' ? <Loader2 className="h-5 w-5 animate-spin" /> : t.subscribe}</button>
       {state === 'error' && <p className={`text-sm sm:absolute sm:top-full sm:mt-2 ${isLight ? 'text-red-700' : 'text-red-200'}`}>{error}</p>}
     </form>
   );

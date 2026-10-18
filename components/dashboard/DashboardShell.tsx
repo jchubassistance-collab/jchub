@@ -1,13 +1,33 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useLocale } from 'next-intl';
 import { onAuthChange, signOut, getUserProfile, UserProfile } from '@/lib/firebase-auth';
-import { auth } from '@/lib/firebase';
-import { useRouter } from 'next/navigation';
 import { LogOut, Wrench, Settings, User } from 'lucide-react';
-import Link from 'next/link';
+import { Link, useRouter } from '@/i18n/navigation';
+import { bilingual } from '@/i18n/copy';
+import type { StaticPathname } from '@/i18n/routing';
+
+const copy = bilingual({
+  hello: 'Bonjour 👋',
+  home: 'Accueil',
+  signOut: 'Déconnexion',
+  navigation: 'Navigation',
+  dashboard: 'Tableau de bord',
+  tools: 'Outils',
+  settings: 'Paramètres',
+}, {
+  hello: 'Hello 👋',
+  home: 'Home',
+  signOut: 'Sign out',
+  navigation: 'Navigation',
+  dashboard: 'Dashboard',
+  tools: 'Tools',
+  settings: 'Settings',
+});
 
 export function DashboardShell({ children }: { children: (user: UserProfile) => React.ReactNode }) {
+  const t = copy[useLocale()];
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,6 +60,12 @@ export function DashboardShell({ children }: { children: (user: UserProfile) => 
 
   if (!user) return null;
 
+  const navigation: { href: StaticPathname; label: string; icon: typeof User }[] = [
+    { href: '/compte/dashboard', label: t.dashboard, icon: User },
+    { href: '/outils', label: t.tools, icon: Wrench },
+    { href: '/compte/parametres', label: t.settings, icon: Settings },
+  ];
+
   return (
     <div className="account-page min-h-[calc(100vh-200px)] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -49,21 +75,21 @@ export function DashboardShell({ children }: { children: (user: UserProfile) => 
               {user.displayName?.[0]?.toUpperCase() || 'U'}
             </div>
             <div>
-              <div className="text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">Bonjour 👋</div>
+              <div className="text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">{t.hello}</div>
               <div className="text-lg font-black text-slate-900">{user.displayName}</div>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <Link href="/" className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-orange-200 hover:text-orange-600">
-              Accueil
+              {t.home}
             </Link>
             <button
               onClick={handleSignOut}
               className="flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100"
             >
               <LogOut className="h-4 w-4" />
-              Déconnexion
+              {t.signOut}
             </button>
           </div>
         </div>
@@ -71,12 +97,8 @@ export function DashboardShell({ children }: { children: (user: UserProfile) => 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
           <aside className="md:col-span-1">
             <div className="sticky top-24 overflow-hidden rounded-[26px] border border-slate-200 bg-gradient-to-b from-slate-900 via-[#13283a] to-[#17324d] p-3 text-white shadow-[0_20px_60px_rgba(15,23,42,0.22)]">
-              <div className="mb-3 px-2 pb-2 pt-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-300">Navigation</div>
-              {[
-                { href: '/compte/dashboard', label: 'Tableau de bord', icon: User },
-                { href: '/outils', label: 'Outils', icon: Wrench },
-                { href: '/compte/parametres', label: 'Paramètres', icon: Settings },
-              ].map((item) => (
+              <div className="mb-3 px-2 pb-2 pt-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-300">{t.navigation}</div>
+              {navigation.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}

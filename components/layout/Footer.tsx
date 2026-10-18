@@ -1,21 +1,56 @@
 ﻿'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { ArrowUpRight, Facebook, Instagram, Mail, MapPin, Sparkles } from 'lucide-react';
 import { OPEN_CONSENT_EVENT } from '@/components/AnalyticsConsent';
+import { isLightPage as isLightHeaderPage } from '@/components/layout/Header';
+import { Link, usePathname } from '@/i18n/navigation';
+import { bilingual } from '@/i18n/copy';
+import type { StaticPathname } from '@/i18n/routing';
 
-const groups = [
-  { title: 'Plateforme', links: [['Outils', '/outils'], ['Centre d’aide', '/aide']] },
-  { title: 'JcHub', links: [['À propos', '/a-propos'], ['Contact', '/contact'], ['Blog', '/blog']] },
-  { title: 'Légal', links: [['Conditions d’utilisation', '/cgu'], ['Conditions de vente', '/cgv'], ['Confidentialité', '/confidentialite'], ['Mentions légales', '/mentions-legales']] },
-];
+const copy = bilingual({
+  groups: [
+    { title: 'Plateforme', links: [['Outils', '/outils'], ['Centre d’aide', '/aide']] },
+    { title: 'JcHub', links: [['À propos', '/a-propos'], ['Contact', '/contact'], ['Blog', '/blog']] },
+    { title: 'Légal', links: [['Conditions d’utilisation', '/cgu'], ['Conditions de vente', '/cgv'], ['Confidentialité', '/confidentialite'], ['Mentions légales', '/mentions-legales']] },
+  ] as { title: string; links: [string, StaticPathname][] }[],
+  eyebrow: 'L’aventure continue',
+  tagline: 'Des idées concrètes pour avancer, un outil à la fois.',
+  explore: 'Explorer les outils',
+  homeLabel: 'JcHub, accueil',
+  about: 'Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques.',
+  location: 'Congo Brazzaville',
+  socialLabel: 'Réseaux sociaux JcHub',
+  onFacebook: 'JcHub sur Facebook',
+  onInstagram: 'JcHub sur Instagram',
+  rights: 'Tous droits réservés.',
+  cookies: 'Gérer les cookies',
+  createdBy: 'Créé par Jessy Ngnambongo.',
+}, {
+  groups: [
+    { title: 'Platform', links: [['Tools', '/outils'], ['Help center', '/aide']] },
+    { title: 'JcHub', links: [['About', '/a-propos'], ['Contact', '/contact'], ['Blog', '/blog']] },
+    { title: 'Legal', links: [['Terms of use', '/cgu'], ['Terms of sale', '/cgv'], ['Privacy', '/confidentialite'], ['Legal notice', '/mentions-legales']] },
+  ],
+  eyebrow: 'The adventure continues',
+  tagline: 'Concrete ideas to move forward, one tool at a time.',
+  explore: 'Explore the tools',
+  homeLabel: 'JcHub, home',
+  about: 'A clear platform to learn, use helpful tools and move your digital projects forward.',
+  location: 'Congo-Brazzaville',
+  socialLabel: 'JcHub social networks',
+  onFacebook: 'JcHub on Facebook',
+  onInstagram: 'JcHub on Instagram',
+  rights: 'All rights reserved.',
+  cookies: 'Manage cookies',
+  createdBy: 'Created by Jessy Ngnambongo.',
+});
 
 export function Footer() {
+  const locale = useLocale();
+  const t = copy[locale];
   const pathname = usePathname() ?? '';
-  const isHome = pathname === '/';
-  const isLightPage = isHome || pathname === '/a-propos' || pathname === '/outils' || pathname.startsWith('/outils/') || pathname.startsWith('/tools/') || pathname === '/aide' || pathname === '/contact' || pathname === '/blog' || pathname.startsWith('/blog/') || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(pathname);
-  const homeHref = '/';
+  const isLightPage = isLightHeaderPage(pathname);
 
   return (
     <footer className={`footer-shell relative ${isLightPage ? 'mt-0' : 'mt-16'} ${isLightPage ? 'border-t border-blue-100 bg-white text-slate-600' : 'bg-[#102a43] text-slate-300'} overflow-hidden`}>
@@ -26,38 +61,38 @@ export function Footer() {
           <div className="max-w-2xl">
             <span className={`mb-4 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] ${isLightPage ? 'text-blue-700' : 'text-orange-300'}`}>
               <Sparkles className="h-4 w-4" aria-hidden="true" />
-              L’aventure continue
+              {t.eyebrow}
             </span>
             <p className={`text-2xl font-black leading-tight tracking-tight sm:text-3xl ${isLightPage ? 'text-[#0f172a]' : 'text-white'}`}>
-              Des idées concrètes pour avancer, un outil à la fois.
+              {t.tagline}
             </p>
           </div>
           <Link href="/outils" className={`group inline-flex w-fit shrink-0 items-center gap-3 rounded-full px-5 py-3 text-sm font-bold transition duration-300 ${isLightPage ? 'bg-[#93c5fd] text-[#0f172a] hover:bg-[#60a5fa] hover:shadow-[0_10px_30px_rgba(37,99,235,.16)] focus-visible:outline-blue-500' : 'bg-orange-400 text-[#102a43] hover:bg-orange-300 hover:shadow-[0_10px_30px_rgba(251,146,60,0.25)] focus-visible:outline-orange-300'}`}>
-            Explorer les outils
+            {t.explore}
             <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
           </Link>
         </div>
 
         <div className="grid gap-10 py-12 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:py-14">
           <div>
-            <Link href={homeHref} className="group inline-flex items-center" aria-label="JcHub, accueil">
+            <Link href="/" className="group inline-flex items-center" aria-label={t.homeLabel}>
               <img src="/jchub-icon-192.png" alt="JcHub" className="h-10 w-auto transition duration-300 group-hover:scale-[1.04] md:hidden" />
               <img src="/logo-blue.svg" alt="JcHub" className="hidden h-14 w-auto transition duration-300 group-hover:scale-[1.04] md:block" />
             </Link>
-            <p className={`mt-5 max-w-sm text-sm leading-relaxed ${isLightPage ? 'text-slate-600' : 'text-slate-300'}`}>Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques.</p>
+            <p className={`mt-5 max-w-sm text-sm leading-relaxed ${isLightPage ? 'text-slate-600' : 'text-slate-300'}`}>{t.about}</p>
             <div className="mt-6 space-y-3 text-sm">
               <a className={`group flex w-fit items-center gap-2 transition ${isLightPage ? 'hover:text-blue-800' : 'hover:text-white'}`} href="mailto:hello@jchub.dev">
                 <Mail className={`h-4 w-4 transition-transform group-hover:-translate-y-0.5 ${isLightPage ? 'text-blue-600' : 'text-orange-400'}`} aria-hidden="true" />
                 hello@jchub.dev
               </a>
-              <span className="flex items-center gap-2"><MapPin className={`h-4 w-4 ${isLightPage ? 'text-blue-600' : 'text-orange-400'}`} aria-hidden="true" />Congo Brazzaville</span>
+              <span className="flex items-center gap-2"><MapPin className={`h-4 w-4 ${isLightPage ? 'text-blue-600' : 'text-orange-400'}`} aria-hidden="true" />{t.location}</span>
             </div>
-            <nav aria-label="Réseaux sociaux JcHub" className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm">
-              <a href="https://www.facebook.com/1393952223791842" target="_blank" rel="noopener noreferrer" aria-label="JcHub sur Facebook" title="Facebook" className={`transition hover:scale-110 ${isLightPage ? 'text-blue-700 hover:text-blue-900' : 'text-slate-300 hover:text-white'}`}><Facebook className="h-5 w-5" aria-hidden="true" /></a>
-              <a href="https://www.instagram.com/jchub.tech/" target="_blank" rel="noopener noreferrer" aria-label="JcHub sur Instagram" title="Instagram" className={`transition hover:scale-110 ${isLightPage ? 'text-pink-600 hover:text-pink-800' : 'text-slate-300 hover:text-white'}`}><Instagram className="h-5 w-5" aria-hidden="true" /></a>
+            <nav aria-label={t.socialLabel} className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+              <a href="https://www.facebook.com/1393952223791842" target="_blank" rel="noopener noreferrer" aria-label={t.onFacebook} title="Facebook" className={`transition hover:scale-110 ${isLightPage ? 'text-blue-700 hover:text-blue-900' : 'text-slate-300 hover:text-white'}`}><Facebook className="h-5 w-5" aria-hidden="true" /></a>
+              <a href="https://www.instagram.com/jchub.tech/" target="_blank" rel="noopener noreferrer" aria-label={t.onInstagram} title="Instagram" className={`transition hover:scale-110 ${isLightPage ? 'text-pink-600 hover:text-pink-800' : 'text-slate-300 hover:text-white'}`}><Instagram className="h-5 w-5" aria-hidden="true" /></a>
             </nav>
           </div>
-          {groups.map((group) => (
+          {t.groups.map((group) => (
             <div key={group.title}>
               <h2 className={`mb-4 text-xs font-bold uppercase tracking-[0.18em] ${isLightPage ? 'text-blue-800' : 'text-orange-200'}`}>{group.title}</h2>
               <ul className="space-y-3 text-sm">
@@ -76,11 +111,11 @@ export function Footer() {
       </div>
       <div className={`border-t ${isLightPage ? 'border-blue-100 bg-blue-50/60' : 'border-white/10 bg-[#0c2135]/70'}`}>
         <div className={`mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-xs sm:flex-row sm:justify-between sm:px-6 ${isLightPage ? 'text-slate-500' : 'text-slate-400'}`}>
-          <span>© {new Date().getFullYear()} JcHub. Tous droits réservés.</span>
+          <span>© {new Date().getFullYear()} JcHub. {t.rights}</span>
           <button type="button" onClick={() => window.dispatchEvent(new Event(OPEN_CONSENT_EVENT))} className={`text-left underline-offset-2 hover:underline ${isLightPage ? 'hover:text-blue-800' : 'hover:text-white'}`}>
-            Gérer les cookies
+            {t.cookies}
           </button>
-          <span>Créé par Jessy Ngnambongo.</span>
+          <span>{t.createdBy}</span>
         </div>
       </div>
     </footer>

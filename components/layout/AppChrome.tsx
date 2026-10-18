@@ -1,14 +1,22 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { usePathname as useInternalPathname } from '@/i18n/navigation';
+import { bilingual } from '@/i18n/copy';
+
+const copy = bilingual({ backToTop: 'Retour en haut', loading: 'Chargement de la page', loadingText: 'Chargement de la page…' }, { backToTop: 'Back to top', loading: 'Loading page', loadingText: 'Loading page…' });
 
 /** Keeps the public storefront chrome out of private admin and account pages. */
 export function AppChrome({ children, isAdminHost = false }: { children: React.ReactNode; isAdminHost?: boolean }) {
   const pathname = usePathname();
+  // French address of the page in either language: /en/account is /compte.
+  const internalPathname = useInternalPathname();
+  const t = copy[useLocale()];
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [toolLoading, setToolLoading] = useState(false);
   const toolLoadingStartedAt = useRef(0);
@@ -61,7 +69,7 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
     return () => { window.clearTimeout(timeout); window.removeEventListener('pageshow', onPageShow); };
   }, [toolLoading]);
 
-  const safePathname = pathname ?? '';
+  const safePathname: string = internalPathname ?? '';
   const isPrivateArea =
     isAdminHost ||
     safePathname === '/admin' ||
@@ -71,7 +79,7 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
 
   // Public pages must render on the server: crawlers, link previews and slow phones see content before JS loads.
   if (isPrivateArea) {
-    return <><main className="min-h-screen">{children}</main>{toolLoading && <PageNavigationLoader />}</>;
+    return <><main className="min-h-screen">{children}</main>{toolLoading && <PageNavigationLoader label={t.loading} text={t.loadingText} />}</>;
   }
 
   return (
@@ -79,10 +87,10 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
       <Header />
       <main className="min-h-screen animate-page-in">{children}</main>
       <Footer />
-      {toolLoading && <PageNavigationLoader />}
+      {toolLoading && <PageNavigationLoader label={t.loading} text={t.loadingText} />}
       <button
         type="button"
-        aria-label="Retour en haut"
+        aria-label={t.backToTop}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className={`fixed bottom-5 right-5 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg shadow-slate-900/25 transition-all duration-300 hover:scale-105 hover:bg-slate-700 ${showBackToTop ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'}`}
       >
@@ -92,6 +100,18 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
   );
 }
 
-function PageNavigationLoader() {
-  return <div className="tool-navigation-loader" role="status" aria-label="Chargement de la page"><div className="loader-atom" aria-hidden="true"><span /><span /><span /><i /><i /><i /></div><span className="sr-only">Chargement de la page…</span></div>;
+function PageNavigationLoader({ label, text }: { label: string; text: string }) {
+  return (
+    <div className="tool-navigation-loader" role="status" aria-label={label}>
+      <svg className="yah-loader" viewBox="0 0 800 600" aria-hidden="true">
+        <g className="yah-loader__symbol yah-loader__yod" lang="he">
+          <text x="425" y="365" textAnchor="middle">&#x05D9;&#x05B8;</text>
+        </g>
+        <g className="yah-loader__symbol yah-loader__he" lang="he">
+          <text x="375" y="365" textAnchor="middle">&#x05D4;&#x05BC;</text>
+        </g>
+      </svg>
+      <span className="sr-only">{text}</span>
+    </div>
+  );
 }

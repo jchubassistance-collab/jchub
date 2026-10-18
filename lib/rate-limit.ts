@@ -1,3 +1,4 @@
+import { apiMessage } from '@/lib/api-messages';
 import 'server-only';
 
 import { createHash } from 'node:crypto';
@@ -20,10 +21,10 @@ export async function enforceRateLimit(
   windowMs: number,
 ): Promise<NextResponse | null> {
   const ip = getTrustedClientIp(request);
-  if (!ip) return NextResponse.json({ error: 'Service temporairement indisponible.' }, { status: 503 });
+  if (!ip) return NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 });
   if (!hasFirebaseAdminConfig()) {
     return process.env.NODE_ENV === 'production'
-      ? NextResponse.json({ error: 'Service temporairement indisponible.' }, { status: 503 })
+      ? NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 })
       : null;
   }
 
@@ -46,22 +47,22 @@ export async function enforceRateLimit(
       return true;
     });
     if (allowed) return null;
-    return NextResponse.json({ error: 'Trop de demandes. Réessaie dans quelques instants.' }, {
+    return NextResponse.json({ error: apiMessage(request, 'Trop de demandes. Réessaie dans quelques instants.') }, {
       status: 429,
       headers: { 'Retry-After': String(Math.ceil(windowMs / 1000)) },
     });
   } catch {
-    return NextResponse.json({ error: 'Service temporairement indisponible.' }, { status: 503 });
+    return NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 });
   }
 }
 
 /** Daily quota for public AI tool discovery; only a one-way IP hash is stored. */
 export async function enforceDailyToolAssistantQuota(request: NextRequest): Promise<NextResponse | null> {
   const ip = getTrustedClientIp(request);
-  if (!ip) return NextResponse.json({ error: 'Service temporairement indisponible.' }, { status: 503 });
+  if (!ip) return NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 });
   if (!hasFirebaseAdminConfig()) {
     return process.env.NODE_ENV === 'production'
-      ? NextResponse.json({ error: 'Service temporairement indisponible.' }, { status: 503 })
+      ? NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 })
       : null;
   }
 
@@ -80,13 +81,13 @@ export async function enforceDailyToolAssistantQuota(request: NextRequest): Prom
     if (allowed) return null;
     const tomorrow = new Date(`${day}T00:00:00.000Z`);
     tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-    return NextResponse.json({ error: 'Tu as utilisé tes 5 recherches assistées du jour. Reviens demain 🙂' }, {
+    return NextResponse.json({ error: apiMessage(request, 'Tu as utilisé tes 5 recherches assistées du jour. Reviens demain 🙂') }, {
       status: 429,
       headers: { 'Retry-After': String(Math.max(1, Math.ceil((tomorrow.getTime() - now.getTime()) / 1000))) },
     });
   } catch {
     reportUserError();
-    return NextResponse.json({ error: 'Service temporairement indisponible.' }, { status: 503 });
+    return NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 });
   }
 }
 
@@ -97,10 +98,10 @@ export async function enforceDailyConversionQuota(
 ): Promise<NextResponse | null> {
   const ip = getTrustedClientIp(request);
 
-  if (!ip) return NextResponse.json({ error: 'Service temporairement indisponible.' }, { status: 503 });
+  if (!ip) return NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 });
   if (!hasFirebaseAdminConfig()) {
     return process.env.NODE_ENV === 'production'
-      ? NextResponse.json({ error: 'Service temporairement indisponible.' }, { status: 503 })
+      ? NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 })
       : null;
   }
 
@@ -125,11 +126,11 @@ export async function enforceDailyConversionQuota(
     nextDay.setUTCDate(nextDay.getUTCDate() + 1);
     const retryAfter = Math.max(1, Math.ceil((nextDay.getTime() - now.getTime()) / 1000));
     return NextResponse.json(
-      { error: 'Limite atteinte : 5 conversions par outil et par jour. Réessaie demain.' },
+      { error: apiMessage(request, 'Limite atteinte : 5 conversions par outil et par jour. Réessaie demain.') },
       { status: 429, headers: { 'Retry-After': String(retryAfter) } },
     );
   } catch {
     reportUserError();
-    return NextResponse.json({ error: 'Service temporairement indisponible.' }, { status: 503 });
+    return NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 });
   }
 }

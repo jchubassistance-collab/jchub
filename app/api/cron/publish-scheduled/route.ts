@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { notifyBrevoNewArticle } from '@/lib/brevo';
+import { ensureArticleTranslation } from '@/lib/content-translation';
+import { articleImage, toArticleTranslation } from '@/lib/blog';
+import { categoryLabel } from '@/lib/categories';
 import { reportUserError } from '@/lib/user-error';
 import { start } from 'workflow/api';
 import { runSocialPreparation } from '@/workflows/social-publishing';
@@ -25,6 +28,9 @@ export async function POST(request: NextRequest) {
       if (!scheduledFor || typeof scheduledFor.toMillis !== 'function' || scheduledFor.toMillis() > now.toMillis()) {
         continue;
       }
+      // The English version goes live with the French one; a failure is retried by the translate-content cron.
+      try { await ensureArticleTranslation(document.id); }
+      catch { reportUserError(); }
       await document.ref.update({ status: 'published', publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
       try { await start(runSocialPreparation, [String(article.slug || document.id)]); }
       catch { reportUserError(); }
@@ -46,6 +52,17 @@ export async function POST(request: NextRequest) {
         readingTime: String(article.readingTime || article.readTime || '5 min'),
         category: String(article.category || 'Développement'),
       });
+      const english = toArticleTranslation((await document.ref.get()).data()?.translations?.en);
+      if (english) {
+        await notifyBrevoNewArticle({
+          title: english.title,
+          description: english.description,
+          slug: english.slug,
+          image: articleImage(String(article.image || '/blog/default.svg'), english.title, 'en'),
+          readingTime: String(article.readingTime || article.readTime || '5 min'),
+          category: categoryLabel(String(article.category || 'Développement'), 'en'),
+        }, 'en');
+      }
       articles.push(document.id);
     }
     return NextResponse.json({ published: articles.length, articles });

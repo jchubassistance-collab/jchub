@@ -15,7 +15,8 @@ function truncate(value: string, maxLength: number) {
  * which previously produced cards with no text at all.
  */
 export async function GET(request: NextRequest) {
-  const title = truncate(request.nextUrl.searchParams.get('title') || 'Outils pratiques et gratuits pour développeurs', 110);
+  const english = request.nextUrl.searchParams.get('lang') === 'en';
+  const title = truncate(request.nextUrl.searchParams.get('title') || (english ? 'Free, practical tools for developers' : 'Outils pratiques et gratuits pour développeurs'), 110);
   const category = truncate(request.nextUrl.searchParams.get('category') || 'JcHub', 45).toUpperCase();
   const titleSize = title.length > 70 ? 52 : title.length > 40 ? 62 : 72;
 
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
             <div style={{ display: 'flex', color: '#b9c9e8', fontSize: 26, letterSpacing: 2 }}>{category}</div>
           </div>
           <div style={{ display: 'flex', marginTop: 70, color: '#ffffff', fontSize: titleSize, lineHeight: 1.15, letterSpacing: -1, maxWidth: 1000 }}>{title}</div>
-          <div style={{ display: 'flex', position: 'absolute', left: 100, top: 505, color: '#b9c9e8', fontSize: 26 }}>jchub.dev · outils, ressources et workflows utiles</div>
+          <div style={{ display: 'flex', position: 'absolute', left: 100, top: 505, color: '#b9c9e8', fontSize: 26 }}>{english ? 'jchub.dev · useful tools, resources and workflows' : 'jchub.dev · outils, ressources et workflows utiles'}</div>
         </div>
       </div>
     ),

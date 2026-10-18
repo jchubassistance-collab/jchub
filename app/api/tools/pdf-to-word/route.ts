@@ -1,3 +1,4 @@
+import { apiMessage } from '@/lib/api-messages';
 import { NextRequest, NextResponse } from 'next/server';
 import { buildVisuallyFaithfulWordDocument } from '@/lib/pdf-to-word';
 import { convertPdfWithAdobe, hasAdobePdfServicesConfig } from '@/lib/document-services';
@@ -13,25 +14,25 @@ export async function POST(request: NextRequest) {
   try {
     const contentLength = Number(request.headers.get('content-length') || 0);
     if (contentLength > MAX_PDF_SIZE_BYTES + 128 * 1024) {
-      return NextResponse.json({ error: 'Le fichier est trop volumineux. La taille maximale autorisée est de 4 Mo.' }, { status: 413 });
+      return NextResponse.json({ error: apiMessage(request, 'Le fichier est trop volumineux. La taille maximale autorisée est de 4 Mo.') }, { status: 413 });
     }
     const formData = await request.formData();
     const file = formData.get('file');
 
     if (!(file instanceof File)) {
-      return NextResponse.json({ error: 'Aucun fichier PDF reçu.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Aucun fichier PDF reçu.') }, { status: 400 });
     }
 
     if (!file.name.toLowerCase().endsWith('.pdf')) {
-      return NextResponse.json({ error: 'Le fichier doit être un PDF.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Le fichier doit être un PDF.') }, { status: 400 });
     }
     if (file.size > MAX_PDF_SIZE_BYTES) {
-      return NextResponse.json({ error: 'Le fichier est trop volumineux. La taille maximale autorisée est de 4 Mo.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Le fichier est trop volumineux. La taille maximale autorisée est de 4 Mo.') }, { status: 400 });
     }
 
     const bytes = Buffer.from(await file.arrayBuffer());
     if (bytes.subarray(0, 5).toString('ascii') !== '%PDF-') {
-      return NextResponse.json({ error: 'Le fichier reçu n’est pas un PDF valide.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Le fichier reçu n’est pas un PDF valide.') }, { status: 400 });
     }
     const limited = await enforceDailyConversionQuota(request, 'pdf-to-word');
     if (limited) return limited;
@@ -85,6 +86,6 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     reportUserError();
-    return NextResponse.json({ error: 'Erreur pendant la conversion du PDF en Word.' }, { status: 500 });
+    return NextResponse.json({ error: apiMessage(request, 'Erreur pendant la conversion du PDF en Word.') }, { status: 500 });
   }
 }

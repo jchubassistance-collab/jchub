@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 import { withWorkflow } from 'workflow/next';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const facebookRedirectUri = process.env.FACEBOOK_REDIRECT_URI || process.env.META_REDIRECT_URI;
 let facebookOAuthHost;
@@ -61,4 +64,4 @@ const nextConfig = {
   },
 };
 
-export default withWorkflow(nextConfig);
+export default withWorkflow(withNextIntl(nextConfig));

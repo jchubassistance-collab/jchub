@@ -2,6 +2,32 @@
 
 import { useState } from 'react';
 import { Copy, Check, RefreshCw, Hash } from 'lucide-react';
+import { useLocale } from 'next-intl';
+import { bilingual } from '@/i18n/copy';
+
+const copy = bilingual({
+  version: 'Version UUID',
+  v4: 'v4 (aléatoire)',
+  v1: 'v1 (timestamp)',
+  v7: 'v7 (moderne)',
+  count: 'Nombre',
+  generate: (count: number) => `Générer ${count} UUID${count > 1 ? 's' : ''}`,
+  generated: 'UUIDs générés',
+  copied: 'Copié !',
+  copyAll: 'Tout copier',
+  copyOne: 'Copier',
+}, {
+  version: 'UUID version',
+  v4: 'v4 (random)',
+  v1: 'v1 (timestamp)',
+  v7: 'v7 (modern)',
+  count: 'Count',
+  generate: (count: number) => `Generate ${count} UUID${count > 1 ? 's' : ''}`,
+  generated: 'Generated UUIDs',
+  copied: 'Copied!',
+  copyAll: 'Copy all',
+  copyOne: 'Copy',
+});
 
 function uuidV4(): string {
   return crypto.randomUUID();
@@ -29,6 +55,7 @@ function uuidV7(): string {
 }
 
 export function UuidGenerator() {
+  const t = copy[useLocale()];
   const [version, setVersion] = useState<'v1' | 'v4' | 'v7'>('v4');
   const [count, setCount] = useState(5);
   const [uuids, setUuids] = useState<string[]>([]);
@@ -54,19 +81,19 @@ export function UuidGenerator() {
     <div className="space-y-4 text-slate-100">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-slate-200">Version UUID</label>
+          <label className="mb-1.5 block text-sm font-semibold text-slate-200">{t.version}</label>
           <select
             value={version}
             onChange={(e) => setVersion(e.target.value as any)}
             className="w-full rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-3 py-2.5 font-medium text-white focus:outline-none focus:border-[#9ccbff]/60"
           >
-            <option value="v4">v4 (aléatoire)</option>
-            <option value="v1">v1 (timestamp)</option>
-            <option value="v7">v7 (moderne)</option>
+            <option value="v4">{t.v4}</option>
+            <option value="v1">{t.v1}</option>
+            <option value="v7">{t.v7}</option>
           </select>
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-slate-200">Nombre</label>
+          <label className="mb-1.5 block text-sm font-semibold text-slate-200">{t.count}</label>
           <input
             type="number"
             min="1"
@@ -80,7 +107,7 @@ export function UuidGenerator() {
 
       <button onClick={generate} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-purple-600 py-3 font-semibold text-white transition hover:shadow-lg">
         <RefreshCw className="w-4 h-4" />
-        Générer {count} UUID{count > 1 ? 's' : ''}
+        {t.generate(count)}
       </button>
 
       {uuids.length > 0 && (
@@ -88,11 +115,11 @@ export function UuidGenerator() {
           <div className="mb-2 flex items-center justify-between">
             <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-200">
               <Hash className="h-3.5 w-3.5 text-[#9ccbff]" />
-              UUIDs générés
+              {t.generated}
             </label>
             <button onClick={copyAll} className="flex items-center gap-1 text-sm font-semibold text-[#9ccbff] hover:text-white transition">
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-              {copied ? 'Copié !' : 'Tout copier'}
+              {copied ? t.copied : t.copyAll}
             </button>
           </div>
           <div className="max-h-96 space-y-1.5 overflow-y-auto">
@@ -101,6 +128,7 @@ export function UuidGenerator() {
                 <span className="flex-1 break-all font-mono text-sm text-slate-100">{u}</span>
                 <button
                   onClick={() => copyOne(u)}
+                  aria-label={t.copyOne}
                   className="text-slate-400 opacity-0 transition hover:text-[#9ccbff] group-hover:opacity-100"
                 >
                   <Copy className="w-4 h-4" />

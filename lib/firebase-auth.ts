@@ -15,6 +15,30 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import { bilingual } from '@/i18n/copy';
+import type { Locale } from '@/i18n/routing';
+
+const errors = bilingual({
+  signupDisabled: 'La création de nouveaux comptes est désactivée.',
+  google: 'Erreur de connexion Google',
+  github: 'Erreur de connexion GitHub',
+  invalidCredentials: 'Adresse e-mail ou mot de passe incorrect. Vérifie aussi que ce compte existe dans le projet Firebase configuré.',
+  tooManyRequests: 'Trop de tentatives. Réessaie plus tard ou réinitialise le mot de passe.',
+  userNotFound: 'Aucun compte avec cet email',
+  wrongPassword: 'Mot de passe incorrect',
+  signIn: 'Erreur de connexion',
+  noSession: 'Session Firebase introuvable.',
+}, {
+  signupDisabled: 'Creating new accounts is disabled.',
+  google: 'Google sign-in error',
+  github: 'GitHub sign-in error',
+  invalidCredentials: 'Incorrect email address or password. Also check that this account exists in the configured Firebase project.',
+  tooManyRequests: 'Too many attempts. Try again later or reset your password.',
+  userNotFound: 'No account with this email',
+  wrongPassword: 'Incorrect password',
+  signIn: 'Sign-in error',
+  noSession: 'Firebase session not found.',
+});
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.addScope('email');
@@ -61,12 +85,13 @@ async function createOrUpdateUserDoc(user: FirebaseUser, provider: 'google' | 'g
   return userRef;
 }
 
-export async function signInWithGoogle(): Promise<UserProfile> {
+export async function signInWithGoogle(locale: Locale = 'fr'): Promise<UserProfile> {
   try {
+    auth.languageCode = locale;
     const result = await signInWithPopup(auth, googleProvider);
     if (getAdditionalUserInfo(result)?.isNewUser) {
       await deleteUser(result.user);
-      throw new Error('La création de nouveaux comptes est désactivée.');
+      throw new Error(errors[locale].signupDisabled);
     }
     await createOrUpdateUserDoc(result.user, 'google');
     return {
@@ -77,16 +102,17 @@ export async function signInWithGoogle(): Promise<UserProfile> {
       provider: 'google',
     };
   } catch (error: any) {
-    throw new Error(error.message || 'Erreur de connexion Google');
+    throw new Error(error.message || errors[locale].google);
   }
 }
 
-export async function signInWithGithub(): Promise<UserProfile> {
+export async function signInWithGithub(locale: Locale = 'fr'): Promise<UserProfile> {
   try {
+    auth.languageCode = locale;
     const result = await signInWithPopup(auth, githubProvider);
     if (getAdditionalUserInfo(result)?.isNewUser) {
       await deleteUser(result.user);
-      throw new Error('La création de nouveaux comptes est désactivée.');
+      throw new Error(errors[locale].signupDisabled);
     }
     await createOrUpdateUserDoc(result.user, 'github');
     return {
@@ -97,11 +123,11 @@ export async function signInWithGithub(): Promise<UserProfile> {
       provider: 'github',
     };
   } catch (error: any) {
-    throw new Error(error.message || 'Erreur de connexion GitHub');
+    throw new Error(error.message || errors[locale].github);
   }
 }
 
-export async function signInWithEmail(email: string, password: string): Promise<UserProfile> {
+export async function signInWithEmail(email: string, password: string, locale: Locale = 'fr'): Promise<UserProfile> {
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
     await createOrUpdateUserDoc(result.user, 'email');
@@ -114,19 +140,19 @@ export async function signInWithEmail(email: string, password: string): Promise<
     };
   } catch (error: any) {
     if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-      throw new Error('Adresse e-mail ou mot de passe incorrect. Vérifie aussi que ce compte existe dans le projet Firebase configuré.');
+      throw new Error(errors[locale].invalidCredentials);
     }
-    if (error.code === 'auth/too-many-requests') throw new Error('Trop de tentatives. Réessaie plus tard ou réinitialise le mot de passe.');
+    if (error.code === 'auth/too-many-requests') throw new Error(errors[locale].tooManyRequests);
     if (error.code === 'auth/multi-factor-auth-required' || error.code === 'auth/operation-not-allowed') {
       throw error;
     }
     if (error.code === 'auth/user-not-found') {
-      throw new Error('Aucun compte avec cet email');
+      throw new Error(errors[locale].userNotFound);
     }
     if (error.code === 'auth/wrong-password') {
-      throw new Error('Mot de passe incorrect');
+      throw new Error(errors[locale].wrongPassword);
     }
-    throw new Error(error.message || 'Erreur de connexion');
+    throw new Error(error.message || errors[locale].signIn);
   }
 }
 
@@ -135,11 +161,13 @@ export async function signOut(): Promise<void> {
 }
 
 export async function getCurrentIdToken(): Promise<string> {
-  if (!auth.currentUser) throw new Error('Session Firebase introuvable.');
+  if (!auth.currentUser) throw new Error(errors.fr.noSession);
   return auth.currentUser.getIdToken(true);
 }
 
-export async function resetPassword(email: string): Promise<void> {
+/** Firebase writes the email in `locale` and adds it to the reset link as ?lang=. */
+export async function resetPassword(email: string, locale: Locale = 'fr'): Promise<void> {
+  auth.languageCode = locale;
   await sendPasswordResetEmail(auth, email);
 }
 

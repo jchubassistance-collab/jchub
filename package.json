@@ -17,7 +17,8 @@
     "test:cm": "node --experimental-strip-types --test tests/cm-metrics.test.js",
     "test:tool-generator": "node --experimental-strip-types --test tests/tool-generation-rules.test.js",
     "test:tool-search": "node --experimental-strip-types --test tests/tool-search.test.js",
-    "test": "npm run -s test:social && npm run -s test:api-cost-calculator && npm run -s test:pdf && npm run -s test:csv && npm run -s test:cm && npm run -s test:tool-generator && npm run -s test:tool-search"
+    "test": "npm run -s test:social && npm run -s test:api-cost-calculator && npm run -s test:pdf && npm run -s test:csv && npm run -s test:cm && npm run -s test:tool-generator && npm run -s test:tool-search && npm run -s test:i18n",
+    "test:i18n": "node --experimental-strip-types --test tests/i18n.test.js"
   },
   "dependencies": {
     "@adobe/pdfservices-node-sdk": "^4.1.0",
@@ -41,6 +42,7 @@
     "jspdf": "^4.2.1",
     "lucide-react": "^0.453.0",
     "next": "^16.4.0",
+    "next-intl": "^4.14.9",
     "pdf-parse": "^1.1.1",
     "pdfjs-dist": "^6.3.289",
     "qrcode": "^1.5.4",

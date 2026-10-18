@@ -1,9 +1,25 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import Script from 'next/script';
+import { useLocale } from 'next-intl';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
+import { Link } from '@/i18n/navigation';
+import { bilingual } from '@/i18n/copy';
+
+const copy = bilingual({
+  title: 'Mesure d’audience',
+  text: 'Avec ton accord, on utilise Google Analytics et Metricool pour savoir quelles pages et quels outils sont utiles. Ces services déposent des cookies. Sans accord, rien n’est chargé et le site fonctionne pareil.',
+  learnMore: 'En savoir plus',
+  refuse: 'Refuser',
+  accept: 'Accepter',
+}, {
+  title: 'Audience measurement',
+  text: 'With your consent, we use Google Analytics and Metricool to find out which pages and tools are useful. These services set cookies. Without your consent, nothing is loaded and the site works the same.',
+  learnMore: 'Learn more',
+  refuse: 'Decline',
+  accept: 'Accept',
+});
 
 const STORAGE_KEY = 'jchub-analytics-consent';
 // The CNIL recommends asking again after six months.
@@ -34,6 +50,7 @@ function clearAnalyticsCookies() {
 
 /** Audience trackers (GA4, Metricool) load only after an explicit opt-in. */
 export function AnalyticsConsent({ nonce }: { nonce?: string }) {
+  const t = copy[useLocale()];
   const [choice, setChoice] = useState<Choice | null>(null);
   const [bannerOpen, setBannerOpen] = useState(false);
 
@@ -73,14 +90,14 @@ export function AnalyticsConsent({ nonce }: { nonce?: string }) {
       )}
       {bannerOpen && (
         <section role="dialog" aria-modal="false" aria-labelledby="consent-title" className="fixed inset-x-4 bottom-4 z-[80] mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-5 text-slate-700 shadow-2xl shadow-slate-950/20 sm:inset-x-6">
-          <h2 id="consent-title" className="text-sm font-bold text-slate-900">Mesure d’audience</h2>
+          <h2 id="consent-title" className="text-sm font-bold text-slate-900">{t.title}</h2>
           <p className="mt-2 text-xs leading-5">
-            Avec ton accord, on utilise Google Analytics et Metricool pour savoir quelles pages et quels outils sont utiles. Ces services déposent des cookies. Sans accord, rien n’est chargé et le site fonctionne pareil.{' '}
-            <Link href="/confidentialite" className="font-semibold text-blue-700 underline-offset-2 hover:underline">En savoir plus</Link>
+            {t.text}{' '}
+            <Link href="/confidentialite" className="font-semibold text-blue-700 underline-offset-2 hover:underline">{t.learnMore}</Link>
           </p>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
-            <button type="button" onClick={() => decide('denied')} className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">Refuser</button>
-            <button type="button" onClick={() => decide('granted')} className="rounded-xl border border-slate-900 bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">Accepter</button>
+            <button type="button" onClick={() => decide('denied')} className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">{t.refuse}</button>
+            <button type="button" onClick={() => decide('granted')} className="rounded-xl border border-slate-900 bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">{t.accept}</button>
           </div>
         </section>
       )}

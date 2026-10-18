@@ -1,0 +1,47 @@
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { ToolRenderer } from '@/components/tools/ToolRenderer';
+import { isToolComponentName } from '@/lib/tool-components';
+import { bilingual } from '@/i18n/copy';
+import { isLocale } from '@/i18n/routing';
+
+export const dynamic = 'force-dynamic';
+
+const copy = bilingual({
+  title: 'Aperçu d’outil',
+  notice: 'Aperçu de test : cette page n’existe pas sur le site en production. Vérifie que l’outil fonctionne avec de vrais cas avant d’approuver.',
+}, {
+  title: 'Tool preview',
+  notice: 'Test preview: this page does not exist on the production site. Check that the tool works with real cases before approving.',
+});
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return { title: copy[isLocale(locale) ? locale : 'fr'].title, robots: { index: false, follow: false } };
+}
+
+/**
+ * Renders any registered tool component without its catalog entry, so a tool generated
+ * from the admin can be tested on its Vercel preview before the Pull Request is merged.
+ * Never available on the production deployment.
+ */
+export default async function ToolPreviewPage({ params }: { params: Promise<{ locale: string; component: string }> }) {
+  if (process.env.VERCEL_ENV === 'production') notFound();
+  const { locale, component } = await params;
+  const t = copy[isLocale(locale) ? locale : 'fr'];
+  if (!isToolComponentName(component)) notFound();
+
+  return (
+    <div className="template-home min-h-screen bg-[#eff6ff] py-10 text-[#0f172a]">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <p className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {t.notice}
+        </p>
+        <h1 className="mb-6 text-3xl font-black">{component}</h1>
+        <div className="rounded-[2rem] border border-blue-100 bg-[rgba(13,28,52,0.8)] p-6 shadow-[0_18px_40px_rgba(7,19,40,0.24)] md:p-8">
+          <ToolRenderer component={component} />
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,3 +1,4 @@
+import { apiMessage } from '@/lib/api-messages';
 import { loadImage } from '@napi-rs/canvas';
 import { jsPDF } from 'jspdf';
 import { NextRequest, NextResponse } from 'next/server';
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Demande de conversion invalide.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Demande de conversion invalide.') }, { status: 400 });
   }
 
   if (
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
     !('fit' in body) ||
     (body.fit !== 'contain' && body.fit !== 'cover')
   ) {
-    return NextResponse.json({ error: 'Paramètres de conversion invalides.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Paramètres de conversion invalides.') }, { status: 400 });
   }
 
   const urls = body.urls;
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
       const file = await readTemporaryBlob(url, 'images-to-pdf');
       totalSize += file.size;
       if (totalSize > MAX_TOTAL_SIZE) {
-        return NextResponse.json({ error: 'La taille totale des images ne doit pas dépasser 50 Mo.' }, { status: 413 });
+        return NextResponse.json({ error: apiMessage(request, 'La taille totale des images ne doit pas dépasser 50 Mo.') }, { status: 413 });
       }
       files.push(file);
     }
@@ -118,10 +119,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     if (error instanceof TemporaryBlobError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
     reportUserError();
-    return NextResponse.json({ error: 'La création du PDF a échoué. Vérifie les images puis réessaie.' }, { status: 500 });
+    return NextResponse.json({ error: apiMessage(request, 'La création du PDF a échoué. Vérifie les images puis réessaie.') }, { status: 500 });
   } finally {
     await cleanUpTemporaryBlobs(urls, 'images-to-pdf');
   }

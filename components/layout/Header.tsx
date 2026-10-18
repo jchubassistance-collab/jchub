@@ -1,31 +1,58 @@
 ﻿'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { CircleHelp, Home, Info, Mail, Menu, Wrench, X } from 'lucide-react';
 import { useState } from 'react';
 import { ToolFinder } from '@/components/layout/ToolFinder';
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { Link, usePathname } from '@/i18n/navigation';
+import { bilingual } from '@/i18n/copy';
+import type { StaticPathname } from '@/i18n/routing';
 
-const links = [
-  { href: '/', label: 'Accueil', icon: Home },
-  { href: '/a-propos', label: 'À propos', icon: Info },
-  { href: '/outils', label: 'Outils', icon: Wrench },
-  { href: '/contact', label: 'Contact', icon: Mail },
-];
+const copy = bilingual({
+  home: 'Accueil',
+  about: 'À propos',
+  tools: 'Outils',
+  contact: 'Contact',
+  homeLabel: 'JcHub, accueil',
+  openMenu: 'Ouvrir le menu',
+  closeMenu: 'Fermer le menu',
+  navigation: 'Navigation',
+}, {
+  home: 'Home',
+  about: 'About',
+  tools: 'Tools',
+  contact: 'Contact',
+  homeLabel: 'JcHub, home',
+  openMenu: 'Open menu',
+  closeMenu: 'Close menu',
+  navigation: 'Navigation',
+});
+
+/** Pages with the light header. `pathname` is the French internal address of the page. */
+export function isLightPage(pathname: string) {
+  return pathname === '/' || pathname === '/a-propos' || pathname === '/outils' || pathname.startsWith('/outils/') || pathname.startsWith('/tools/') || pathname === '/aide' || pathname === '/contact' || pathname === '/blog' || pathname.startsWith('/blog/') || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(pathname);
+}
 
 export function Header() {
+  const locale = useLocale();
+  const t = copy[locale];
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const safePathname = pathname ?? '';
-  const isHome = safePathname === '/' || safePathname === '/a-propos' || safePathname === '/outils' || safePathname.startsWith('/outils/') || safePathname.startsWith('/tools/') || safePathname === '/aide' || safePathname === '/contact' || safePathname === '/blog' || safePathname.startsWith('/blog/') || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(safePathname);
-  const homeHref = '/';
-  const currentLinks = links;
+  const isHome = isLightPage(safePathname);
+  const currentLinks: { href: StaticPathname; label: string; icon: typeof Home }[] = [
+    { href: '/', label: t.home, icon: Home },
+    { href: '/a-propos', label: t.about, icon: Info },
+    { href: '/outils', label: t.tools, icon: Wrench },
+    { href: '/contact', label: t.contact, icon: Mail },
+  ];
   const closeMenus = () => setOpen(false);
 
   return (
     <header className={`sticky top-0 z-50 border-b backdrop-blur-xl ${isHome ? 'border-blue-100 bg-[#eff6ff]/90 shadow-[0_8px_24px_rgba(37,99,235,.07)]' : 'border-white/10 bg-[#07162d]/80 shadow-[0_12px_30px_rgba(2,11,26,0.28)]'}`}>
       <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-6 px-4 sm:px-6">
-        <Link href={homeHref} className="group flex shrink-0 items-center" aria-label="JcHub, accueil">
+        <Link href="/" className="group flex shrink-0 items-center" aria-label={t.homeLabel}>
           <img src="/jchub-icon-192.png" alt="JcHub" width="64" height="64" className="h-9 w-auto transition duration-300 group-hover:scale-[1.04] lg:hidden" />
           <img src="/logo-blue.svg" alt="JcHub" width="320" height="100" className="hidden h-11 w-auto transition duration-300 group-hover:scale-[1.04] lg:block" />
         </Link>
@@ -38,10 +65,11 @@ export function Header() {
 
         <div className="hidden w-[19rem] items-center gap-3 xl:flex"><ToolFinder compact dark={!isHome}/></div>
         <div className="flex items-center gap-2">
+          <LanguageSwitcher light={isHome} />
           <button
             onClick={() => setOpen((value) => !value)}
             className={`rounded-xl border p-2.5 transition lg:hidden ${isHome ? 'border-blue-100 bg-white text-slate-800 hover:border-blue-300 hover:bg-blue-50' : 'border-white/10 bg-white/5 text-slate-100 hover:border-[#9ccbff]/40 hover:bg-white/10'}`}
-            aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-label={open ? t.closeMenu : t.openMenu}
             aria-expanded={open}
             type="button"
           >
@@ -61,12 +89,12 @@ export function Header() {
         inert={!open}
       >
         <div className={`flex items-center justify-between border-b pb-4 ${isHome ? 'border-blue-100' : 'border-white/10'}`}>
-          <span className={`text-xs font-bold uppercase tracking-[0.2em] ${isHome ? 'text-blue-700' : 'text-[#9ccbff]'}`}>Navigation</span>
+          <span className={`text-xs font-bold uppercase tracking-[0.2em] ${isHome ? 'text-blue-700' : 'text-[#9ccbff]'}`}>{t.navigation}</span>
           <button
             type="button"
             onClick={closeMenus}
             className={`rounded-lg border p-2 transition ${isHome ? 'border-blue-100 bg-white text-slate-800 hover:border-blue-300 hover:bg-blue-50' : 'border-white/10 bg-white/5 text-slate-100 hover:border-[#9ccbff]/40 hover:bg-white/10'}`}
-            aria-label="Fermer le menu"
+            aria-label={t.closeMenu}
           >
             <X className="h-4 w-4" />
           </button>
@@ -82,7 +110,7 @@ export function Header() {
   );
 }
 
-function NavLink({ href, label, icon: Icon, pathname, isLight = false }: { href: string; label: string; icon: typeof Home; pathname: string; isLight?: boolean }) {
+function NavLink({ href, label, icon: Icon, pathname, isLight = false }: { href: StaticPathname; label: string; icon: typeof Home; pathname: string; isLight?: boolean }) {
   const active = isCurrentNavLink(href, pathname);
 
   return (
@@ -98,7 +126,7 @@ function NavLink({ href, label, icon: Icon, pathname, isLight = false }: { href:
   );
 }
 
-function MobileNavLink({ href, label, icon: Icon, pathname, onClick, isLight = false }: { href: string; label: string; icon: typeof Home; pathname: string; onClick: () => void; isLight?: boolean }) {
+function MobileNavLink({ href, label, icon: Icon, pathname, onClick, isLight = false }: { href: StaticPathname; label: string; icon: typeof Home; pathname: string; onClick: () => void; isLight?: boolean }) {
   const active = isCurrentNavLink(href, pathname);
 
   return (

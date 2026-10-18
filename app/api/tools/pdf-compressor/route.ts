@@ -1,3 +1,4 @@
+import { apiMessage } from '@/lib/api-messages';
 import { createCanvas, DOMMatrix, ImageData, Path2D } from '@napi-rs/canvas';
 import { jsPDF } from 'jspdf';
 import { NextRequest, NextResponse } from 'next/server';
@@ -19,17 +20,17 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Demande de compression invalide.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Demande de compression invalide.') }, { status: 400 });
   }
   if (!body || typeof body !== 'object' || !('url' in body) || typeof body.url !== 'string') {
-    return NextResponse.json({ error: 'Fichier temporaire manquant.' }, { status: 400 });
+    return NextResponse.json({ error: apiMessage(request, 'Fichier temporaire manquant.') }, { status: 400 });
   }
 
   const url = body.url;
   try {
     const file = await readTemporaryBlob(url, 'pdf-compressor');
     if (file.buffer.subarray(0, 5).toString('ascii') !== '%PDF-') {
-      return NextResponse.json({ error: 'Le fichier reçu n’est pas un PDF valide.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Le fichier reçu n’est pas un PDF valide.') }, { status: 400 });
     }
 
     const runtimeGlobals = globalThis as Record<string, unknown>;
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
       useWorkerFetch: false,
     }).promise;
     if (pdf.numPages > MAX_PAGES) {
-      return NextResponse.json({ error: `Le PDF ne doit pas dépasser ${MAX_PAGES} pages.` }, { status: 413 });
+      return NextResponse.json({ error: apiMessage(request, 'Le PDF ne doit pas dépasser {pages} pages.', { pages: MAX_PAGES }) }, { status: 413 });
     }
 
     const limited = await enforceDailyConversionQuota(request, 'pdf-compressor');
@@ -90,10 +91,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     if (error instanceof TemporaryBlobError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
     reportUserError();
-    return NextResponse.json({ error: 'La compression du PDF a échoué. Vérifie le fichier puis réessaie.' }, { status: 500 });
+    return NextResponse.json({ error: apiMessage(request, 'La compression du PDF a échoué. Vérifie le fichier puis réessaie.') }, { status: 500 });
   } finally {
     await cleanUpTemporaryBlobs([url], 'pdf-compressor');
   }

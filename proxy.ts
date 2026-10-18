@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import createIntlMiddleware from 'next-intl/middleware';
+import { routing } from '@/i18n/routing';
+
+const handleLocale = createIntlMiddleware(routing);
 
 const ADMIN_HOST = process.env.ADMIN_HOST || 'admin.jchub.dev';
 const PUBLIC_HOST = process.env.PUBLIC_HOST || 'jchub.dev';
@@ -20,6 +24,18 @@ function getContentSecurityPolicy(nonce: string) {
     "frame-src 'self' https://accounts.google.com https://giscus.app",
     "media-src 'self' blob: https:",
   ].join('; ');
+}
+
+/**
+ * Public pages get a language: /outils is served by app/[locale] as French, /en/tools as
+ * English. API routes, the admin, Next.js internals and files (anything with an extension)
+ * keep their address untouched.
+ */
+function isLocalizedPage(pathname: string) {
+  return !pathname.startsWith('/api/')
+    && !pathname.startsWith('/_next/')
+    && !pathname.startsWith('/.well-known/')
+    && !/\.[^/]+$/.test(pathname);
 }
 
 function getClientIp(request: NextRequest) {
@@ -79,7 +95,10 @@ export function proxy(request: NextRequest) {
     return deniedResponse;
   }
 
-  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  // The locale proxy forwards the headers of the request it receives: give it the nonce and the CSP.
+  const response = isLocalizedPage(pathname)
+    ? handleLocale(new NextRequest(request, { headers: requestHeaders }))
+    : NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set('Content-Security-Policy', contentSecurityPolicy);
   return response;
 }

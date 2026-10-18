@@ -1,3 +1,4 @@
+import { apiMessage } from '@/lib/api-messages';
 import { NextRequest, NextResponse } from 'next/server';
 import { convertImageToOcrPdfWithAdobe, hasAdobeImagePdfConfig } from '@/lib/image-to-pdf-services';
 import { extractPdfLayout, joinPdfRuns } from '@/lib/pdf-to-word';
@@ -69,24 +70,24 @@ export async function POST(request: NextRequest) {
   const apiKey = process.env.OCR_API_KEY;
   const apiUrl = process.env.OCR_API_URL;
   if (!apiKey || !apiUrl) {
-    return NextResponse.json({ error: 'La configuration OCR.space est absente.' }, { status: 503 });
+    return NextResponse.json({ error: apiMessage(request, 'La configuration OCR.space est absente.') }, { status: 503 });
   }
 
   try {
     const contentLength = Number(request.headers.get('content-length') || 0);
     if (contentLength > MAX_IMAGE_SIZE + 128 * 1024) {
-      return NextResponse.json({ error: 'Le fichier ne doit pas dépasser 10 Mo.' }, { status: 413 });
+      return NextResponse.json({ error: apiMessage(request, 'Le fichier ne doit pas dépasser 10 Mo.') }, { status: 413 });
     }
     const formData = await request.formData();
     const file = formData.get('file');
     if (!(file instanceof File)) {
-      return NextResponse.json({ error: 'Aucun fichier reçu.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Aucun fichier reçu.') }, { status: 400 });
     }
     if (!ALLOWED_TYPES.has(file.type)) {
-      return NextResponse.json({ error: 'Format accepté : JPG, PNG, GIF, WebP ou PDF.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Format accepté : JPG, PNG, GIF, WebP ou PDF.') }, { status: 400 });
     }
     if (file.size > MAX_IMAGE_SIZE) {
-      return NextResponse.json({ error: 'Le fichier ne doit pas dépasser 10 Mo.' }, { status: 400 });
+      return NextResponse.json({ error: apiMessage(request, 'Le fichier ne doit pas dépasser 10 Mo.') }, { status: 400 });
     }
 
     const limited = await enforceDailyConversionQuota(request, 'ocr');
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
     if (!response.ok || payload.IsErroredOnProcessing) {
       const message = Array.isArray(payload.ErrorMessage) ? payload.ErrorMessage.join(' ') : payload.ErrorMessage;
       reportUserError();
-      return NextResponse.json({ error: 'Le service OCR n’a pas pu analyser ce fichier.' }, { status: 502 });
+      return NextResponse.json({ error: apiMessage(request, 'Le service OCR n’a pas pu analyser ce fichier.') }, { status: 502 });
     }
 
     const results = payload.ParsedResults ?? [];
@@ -177,6 +178,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     reportUserError();
-    return NextResponse.json({ error: 'Erreur pendant l’analyse OCR.' }, { status: 500 });
+    return NextResponse.json({ error: apiMessage(request, 'Erreur pendant l’analyse OCR.') }, { status: 500 });
   }
 }

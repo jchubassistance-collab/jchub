@@ -1,5 +1,13 @@
-const CACHE_NAME = 'jchub-v5';
-const APP_SHELL = ['/', '/manifest.webmanifest', '/jchub-icon-192.png'];
+const CACHE_NAME = 'jchub-v6';
+const APP_SHELL = ['/', '/en', '/manifest.webmanifest', '/en/manifest.webmanifest', '/jchub-icon-192.png'];
+
+function unavailable(pathname) {
+  const english = pathname === '/en' || pathname.startsWith('/en/');
+  return new Response(english ? 'Resource temporarily unavailable.' : 'Ressource temporairement indisponible.', {
+    status: 503,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
@@ -27,13 +35,7 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) return cachedResponse;
-      return new Response('Ressource temporairement indisponible.', {
-        status: 503,
-        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-      });
-    }).catch(() => new Response('Ressource temporairement indisponible.', {
-      status: 503,
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-    }))),
+      return unavailable(requestUrl.pathname);
+    }).catch(() => unavailable(requestUrl.pathname))),
   );
 });

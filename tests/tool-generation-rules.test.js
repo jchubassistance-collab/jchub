@@ -13,11 +13,16 @@ const validSource = `'use client';
 
 import { useState } from 'react';
 import { Copy } from 'lucide-react';
+import { useLocale } from 'next-intl';
+import { bilingual } from '@/i18n/copy';
+
+const copy = bilingual({ words: 'mots' }, { words: 'words' });
 
 export function CompteurDeMots() {
+  const t = copy[useLocale()];
   const [text, setText] = useState('');
   const url = new URL('https://jchub.dev');
-  return <div><Copy />{text.split(/\\s+/).length}{url.host}<textarea value={text} onChange={(event) => setText(event.target.value)} /></div>;
+  return <div><Copy />{text.split(/\\s+/).length} {t.words}{url.host}<textarea value={text} onChange={(event) => setText(event.target.value)} /></div>;
 }
 `;
 
@@ -35,6 +40,11 @@ test('lit la liste des composants enregistrés', () => {
 
 test('accepte un outil qui reste dans le navigateur', () => {
   assert.deepEqual(checkGeneratedSource(validSource, 'CompteurDeMots'), []);
+});
+
+test('refuse une interface qui n’existe qu’en une langue', () => {
+  const frenchOnly = validSource.replace("const t = copy[useLocale()];", "const t = { words: 'mots' };");
+  assert.ok(checkGeneratedSource(frenchOnly, 'CompteurDeMots').some((problem) => /bilingue/.test(problem)));
 });
 
 test('refuse le réseau, le stockage, l’exécution dynamique et les imports non autorisés', () => {
