@@ -1,19 +1,20 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, FileText, Folder, Image as ImageIcon, List, Search, Sparkles, Wrench } from 'lucide-react';
+import { CalendarDays, Check, ChevronDown, FileText, Folder, Image as ImageIcon, List, Search, Sparkles, Wrench } from 'lucide-react';
+import { AdminPagination, useAdminPageSize, usePageParam } from '@/components/ui/Pagination';
 
 export type CmCatalogItem = { slug: string; title: string; description: string; excerpt?: string; category?: string; publishedAt?: string; tags?: string[]; url: string; kind: 'Article'|'Outil'; image?: string; icon?: string };
 type KitSummary = { slug: string; kind: 'article'|'tool'; status: 'draft'|'ready'|'published' };
 
-const PAGE_SIZE = 8;
 
 export function CmCatalogDashboard({ items, kits, kind, onKindChange, onPrepare }: { items: CmCatalogItem[]; kits: KitSummary[]; kind: 'Article'|'Outil'; onKindChange: (kind:'Article'|'Outil')=>void; onPrepare: (item: CmCatalogItem) => void }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [kitStatus, setKitStatus] = useState('all');
   const [dateRange, setDateRange] = useState('all');
-  const [page, setPage] = useState(1);
+  const [page, setPage] = usePageParam();
+  const [pageSize, setPageSize] = useAdminPageSize();
   const [selected, setSelected] = useState<string[]>([]);
   const currentItems = useMemo(() => items.filter(item=>item.kind===kind),[items,kind]);
   const categories = useMemo(()=>Array.from(new Set(currentItems.map(item=>item.category).filter((value):value is string=>Boolean(value)))).sort((a,b)=>a.localeCompare(b,'fr')),[currentItems]);
@@ -28,9 +29,8 @@ export function CmCatalogDashboard({ items, kits, kind, onKindChange, onPrepare 
     const matchesDate = dateRange==='all'||(dateRange==='week'&&age<=7*86400000)||(dateRange==='month'&&age<=30*86400000);
     return matchesText&&(category==='all'||item.category===category)&& (kitStatus==='all'||getKitStatus(item)===kitStatus)&&matchesDate;
   }),[currentItems,query,category,kitStatus,dateRange,kits]);
-  const totalPages = Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
-  const safePage = Math.min(page,totalPages);
-  const pageItems=filtered.slice((safePage-1)*PAGE_SIZE,safePage*PAGE_SIZE);
+  const safePage = Math.min(page,Math.max(1,Math.ceil(filtered.length/pageSize)));
+  const pageItems=filtered.slice((safePage-1)*pageSize,safePage*pageSize);
   const countArticles=items.filter(item=>item.kind==='Article').length;
   const countTools=items.filter(item=>item.kind==='Outil').length;
   const readyCount=kits.filter(kit=>kit.status==='ready').length;
@@ -60,7 +60,7 @@ export function CmCatalogDashboard({ items, kits, kind, onKindChange, onPrepare 
 
     <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="overflow-x-auto"><table className="w-full min-w-[900px] border-collapse text-left"><thead><tr className="border-b border-slate-200 bg-slate-50/70 text-[10px] font-bold text-slate-500"><th className="w-10 px-3 py-3"><input aria-label="Sélectionner tous les contenus affichés" type="checkbox" checked={pageItems.length>0&&pageItems.every(item=>selected.includes(item.slug))} onChange={()=>setSelected(old=>pageItems.every(item=>old.includes(item.slug))?old.filter(slug=>!pageItems.some(item=>item.slug===slug)):Array.from(new Set([...old,...pageItems.map(item=>item.slug)])))} className="rounded border-slate-300"/></th><th className="px-3 py-3">{kind}</th><th className="px-3 py-3">Catégorie</th><th className="px-3 py-3">Statut du kit</th><th className="px-3 py-3">Date</th><th className="px-3 py-3 text-right">Actions</th></tr></thead><tbody>{pageItems.map(item=>{const status=getKitStatus(item);return <tr key={`${item.kind}-${item.slug}`} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60"><td className="px-3 py-3"><input aria-label={`Sélectionner ${item.title}`} type="checkbox" checked={selected.includes(item.slug)} onChange={()=>setSelected(old=>old.includes(item.slug)?old.filter(slug=>slug!==item.slug):[...old,item.slug])} className="rounded border-slate-300"/></td><td className="px-3 py-3"><div className="flex items-center gap-3"><span className="grid h-12 w-14 shrink-0 place-items-center overflow-hidden rounded-lg bg-slate-100 text-xl">{item.image?<img src={item.image} alt="" className="h-full w-full object-cover"/>:item.icon||<ImageIcon className="h-5 w-5 text-slate-400"/>}</span><span className="min-w-0"><strong className="block max-w-[390px] truncate text-[11px] text-slate-800">{item.title}</strong><small className="mt-1 block max-w-[390px] truncate text-[10px] text-slate-400">/{item.slug}</small></span></div></td><td className="px-3 py-3"><span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-semibold text-blue-700">{item.category||'Général'}</span></td><td className="px-3 py-3"><span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold ${statusColor(status)}`}><i className={`h-1.5 w-1.5 rounded-full ${status==='ready'?'bg-amber-500':status==='published'?'bg-emerald-500':status==='draft'?'bg-slate-400':'bg-blue-500'}`}/>{statusLabel(status)}</span></td><td className="px-3 py-3"><span className="block text-[10px] font-semibold text-slate-600">{item.publishedAt?new Date(item.publishedAt).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}):'—'}</span><small className="text-[9px] text-slate-400">{item.publishedAt?new Date(item.publishedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'—'}</small></td><td className="px-3 py-3"><div className="flex justify-end"><button onClick={()=>onPrepare(item)} className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-blue-200 px-2.5 text-[10px] font-bold text-blue-700 hover:bg-blue-50"><Sparkles className="h-3.5 w-3.5"/>Créer un kit</button></div></td></tr>})}{!pageItems.length&&<tr><td colSpan={6} className="px-4 py-16 text-center text-sm text-slate-500">Aucun {kind.toLowerCase()} ne correspond à ces filtres.</td></tr>}</tbody></table></div>
-      <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-4 py-3"><span className="text-[10px] text-slate-500">{filtered.length?`Affichage de ${(safePage-1)*PAGE_SIZE+1} à ${Math.min(safePage*PAGE_SIZE,filtered.length)} sur ${filtered.length} ${kind.toLowerCase()}s`:`Aucun ${kind.toLowerCase()} correspondant`}</span><div className="flex items-center gap-1"><button aria-label="Page précédente" disabled={safePage<=1} onClick={()=>setPage(value=>Math.max(1,value-1))} className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200 text-slate-500 disabled:opacity-40"><ChevronLeft className="h-4 w-4"/></button>{Array.from({length:totalPages},(_,index)=>index+1).slice(Math.max(0,safePage-2),Math.max(0,safePage-2)+3).map(number=><button key={number} onClick={()=>setPage(number)} className={`h-8 min-w-8 rounded-lg px-2 text-xs font-bold ${safePage===number?'bg-blue-600 text-white':'border border-slate-200 text-slate-600'}`}>{number}</button>)}<button aria-label="Page suivante" disabled={safePage>=totalPages} onClick={()=>setPage(value=>Math.min(totalPages,value+1))} className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200 text-slate-500 disabled:opacity-40"><ChevronRight className="h-4 w-4"/></button></div></footer>
+      <AdminPagination page={safePage} pageSize={pageSize} total={filtered.length} noun={`${kind.toLowerCase()}s`} empty={`Aucun ${kind.toLowerCase()} correspondant`} onPage={setPage} onPageSize={setPageSize}/>
     </section>
     {selected.length>0&&<p className="text-right text-xs text-slate-500">{selected.length} contenu(s) sélectionné(s) · choisis « Créer un kit » sur une ligne pour générer un kit.</p>}
   </section>;

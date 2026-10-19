@@ -1,13 +1,16 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { ArrowLeft, ArrowRight, Grid2X2, Grid3X3, List, Search, Tag, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ArrowRight, Grid2X2, Grid3X3, List, Search, Tag, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import type { BlogArticle } from '@/lib/blog';
 import { Link } from '@/i18n/navigation';
 import { bilingual } from '@/i18n/copy';
+import { LoadMore, usePageParam } from '@/components/ui/Pagination';
 
 const ALL = '__all__';
+/** Articles added by each "See more": two rows of four on a large screen. */
+const STEP = 8;
 
 const copy = bilingual({
   all: 'Tous',
@@ -24,13 +27,8 @@ const copy = bilingual({
   readArticle: 'Lire l’article',
   noResult: 'Aucun article ne correspond à ta recherche.',
   resetFilters: 'Réinitialiser les filtres',
-  pagination: 'Pagination des articles',
-  previousPage: 'Page précédente',
-  previousShort: 'Préc.',
-  previous: 'Précédente',
-  nextPage: 'Page suivante',
-  nextShort: 'Suiv.',
-  next: 'Suivant',
+  shown: (shown: number, total: number) => `${shown} article${shown > 1 ? 's' : ''} sur ${total}`,
+  more: (count: number) => `Voir ${count} article${count > 1 ? 's' : ''} de plus`,
 }, {
   all: 'All',
   searchPlaceholder: 'Search for an article...',
@@ -46,30 +44,38 @@ const copy = bilingual({
   readArticle: 'Read the article',
   noResult: 'No article matches your search.',
   resetFilters: 'Reset filters',
-  pagination: 'Articles pagination',
-  previousPage: 'Previous page',
-  previousShort: 'Prev.',
-  previous: 'Previous',
-  nextPage: 'Next page',
-  nextShort: 'Next',
-  next: 'Next',
+  shown: (shown: number, total: number) => `${shown} of ${total} articles`,
+  more: (count: number) => `See ${count} more article${count === 1 ? '' : 's'}`,
 });
 
 /** `showCategories` is false on a category page, where every article shares the category. */
 export function BlogCatalog({ articles, showCategories = true }: { articles: BlogArticle[]; showCategories?: boolean }) {
   const t = copy[useLocale()];
-  const pageSize = 8;
   const categories = [ALL, ...Array.from(new Set(articles.map((article) => article.category)))];
-  const [category, setCategory] = useState(ALL);
-  const [query, setQuery] = useState('');
-  const [page, setPage] = useState(1);
+  const [category, setCategoryState] = useState(ALL);
+  const [query, setQueryState] = useState('');
+  // Pages of articles shown: ?page=3 shows the first 24, so Back and shared links find the same list.
+  const [pages, setPages] = usePageParam();
   const [view, setView] = useState<'grid' | 'compact' | 'list'>('grid');
+  const [focusFrom, setFocusFrom] = useState<number | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
   const filteredArticles = (category === ALL ? articles : articles.filter((article) => article.category === category)).filter((article) => `${article.title} ${article.description} ${article.keywords.join(' ')}`.toLowerCase().includes(query.toLowerCase().trim()));
-  const pageCount = Math.max(1, Math.ceil(filteredArticles.length / pageSize));
-  const currentPage = Math.min(page, pageCount);
-  const visibleArticles = filteredArticles.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const visibleArticles = filteredArticles.slice(0, pages * STEP);
+  const shown = visibleArticles.length;
 
-  useEffect(() => setPage(1), [category, query]);
+  const setQuery = (value: string) => { setQueryState(value); setPages(1); };
+  const setCategory = (value: string) => { setCategoryState(value); setPages(1); };
+  const showMore = () => {
+    setFocusFrom(shown);
+    setPages(Math.ceil(shown / STEP) + 1);
+  };
+
+  // Keyboard and screen reader users land on the first article just added.
+  useEffect(() => {
+    if (focusFrom === null) return;
+    (gridRef.current?.children[focusFrom] as HTMLElement | undefined)?.focus({ preventScroll: true });
+    setFocusFrom(null);
+  }, [focusFrom]);
 
   return (
     <>
@@ -117,12 +123,12 @@ export function BlogCatalog({ articles, showCategories = true }: { articles: Blo
         <span className="font-black text-slate-900">{filteredArticles.length}</span>{t.found(filteredArticles.length)}
       </p>
 
-      <div className={view === 'list' ? 'grid grid-cols-1 gap-3' : view === 'compact' ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4' : 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}>
+      <div ref={gridRef} className={view === 'list' ? 'grid grid-cols-1 gap-3' : view === 'compact' ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4' : 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}>
         {visibleArticles.map((article, index) => (
           <Link
             key={article.slug}
             href={{ pathname: '/blog/[slug]', params: { slug: article.slug } }}
-            style={{ animationDelay: `${index * 70}ms` }}
+            style={{ animationDelay: `${(index % STEP) * 70}ms` }}
             className={`group relative overflow-hidden rounded-[20px] border border-blue-100 bg-white shadow-[0_8px_24px_rgba(37,99,235,.06)] transition-all duration-300 ease-out will-change-transform hover:-translate-y-1 hover:translate-x-0.5 hover:border-blue-300 hover:shadow-[0_18px_40px_rgba(37,99,235,.12)] motion-safe:animate-[fadeIn_0.5s_ease-out] ${view === 'list' ? 'flex items-center gap-3 p-2.5 sm:gap-4 sm:p-3' : 'hover:shadow-[0_20px_50px_rgba(50,140,255,0.18)]'}`}
           >
             <div className={view === 'list' ? 'h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-slate-800 sm:h-24 sm:w-36' : view === 'compact' ? 'aspect-[4/3] overflow-hidden rounded-t-[20px] bg-slate-800' : 'aspect-[16/9] overflow-hidden rounded-t-[20px] bg-slate-800'}>
@@ -155,23 +161,7 @@ export function BlogCatalog({ articles, showCategories = true }: { articles: Blo
         </div>
       )}
 
-      {pageCount > 1 && (
-        <nav className="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label={t.pagination}>
-          <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1} aria-label={t.previousPage} className="inline-flex h-10 items-center gap-1 rounded-full border border-blue-100 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"><ArrowLeft className="h-4 w-4" /><span>{t.previous}</span></button>
-          {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
-            <button
-              key={pageNumber}
-              type="button"
-              onClick={() => setPage(pageNumber)}
-              aria-current={currentPage === pageNumber ? 'page' : undefined}
-              className={`h-10 min-w-10 rounded-full border px-3 text-sm font-bold transition ${currentPage === pageNumber ? 'border-blue-600 bg-blue-600 text-white' : 'border-blue-100 bg-white text-slate-700 hover:border-blue-300 hover:text-blue-700'}`}
-            >
-              {pageNumber}
-            </button>
-          ))}
-          <button type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage === pageCount} aria-label={t.nextPage} className="inline-flex h-10 items-center gap-1 rounded-full border border-blue-100 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"><span>{t.next}</span><ArrowRight className="h-4 w-4" /></button>
-        </nav>
-      )}
+      {shown > 0 && <LoadMore shown={shown} total={filteredArticles.length} nextPage={Math.ceil(shown / STEP) + 1} counter={t.shown(shown, filteredArticles.length)} label={t.more(Math.min(STEP, filteredArticles.length - shown))} onMore={showMore} />}
     </>
   );
 }
