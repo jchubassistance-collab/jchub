@@ -29,6 +29,7 @@ const tools: Record<ToolComponentName, ComponentType> = {
   TimestampConverter: dynamic(() => import('@/components/tools/jchub-tools/TimestampConverter').then((m) => m.TimestampConverter)),
   UrlEncoder: dynamic(() => import('@/components/tools/jchub-tools/UrlEncoder').then((m) => m.UrlEncoder)),
   PdfMergeSplit: dynamic(() => import('@/components/tools/PdfMergeSplit').then((m) => m.PdfMergeSplit)),
+  LogoStudio: dynamic(() => import('@/components/tools/logo-studio/LogoStudio').then((m) => m.LogoStudio)),
   // @generated-tools: components created from the admin are inserted above this line.
 };
 

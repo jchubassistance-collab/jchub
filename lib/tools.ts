@@ -470,6 +470,34 @@ export const tools: Tool[] = [
     },
   },
   {
+    slug: 'logo-studio',
+    name: 'JcHub Logo Studio',
+    description: 'Retouche ton logo (couleurs, fond, ombre, contour, dégradé, recadrage) et crée un pack d’icônes complet : SVG, sprite, PNG, police d’icônes et favicon.',
+    category: 'Design',
+    icon: '🎨',
+    tags: ['logo', 'icônes', 'svg', 'favicon', 'police d’icônes', 'sprite', 'png', 'vectoriser', 'couleurs', 'fond transparent', 'recadrer', 'design'],
+    component: 'LogoStudio',
+    translations: {
+      en: {
+        slug: 'logo-studio',
+        name: 'JcHub Logo Studio',
+        description: 'Edit your logo (colors, background, shadow, outline, gradient, cropping) and create a complete icon pack: SVG, sprite, PNG, icon font and favicon.',
+        tags: ['logo', 'icons', 'svg', 'favicon', 'icon font', 'sprite', 'png', 'vectorize', 'colors', 'transparent background', 'crop', 'design'],
+        seo: {
+          title: 'Logo editor and icon pack generator — JcHub Logo Studio',
+          description: 'Change your logo’s colors, add a shadow, outline or gradient, crop it, then turn your icons into SVG files, a sprite, PNG images, an icon font and a favicon. Free, no sign-up: your files never leave your browser.',
+          keywords: ['edit logo online', 'change logo color', 'icon font generator', 'favicon generator', 'svg sprite generator', 'vectorize logo', 'png to svg'],
+        },
+      },
+    },
+    status: 'published',
+    seo: {
+      title: 'Éditeur de logo et générateur de pack d’icônes — JcHub Logo Studio',
+      description: 'Change les couleurs de ton logo, ajoute une ombre, un contour ou un dégradé, recadre-le, puis transforme tes icônes en SVG, sprite, PNG, police d’icônes et favicon. Gratuit, sans inscription : tes fichiers restent dans ton navigateur.',
+      keywords: ['modifier logo en ligne', 'changer couleur logo', 'générateur police d’icônes', 'générateur favicon', 'sprite svg', 'vectoriser logo', 'png en svg'],
+    },
+  },
+  {
     slug: 'convertisseur-couleurs',
     name: 'Convertisseur de couleurs',
     description: 'Convertis les couleurs entre HEX, RGB, HSL et autres formats.',

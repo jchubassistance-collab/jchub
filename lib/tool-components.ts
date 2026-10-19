@@ -21,6 +21,7 @@ export const TOOL_COMPONENTS = [
   'TimestampConverter',
   'UrlEncoder',
   'PdfMergeSplit',
+  'LogoStudio',
   // @generated-tools: components created from the admin are inserted above this line.
 ] as const;
 
