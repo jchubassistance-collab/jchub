@@ -21,6 +21,7 @@ const copy = bilingual({
   about: 'Une plateforme claire pour apprendre, utiliser des outils utiles et avancer dans ses projets numériques.',
   location: 'Congo Brazzaville',
   socialLabel: 'Réseaux sociaux JcHub',
+  legalGroup: 'Légal',
   onFacebook: 'JcHub sur Facebook',
   onInstagram: 'JcHub sur Instagram',
   rights: 'Tous droits réservés.',
@@ -39,6 +40,7 @@ const copy = bilingual({
   about: 'A clear platform to learn, use helpful tools and move your digital projects forward.',
   location: 'Congo-Brazzaville',
   socialLabel: 'JcHub social networks',
+  legalGroup: 'Legal',
   onFacebook: 'JcHub on Facebook',
   onInstagram: 'JcHub on Instagram',
   rights: 'All rights reserved.',
@@ -87,10 +89,6 @@ export function Footer() {
               </a>
               <span className="flex items-center gap-2"><MapPin className={`h-4 w-4 ${isLightPage ? 'text-blue-600' : 'text-orange-400'}`} aria-hidden="true" />{t.location}</span>
             </div>
-            <nav aria-label={t.socialLabel} className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm">
-              <a href="https://www.facebook.com/1393952223791842" target="_blank" rel="noopener noreferrer" aria-label={t.onFacebook} title="Facebook" className={`transition hover:scale-110 ${isLightPage ? 'text-blue-700 hover:text-blue-900' : 'text-slate-300 hover:text-white'}`}><Facebook className="h-5 w-5" aria-hidden="true" /></a>
-              <a href="https://www.instagram.com/jchub.tech/" target="_blank" rel="noopener noreferrer" aria-label={t.onInstagram} title="Instagram" className={`transition hover:scale-110 ${isLightPage ? 'text-pink-600 hover:text-pink-800' : 'text-slate-300 hover:text-white'}`}><Instagram className="h-5 w-5" aria-hidden="true" /></a>
-            </nav>
           </div>
           {t.groups.map((group) => (
             <div key={group.title}>
@@ -105,6 +103,12 @@ export function Footer() {
                   </li>
                 ))}
               </ul>
+              {group.title === t.legalGroup && (
+                <nav aria-label={t.socialLabel} className="mt-5 flex items-center gap-2.5">
+                  <a href="https://www.facebook.com/1393952223791842" target="_blank" rel="noopener noreferrer" aria-label={t.onFacebook} title="Facebook" className="group relative inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#2787ff] to-[#0755c9] text-white shadow-[0_5px_14px_rgba(24,119,242,.24)] ring-1 ring-white/70 transition duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-[0_9px_20px_rgba(24,119,242,.35)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-500"><span aria-hidden="true" className="pointer-events-none absolute inset-[3px] rounded-full border border-white/25" /><Facebook className="relative z-10 h-[1.15rem] w-[1.15rem] transition-transform duration-300 group-hover:scale-110" strokeWidth={2.8} aria-hidden="true" /></a>
+                  <a href="https://www.instagram.com/jchub.tech/" target="_blank" rel="noopener noreferrer" aria-label={t.onInstagram} title="Instagram" className="group relative inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-gradient-to-tr from-[#feda75] via-[#e1306c] to-[#833ab4] text-white shadow-[0_5px_14px_rgba(225,48,108,.22)] ring-1 ring-white/70 transition duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-[0_9px_20px_rgba(225,48,108,.34)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-pink-500"><span aria-hidden="true" className="pointer-events-none absolute inset-[3px] rounded-full border border-white/25" /><Instagram className="relative z-10 h-[1.15rem] w-[1.15rem] transition-transform duration-300 group-hover:scale-110" strokeWidth={2.5} aria-hidden="true" /></a>
+                </nav>
+              )}
             </div>
           ))}
         </div>
