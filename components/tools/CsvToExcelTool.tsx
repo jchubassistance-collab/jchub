@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { Download, FileUp, Loader2, TableProperties } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { bilingual } from '@/i18n/copy';
+import { downloadName } from '@/lib/download-name';
 
 const copy = bilingual({
   unsupported: 'Le fichier doit être un CSV (.csv) ou un fichier texte tabulé.',
@@ -43,7 +44,7 @@ export function CsvToExcelTool() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const [outputName, setOutputName] = useState('conversion.xlsx');
+  const [outputName, setOutputName] = useState(downloadName('conversion', 'xlsx'));
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextFile = event.target.files?.[0] ?? null;
@@ -69,7 +70,7 @@ export function CsvToExcelTool() {
     }
 
     setFile(nextFile);
-    setOutputName(nextFile.name.replace(/\.(csv|txt)$/i, '') + '.xlsx');
+    setOutputName(downloadName(nextFile.name, 'xlsx', '', 'conversion'));
   };
 
   const handleConvert = async () => {

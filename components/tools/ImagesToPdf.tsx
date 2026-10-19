@@ -51,6 +51,7 @@ const copy = bilingual({
   quota: '5 conversions per day per IP address. The images are processed on the server from temporary private storage, then deleted.',
 });
 import { cleanUpConversionFiles, postConversion, uploadConversionFile } from '@/lib/conversion-upload-client';
+import { downloadName } from '@/lib/download-name';
 
 type ImageItem = { file: File; url: string };
 const MAX_FILES = 20;
@@ -131,7 +132,7 @@ export function ImagesToPdf() {
     <p className="flex items-center gap-2 rounded-xl border border-[#9ccbff]/20 bg-[#071526] p-3 text-xs text-slate-300"><FileImage className="h-4 w-4 shrink-0 text-blue-300" />{t.order}</p>
     <button type="button" disabled={!images.length || busy} onClick={convert} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4a74d6] to-[#7a5cf7] px-4 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileText className="h-5 w-5" />}{busy ? t.creating : t.convert}</button>
     {error && <div role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{error}</div>}
-    {downloadUrl && <a href={downloadUrl} download="images.pdf" className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 font-bold text-emerald-200"><Download className="h-5 w-5" /> {t.download}</a>}
+    {downloadUrl && <a href={downloadUrl} download={downloadName(images[0]?.file.name ?? 'images', 'pdf', '', 'images')} className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 font-bold text-emerald-200"><Download className="h-5 w-5" /> {t.download}</a>}
     <p className="text-center text-xs text-slate-400">{t.quota}</p>
   </div>;
 }

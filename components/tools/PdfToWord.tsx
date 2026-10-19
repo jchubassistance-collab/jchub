@@ -5,6 +5,7 @@ import { Download, FileText, Loader2, ScanLine, UploadCloud } from 'lucide-react
 import { useLocale } from 'next-intl';
 import { bilingual } from '@/i18n/copy';
 import { LOCALE_HEADER } from '@/i18n/request-locale';
+import { downloadName } from '@/lib/download-name';
 
 const copy = bilingual({
   mustBePdf: 'Le fichier doit être un PDF.',
@@ -53,7 +54,7 @@ export function PdfToWord() {
   const [error, setError] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [hasConverted, setHasConverted] = useState(false);
-  const [fileName, setFileName] = useState<string>('document.docx');
+  const [fileName, setFileName] = useState<string>(downloadName('document', 'docx'));
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const nextFile = event.target.files?.[0] ?? null;
@@ -80,7 +81,7 @@ export function PdfToWord() {
     }
 
     setFile(nextFile);
-    setFileName(nextFile.name.replace(/\.pdf$/i, '') + '.docx');
+    setFileName(downloadName(nextFile.name, 'docx', '', 'document'));
   };
 
   const handleSubmit = async () => {

@@ -8,6 +8,7 @@ import {
   readTemporaryBlob,
   TemporaryBlobError,
 } from '@/lib/temporary-conversion-blobs';
+import { downloadName } from '@/lib/download-name';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -67,7 +68,8 @@ export async function POST(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': 'attachment; filename="document.pdf"',
+        // The page names the file after the original document; this name only shows when opened directly.
+        'Content-Disposition': `attachment; filename="${downloadName('document', 'pdf')}"`,
         'Cache-Control': 'no-store',
       },
     });

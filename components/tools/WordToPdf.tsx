@@ -33,6 +33,7 @@ const copy = bilingual({
   quota: '5 conversions per day per IP address. The document is transferred to a temporary private space, then deleted after processing.',
 });
 import { cleanUpConversionFiles, postConversion, uploadConversionFile } from '@/lib/conversion-upload-client';
+import { downloadName } from '@/lib/download-name';
 
 const MAX_WORD_SIZE_BYTES = 10 * 1024 * 1024;
 
@@ -43,7 +44,7 @@ export function WordToPdf() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const [fileName, setFileName] = useState('document.pdf');
+  const [fileName, setFileName] = useState(downloadName('document', 'pdf'));
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selected = event.target.files?.[0] ?? null;
@@ -65,7 +66,7 @@ export function WordToPdf() {
       return;
     }
     setFile(selected);
-    setFileName(selected.name.replace(/\.docx$/i, '') + '.pdf');
+    setFileName(downloadName(selected.name, 'pdf', '', 'document'));
   };
 
   const convert = async () => {

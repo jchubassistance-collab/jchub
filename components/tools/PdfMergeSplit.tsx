@@ -4,7 +4,8 @@ import { useRef, useState, type ChangeEvent, type DragEvent } from 'react';
 import { ArrowDown, ArrowUp, Combine, Download, FileArchive, FileText, Loader2, Scissors, Trash2, UploadCloud } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { bilingual } from '@/i18n/copy';
-import { pageGroupLabel, parsePageRanges, safeBaseName, uniqueNames } from '@/lib/pdf-pages';
+import { pageGroupLabel, parsePageRanges, uniqueNames } from '@/lib/pdf-pages';
+import { downloadName } from '@/lib/download-name';
 
 const copy = bilingual({
   merge: 'Fusionner',
@@ -230,7 +231,7 @@ export function PdfMergeSplit() {
     try {
       const blob = await buildPdf(mergeFiles.map((item) => ({ file: item.file })));
       const pages = mergeFiles.reduce((sum, item) => sum + (item.pages ?? 0), 0);
-      setOutputs([{ name: `${t.mergedName}.pdf`, blob, pages }]);
+      setOutputs([{ name: downloadName(mergeFiles[0].file.name, 'pdf', t.mergedName, 'document'), blob, pages }]);
     } catch {
       setError(t.failed);
     } finally {
@@ -255,10 +256,10 @@ export function PdfMergeSplit() {
     }
     setBusy(true); resetResult();
     try {
-      const base = safeBaseName(splitFile.file.name);
-      // pages-1-3 for a run of pages, selection for pages picked here and there.
+      // pages-1-3 for a run of pages, selection for pages picked here and there. Repeated labels
+      // are numbered before -jchub is added, so that every name still ends with it.
       const label = (group: number[]) => isContiguous(group) ? `${t.pagesName}-${pageGroupLabel(group)}` : t.selectionName;
-      const names = uniqueNames(groups.map((group) => `${base}-${label(group)}.pdf`));
+      const names = uniqueNames(groups.map(label)).map((detail) => downloadName(splitFile.file.name, 'pdf', detail, 'document'));
       const results: Output[] = [];
       for (let index = 0; index < groups.length; index += 1) {
         const blob = await buildPdf([{ file: splitFile.file, pages: groups[index].map((page) => page - 1) }]);
@@ -279,7 +280,7 @@ export function PdfMergeSplit() {
     const files: Record<string, [Uint8Array, { level: 0 }]> = {};
     for (const output of outputs) files[output.name] = [new Uint8Array(await output.blob.arrayBuffer()), { level: 0 }];
     const zip = zipSync(files);
-    downloadBlob(new Blob([zip as Uint8Array<ArrayBuffer>], { type: 'application/zip' }), `${safeBaseName(splitFile.file.name)}-${t.zipName}.zip`);
+    downloadBlob(new Blob([zip as Uint8Array<ArrayBuffer>], { type: 'application/zip' }), downloadName(splitFile.file.name, 'zip', t.zipName, 'document'));
   };
 
   const tabClass = (active: boolean) => `inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-base transition ${active ? 'bg-white font-semibold text-slate-900 shadow-sm' : 'font-medium text-slate-500 hover:text-slate-900'}`;

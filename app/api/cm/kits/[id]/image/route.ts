@@ -3,6 +3,7 @@ import { requireCm } from '@/lib/admin-auth';
 import { cmError } from '@/lib/cm-server';
 import { getKit, kitCardInput } from '@/lib/cm-publication-kit';
 import { renderSocialCardJpeg } from '@/lib/social-card';
+import { downloadName } from '@/lib/download-name';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     return new NextResponse(jpeg, {
       headers: {
         'Content-Type': 'image/jpeg',
-        ...(download ? { 'Content-Disposition': `attachment; filename="jchub-${safeSlug}-${facebook ? 'facebook' : 'instagram'}.jpg"` } : {}),
+        ...(download ? { 'Content-Disposition': `attachment; filename="${downloadName(safeSlug, 'jpg', facebook ? 'facebook' : 'instagram')}"` } : {}),
         'Cache-Control': 'private, no-store',
         'X-Content-Type-Options': 'nosniff',
       },

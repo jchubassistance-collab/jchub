@@ -9,7 +9,6 @@ const copy = bilingual({
   mustBePdf: 'Le fichier doit être un PDF.',
   tooLarge: 'Le fichier est trop volumineux. La taille maximale autorisée est de 30 Mo.',
   selectPdf: 'Sélectionne un fichier PDF pour commencer.',
-  compressedSuffix: '-compacte.pdf',
   failed: 'La compression a échoué.',
   choose: 'Choisir un PDF',
   selected: 'Fichier sélectionné : ',
@@ -32,7 +31,6 @@ const copy = bilingual({
   mustBePdf: 'The file must be a PDF.',
   tooLarge: 'The file is too large. The maximum allowed size is 30 MB.',
   selectPdf: 'Select a PDF file to get started.',
-  compressedSuffix: '-compressed.pdf',
   failed: 'The compression failed.',
   choose: 'Choose a PDF',
   selected: 'Selected file: ',
@@ -53,6 +51,7 @@ const copy = bilingual({
   tip: 'To send it by email or upload it to a portal, aim for a file under 2 MB. Compression lowers image quality if needed.',
 });
 import { cleanUpConversionFiles, postConversion, uploadConversionFile } from '@/lib/conversion-upload-client';
+import { downloadName } from '@/lib/download-name';
 
 const MAX_FILE_SIZE = 30 * 1024 * 1024;
 
@@ -111,7 +110,7 @@ export function PdfCompressor() {
         url: URL.createObjectURL(blob),
         originalSize: file.size,
         compressedSize: blob.size,
-        name: keptOriginal ? file.name : file.name.replace(/\.pdf$/i, '') + t.compressedSuffix,
+        name: downloadName(file.name, 'pdf', '', 'document'),
         keptOriginal,
       });
     } catch (compressError) {

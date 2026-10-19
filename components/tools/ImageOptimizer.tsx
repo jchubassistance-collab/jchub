@@ -6,6 +6,7 @@ import { useLocale } from 'next-intl';
 import { cleanUpConversionFiles, ConversionError, postConversion, uploadConversionFile } from '@/lib/conversion-upload-client';
 import { bilingual } from '@/i18n/copy';
 import type { Locale } from '@/i18n/routing';
+import { downloadName } from '@/lib/download-name';
 
 const copy = bilingual({
   unsupported: (name: string) => `${name} : format non pris en charge.`,
@@ -194,19 +195,7 @@ function downloadImage(file: File, blob: Blob) {
 }
 
 function getDownloadFilename(originalName: string, extension: string): string {
-  const originalBaseName = originalName.replace(/\.[^.]+$/, '');
-  const safeBaseName = (originalBaseName || 'image')
-    .replace(/[<>:"/\\|?*\u0000-\u001f]/g, '_')
-    .replace(/[. ]+$/g, '') || 'image';
-  const prefix = 'jchub.dev_';
-  const suffix = `.${extension}`;
-  const maxFilenameLength = 120;
-  const maxBaseNameLength = maxFilenameLength - prefix.length - suffix.length;
-  const truncatedBaseName = Array.from(safeBaseName).length > maxBaseNameLength
-    ? `${Array.from(safeBaseName).slice(0, maxBaseNameLength - 3).join('')}---`
-    : safeBaseName;
-
-  return `${prefix}${truncatedBaseName}${suffix}`;
+  return downloadName(originalName, extension, '', 'image');
 }
 
 function formatBytes(bytes: number, locale: Locale): string {

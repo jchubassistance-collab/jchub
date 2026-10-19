@@ -55,9 +55,9 @@ ${details}
 Règles obligatoires (le code est vérifié automatiquement puis relu par un humain) :
 1. Fichier TSX unique dont la première ligne est exactement 'use client';
 2. Export nommé exact : export function ${componentName}() { … } — aucune prop, pas d’export par défaut.
-3. Imports autorisés uniquement : 'react', 'lucide-react' (icônes qui existent vraiment), useLocale de 'next-intl' et bilingual de '@/i18n/copy'.
+3. Imports autorisés uniquement : 'react', 'lucide-react' (icônes qui existent vraiment), useLocale de 'next-intl', bilingual de '@/i18n/copy' et downloadName de '@/lib/download-name'.
 4. Tout se passe dans le navigateur. Interdits : fetch, XMLHttpRequest, WebSocket et toute requête réseau ; localStorage, sessionStorage, cookies, indexedDB ; eval, new Function ; dangerouslySetInnerHTML, innerHTML ; balises <img>, <script>, <iframe>, <link> et new Image() ; url() en CSS ; window.open et toute modification de location ; import() dynamique, require, process.env ; postMessage et Workers.
-5. Autorisés : useState, useMemo, useEffect, useRef ; navigator.clipboard.writeText pour copier ; Blob + URL.createObjectURL + élément <a download> pour télécharger un résultat ; <canvas> ; crypto.getRandomValues et crypto.subtle ; new URL() pour analyser du texte.
+5. Autorisés : useState, useMemo, useEffect, useRef ; navigator.clipboard.writeText pour copier ; Blob + URL.createObjectURL + élément <a download> pour télécharger un résultat, nommé avec downloadName(nomDuFichierSource, extension) : le nom d’origine suivi de -jchub (ex. rapport-jchub.pdf), ou un nom qui décrit le résultat quand il n’y a pas de fichier source (downloadName('qrcode', 'png')) ; <canvas> ; crypto.getRandomValues et crypto.subtle ; new URL() pour analyser du texte.
 6. Le premier rendu doit être identique côté serveur et côté navigateur : n’appelle Date.now(), new Date(), Math.random() ou window qu’à l’intérieur de gestionnaires d’événements ou de useEffect.
 7. TypeScript strict : types explicites pour l’état, aucune variable inutilisée, gestion des erreurs avec des messages clairs.
 8. Style : classes Tailwind ; l’outil s’affiche dans une carte sombre. Reproduis le style du composant de référence (fonds, bordures, champs, boutons, couleurs du texte).

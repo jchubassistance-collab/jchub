@@ -5,6 +5,7 @@ import { Download, Copy, Check, QrCode as QrIcon } from 'lucide-react';
 import QRCode from 'qrcode';
 import { useLocale } from 'next-intl';
 import { bilingual } from '@/i18n/copy';
+import { downloadName } from '@/lib/download-name';
 
 const strings = bilingual({
   failed: 'Impossible de générer ce QR code. Vérifie le contenu saisi.',
@@ -67,7 +68,7 @@ export function QrCodeGenerator() {
   const download = () => {
     if (!dataUrl) return;
     const link = document.createElement('a');
-    link.download = `qrcode-${Date.now()}.png`;
+    link.download = downloadName('qrcode', 'png');
     link.href = dataUrl;
     link.click();
   };

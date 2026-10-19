@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Download, FileSpreadsheet, Loader2, UploadCloud } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { bilingual } from '@/i18n/copy';
+import { downloadName } from '@/lib/download-name';
 
 const copy = bilingual({
   unsupported: 'Le fichier doit être un classeur Excel .xlsx ou un CSV.',
@@ -43,7 +44,7 @@ export function ExcelToCsvTool() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const [outputName, setOutputName] = useState('conversion.csv');
+  const [outputName, setOutputName] = useState(downloadName('conversion', 'csv'));
 
   useEffect(() => {
     if (downloadUrl) return () => URL.revokeObjectURL(downloadUrl);
@@ -73,7 +74,7 @@ export function ExcelToCsvTool() {
     }
 
     setFile(nextFile);
-    setOutputName(nextFile.name.replace(/\.(xlsx|csv)$/i, '') + '.csv');
+    setOutputName(downloadName(nextFile.name, 'csv', '', 'conversion'));
   };
 
   const handleConvert = async () => {

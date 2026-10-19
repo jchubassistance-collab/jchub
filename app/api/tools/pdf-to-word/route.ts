@@ -4,6 +4,7 @@ import { buildVisuallyFaithfulWordDocument } from '@/lib/pdf-to-word';
 import { convertPdfWithAdobe, hasAdobePdfServicesConfig } from '@/lib/document-services';
 import { reportUserError } from '@/lib/user-error';
 import { enforceDailyConversionQuota } from '@/lib/rate-limit';
+import { downloadName } from '@/lib/download-name';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'Content-Disposition': `attachment; filename="document.docx"; filename*=UTF-8''${encodeURIComponent(file.name.replace(/\.pdf$/i, '') + '.docx')}`,
+        'Content-Disposition': `attachment; filename="document-jchub.docx"; filename*=UTF-8''${encodeURIComponent(downloadName(file.name, 'docx', '', 'document'))}`,
         'X-Word-Mode': 'visual',
         'X-Document-Service': usedAdobe ? 'adobe' : 'local',
       },
