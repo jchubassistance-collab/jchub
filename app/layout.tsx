@@ -102,7 +102,7 @@ export default async function RootLayout({
   const isVercelDeployment = process.env.VERCEL === '1';
 
   return (
-    <html lang={locale}>
+    <html lang={locale} data-scroll-behavior="smooth">
       <head>
         <link rel="alternate" type="application/rss+xml" href={locale === 'en' ? '/en/rss.xml' : '/rss.xml'} />
       </head>

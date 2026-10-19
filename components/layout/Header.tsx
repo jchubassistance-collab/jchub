@@ -14,7 +14,7 @@ const copy = bilingual({
   about: 'À propos',
   tools: 'Outils',
   contact: 'Contact',
-  homeLabel: 'JcHub, accueil',
+  homeLabel: 'יָהּ, accueil',
   openMenu: 'Ouvrir le menu',
   closeMenu: 'Fermer le menu',
   navigation: 'Navigation',
@@ -23,7 +23,7 @@ const copy = bilingual({
   about: 'About',
   tools: 'Tools',
   contact: 'Contact',
-  homeLabel: 'JcHub, home',
+  homeLabel: 'יָהּ, home',
   openMenu: 'Open menu',
   closeMenu: 'Close menu',
   navigation: 'Navigation',
@@ -53,8 +53,11 @@ export function Header() {
     <header className={`sticky top-0 z-50 border-b backdrop-blur-xl ${isHome ? 'border-blue-100 bg-[#eff6ff]/90 shadow-[0_8px_24px_rgba(37,99,235,.07)]' : 'border-white/10 bg-[#07162d]/80 shadow-[0_12px_30px_rgba(2,11,26,0.28)]'}`}>
       <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-6 px-4 sm:px-6">
         <Link href="/" className="group flex shrink-0 items-center" aria-label={t.homeLabel}>
-          <img src="/jchub-icon-192.png" alt="JcHub" width="64" height="64" className="h-9 w-auto transition duration-300 group-hover:scale-[1.04] lg:hidden" />
-          <img src="/logo-blue.svg" alt="JcHub" width="320" height="100" className="hidden h-11 w-auto transition duration-300 group-hover:scale-[1.04] lg:block" />
+          <span className="relative grid h-10 w-[3.7rem] shrink-0 place-items-center rounded-xl border border-[#12a8e8]/25 bg-white shadow-[0_4px_14px_rgba(16,28,175,.12)] transition duration-300 group-hover:-translate-y-0.5 group-hover:border-[#12a8e8]/55 group-hover:shadow-[0_8px_20px_rgba(16,28,175,.2)]">
+            <span lang="he" dir="rtl" aria-hidden="true" className="font-serif text-[1.55rem] font-semibold leading-none tracking-[0.02em] transition duration-200 group-hover:scale-105" style={{ fontFamily: '"Noto Serif Hebrew", "Times New Roman", serif' }}>
+              <span className="text-[#101caf]">יָ</span><span className="text-[#12a8e8]">הּ</span>
+            </span>
+          </span>
         </Link>
 
         <nav className={`hidden items-center gap-1 rounded-2xl border p-1 lg:flex ${isHome ? 'border-blue-100 bg-white/75' : 'border-white/10 bg-white/5'}`}>

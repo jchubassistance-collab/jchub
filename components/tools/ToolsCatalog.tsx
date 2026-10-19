@@ -103,8 +103,11 @@ export function ToolsCatalog({ tools, initialQuery = '' }: ToolsCatalogProps) {
           <input value={query} onChange={(event) => updateQuery(event.target.value)} placeholder={t.searchPlaceholder} className="w-full rounded-full border border-blue-100 bg-[#f8fbff] py-3 pl-11 pr-10 text-sm text-[#0f172a] outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:ring-2 focus:ring-blue-100" aria-label={t.searchLabel} />
           {query && <button type="button" onClick={() => updateQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-700" aria-label={t.clearSearch}><X className="h-4 w-4" /></button>}
         </label>
-        <div className="flex gap-2 overflow-x-auto pb-1 sm:max-w-xl sm:justify-end sm:pb-0" aria-label={t.filterLabel}>
-          {categories.map((item) => <button key={item} type="button" onClick={() => { setCategory(item); setPage(1); }} className={`whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-bold transition ${category === item ? 'border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'border-blue-100 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800'}`}>{item === ALL ? t.all : item}</button>)}
+        <div className="flex min-w-0 items-center gap-2 pb-1 sm:max-w-xl sm:justify-end sm:pb-0" aria-label={t.filterLabel}>
+          <button type="button" onClick={() => { setCategory(ALL); setPage(1); }} className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-bold transition ${category === ALL ? 'border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'border-blue-100 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800'}`}>{t.all}</button>
+          <div className="tools-category-scroll flex min-w-0 gap-2 overflow-x-auto">
+            {categories.filter((item) => item !== ALL).map((item) => <button key={item} type="button" onClick={() => { setCategory(item); setPage(1); }} className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-bold transition ${category === item ? 'border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'border-blue-100 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800'}`}>{item}</button>)}
+          </div>
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { ArrowRight, Grid2X2, Grid3X3, List, Search, Tag, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Grid2X2, Grid3X3, List, Search, Tag, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { BlogArticle } from '@/lib/blog';
 import { Link } from '@/i18n/navigation';
@@ -27,7 +27,7 @@ const copy = bilingual({
   pagination: 'Pagination des articles',
   previousPage: 'Page précédente',
   previousShort: 'Préc.',
-  previous: 'Précédent',
+  previous: 'Précédente',
   nextPage: 'Page suivante',
   nextShort: 'Suiv.',
   next: 'Suivant',
@@ -155,20 +155,20 @@ export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
       )}
 
       {pageCount > 1 && (
-        <nav className="mt-8 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2" aria-label={t.pagination}>
-          <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1} aria-label={t.previousPage} className="shrink-0 rounded-lg border border-white/10 bg-[#071526] px-2.5 py-2 text-xs font-semibold text-slate-200 disabled:opacity-40 sm:px-3 sm:text-sm"><span className="sm:hidden">{t.previousShort}</span><span className="hidden sm:inline">{t.previous}</span></button>
+        <nav className="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label={t.pagination}>
+          <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1} aria-label={t.previousPage} className="inline-flex h-10 items-center gap-1 rounded-full border border-blue-100 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"><ArrowLeft className="h-4 w-4" /><span>{t.previous}</span></button>
           {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
             <button
               key={pageNumber}
               type="button"
               onClick={() => setPage(pageNumber)}
               aria-current={currentPage === pageNumber ? 'page' : undefined}
-              className={`h-9 min-w-9 shrink-0 rounded-lg border px-2.5 text-sm font-bold ${currentPage === pageNumber ? 'border-cyan-400 bg-cyan-400 text-slate-950' : 'border-white/10 bg-[#071526] text-slate-300'}`}
+              className={`h-10 min-w-10 rounded-full border px-3 text-sm font-bold transition ${currentPage === pageNumber ? 'border-blue-600 bg-blue-600 text-white' : 'border-blue-100 bg-white text-slate-700 hover:border-blue-300 hover:text-blue-700'}`}
             >
               {pageNumber}
             </button>
           ))}
-          <button type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage === pageCount} aria-label={t.nextPage} className="shrink-0 rounded-lg border border-white/10 bg-[#071526] px-2.5 py-2 text-xs font-semibold text-slate-200 disabled:opacity-40 sm:px-3 sm:text-sm"><span className="sm:hidden">{t.nextShort}</span><span className="hidden sm:inline">{t.next}</span></button>
+          <button type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage === pageCount} aria-label={t.nextPage} className="inline-flex h-10 items-center gap-1 rounded-full border border-blue-100 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"><span>{t.next}</span><ArrowRight className="h-4 w-4" /></button>
         </nav>
       )}
     </>

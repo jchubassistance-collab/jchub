@@ -1,5 +1,4 @@
 // lib/tools.ts — Catalogue des outils JcHub
-import { cache } from 'react';
 import { reportUserError } from '@/lib/user-error';
 import { isToolComponentName } from '@/lib/tool-components';
 import type { Locale } from '@/i18n/routing';
@@ -732,12 +731,57 @@ export function toToolTranslation(data: unknown): ToolTranslation | undefined {
   };
 }
 
-/** The tools collection, read once per page render however many components need it. */
-const readToolDocuments = cache(async () => {
-  const { getAdminDb } = await import('@/lib/firebase-admin');
-  const snapshot = await getAdminDb().collection('tools').get();
-  return snapshot.docs.map((document) => toToolRecord(document.data()));
-});
+/** Share catalog reads across requests and keep Firestore throttling off the render path. */
+const TOOL_DOCUMENTS_CACHE_MS = 60_000;
+const TOOL_DOCUMENTS_TIMEOUT_MS = 1_200;
+const TOOL_DOCUMENTS_RETRY_MS = 60_000;
+let toolDocumentsCache: Tool[] | null = null;
+let toolDocumentsCachedAt = 0;
+let toolDocumentsRetryAt = 0;
+let toolDocumentsRequest: Promise<Tool[] | null> | null = null;
+
+function readToolDocuments(): Promise<Tool[] | null> {
+  if (!toolDocumentsRequest) {
+    const request = (async () => {
+      try {
+        const { getAdminDb } = await import('@/lib/firebase-admin');
+        const snapshot = await getAdminDb().collection('tools').get();
+        const documents = snapshot.docs.map((document) => toToolRecord(document.data()));
+        toolDocumentsCache = documents;
+        toolDocumentsCachedAt = Date.now();
+        toolDocumentsRetryAt = 0;
+        return documents;
+      } catch (error) {
+        toolDocumentsRetryAt = Date.now() + TOOL_DOCUMENTS_RETRY_MS;
+        reportUserError(error);
+        return null;
+      }
+    })().finally(() => {
+      if (toolDocumentsRequest === request) toolDocumentsRequest = null;
+    });
+    toolDocumentsRequest = request;
+  }
+  return toolDocumentsRequest;
+}
+
+async function getFirestoreToolsWithoutBlocking(): Promise<Tool[] | null> {
+  if (toolDocumentsCache && Date.now() - toolDocumentsCachedAt < TOOL_DOCUMENTS_CACHE_MS) {
+    return toolDocumentsCache;
+  }
+  if (Date.now() < toolDocumentsRetryAt) return toolDocumentsCache;
+
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  const timedOut = new Promise<null>((resolve) => {
+    timeout = setTimeout(() => {
+      toolDocumentsRetryAt = Date.now() + TOOL_DOCUMENTS_RETRY_MS;
+      resolve(null);
+    }, TOOL_DOCUMENTS_TIMEOUT_MS);
+  });
+
+  const documents = await Promise.race([readToolDocuments(), timedOut]);
+  if (timeout) clearTimeout(timeout);
+  return documents ?? toolDocumentsCache;
+}
 
 export async function getPublishedTools(options: { includeScheduled?: boolean } = {}): Promise<Tool[]> {
   const filterPublished = (list: Tool[]) => list.filter((tool) =>
@@ -757,9 +801,9 @@ export async function getPublishedTools(options: { includeScheduled?: boolean } 
   }
 
   try {
-    const fromFirestore = await readToolDocuments();
+    const fromFirestore = await getFirestoreToolsWithoutBlocking();
 
-    if (fromFirestore.length === 0) {
+    if (!fromFirestore || fromFirestore.length === 0) {
       return filterPublished(tools);
     }
 
@@ -777,7 +821,7 @@ export async function getPublishedTools(options: { includeScheduled?: boolean } 
 
     return filterPublished(Array.from(mergedBySlug.values()));
   } catch (error) {
-    reportUserError();
+    reportUserError(error);
     return filterPublished(tools);
   }
 }

@@ -28,7 +28,7 @@ const copy = bilingual({
   total: (saved: string, percent: number, count: number) => `Gain total : ${saved}${percent >= 0 ? ` (${percent} % plus léger)` : ` (${Math.abs(percent)} % plus volumineux)`} sur ${count} image${count > 1 ? 's' : ''} convertie${count > 1 ? 's' : ''}.`,
   converting: (done: number, total: number) => `Conversion… ${done}/${total}`,
   convert: 'Convertir et optimiser',
-  quota: '5 images converties par jour et par adresse IP. Chaque fichier est traité sur le serveur depuis un stockage privé temporaire, puis supprimé.',
+  quota: '5 images converties par jour et par adresse IP.',
 }, {
   unsupported: (name: string) => `${name}: unsupported format.`,
   tooLarge: (name: string) => `${name}: exceeds the 15 MB limit.`,
@@ -50,7 +50,7 @@ const copy = bilingual({
   total: (saved: string, percent: number, count: number) => `Total saving: ${saved}${percent >= 0 ? ` (${percent}% lighter)` : ` (${Math.abs(percent)}% larger)`} across ${count} converted image${count > 1 ? 's' : ''}.`,
   converting: (done: number, total: number) => `Converting… ${done}/${total}`,
   convert: 'Convert and optimize',
-  quota: '5 images converted per day per IP address. Each file is processed on the server from temporary private storage, then deleted.',
+  quota: '5 images converted per day per IP address.',
 });
 
 type OutputFormat = 'webp' | 'png';
@@ -138,32 +138,32 @@ export function ImageOptimizer() {
   const totalResult = successful.reduce((sum, image) => sum + (image.result?.size ?? 0), 0);
   const savedPercent = totalOriginal ? Math.round((1 - totalResult / totalOriginal) * 100) : 0;
 
-  return <div className="space-y-5 text-slate-100">
-    <div className="rounded-2xl border border-dashed border-[#9ccbff]/40 bg-[#071526] p-6 text-center">
+  return <div className="space-y-5 text-slate-700">
+    <div className="rounded-xl border-2 border-dashed border-slate-300 bg-white p-6 text-center sm:py-8">
       <input ref={inputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" className="hidden" onChange={addFiles} />
-      <button type="button" onClick={() => inputRef.current?.click()} disabled={busy || images.length >= MAX_FILES} className="mx-auto flex items-center gap-2 rounded-xl border border-[#9ccbff]/30 bg-[#0c1d31] px-4 py-3 font-semibold text-[#dfeeff] hover:border-[#9ccbff]/50 disabled:opacity-50"><UploadCloud className="h-5 w-5" /> {t.add}</button>
-      <p className="mt-3 text-xs text-slate-400">{t.limits(MAX_FILES)}</p>
+      <button type="button" onClick={() => inputRef.current?.click()} disabled={busy || images.length >= MAX_FILES} className="mx-auto flex items-center gap-3 rounded-xl border border-slate-300 bg-white px-5 py-3.5 text-lg font-medium text-slate-900 transition hover:border-slate-400 disabled:opacity-50"><UploadCloud className="h-5 w-5" /> {t.add}</button>
+      <p className="mt-3 text-sm text-slate-500">{t.limits(MAX_FILES)}</p>
     </div>
 
-    {images.length > 0 && <ol className="max-h-72 space-y-2 overflow-auto rounded-2xl border border-[#9ccbff]/20 bg-[#071526] p-3">
-      {images.map(({ id, file, result, keptOriginal, error: imageError }) => <li key={id} className="flex flex-wrap items-center gap-3 rounded-xl bg-[#0c1d31] p-3">
-        <FileImage className="h-5 w-5 shrink-0 text-blue-300" />
-        <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium text-white">{file.name}</span><span className="text-xs text-slate-400">{formatBytes(file.size, locale)}{result ? ` → ${formatBytes(result.size, locale)} (${result.size <= file.size ? t.saved(Math.round((1 - result.size / file.size) * 100)) : t.heavier(Math.round((result.size / file.size - 1) * 100))})` : ''}</span>{keptOriginal && <span className="mt-1 block text-xs text-amber-200">{t.keptOriginal}</span>}{imageError && <span role="alert" className="mt-1 block text-xs text-rose-300">{imageError}</span>}</span>
-        {result && <button type="button" onClick={() => downloadImage(file, result)} className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-400/30 px-3 py-2 text-xs font-bold text-emerald-200 hover:bg-emerald-500/10"><Download className="h-4 w-4" /> {t.download}</button>}
-        <button type="button" onClick={() => removeImage(id)} disabled={busy} aria-label={t.remove(file.name)} className="rounded-lg p-2 text-slate-400 hover:bg-rose-500/10 hover:text-rose-300 disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>
+    {images.length > 0 && <ol className="max-h-72 space-y-2 overflow-auto rounded-xl border border-slate-200 bg-white p-3">
+      {images.map(({ id, file, result, keptOriginal, error: imageError }) => <li key={id} className="flex flex-wrap items-center gap-3 rounded-lg bg-slate-50 p-3">
+        <FileImage className="h-5 w-5 shrink-0 text-slate-500" />
+        <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium text-slate-900">{file.name}</span><span className="text-xs text-slate-500">{formatBytes(file.size, locale)}{result ? ` → ${formatBytes(result.size, locale)} (${result.size <= file.size ? t.saved(Math.round((1 - result.size / file.size) * 100)) : t.heavier(Math.round((result.size / file.size - 1) * 100))})` : ''}</span>{keptOriginal && <span className="mt-1 block text-xs text-amber-700">{t.keptOriginal}</span>}{imageError && <span role="alert" className="mt-1 block text-xs text-rose-700">{imageError}</span>}</span>
+        {result && <button type="button" onClick={() => downloadImage(file, result)} className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-50"><Download className="h-4 w-4" /> {t.download}</button>}
+        <button type="button" onClick={() => removeImage(id)} disabled={busy} aria-label={t.remove(file.name)} className="rounded-lg p-2 text-slate-500 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>
       </li>)}
     </ol>}
 
     <div className="grid gap-3 sm:grid-cols-2">
-      <label className="text-sm text-slate-300">{t.outputFormat}<select value={format} disabled={busy} onChange={(event) => updateOptions(event.target.value as OutputFormat, quality)} className="mt-1 w-full rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-3 py-2.5 text-white"><option value="webp">{t.webp}</option><option value="png">{t.png}</option></select></label>
-      <label className={`text-sm ${format === 'png' ? 'text-slate-500' : 'text-slate-300'}`}>{t.quality(quality)}<input type="range" min="10" max="100" step="5" value={quality} disabled={busy || format === 'png'} onChange={(event) => updateOptions(format, Number(event.target.value))} className="mt-3 block w-full accent-blue-400 disabled:opacity-40" /><span className="mt-1 block text-xs text-slate-400">{format === 'png' ? t.pngNote : t.webpNote}</span></label>
+      <label className="text-base text-slate-600">{t.outputFormat}<select value={format} disabled={busy} onChange={(event) => updateOptions(event.target.value as OutputFormat, quality)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-lg text-slate-900 focus:border-slate-500 focus:outline-none"><option value="webp">{t.webp}</option><option value="png">{t.png}</option></select></label>
+      <label className={`text-base ${format === 'png' ? 'text-slate-500' : 'text-slate-600'}`}>{t.quality(quality)}<input type="range" min="10" max="100" step="5" value={quality} disabled={busy || format === 'png'} onChange={(event) => updateOptions(format, Number(event.target.value))} className="mt-5 block w-full accent-slate-900 disabled:opacity-40" /><span className="sr-only">{format === 'png' ? t.pngNote : t.webpNote}</span></label>
     </div>
 
-    {successful.length > 0 && <p role="status" className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 p-3 text-sm text-emerald-100">{t.total(formatBytes(totalOriginal - totalResult, locale), savedPercent, successful.length)}</p>}
+    {successful.length > 0 && <p role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">{t.total(formatBytes(totalOriginal - totalResult, locale), savedPercent, successful.length)}</p>}
 
-    <button type="button" disabled={!images.length || busy} onClick={() => void convert()} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4a74d6] to-[#7a5cf7] px-4 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileImage className="h-5 w-5" />}{busy ? t.converting(progress, images.length) : t.convert}</button>
-    {error && <div role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{error}</div>}
-    <p className="text-center text-xs text-slate-400">{t.quota}</p>
+    <button type="button" disabled={!images.length || busy} onClick={() => void convert()} className="flex min-h-16 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-lg font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed">{busy ? <Loader2 className="h-5 w-5 animate-spin" /> : null}{busy ? t.converting(progress, images.length) : t.convert}</button>
+    {error && <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</div>}
+    <p className="text-center text-sm text-slate-500">{t.quota}</p>
   </div>;
 }
 

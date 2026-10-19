@@ -103,14 +103,15 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
 function PageNavigationLoader({ label, text }: { label: string; text: string }) {
   return (
     <div className="tool-navigation-loader" role="status" aria-label={label}>
-      <svg className="yah-loader" viewBox="0 0 800 600" aria-hidden="true">
-        <g className="yah-loader__symbol yah-loader__yod" lang="he">
-          <text x="425" y="365" textAnchor="middle">&#x05D9;&#x05B8;</text>
-        </g>
-        <g className="yah-loader__symbol yah-loader__he" lang="he">
-          <text x="375" y="365" textAnchor="middle">&#x05D4;&#x05BC;</text>
-        </g>
-      </svg>
+      <div className="jchub-loader" aria-hidden="true">
+        <span className="jchub-loader__dots">
+          <span className="jchub-loader__dot jchub-loader__dot--top" />
+          <span className="jchub-loader__dot jchub-loader__dot--right" />
+          <span className="jchub-loader__dot jchub-loader__dot--bottom" />
+          <span className="jchub-loader__dot jchub-loader__dot--left" />
+        </span>
+        <img src="/jchub-icon-192.png" alt="" width="192" height="192" className="jchub-loader__icon" />
+      </div>
       <span className="sr-only">{text}</span>
     </div>
   );

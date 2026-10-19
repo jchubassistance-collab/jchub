@@ -261,7 +261,7 @@ export default function ContactPage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <div className="rounded-3xl border border-blue-100 bg-white p-8 shadow-[0_18px_40px_rgba(7,19,40,0.24)] backdrop-blur-sm" style={{ transform: 'perspective(1200px) rotateX(3deg) rotateY(-3deg)' }}>
+              <div className="rounded-3xl border border-blue-100 bg-white p-8 shadow-[0_18px_40px_rgba(7,19,40,0.24)] backdrop-blur-sm">
                 {sent ? (
                   <div className="py-12 text-center">
                     <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg">
