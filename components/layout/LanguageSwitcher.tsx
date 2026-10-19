@@ -6,25 +6,31 @@ import type { MouseEvent } from 'react';
 import { getPathname, usePathname } from '@/i18n/navigation';
 import { routing, type Locale } from '@/i18n/routing';
 
-const LANGUAGES: Record<Locale, { name: string; label: string }> = {
-  fr: { name: 'Fran\u00e7ais', label: 'Choisir la langue' },
-  en: { name: 'English', label: 'Choose language' },
+const LANGUAGES: Record<Locale, { label: string }> = {
+  fr: { label: 'Français' },
+  en: { label: 'English' },
 };
 
 function Flag({ locale }: { locale: Locale }) {
   return locale === 'fr' ? (
-    <svg aria-hidden="true" viewBox="0 0 30 20" className="h-4 w-6 shrink-0 overflow-hidden rounded-[2px] shadow-sm">
-      <rect width="10" height="20" fill="#1b3f8b" />
-      <rect x="10" width="10" height="20" fill="#fff" />
-      <rect x="20" width="10" height="20" fill="#ed2939" />
+    <svg aria-hidden="true" viewBox="0 0 32 32" className="h-full w-full">
+      <defs><clipPath id="fr-flag-circle"><circle cx="16" cy="16" r="16" /></clipPath></defs>
+      <g clipPath="url(#fr-flag-circle)">
+        <rect width="32" height="32" fill="#1b3f8b" />
+        <rect x="10.67" width="10.66" height="32" fill="#fff" />
+        <rect x="21.33" width="10.67" height="32" fill="#ed2939" />
+      </g>
     </svg>
   ) : (
-    <svg aria-hidden="true" viewBox="0 0 60 30" className="h-4 w-6 shrink-0 overflow-hidden rounded-[2px] shadow-sm">
-      <rect width="60" height="30" fill="#012169" />
-      <path d="M0 0 60 30M60 0 0 30" stroke="#fff" strokeWidth="6" />
-      <path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" strokeWidth="2.4" />
-      <path d="M30 0v30M0 15h60" stroke="#fff" strokeWidth="10" />
-      <path d="M30 0v30M0 15h60" stroke="#c8102e" strokeWidth="6" />
+    <svg aria-hidden="true" viewBox="0 0 32 32" className="h-full w-full">
+      <defs><clipPath id="en-flag-circle"><circle cx="16" cy="16" r="16" /></clipPath></defs>
+      <g clipPath="url(#en-flag-circle)">
+        <rect width="32" height="32" fill="#012169" />
+        <path d="M-2 0 34 32M34 0-2 32" stroke="#fff" strokeWidth="6" />
+        <path d="M-2 0 34 32M34 0-2 32" stroke="#c8102e" strokeWidth="2.4" />
+        <path d="M16 0v32M0 16h32" stroke="#fff" strokeWidth="10" />
+        <path d="M16 0v32M0 16h32" stroke="#c8102e" strokeWidth="6" />
+      </g>
     </svg>
   );
 }
@@ -45,7 +51,7 @@ function alternateAddress(target: Locale): string | null {
  * Language list. Changing language reloads the page: the <html lang> attribute and
  * every text of the layout then switch together.
  */
-export function LanguageSwitcher({ light = true, className = '' }: { light?: boolean; className?: string }) {
+export function LanguageSwitcher({ light = true, small = false, className = '' }: { light?: boolean; small?: boolean; className?: string }) {
   const locale = useLocale();
   const pathname = usePathname();
   const params = useParams();
@@ -69,23 +75,24 @@ export function LanguageSwitcher({ light = true, className = '' }: { light?: boo
 
   return (
     <nav aria-label={LANGUAGES[locale].label} className={className}>
-      <ul className={`flex list-none items-center gap-1 rounded-xl border p-1 text-xs font-bold ${light ? 'border-blue-100 bg-white/75' : 'border-white/10 bg-white/5'}`}>
+      <ul className="flex list-none items-center gap-2 p-0">
         {routing.locales.map((target) => (
           <li key={target}>
             {target === locale ? (
-              <span aria-current="true" title={LANGUAGES[target].name} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 ${light ? 'bg-blue-600 text-white' : 'bg-white/10 text-white'}`}>
-                <Flag locale={target} /><span>{LANGUAGES[target].name}</span>
+              <span aria-current="true" aria-label={LANGUAGES[target].label} title={LANGUAGES[target].label} className={`block ${small ? 'h-8 w-8 p-px' : 'h-10 w-10 p-[2px]'} overflow-hidden rounded-full border-2 shadow-sm transition-transform ${light ? 'border-blue-600 bg-white shadow-blue-900/15' : 'border-white bg-white/10 shadow-black/20'}`}>
+                <Flag locale={target} />
               </span>
             ) : (
               <a
                 href={fallbackHref(target)}
                 hrefLang={target}
                 lang={target}
-                title={LANGUAGES[target].name}
+                title={LANGUAGES[target].label}
+                aria-label={LANGUAGES[target].label}
                 onClick={(event) => switchTo(event, target)}
-                className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition ${light ? 'text-slate-700 hover:bg-blue-50 hover:text-blue-800' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}
+                className={`block ${small ? 'h-8 w-8 p-px' : 'h-10 w-10 p-[2px]'} overflow-hidden rounded-full border-2 shadow-sm transition-transform hover:scale-105 ${light ? 'border-slate-200 bg-white hover:border-blue-300' : 'border-white/20 bg-white/10 hover:border-white/50'}`}
               >
-                <Flag locale={target} /><span>{LANGUAGES[target].name}</span>
+                <Flag locale={target} />
               </a>
             )}
           </li>

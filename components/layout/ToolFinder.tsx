@@ -69,7 +69,8 @@ function toSuggestion(tool: CatalogTool): Suggestion {
   return { slug: tool.slug, name: tool.name, description: tool.description, href: tool.href, reason: tool.description, icon: tool.icon };
 }
 
-export function ToolFinder({ compact = false, dark = false, onNavigate }: { compact?: boolean; dark?: boolean; onNavigate?: () => void }) {
+/** `pill`: the outlined, centered field of the mobile menu; the results open centered below it. */
+export function ToolFinder({ compact = false, dark = false, pill = false, menu = false, onNavigate }: { compact?: boolean; dark?: boolean; pill?: boolean; menu?: boolean; onNavigate?: () => void }) {
   const locale = useLocale();
   const t = copy[locale];
   const [query, setQuery] = useState('');
@@ -182,12 +183,23 @@ export function ToolFinder({ compact = false, dark = false, onNavigate }: { comp
   const shell = dark ? 'border-white/10 bg-white/5 text-white placeholder:text-slate-300' : 'border-blue-100 bg-white/80 text-slate-800 placeholder:text-slate-500';
 
   return <div ref={containerRef} className="relative">
-    <form onSubmit={submit} role="search" className={`flex items-center gap-2 rounded-full border px-3 py-2 ${shell}`}>
-      {loading ? <LoaderCircle className="h-4 w-4 shrink-0 animate-spin text-indigo-500"/> : <Search className={`h-4 w-4 shrink-0 ${dark ? 'text-slate-300' : 'text-blue-600'}`}/>}
-      <input value={query} onChange={(event) => { setQuery(event.target.value); setOpen(true); }} onFocus={prepare} maxLength={500} role="combobox" aria-autocomplete="list" aria-label={t.describe} aria-expanded={showPanel} aria-controls={panelId} placeholder={compact ? t.placeholderCompact : t.placeholder} className={`min-w-0 flex-1 bg-transparent outline-none ${compact ? 'text-xs' : 'text-sm'} placeholder:opacity-80`} />
-      {query && <button type="button" onClick={reset} aria-label={t.clear} className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"><X className="h-3.5 w-3.5"/></button>}
+    <form onSubmit={submit} role="search" className={menu
+      ? 'flex items-center gap-2'
+      : pill
+        ? 'flex h-12 items-center gap-2 rounded-full border border-white/70 bg-transparent px-5 text-white transition focus-within:border-white'
+        : `flex items-center gap-2 rounded-full border px-3 py-2 ${shell}`}>
+      {loading && !menu ? <LoaderCircle className={`h-4 w-4 shrink-0 animate-spin ${pill ? 'text-white' : 'text-indigo-500'}`}/> : !pill && !menu && <Search className={`h-4 w-4 shrink-0 ${dark ? 'text-slate-300' : 'text-blue-600'}`}/>}
+      <input value={query} onChange={(event) => { setQuery(event.target.value); setOpen(true); }} onFocus={prepare} maxLength={500} role="combobox" aria-autocomplete="list" aria-label={t.describe} aria-expanded={showPanel} aria-controls={panelId} placeholder={compact || pill || menu ? t.placeholderCompact : t.placeholder} className={pill
+        ? 'min-w-0 flex-1 bg-transparent text-center text-[0.95rem] font-light tracking-[0.06em] text-white outline-none placeholder:text-white/85'
+        : menu
+          ? 'h-12 min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#0369fb] focus:ring-2 focus:ring-[#0369fb]/15'
+          : `min-w-0 flex-1 bg-transparent outline-none ${compact ? 'text-xs' : 'text-sm'} placeholder:opacity-80`} />
+      {query && <button type="button" onClick={reset} aria-label={t.clear} className={`rounded-full p-1 ${pill ? 'text-white/80 hover:bg-white/10 hover:text-white' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-700'}`}><X className="h-3.5 w-3.5"/></button>}
+      {menu && <button type="submit" aria-label={t.describe} title={t.describe} className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-[#0369fb]/25 bg-white text-[#0369fb] shadow-sm transition hover:border-[#0369fb]/50 hover:bg-blue-50">{loading ? <LoaderCircle className="h-4 w-4 animate-spin"/> : <Search className="h-5 w-5"/>}</button>}
     </form>
-    {showPanel && <section id={panelId} className="absolute right-0 top-full z-[70] mt-2 max-h-[70vh] w-[min(92vw,25rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-xl shadow-slate-950/15" aria-live="polite">
+    {showPanel && <section id={panelId} className={`z-[70] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 text-left text-slate-900 shadow-xl shadow-slate-950/15 ${menu
+      ? 'fixed right-5 top-[24rem] max-h-[40vh] w-[calc(82vw-2.5rem)] max-w-[21rem]'
+      : `absolute top-full mt-2 max-h-[70vh] w-[min(92vw,25rem)] ${pill ? 'left-1/2 -translate-x-1/2' : 'right-0'}`}`} aria-live="polite">
       <div className="flex items-start justify-between gap-3"><div className="flex items-center gap-2"><span className="grid h-8 w-8 place-items-center rounded-lg bg-indigo-50 text-indigo-600"><Sparkles className="h-4 w-4"/></span><p className="text-sm font-bold">{error ? t.unavailable : t.recommended}</p></div><button type="button" onClick={() => setOpen(false)} aria-label={t.closeResults} className="rounded-md p-1 text-slate-400 hover:bg-slate-100"><X className="h-4 w-4"/></button></div>
       {error ? <p className="mt-3 text-xs leading-5 text-slate-600">{error}</p> : <>
         {result && <p className="mt-2 text-xs leading-5 text-slate-600">{result.message}</p>}

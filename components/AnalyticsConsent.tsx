@@ -89,15 +89,16 @@ export function AnalyticsConsent({ nonce }: { nonce?: string }) {
         </>
       )}
       {bannerOpen && (
-        <section role="dialog" aria-modal="false" aria-labelledby="consent-title" className="fixed inset-x-4 bottom-4 z-[80] mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-5 text-slate-700 shadow-2xl shadow-slate-950/20 sm:inset-x-6">
+        <section role="dialog" aria-modal="false" aria-labelledby="consent-title" className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-[80] mx-auto max-h-[calc(100dvh-1.5rem)] max-w-xl overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 text-slate-700 shadow-2xl shadow-slate-950/20 sm:inset-x-6 sm:bottom-6 sm:p-5">
           <h2 id="consent-title" className="text-sm font-bold text-slate-900">{t.title}</h2>
-          <p className="mt-2 text-xs leading-5">
+          <p className="mt-1.5 break-words text-xs leading-5">
             {t.text}{' '}
             <Link href="/confidentialite" className="font-semibold text-blue-700 underline-offset-2 hover:underline">{t.learnMore}</Link>
           </p>
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
-            <button type="button" onClick={() => decide('denied')} className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">{t.refuse}</button>
-            <button type="button" onClick={() => decide('granted')} className="rounded-xl border border-slate-900 bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">{t.accept}</button>
+          {/* Side by side even on phones: the banner stays short and hides less of the page. */}
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:flex sm:justify-end">
+            <button type="button" onClick={() => decide('denied')} className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">{t.refuse}</button>
+            <button type="button" onClick={() => decide('granted')} className="min-h-11 rounded-xl border border-slate-900 bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">{t.accept}</button>
           </div>
         </section>
       )}

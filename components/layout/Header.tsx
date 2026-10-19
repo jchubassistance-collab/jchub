@@ -1,7 +1,7 @@
-﻿'use client';
+'use client';
 
 import { useLocale } from 'next-intl';
-import { CircleHelp, Home, Info, Mail, Menu, Wrench, X } from 'lucide-react';
+import { ChevronRight, Home, Info, Mail, Menu,Newspaper, Wrench, X } from 'lucide-react';
 import { useState } from 'react';
 import { ToolFinder } from '@/components/layout/ToolFinder';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
@@ -13,6 +13,7 @@ const copy = bilingual({
   home: 'Accueil',
   about: 'À propos',
   tools: 'Outils',
+  blog: 'Blog', 
   contact: 'Contact',
   homeLabel: 'יָהּ, accueil',
   openMenu: 'Ouvrir le menu',
@@ -22,6 +23,7 @@ const copy = bilingual({
   home: 'Home',
   about: 'About',
   tools: 'Tools',
+  blog: 'Blog', 
   contact: 'Contact',
   homeLabel: 'יָהּ, home',
   openMenu: 'Open menu',
@@ -45,71 +47,83 @@ export function Header() {
     { href: '/', label: t.home, icon: Home },
     { href: '/a-propos', label: t.about, icon: Info },
     { href: '/outils', label: t.tools, icon: Wrench },
+    { href: '/blog', label: t.blog, icon: Newspaper },
     { href: '/contact', label: t.contact, icon: Mail },
   ];
   const closeMenus = () => setOpen(false);
 
   return (
-    <header className={`sticky top-0 z-50 border-b backdrop-blur-xl ${isHome ? 'border-blue-100 bg-[#eff6ff]/90 shadow-[0_8px_24px_rgba(37,99,235,.07)]' : 'border-white/10 bg-[#07162d]/80 shadow-[0_12px_30px_rgba(2,11,26,0.28)]'}`}>
-      <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-6 px-4 sm:px-6">
-        <Link href="/" className="group flex shrink-0 items-center" aria-label={t.homeLabel}>
-          <span className="relative grid h-10 w-[3.7rem] shrink-0 place-items-center rounded-xl border border-[#12a8e8]/25 bg-white shadow-[0_4px_14px_rgba(16,28,175,.12)] transition duration-300 group-hover:-translate-y-0.5 group-hover:border-[#12a8e8]/55 group-hover:shadow-[0_8px_20px_rgba(16,28,175,.2)]">
-            <span lang="he" dir="rtl" aria-hidden="true" className="font-serif text-[1.55rem] font-semibold leading-none tracking-[0.02em] transition duration-200 group-hover:scale-105" style={{ fontFamily: '"Noto Serif Hebrew", "Times New Roman", serif' }}>
-              <span className="text-[#101caf]">יָ</span><span className="text-[#12a8e8]">הּ</span>
+    <>
+      <header className={`sticky top-0 z-50 border-b backdrop-blur-xl ${isHome ? 'border-blue-100 bg-[#eff6ff]/90 shadow-[0_8px_24px_rgba(37,99,235,.07)]' : 'border-white/10 bg-[#07162d]/80 shadow-[0_12px_30px_rgba(2,11,26,0.28)]'}`}>
+        <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-6 px-4 sm:px-6">
+          <Link href="/" className="group flex shrink-0 items-center" aria-label={t.homeLabel}>
+            <span className="relative hidden h-10 w-[3.7rem] shrink-0 place-items-center rounded-xl border border-[#12a8e8]/25 bg-white shadow-[0_4px_14px_rgba(16,28,175,.12)] transition duration-300 group-hover:-translate-y-0.5 group-hover:border-[#12a8e8]/55 group-hover:shadow-[0_8px_20px_rgba(16,28,175,.2)] md:grid">
+              <span lang="he" dir="rtl" aria-hidden="true" className="font-serif text-[1.55rem] font-semibold leading-none tracking-[0.02em] transition duration-200 group-hover:scale-105" style={{ fontFamily: '"Noto Serif Hebrew", "Times New Roman", serif' }}>
+                <span className="text-[#101caf]">יָ</span><span className="text-[#12a8e8]">הּ</span>
+              </span>
             </span>
-          </span>
-        </Link>
+            <span className="md:hidden"><MobileBrand /></span>
+          </Link>
 
-        <nav className={`hidden items-center gap-1 rounded-2xl border p-1 lg:flex ${isHome ? 'border-blue-100 bg-white/75' : 'border-white/10 bg-white/5'}`}>
-          {currentLinks.map((link) => (
-            <NavLink key={link.href} {...link} pathname={safePathname} isLight={isHome} />
-          ))}
-        </nav>
+          <nav className={`hidden items-center gap-1 rounded-2xl border p-1 md:flex ${isHome ? 'border-blue-100 bg-white/75' : 'border-white/10 bg-white/5'}`}>
+            {currentLinks.map((link) => (
+              <NavLink key={link.href} {...link} pathname={safePathname} isLight={isHome} />
+            ))}
+          </nav>
 
-        <div className="hidden w-[19rem] items-center gap-3 xl:flex"><ToolFinder compact dark={!isHome}/></div>
-        <div className="flex items-center gap-2">
-          <LanguageSwitcher light={isHome} />
-          <button
-            onClick={() => setOpen((value) => !value)}
-            className={`rounded-xl border p-2.5 transition lg:hidden ${isHome ? 'border-blue-100 bg-white text-slate-800 hover:border-blue-300 hover:bg-blue-50' : 'border-white/10 bg-white/5 text-slate-100 hover:border-[#9ccbff]/40 hover:bg-white/10'}`}
-            aria-label={open ? t.closeMenu : t.openMenu}
-            aria-expanded={open}
-            type="button"
-          >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          <div className="hidden w-[19rem] items-center gap-3 xl:flex"><ToolFinder compact dark={!isHome}/></div>
+          <div className="flex items-center gap-2">
+            <div className="hidden md:block"><LanguageSwitcher light={isHome} /></div>
+            <button
+              onClick={() => setOpen((value) => !value)}
+              className={`rounded-xl border p-2.5 transition md:hidden ${isHome ? 'border-blue-100 bg-white text-slate-800 hover:border-blue-300 hover:bg-blue-50' : 'border-white/10 bg-white/5 text-slate-100 hover:border-[#9ccbff]/40 hover:bg-white/10'}`}
+              aria-label={open ? t.closeMenu : t.openMenu}
+              aria-expanded={open}
+              type="button"
+            >
+              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
 
+      {/* Outside the header: its backdrop blur would make it the box of these fixed layers, and the
+          closed menu, pushed off to the right, would then widen the page on phones. */}
       <div
-        className={`fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-sm transition-opacity duration-200 lg:hidden ${open ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+        className={`fixed inset-0 z-[60] bg-slate-950/30 backdrop-blur-[2px] transition-opacity duration-300 md:hidden ${open ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
         onClick={closeMenus}
         aria-hidden={!open}
       />
       <nav
-        className={`fixed left-0 top-0 z-50 h-screen w-[92vw] max-w-[22rem] overflow-y-auto border-r px-4 pb-8 pt-20 shadow-[0_20px_60px_rgba(2,8,23,0.2)] backdrop-blur-xl transition-transform duration-250 ease-out lg:hidden ${isHome ? 'border-blue-100 bg-white/95' : 'border-white/10 bg-[#081a2f]/95'} ${open ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed right-0 top-0 z-[70] flex h-[100dvh] w-[min(82vw,24rem)] flex-col overflow-y-auto rounded-l-2xl bg-white px-5 pb-6 pt-6 text-slate-900 shadow-[-16px_0_50px_rgba(15,23,42,.15)] transition-transform duration-300 ease-out md:hidden ${open ? 'translate-x-0' : 'translate-x-full'}`}
+        aria-label={t.navigation}
         aria-hidden={!open}
         inert={!open}
       >
-        <div className={`flex items-center justify-between border-b pb-4 ${isHome ? 'border-blue-100' : 'border-white/10'}`}>
-          <span className={`text-xs font-bold uppercase tracking-[0.2em] ${isHome ? 'text-blue-700' : 'text-[#9ccbff]'}`}>{t.navigation}</span>
+        <div className="flex items-center justify-between border-b border-slate-100 pb-5">
+          <Link href="/" onClick={closeMenus} aria-label={t.homeLabel} className="rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0369fb]">
+            <MobileBrand />
+          </Link>
           <button
             type="button"
             onClick={closeMenus}
-            className={`rounded-lg border p-2 transition ${isHome ? 'border-blue-100 bg-white text-slate-800 hover:border-blue-300 hover:bg-blue-50' : 'border-white/10 bg-white/5 text-slate-100 hover:border-[#9ccbff]/40 hover:bg-white/10'}`}
+            className="grid h-9 w-9 place-items-center rounded-full border border-slate-200 text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-[#0369fb]"
             aria-label={t.closeMenu}
           >
-            <X className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" />
           </button>
         </div>
-        <div className="mt-4 space-y-2">
-          {currentLinks.map((link) => (
-            <MobileNavLink key={link.href} {...link} pathname={safePathname} onClick={closeMenus} isLight={isHome} />
+        <div className="mt-6 flex flex-col gap-1">
+          {currentLinks.map((link, index) => (
+            <MobileNavLink key={link.href} {...link} pathname={safePathname} onClick={closeMenus} index={index} open={open} />
           ))}
         </div>
-        <div className="mt-5"><ToolFinder dark={!isHome} onNavigate={closeMenus}/></div>
+        <div className="mt-3 flex justify-start border-t border-slate-100 pt-3">
+          <LanguageSwitcher light small />
+        </div>
+        <div className="mt-auto w-full pt-6"><ToolFinder menu onNavigate={closeMenus}/></div>
       </nav>
-    </header>
+    </>
   );
 }
 
@@ -129,7 +143,7 @@ function NavLink({ href, label, icon: Icon, pathname, isLight = false }: { href:
   );
 }
 
-function MobileNavLink({ href, label, icon: Icon, pathname, onClick, isLight = false }: { href: StaticPathname; label: string; icon: typeof Home; pathname: string; onClick: () => void; isLight?: boolean }) {
+function MobileNavLink({ href, label, icon: Icon, pathname, onClick, index, open }: { href: StaticPathname; label: string; icon: typeof Home; pathname: string; onClick: () => void; index: number; open: boolean }) {
   const active = isCurrentNavLink(href, pathname);
 
   return (
@@ -137,11 +151,24 @@ function MobileNavLink({ href, label, icon: Icon, pathname, onClick, isLight = f
       href={href}
       aria-current={active ? 'page' : undefined}
       onClick={onClick}
-      className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold ${active ? (isLight ? 'bg-blue-50 text-blue-900' : 'bg-white/5 text-white') : (isLight ? 'text-slate-700 hover:bg-blue-50' : 'text-slate-200 hover:bg-white/5')}`}
+      style={{ transitionDelay: open ? `${index * 45}ms` : '0ms' }}
+      className={`group flex items-center gap-3 rounded-xl px-0 py-3 text-sm font-medium transition-[opacity,transform,background-color,color] duration-300 ${open ? 'translate-x-0 opacity-100' : 'translate-x-3 opacity-0'} ${active ? 'bg-blue-50 text-[#0369fb]' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'}`}
     >
-      <Icon className={`h-4 w-4 ${isLight ? 'text-blue-700' : 'text-[#9ccbff]'}`} />
-      {label}
+      <Icon className={`h-6 w-6 shrink-0 transition-transform duration-200 group-hover:scale-110 ${active ? 'text-[#0369fb]' : 'text-slate-500 group-hover:text-slate-800'}`} strokeWidth={1.8} />
+      <span className="min-w-0 flex-1 whitespace-nowrap">{label}</span>
+      <ChevronRight className="ml-auto h-4 w-4 text-slate-400 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-[#0369fb]" strokeWidth={1.7} />
     </Link>
+  );
+}
+
+function MobileBrand() {
+  return (
+    <span className="inline-flex items-center gap-2.5" aria-label="JcHub">
+      <img src="/jchub-icon-192.png" alt="" aria-hidden="true" className="h-9 w-9 rounded-xl shadow-[0_4px_12px_rgba(15,23,42,.15)]" />
+      <span className="text-2xl font-extrabold leading-none tracking-tight text-[#0369fb]">
+        JcHub
+      </span>
+    </span>
   );
 }
 
