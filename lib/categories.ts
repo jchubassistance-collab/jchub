@@ -21,3 +21,25 @@ const CATEGORY_LABELS_EN: Record<string, string> = {
 export function categoryLabel(category: string, locale: Locale): string {
   return locale === 'en' ? CATEGORY_LABELS_EN[category] ?? category : category;
 }
+
+/** Address segment of a category page: its label in that language, e.g. Sécurité → securite / security. */
+export function categorySlug(category: string, locale: Locale): string {
+  return categoryLabel(category, locale)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/** The stored (French) category whose page address in `locale` is `slug`, among `categories`. */
+export function categoryFromSlug(slug: string, locale: Locale, categories: string[]): string | undefined {
+  return categories.find((category) => categorySlug(category, locale) === slug);
+}
+
+/** Categories in order of first appearance, with how many items each one has. */
+export function countByCategory(categories: string[]): { category: string; count: number }[] {
+  const counts = new Map<string, number>();
+  categories.forEach((category) => counts.set(category, (counts.get(category) ?? 0) + 1));
+  return Array.from(counts, ([category, count]) => ({ category, count }));
+}

@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 import { ArrowRight, Check, Grid2X2, Lightbulb, ShieldCheck, Sparkles, Wrench, Zap } from 'lucide-react';
 import { getPublishedTools, localizeTool, toolPath } from '@/lib/tools';
 import { ToolsCatalog } from '@/components/tools/ToolsCatalog';
+import { CategoryLinks } from '@/components/CategoryLinks';
+import { categoryLabel, categorySlug, countByCategory } from '@/lib/categories';
 import { pageMetadata } from '@/lib/seo';
 import { Link } from '@/i18n/navigation';
 import { bilingual } from '@/i18n/copy';
@@ -25,6 +27,10 @@ const copy = bilingual({
   library: 'Bibliothèque',
   libraryTitle: 'Tous les outils JcHub.',
   libraryText: 'Recherche un outil, filtre par catégorie et ouvre directement celui qui répond à ton besoin.',
+  categoriesEyebrow: 'Catégories',
+  categoriesTitle: 'Parcourir par catégorie.',
+  categoriesLabel: 'Catégories d’outils',
+  toolCount: (count: number) => `${count} outil${count > 1 ? 's' : ''}`,
   statsLabel: 'Les outils en chiffres',
   stats: ['Outils disponibles', 'Gratuits', 'Inscription requise', 'Utilisations'],
   faqTitle: 'Questions fréquentes.',
@@ -56,6 +62,10 @@ const copy = bilingual({
   library: 'Library',
   libraryTitle: 'All JcHub tools.',
   libraryText: 'Search for a tool, filter by category and open the one that fits your need.',
+  categoriesEyebrow: 'Categories',
+  categoriesTitle: 'Browse by category.',
+  categoriesLabel: 'Tool categories',
+  toolCount: (count: number) => `${count} tool${count === 1 ? '' : 's'}`,
   statsLabel: 'The tools in numbers',
   stats: ['Tools available', 'Free', 'Sign-up required', 'Uses'],
   faqTitle: 'Frequently asked questions.',
@@ -81,7 +91,9 @@ export default async function ToolsPage({ params, searchParams }: { params: Prom
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const t = copy[locale];
-  const tools = (await getPublishedTools()).map((tool) => ({ ...localizeTool(tool, locale), href: toolPath(tool, locale) }));
+  const publishedTools = await getPublishedTools();
+  const tools = publishedTools.map((tool) => ({ ...localizeTool(tool, locale), href: toolPath(tool, locale) }));
+  const categories = countByCategory(publishedTools.map((tool) => tool.category));
   const { q = '' } = await searchParams;
 
   return (
@@ -128,6 +140,20 @@ export default async function ToolsPage({ params, searchParams }: { params: Prom
           <div className="space-y-3"><Badge>{t.library}</Badge><h2 className="text-3xl font-extrabold leading-tight sm:text-4xl" style={{ fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif' }}>{t.libraryTitle}</h2><p className="max-w-xl text-sm leading-6 text-slate-600">{t.libraryText}</p></div>
         </div>
         <ToolsCatalog tools={tools} initialQuery={q} />
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8 lg:px-10 lg:pb-20">
+        <div className="mb-6 space-y-3"><Badge>{t.categoriesEyebrow}</Badge><h2 className="text-3xl font-extrabold leading-tight sm:text-4xl" style={{ fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif' }}>{t.categoriesTitle}</h2></div>
+        <CategoryLinks
+          label={t.categoriesLabel}
+          items={categories.map((item) => ({
+            key: item.category,
+            href: { pathname: '/outils/categorie/[category]', params: { category: categorySlug(item.category, locale) } },
+            label: categoryLabel(item.category, locale),
+            detail: t.toolCount(item.count),
+            icon: publishedTools.find((tool) => tool.category === item.category)?.icon ?? <Wrench className="h-5 w-5" />,
+          }))}
+        />
       </section>
 
       <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8 lg:px-10 lg:pb-20" aria-label={t.statsLabel}>

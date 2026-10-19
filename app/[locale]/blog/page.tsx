@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
-import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, Sparkles, Tag } from 'lucide-react';
 import { BlogCatalog } from '@/components/blog/BlogCatalog';
+import { CategoryLinks } from '@/components/CategoryLinks';
+import { categoryLabel, categorySlug, countByCategory } from '@/lib/categories';
 import { Newsletter } from '@/components/Newsletter';
 import { getPublishedArticles } from '@/lib/blog';
 import { pageMetadata } from '@/lib/seo';
@@ -19,6 +21,10 @@ const copy = bilingual({
   featured: 'À la une',
   eyebrow: 'Ressources pratiques',
   readNow: 'À lire maintenant',
+  categoriesEyebrow: 'Thèmes',
+  categoriesTitle: 'Explorer par thème',
+  categoriesLabel: 'Catégories du blog',
+  articleCount: (count: number) => `${count} article${count > 1 ? 's' : ''}`,
   newsletterTitle: 'Reçois les nouveaux articles',
   newsletterText: 'Un article par semaine. Pas de spam.',
 }, {
@@ -32,6 +38,10 @@ const copy = bilingual({
   featured: 'Featured',
   eyebrow: 'Practical resources',
   readNow: 'Read now',
+  categoriesEyebrow: 'Topics',
+  categoriesTitle: 'Explore by topic',
+  categoriesLabel: 'Blog categories',
+  articleCount: (count: number) => `${count} article${count === 1 ? '' : 's'}`,
   newsletterTitle: 'Get the new articles',
   newsletterText: 'One article a week. No spam.',
 });
@@ -57,6 +67,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
       <section id="articles" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-14 sm:px-8 lg:px-10 lg:py-20"><div className="mb-8"><p className="text-xs font-bold uppercase tracking-[.16em] text-blue-700">{t.eyebrow}</p><h2 className="mt-3 text-3xl font-black sm:text-4xl">{t.readNow}</h2></div><BlogCatalog articles={articles} /></section>
+      <section className="mx-auto max-w-7xl px-5 pb-14 sm:px-8 lg:px-10 lg:pb-20"><div className="mb-6"><p className="text-xs font-bold uppercase tracking-[.16em] text-blue-700">{t.categoriesEyebrow}</p><h2 className="mt-3 text-3xl font-black sm:text-4xl">{t.categoriesTitle}</h2></div><CategoryLinks label={t.categoriesLabel} items={countByCategory(articles.map((article) => article.categoryKey)).map((item) => ({ key: item.category, href: { pathname: '/blog/categorie/[category]', params: { category: categorySlug(item.category, locale) } }, label: categoryLabel(item.category, locale), detail: t.articleCount(item.count), icon: <Tag className="h-5 w-5" /> }))} /></section>
       <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8 lg:px-10 lg:pb-20"><div className="rounded-[1.75rem] border border-blue-100 bg-white p-7 shadow-[0_12px_36px_rgba(37,99,235,.07)] sm:p-10"><div className="mx-auto max-w-3xl text-center"><Sparkles className="mx-auto mb-3 h-8 w-8 text-blue-700" /><h2 className="text-2xl font-black sm:text-3xl">{t.newsletterTitle}</h2><p className="mt-2 text-slate-600">{t.newsletterText}</p><div className="mt-6"><Newsletter /></div></div></div></section>
     </div>
   );

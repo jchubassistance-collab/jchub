@@ -55,7 +55,8 @@ const copy = bilingual({
   next: 'Next',
 });
 
-export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
+/** `showCategories` is false on a category page, where every article shares the category. */
+export function BlogCatalog({ articles, showCategories = true }: { articles: BlogArticle[]; showCategories?: boolean }) {
   const t = copy[useLocale()];
   const pageSize = 8;
   const categories = [ALL, ...Array.from(new Set(articles.map((article) => article.category)))];
@@ -90,7 +91,7 @@ export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
         </label>
 
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-bold uppercase tracking-[.14em] text-slate-500">{t.filterByExpertise}</p>
+          {showCategories && <p className="text-xs font-bold uppercase tracking-[.14em] text-slate-500">{t.filterByExpertise}</p>}
           <div className="flex shrink-0 rounded-xl border border-blue-100 bg-white p-1" aria-label={t.chooseView}>
             <button type="button" onClick={() => setView('grid')} aria-label={t.gridView} aria-pressed={view === 'grid'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><Grid2X2 className="h-4 w-4" /></button>
             <button type="button" onClick={() => setView('compact')} aria-label={t.compactView} aria-pressed={view === 'compact'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'compact' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><Grid3X3 className="h-4 w-4" /></button>
@@ -99,7 +100,7 @@ export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
         </div>
       </div>
 
-      <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2" aria-label={t.filterArticles}>
+      {showCategories && <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2" aria-label={t.filterArticles}>
         {categories.map((item) => (
           <button
             key={item}
@@ -110,7 +111,7 @@ export function BlogCatalog({ articles }: { articles: BlogArticle[] }) {
             {item === ALL ? t.all : item}
           </button>
         ))}
-      </div>
+      </div>}
 
       <p className="mb-5 text-sm text-slate-500">
         <span className="font-black text-slate-900">{filteredArticles.length}</span>{t.found(filteredArticles.length)}

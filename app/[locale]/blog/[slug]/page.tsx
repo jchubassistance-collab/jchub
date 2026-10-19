@@ -8,6 +8,7 @@ import { getPublishedArticles, getPublishedArticleBySlug, getPublishedArticleSlu
 import { toolPath, tools } from '@/lib/tools';
 import { getPublicBaseUrl } from '@/lib/site-url';
 import { languageAlternates } from '@/lib/seo';
+import { categorySlug } from '@/lib/categories';
 import { getPathname, Link } from '@/i18n/navigation';
 import { bilingual, OG_LOCALE } from '@/i18n/copy';
 import { isLocale, type Locale } from '@/i18n/routing';
@@ -128,7 +129,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
           <div className="grid items-end gap-10 lg:grid-cols-[1fr_360px]">
             <div className="max-w-3xl">
               <div className="mb-5 flex flex-wrap items-center gap-3 text-sm">
-                <span className="rounded-full bg-blue-50 px-3 py-1 font-semibold text-blue-700">{article.category}</span>
+                <Link href={{ pathname: '/blog/categorie/[category]', params: { category: categorySlug(article.categoryKey, locale) } }} className="rounded-full bg-blue-50 px-3 py-1 font-semibold text-blue-700 transition hover:bg-blue-100 hover:text-blue-900">{article.category}</Link>
                 <span className="inline-flex items-center gap-1 text-slate-500"><Calendar className="h-4 w-4" />{article.publishedAt?.slice(0, 10) || t.published}</span>
                 <span className="inline-flex items-center gap-1 text-slate-500"><Clock className="h-4 w-4" />{article.readTime}</span>
               </div>

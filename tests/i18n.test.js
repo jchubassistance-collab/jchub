@@ -56,3 +56,17 @@ test('les outils intégrés ont une adresse anglaise unique', () => {
     assert.ok(owner === -1 || owner === index, `${slug} est déjà l’adresse française d’un autre outil`);
   });
 });
+
+test('chaque catégorie a une adresse propre dans chaque langue, et on la retrouve à partir de cette adresse', async () => {
+  const { categoryFromSlug, categorySlug, countByCategory } = await import('../lib/categories.ts');
+  const categories = ['Développement', 'Design', 'Document', 'Productivité', 'Sécurité', 'Texte', 'Encodage', 'Autre', 'Informatique', 'Frontend', 'Technologie', 'Base de données', 'Produit', 'Numérique'];
+  for (const locale of ['fr', 'en']) {
+    const slugs = categories.map((category) => categorySlug(category, locale));
+    assert.equal(new Set(slugs).size, categories.length, `deux catégories partagent une adresse en ${locale}`);
+    for (const slug of slugs) assert.match(slug, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    for (const category of categories) assert.equal(categoryFromSlug(categorySlug(category, locale), locale, categories), category);
+  }
+  assert.equal(categorySlug('Base de données', 'fr'), 'base-de-donnees');
+  assert.equal(categorySlug('Sécurité', 'en'), 'security');
+  assert.deepEqual(countByCategory(['Design', 'Document', 'Design']), [{ category: 'Design', count: 2 }, { category: 'Document', count: 1 }]);
+});

@@ -10,7 +10,8 @@ import { bilingual } from '@/i18n/copy';
 
 /** A tool already localized by the page, with its address in the visitor's language. */
 export type CatalogTool = Tool & { href: string };
-type ToolsCatalogProps = { tools: CatalogTool[]; initialQuery?: string };
+/** `showCategories` is false on a category page, where every tool shares the category. */
+type ToolsCatalogProps = { tools: CatalogTool[]; initialQuery?: string; showCategories?: boolean };
 const DESKTOP_PAGE_SIZE = 12;
 const MOBILE_PAGE_SIZE = 4;
 const ALL = '__all__';
@@ -49,7 +50,7 @@ const copy = bilingual({
   next: 'Next',
 });
 
-export function ToolsCatalog({ tools, initialQuery = '' }: ToolsCatalogProps) {
+export function ToolsCatalog({ tools, initialQuery = '', showCategories = true }: ToolsCatalogProps) {
   const locale = useLocale();
   const t = copy[locale];
   const [page, setPage] = useState(1);
@@ -97,18 +98,18 @@ export function ToolsCatalog({ tools, initialQuery = '' }: ToolsCatalogProps) {
 
   return (
     <>
-      <div className="template-tools__filters mb-6 grid gap-3 rounded-[1.25rem] border border-blue-100 bg-white p-3 shadow-[0_8px_28px_rgba(37,99,235,.06)] sm:grid-cols-[1fr_auto] sm:p-4">
+      <div className={`template-tools__filters mb-6 grid gap-3 rounded-[1.25rem] border border-blue-100 bg-white p-3 shadow-[0_8px_28px_rgba(37,99,235,.06)] sm:p-4 ${showCategories ? 'sm:grid-cols-[1fr_auto]' : ''}`}>
         <label className="relative block">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
           <input value={query} onChange={(event) => updateQuery(event.target.value)} placeholder={t.searchPlaceholder} className="w-full rounded-full border border-blue-100 bg-[#f8fbff] py-3 pl-11 pr-10 text-sm text-[#0f172a] outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:ring-2 focus:ring-blue-100" aria-label={t.searchLabel} />
           {query && <button type="button" onClick={() => updateQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-700" aria-label={t.clearSearch}><X className="h-4 w-4" /></button>}
         </label>
-        <div className="flex min-w-0 items-center gap-2 pb-1 sm:max-w-xl sm:justify-end sm:pb-0" aria-label={t.filterLabel}>
+        {showCategories && <div className="flex min-w-0 items-center gap-2 pb-1 sm:max-w-xl sm:justify-end sm:pb-0" aria-label={t.filterLabel}>
           <button type="button" onClick={() => { setCategory(ALL); setPage(1); }} className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-bold transition ${category === ALL ? 'border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'border-blue-100 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800'}`}>{t.all}</button>
           <div className="tools-category-scroll flex min-w-0 gap-2 overflow-x-auto">
             {categories.filter((item) => item !== ALL).map((item) => <button key={item} type="button" onClick={() => { setCategory(item); setPage(1); }} className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-bold transition ${category === item ? 'border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'border-blue-100 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800'}`}>{item}</button>)}
           </div>
-        </div>
+        </div>}
       </div>
 
       <div className="mb-5 flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">

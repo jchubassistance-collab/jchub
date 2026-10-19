@@ -3,6 +3,8 @@ import { getPublishedArticlesByLocale } from '@/lib/blog';
 import { getPublishedTools, toolPath } from '@/lib/tools';
 import { getPublicBaseUrl } from '@/lib/site-url';
 import { localizedPaths, type LocalizedPaths } from '@/lib/seo';
+import { countByCategory } from '@/lib/categories';
+import { blogCategoryPath, toolCategoryPath } from '@/lib/category-paths';
 import type { StaticPathname } from '@/i18n/routing';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +18,7 @@ type Entry = MetadataRoute.Sitemap[number];
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getPublicBaseUrl();
-  // One Firestore query gives the articles in both languages.
+  // The articles come from content/articles, in both languages.
   const [{ fr: articles, en: englishArticles }, tools] = await Promise.all([getPublishedArticlesByLocale(), getPublishedTools()]);
   const publicPages: { href: StaticPathname; changeFrequency: Entry['changeFrequency']; priority: number }[] = [
     { href: '/', changeFrequency: 'weekly', priority: 1 },
@@ -58,6 +60,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...tools.filter((tool) => tool.slug.trim()).flatMap((tool) => bothLanguages(
       { fr: toolPath(tool, 'fr'), en: toolPath(tool, 'en') },
       { changeFrequency: 'monthly', priority: 0.7 },
+    )),
+    ...countByCategory(tools.map((tool) => tool.category)).flatMap(({ category }) => bothLanguages(
+      { fr: toolCategoryPath(category, 'fr'), en: toolCategoryPath(category, 'en') },
+      { changeFrequency: 'weekly', priority: 0.6 },
+    )),
+    ...countByCategory(articles.map((article) => article.categoryKey)).flatMap(({ category }) => bothLanguages(
+      { fr: blogCategoryPath(category, 'fr'), en: blogCategoryPath(category, 'en') },
+      { changeFrequency: 'weekly', priority: 0.5 },
     )),
   ];
 

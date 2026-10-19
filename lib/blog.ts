@@ -15,7 +15,10 @@ export type BlogArticle = {
   description: string;
   excerpt: string;
   keywords: string[];
+  /** Category in the visitor's language. */
   category: string;
+  /** Category as stored, in French: the key of its category page. */
+  categoryKey: string;
   author: string;
   image: string;
   content: string;
@@ -90,16 +93,18 @@ function englishCoverLabel(label: string): string {
  * title; static covers have an English copy under /blog/en/.
  */
 export function articleImage(image: string, title: string, locale: Locale): string {
-  if (locale === 'fr') return image;
   if (image.includes('/api/article-cover')) {
     try {
       const url = new URL(image, 'https://jchub.dev');
+      // Generated covers are drawn by this site, whatever host was saved with the article.
+      if (locale === 'fr') return `/api/article-cover?${url.searchParams}`;
       const params = new URLSearchParams({ title, category: englishCoverLabel(url.searchParams.get('category') || 'JcHub'), lang: 'en' });
       return `/api/article-cover?${params}`;
     } catch {
       return image;
     }
   }
+  if (locale === 'fr') return image;
   if (/^\/blog\/[^/]+\.svg$/.test(image)) return image.replace('/blog/', '/blog/en/');
   return image;
 }
@@ -112,7 +117,8 @@ function toArticle(data: Record<string, unknown>, locale: Locale): BlogArticle {
   const title = english?.title ?? String(data.title || (locale === 'en' ? 'JcHub article' : 'Article JcHub'));
   const description = english?.description ?? String(data.description || '');
   const keywords = english?.keywords.length ? english.keywords : Array.isArray(data.keywords) ? data.keywords.map(String) : [];
-  const category = categoryLabel(String(data.category || 'Développement'), locale);
+  const categoryKey = String(data.category || 'Développement');
+  const category = categoryLabel(categoryKey, locale);
   const status = data.status === 'scheduled' || data.status === 'draft' ? data.status : 'published';
   const slugs = { fr: frenchSlug, en: translation?.slug || frenchSlug };
   return {
@@ -123,6 +129,7 @@ function toArticle(data: Record<string, unknown>, locale: Locale): BlogArticle {
     excerpt: english?.excerpt ?? String(data.excerpt || data.description || ''),
     keywords,
     category,
+    categoryKey,
     author: String(data.author || 'JcHub'),
     image: articleImage(String(data.image || '/blog/default.svg'), title, locale),
     content: english?.content ?? String(data.content || ''),

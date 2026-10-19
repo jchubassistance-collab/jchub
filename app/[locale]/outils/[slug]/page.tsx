@@ -11,6 +11,7 @@ import { bilingual, OG_LOCALE } from '@/i18n/copy';
 import { isLocale, type Locale } from '@/i18n/routing';
 import { getPublicBaseUrl } from '@/lib/site-url';
 import { defaultSocialImage, languageAlternates } from '@/lib/seo';
+import { categorySlug } from '@/lib/categories';
 
 export const dynamic = 'force-dynamic';
 
@@ -124,6 +125,7 @@ export default async function ToolPage({ params }: { params: Params }) {
   // A French slug opened in English moves to the English address.
   if (tool.localSlug && tool.localSlug !== slug) permanentRedirect(toolPath(found, locale));
   const t = copy[locale];
+  const categoryHref = { pathname: '/outils/categorie/[category]' as const, params: { category: categorySlug(found.category, locale) } };
 
   // A catalog entry pointing to an unknown component used to silently show the password generator.
   if (!isToolComponentName(tool.component)) notFound();
@@ -164,6 +166,8 @@ export default async function ToolPage({ params }: { params: Params }) {
             <ChevronRight className="h-3 w-3 text-slate-400" aria-hidden="true" />
             <Link href="/outils" className="hover:text-blue-700">{t.tools}</Link>
             <ChevronRight className="h-3 w-3 text-slate-400" aria-hidden="true" />
+            <Link href={categoryHref} className="hover:text-blue-700">{tool.category}</Link>
+            <ChevronRight className="h-3 w-3 text-slate-400" aria-hidden="true" />
             <span className="font-semibold text-[#0f172a]">{tool.name}</span>
           </nav>
 
@@ -175,7 +179,7 @@ export default async function ToolPage({ params }: { params: Params }) {
               <div className="flex flex-wrap items-center gap-2">
                 {/* Sur mobile, l'icône rejoint les badges au lieu d'occuper une ligne. */}
                 <span aria-hidden="true" className="mr-1 grid h-11 w-11 place-items-center rounded-xl border border-blue-100 bg-white text-2xl shadow-[0_8px_20px_rgba(37,99,235,.12)] sm:hidden">{tool.icon}</span>
-                <span className="rounded-full border border-blue-100 bg-white/80 px-2.5 py-0.5 text-xs font-semibold text-blue-800">{tool.category}</span>
+                <Link href={categoryHref} className="rounded-full border border-blue-100 bg-white/80 px-2.5 py-0.5 text-xs font-semibold text-blue-800 transition hover:border-blue-300 hover:text-blue-900">{tool.category}</Link>
                 <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-800">{t.free}</span>
               </div>
               <h1 className="mt-3 text-3xl font-black tracking-tight text-[#0f172a] [text-wrap:balance] md:text-4xl">{tool.name}</h1>
