@@ -17,9 +17,10 @@
     "test:cm": "node --experimental-strip-types --test tests/cm-metrics.test.js",
     "test:tool-generator": "node --experimental-strip-types --test tests/tool-generation-rules.test.js",
     "test:tool-search": "node --experimental-strip-types --test tests/tool-search.test.js",
-    "test": "npm run -s test:social && npm run -s test:api-cost-calculator && npm run -s test:pdf && npm run -s test:csv && npm run -s test:cm && npm run -s test:tool-generator && npm run -s test:tool-search && npm run -s test:i18n && npm run -s test:articles",
+    "test": "npm run -s test:social && npm run -s test:api-cost-calculator && npm run -s test:pdf && npm run -s test:csv && npm run -s test:cm && npm run -s test:tool-generator && npm run -s test:tool-search && npm run -s test:i18n && npm run -s test:articles && npm run -s test:pdf-pages",
     "test:i18n": "node --experimental-strip-types --test tests/i18n.test.js",
     "test:articles": "node --experimental-strip-types --test tests/article-files.test.js",
+    "test:pdf-pages": "node --experimental-strip-types --test tests/pdf-pages.test.js",
     "articles:export": "node --experimental-strip-types --env-file=.env scripts/export-articles.mjs"
   },
   "dependencies": {
@@ -38,6 +39,7 @@
     "date-fns": "^4.1.0",
     "docx": "^9.7.1",
     "exceljs": "^4.4.0",
+    "fflate": "0.8.3",
     "firebase": "^11.3.1",
     "firebase-admin": "13.10.0",
     "gray-matter": "^2.0.1",
@@ -45,6 +47,7 @@
     "lucide-react": "^0.453.0",
     "next": "^16.4.0",
     "next-intl": "^4.14.9",
+    "pdf-lib": "1.17.1",
     "pdf-parse": "^1.1.1",
     "pdfjs-dist": "^6.3.289",
     "qrcode": "^1.5.4",

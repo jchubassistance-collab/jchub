@@ -28,6 +28,7 @@ const tools: Record<ToolComponentName, ComponentType> = {
   QrCodeGenerator: dynamic(() => import('@/components/tools/jchub-tools/QrCodeGenerator').then((m) => m.QrCodeGenerator)),
   TimestampConverter: dynamic(() => import('@/components/tools/jchub-tools/TimestampConverter').then((m) => m.TimestampConverter)),
   UrlEncoder: dynamic(() => import('@/components/tools/jchub-tools/UrlEncoder').then((m) => m.UrlEncoder)),
+  PdfMergeSplit: dynamic(() => import('@/components/tools/PdfMergeSplit').then((m) => m.PdfMergeSplit)),
   // @generated-tools: components created from the admin are inserted above this line.
 };
 

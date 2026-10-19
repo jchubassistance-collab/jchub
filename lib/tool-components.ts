@@ -20,6 +20,7 @@ export const TOOL_COMPONENTS = [
   'QrCodeGenerator',
   'TimestampConverter',
   'UrlEncoder',
+  'PdfMergeSplit',
   // @generated-tools: components created from the admin are inserted above this line.
 ] as const;
 

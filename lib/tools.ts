@@ -442,6 +442,34 @@ export const tools: Tool[] = [
     },
   },
   {
+    slug: 'fusionner-decouper-pdf',
+    name: 'Fusion et découpe de PDF',
+    description: 'Fusionne plusieurs PDF en un seul ou découpe un PDF en plusieurs fichiers, directement dans ton navigateur.',
+    category: 'Document',
+    icon: '✂️',
+    tags: ['pdf', 'fusionner', 'découper', 'pages', 'extraire', 'document'],
+    component: 'PdfMergeSplit',
+    translations: {
+      en: {
+        slug: 'merge-split-pdf',
+        name: 'PDF merge and split',
+        description: 'Merge several PDFs into one or split a PDF into several files, right in your browser.',
+        tags: ['pdf', 'merge', 'split', 'pages', 'extract', 'document'],
+        seo: {
+          title: 'Merge and split PDF files for free — JcHub',
+          description: 'Combine several PDFs into one file or split a PDF by pages. Free, no sign-up: your files never leave your browser.',
+          keywords: ['merge pdf', 'split pdf', 'combine pdf', 'extract pdf pages', 'pdf splitter'],
+        },
+      },
+    },
+    status: 'published',
+    seo: {
+      title: 'Fusionner et découper un PDF gratuitement — JcHub',
+      description: 'Assemble plusieurs PDF en un seul fichier ou découpe un PDF par pages. Gratuit, sans inscription : tes fichiers restent dans ton navigateur.',
+      keywords: ['fusionner pdf', 'découper pdf', 'assembler pdf', 'extraire pages pdf', 'diviser pdf'],
+    },
+  },
+  {
     slug: 'convertisseur-couleurs',
     name: 'Convertisseur de couleurs',
     description: 'Convertis les couleurs entre HEX, RGB, HSL et autres formats.',
