@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import path from 'node:path';
 import matter from 'gray-matter';
 
 /**
@@ -10,6 +11,16 @@ import matter from 'gray-matter';
  */
 
 export const ARTICLES_DIRECTORY = 'content/articles';
+
+/**
+ * Absolute path on disk of content/articles or of one of its files. The folder is spelled out
+ * here on purpose: the build traces the files each server function reads, and a path made from
+ * a variable after process.cwd() makes it bundle the whole project (.env, .git and .next/lock,
+ * which then fails the Vercel deploy).
+ */
+export function articlePathOnDisk(file: string = ARTICLES_DIRECTORY): string {
+  return path.join(process.cwd(), 'content/articles', path.posix.relative(ARTICLES_DIRECTORY, file));
+}
 
 /** Fields of the French document written to the file, in this order. */
 const FRENCH_FIELDS = ['slug', 'title', 'description', 'excerpt', 'category', 'keywords', 'tags', 'author', 'image', 'readTime', 'status', 'publishedAt', 'scheduledFor', 'updatedAt'] as const;

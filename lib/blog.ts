@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { cache } from 'react';
-import { ARTICLES_DIRECTORY, parseArticleFiles } from '@/lib/article-files';
+import { articlePathOnDisk, parseArticleFiles } from '@/lib/article-files';
 import { categoryLabel } from '@/lib/categories';
 import { tools } from '@/lib/tools';
 import type { Locale } from '@/i18n/routing';
@@ -153,7 +153,7 @@ let articleRecords: Record<string, unknown>[] | null = null;
  */
 function readArticleRecords(): Record<string, unknown>[] {
   if (articleRecords && process.env.NODE_ENV === 'production') return articleRecords;
-  const directory = path.join(process.cwd(), ARTICLES_DIRECTORY);
+  const directory = articlePathOnDisk();
   const records = fs.existsSync(directory)
     ? fs.readdirSync(directory)
       .filter((file) => file.endsWith('.md'))

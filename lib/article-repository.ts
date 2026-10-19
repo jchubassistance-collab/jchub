@@ -5,7 +5,7 @@ import path from 'node:path';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { ensureArticleTranslation } from '@/lib/content-translation';
 import { reportUserError } from '@/lib/user-error';
-import { ARTICLES_DIRECTORY, articleFilePaths, buildArticleFiles, gitBlobSha, isSafeArticleId } from '@/lib/article-files';
+import { ARTICLES_DIRECTORY, articleFilePaths, articlePathOnDisk, buildArticleFiles, gitBlobSha, isSafeArticleId } from '@/lib/article-files';
 import { commitFilesOnBase, getGithubConfig, listRepoDirectory, type GithubConfig } from '@/lib/github';
 
 /**
@@ -27,7 +27,7 @@ async function existingFiles(config: GithubConfig | null): Promise<Map<string, s
   const files = new Map<string, string>();
   for (const directory of [ARTICLES_DIRECTORY, `${ARTICLES_DIRECTORY}/en`]) {
     if (!config) {
-      const absolute = path.join(process.cwd(), directory);
+      const absolute = articlePathOnDisk(directory);
       if (!fs.existsSync(absolute)) continue;
       for (const name of fs.readdirSync(absolute).filter((file) => file.endsWith('.md'))) {
         files.set(`${directory}/${name}`, gitBlobSha(fs.readFileSync(path.join(absolute, name), 'utf8').replace(/\r\n/g, '\n')));
@@ -57,7 +57,7 @@ function diff(wanted: Record<string, string>, ids: string[], existing: Map<strin
 
 function writeToDisk(changes: FileChanges) {
   changes.forEach((text, file) => {
-    const absolute = path.join(process.cwd(), file);
+    const absolute = articlePathOnDisk(file);
     if (text === null) fs.rmSync(absolute, { force: true });
     else {
       fs.mkdirSync(path.dirname(absolute), { recursive: true });
