@@ -172,7 +172,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
       </div>
 
       <div className="mx-auto max-w-4xl px-4 pb-16 sm:px-6 lg:px-8">
-        <GiscusComments />
+        <GiscusComments articleId={article.id} />
         {relatedArticles.length > 0 && (
           <section className="mt-12">
             <h2 className="mb-5 text-2xl font-black text-slate-900">{t.readNext}</h2>

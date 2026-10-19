@@ -14,7 +14,11 @@ const copy = bilingual({
   soon: 'Comments will be available soon.',
 });
 
-export function GiscusComments() {
+/**
+ * One discussion per article, shared by its French and English pages: it is found by the
+ * article id (also the name of its file), which does not change with the address or language.
+ */
+export function GiscusComments({ articleId }: { articleId: string }) {
   const locale = useLocale();
   const t = copy[locale];
   const containerRef = useRef<HTMLDivElement>(null);
@@ -22,7 +26,8 @@ export function GiscusComments() {
   useEffect(() => {
     const repository = process.env.NEXT_PUBLIC_GISCUS_REPOSITORY;
     const category = process.env.NEXT_PUBLIC_GISCUS_CATEGORY;
-    if (!repository || !category || !containerRef.current) return;
+    const container = containerRef.current;
+    if (!repository || !category || !container) return;
 
     const script = document.createElement('script');
     script.src = 'https://giscus.app/client.js';
@@ -32,16 +37,19 @@ export function GiscusComments() {
     script.setAttribute('data-repo-id', process.env.NEXT_PUBLIC_GISCUS_REPOSITORY_ID || '');
     script.setAttribute('data-category', category);
     script.setAttribute('data-category-id', process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID || '');
-    script.setAttribute('data-mapping', 'pathname');
-    script.setAttribute('data-strict', '0');
+    script.setAttribute('data-mapping', 'specific');
+    script.setAttribute('data-term', `blog/${articleId}`);
+    // Exact match on the term, so an article never picks up the discussion of a similar title.
+    script.setAttribute('data-strict', '1');
     script.setAttribute('data-reactions-enabled', '1');
     script.setAttribute('data-emit-metadata', '0');
     script.setAttribute('data-input-position', 'top');
     script.setAttribute('data-theme', 'light');
     script.setAttribute('data-lang', locale);
-    containerRef.current.appendChild(script);
-    return () => { script.remove(); };
-  }, [locale]);
+    container.appendChild(script);
+    // The script turns into an iframe: clear it so another article does not show two threads.
+    return () => { container.replaceChildren(); };
+  }, [locale, articleId]);
 
   const configured = process.env.NEXT_PUBLIC_GISCUS_REPOSITORY && process.env.NEXT_PUBLIC_GISCUS_CATEGORY;
   return (
