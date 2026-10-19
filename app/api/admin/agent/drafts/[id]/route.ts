@@ -1,5 +1,5 @@
 import { after, NextRequest, NextResponse } from 'next/server';
-import { ensureArticleTranslation } from '@/lib/content-translation';
+import { refreshArticle } from '@/lib/article-repository';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
@@ -55,7 +55,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         sourceDraftId: id,
       }, { merge: true });
       await reference.update({ status: 'scheduled', publishedSlug: slug, scheduledFor, approvedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
-      after(() => ensureArticleTranslation(slug).catch(() => reportUserError()));
+      after(() => refreshArticle(slug, { translate: true }));
       return NextResponse.json({ id, status: 'scheduled', slug, scheduledFor: scheduledDate.toISOString() });
     }
     if (body.action === 'edit') {
@@ -111,7 +111,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         sourceDraftId: id,
       }, { merge: true });
       await reference.update({ status: 'scheduled', publishedSlug: slug, scheduledFor, updatedAt: FieldValue.serverTimestamp() });
-      after(() => ensureArticleTranslation(slug).catch(() => reportUserError()));
+      after(() => refreshArticle(slug, { translate: true }));
       return NextResponse.json({ id: id, status: 'scheduled', slug, scheduledFor: requestedDate.toISOString() });
     }
     if (body.action === 'publish-network') {
@@ -163,7 +163,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         tags: Array.isArray(draft.keywords) ? draft.keywords.map(String) : ['development', 'technology'],
       })];
       await reference.update({ status: 'published', publishedSlug: slug, socialResults, publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
-      after(() => ensureArticleTranslation(slug).catch(() => reportUserError()));
+      after(() => refreshArticle(slug, { translate: true }));
       try { await start(runSocialPreparation, [slug]); }
       catch { reportUserError(); }
       return NextResponse.json({ id: id, status: 'published', slug, socialResults });

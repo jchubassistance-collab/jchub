@@ -25,6 +25,8 @@ const nextConfig = {
   typedRoutes: false,
   serverExternalPackages: ['@napi-rs/canvas', '@adobe/pdfservices-node-sdk', 'gray-matter'],
   outputFileTracingIncludes: {
+    // Articles are read from these files at request time by the blog, sitemap, RSS and agents.
+    '/**': ['./content/articles/**/*.md'],
     '/api/tools/pdf-to-word': ['./node_modules/pdfjs-dist/standard_fonts/**'],
     '/api/cm/kits/[id]/image': ['./assets/fonts/**', './public/jchub-icon-192.png'],
     '/api/kit-image/[id]': ['./assets/fonts/**', './public/jchub-icon-192.png'],

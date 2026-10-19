@@ -128,10 +128,10 @@ export default async function ToolPage({ params }: { params: Params }) {
         (candidate.category === found.category ? 3 : 0) +
         candidate.tags.filter((tag) => found.tags.includes(tag)).length,
     }))
-    .map(({ tool: candidate, score }) => ({ tool: localizeTool(candidate, locale), score }))
+    // Ties are broken on the French name so both languages suggest the same tools.
     .sort((a, b) => b.score - a.score || a.tool.name.localeCompare(b.tool.name))
     .slice(0, 4)
-    .map(({ tool: candidate }) => candidate);
+    .map(({ tool: candidate }) => localizeTool(candidate, locale));
 
   return (
     <div className="template-home min-h-screen bg-[#eff6ff] text-[#0f172a]">

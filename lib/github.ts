@@ -81,6 +81,39 @@ export async function commitFilesOnBranch(
   return commit.sha;
 }
 
+/** Entries of a repository folder with their Git object id; empty when the folder does not exist. */
+export async function listRepoDirectory(config: GithubConfig, directory: string, ref: string): Promise<Array<{ type: string; path: string; sha: string }>> {
+  try {
+    const entries = await github<Array<{ type: string; path: string; sha: string }>>(config, `/contents/${directory}?ref=${encodeURIComponent(ref)}`);
+    return Array.isArray(entries) ? entries : [];
+  } catch (error) {
+    if (error instanceof GithubError && error.status === 404) return [];
+    throw error;
+  }
+}
+
+/**
+ * Adds one commit on top of the base branch; a null content removes the file. Never forces:
+ * when another commit lands in the meantime, it starts again from the new head.
+ */
+export async function commitFilesOnBase(config: GithubConfig, files: Array<{ path: string; content: string | null }>, message: string): Promise<string> {
+  for (let attempt = 1; ; attempt += 1) {
+    const baseSha = await getBaseSha(config);
+    const baseCommit = await github<{ tree: { sha: string } }>(config, `/git/commits/${baseSha}`);
+    const tree = await github<{ sha: string }>(config, '/git/trees', {
+      method: 'POST',
+      body: { base_tree: baseCommit.tree.sha, tree: files.map((file) => ({ path: file.path, mode: '100644', type: 'blob', ...(file.content === null ? { sha: null } : { content: file.content }) })) },
+    });
+    const commit = await github<{ sha: string }>(config, '/git/commits', { method: 'POST', body: { message, tree: tree.sha, parents: [baseSha] } });
+    try {
+      await github(config, `/git/refs/heads/${config.base}`, { method: 'PATCH', body: { sha: commit.sha, force: false } });
+      return commit.sha;
+    } catch (error) {
+      if (!(error instanceof GithubError) || error.status !== 422 || attempt >= 3) throw error;
+    }
+  }
+}
+
 export type PullRequest = {
   number: number;
   html_url: string;

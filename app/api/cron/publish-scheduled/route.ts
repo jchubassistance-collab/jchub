@@ -3,6 +3,7 @@ import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { notifyBrevoNewArticle } from '@/lib/brevo';
 import { ensureArticleTranslation } from '@/lib/content-translation';
+import { logSyncError, syncArticleFiles } from '@/lib/article-repository';
 import { articleImage, toArticleTranslation } from '@/lib/blog';
 import { categoryLabel } from '@/lib/categories';
 import { reportUserError } from '@/lib/user-error';
@@ -65,7 +66,9 @@ export async function POST(request: NextRequest) {
       }
       articles.push(document.id);
     }
-    return NextResponse.json({ published: articles.length, articles });
+    // The files already put the articles online at their date; this records the new status.
+    const files = articles.length ? await syncArticleFiles(articles).catch((error) => { logSyncError(error); return null; }) : null;
+    return NextResponse.json({ published: articles.length, articles, files: files?.status ?? null });
   } catch (error) {
     reportUserError();
     return NextResponse.json({ error: 'Publication impossible.' }, { status: 500 });

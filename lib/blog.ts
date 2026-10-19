@@ -1,16 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import matter from 'gray-matter';
 import { cache } from 'react';
-import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
-import { reportUserError } from '@/lib/user-error';
+import { ARTICLES_DIRECTORY, parseArticleFiles } from '@/lib/article-files';
 import { categoryLabel } from '@/lib/categories';
 import { tools } from '@/lib/tools';
 import type { Locale } from '@/i18n/routing';
 
 export type BlogArticle = {
-  /** Firestore document id (the French slug for articles created from the admin). */
+  /** Firestore document id, also the file name in content/articles (the French slug for articles created from the admin). */
   id: string;
   slug: string;
   title: string;
@@ -140,53 +138,49 @@ function toArticle(data: Record<string, unknown>, locale: Locale): BlogArticle {
   };
 }
 
-/** Markdown files shipped with the site, used when Firestore is unreachable. English copies live in content/blog/en. */
-function getLocalFallback(locale: Locale): BlogArticle[] {
-  const directory = path.join(process.cwd(), 'content', 'blog');
-  if (!fs.existsSync(directory)) return [];
-  return fs.readdirSync(directory)
-    .filter((file) => /^\d{2}-.+\.md$/.test(file))
-    .sort()
-    .map((file) => {
-      const parsed = matter(fs.readFileSync(path.join(directory, file), 'utf8'));
-      const data = parsed.data as Record<string, unknown>;
-      const englishFile = path.join(directory, 'en', file);
-      const english = fs.existsSync(englishFile) ? matter(fs.readFileSync(englishFile, 'utf8')) : null;
-      const slug = String(data.slug || file.replace(/\.md$/, ''));
-      return toArticle({
-        ...data,
-        id: slug,
-        slug,
-        content: parsed.content,
-        image: `/blog/${file.replace(/\.md$/, '.svg')}`,
-        status: 'published',
-        translations: english ? { en: { ...(english.data as Record<string, unknown>), content: english.content } } : undefined,
-      }, locale);
-    });
-}
-
-function fromDocument(document: { id: string; data: () => Record<string, unknown> | undefined }, locale: Locale) {
-  const data = document.data() || {};
-  return toArticle({ ...data, id: document.id, slug: data.slug || document.id }, locale);
-}
+let articleRecords: Record<string, unknown>[] | null = null;
 
 /**
- * Published articles in every language from a single Firestore query. Shared by the
- * metadata and the page of one request, so a page view reads the collection once.
+ * Every article file of content/articles, in the order of their id like the former Firestore
+ * query. The files only change with a deploy, so production reads them once per server.
  */
+function readArticleRecords(): Record<string, unknown>[] {
+  if (articleRecords && process.env.NODE_ENV === 'production') return articleRecords;
+  const directory = path.join(process.cwd(), ARTICLES_DIRECTORY);
+  const records = fs.existsSync(directory)
+    ? fs.readdirSync(directory)
+      .filter((file) => file.endsWith('.md'))
+      .sort()
+      .map((file) => {
+        const englishFile = path.join(directory, 'en', file);
+        return parseArticleFiles(
+          file.slice(0, -3),
+          fs.readFileSync(path.join(directory, file), 'utf8'),
+          fs.existsSync(englishFile) ? fs.readFileSync(englishFile, 'utf8') : null,
+        );
+      })
+    : [];
+  articleRecords = records;
+  return records;
+}
+
+/** Published articles, and scheduled ones whose date has come: they go live on time, before the cron. */
+function publishedRecords(now = Date.now()): Record<string, unknown>[] {
+  return readArticleRecords().flatMap((record) => {
+    if (record.status === 'published') return [record];
+    const scheduledFor = Date.parse(String(record.scheduledFor || ''));
+    if (record.status !== 'scheduled' || !Number.isFinite(scheduledFor) || scheduledFor > now) return [];
+    return [{ ...record, status: 'published', publishedAt: record.publishedAt || record.scheduledFor }];
+  });
+}
+
+/** Published articles in every language, read from the files of content/articles. */
 export const getPublishedArticlesByLocale = cache(async (): Promise<Record<Locale, BlogArticle[]>> => {
-  const fallback = () => ({ fr: getLocalFallback('fr'), en: getLocalFallback('en') });
-  if (!hasFirebaseAdminConfig()) return fallback();
-  try {
-    const snapshot = await getAdminDb().collection('articles').where('status', '==', 'published').get();
-    return {
-      fr: snapshot.docs.map((document) => fromDocument(document, 'fr')),
-      en: snapshot.docs.map((document) => fromDocument(document, 'en')),
-    };
-  } catch (error) {
-    reportUserError();
-    return fallback();
-  }
+  const records = publishedRecords();
+  return {
+    fr: records.map((record) => toArticle(record, 'fr')),
+    en: records.map((record) => toArticle(record, 'en')),
+  };
 });
 
 export async function getPublishedArticles(locale: Locale = 'fr'): Promise<BlogArticle[]> {
@@ -198,30 +192,10 @@ export async function getPublishedArticles(locale: Locale = 'fr'): Promise<BlogA
  * French slug is accepted too, so the page can redirect it to the English address.
  */
 export const getPublishedArticleBySlug = cache(async (slug: string, locale: Locale = 'fr'): Promise<BlogArticle | null> => {
-  const matches = (article: BlogArticle) => article.slug === slug || (locale === 'en' && article.slugs.fr === slug);
-  if (!hasFirebaseAdminConfig()) return getLocalFallback(locale).find(matches) || null;
-  try {
-    const articles = getAdminDb().collection('articles');
-    if (locale === 'en') {
-      // One read for an English address; the French slug (redirected by the page) is the document id.
-      // A single-field filter: Firestore indexes it automatically, no composite index to create.
-      const english = await articles.where('translations.en.slug', '==', slug).limit(3).get();
-      const published = english.docs.map((item) => fromDocument(item, locale)).find((item) => item.status === 'published');
-      if (published) return published;
-    }
-    const document = await articles.doc(slug).get();
-    if (document.exists) {
-      const article = fromDocument(document, locale);
-      if (article.status === 'published' && (article.slug === slug || article.slugs.fr === slug)) return article;
-    }
-
-    const snapshot = await articles.where('status', '==', 'published').get();
-    const published = snapshot.docs.map((item) => fromDocument(item, locale));
-    return published.find((item) => item.slug === slug) || published.find(matches) || null;
-  } catch (error) {
-    reportUserError();
-    return getLocalFallback(locale).find(matches) || null;
-  }
+  const articles = (await getPublishedArticlesByLocale())[locale];
+  return articles.find((article) => article.slug === slug)
+    || (locale === 'en' ? articles.find((article) => article.slugs.fr === slug) : undefined)
+    || null;
 });
 
 export async function getPublishedArticleSlugs() {

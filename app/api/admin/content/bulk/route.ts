@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
+import { logSyncError, syncArticleFiles } from '@/lib/article-repository';
 
 export const runtime = 'nodejs';
 
@@ -26,6 +27,8 @@ export async function POST(request: NextRequest) {
       batch.update(snapshot.ref, update);
     }
     await batch.commit();
+    // Published articles get their files, withdrawn ones lose them, in a single commit.
+    after(() => syncArticleFiles(ids).then(() => undefined, logSyncError));
     return NextResponse.json({ updated: ids.length, status });
   } catch (error) {
     const code = error instanceof Error ? error.message : 'INTERNAL_ERROR';

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Home, Search } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { bilingual } from '@/i18n/copy';
@@ -20,6 +21,11 @@ const copy = bilingual({
   about: 'About',
   contact: 'Contact',
 });
+
+/** Tab title and description of the 404 page, in the visitor's language. */
+export function notFoundMetadata(locale: Locale): Metadata {
+  return { title: copy[locale].title, description: copy[locale].text };
+}
 
 export function NotFoundContent({ locale }: { locale: Locale }) {
   const t = copy[locale];

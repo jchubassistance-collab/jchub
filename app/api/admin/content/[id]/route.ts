@@ -1,6 +1,6 @@
 import { after, NextRequest, NextResponse } from 'next/server';
-import { ensureArticleTranslation } from '@/lib/content-translation';
-import { reportUserError } from '@/lib/user-error';
+import { isPublicArticleStatus } from '@/lib/article-files';
+import { refreshArticle } from '@/lib/article-repository';
 import { FieldValue } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
@@ -51,10 +51,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       if (body.status === 'published' && !snapshot.data()?.publishedAt) update.publishedAt = FieldValue.serverTimestamp();
     }
     await reference.update(update);
-    // Edited or newly published text gets its English version refreshed.
-    if (body.title !== undefined || body.description !== undefined || body.content !== undefined || body.status === 'published') {
-      after(() => ensureArticleTranslation(id).catch(() => reportUserError()));
-    }
+    // Edited or newly published text gets its English version refreshed. A draft saved again
+    // has no file to update; an article published, edited or withdrawn has its files rewritten.
+    const translate = body.title !== undefined || body.description !== undefined || body.content !== undefined || body.status === 'published';
+    const sync = isPublicArticleStatus(snapshot.data()?.status) || isPublicArticleStatus(body.status ?? snapshot.data()?.status);
+    if (translate || sync) after(() => refreshArticle(id, { translate, sync }));
     return NextResponse.json({ id, ok: true });
   } catch (error) {
     const code = error instanceof Error ? error.message : 'INTERNAL_ERROR';
