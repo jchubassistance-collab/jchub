@@ -6,11 +6,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { reportUserError } from '@/lib/user-error';
+import { clientIpFromHeaders } from '@/lib/client-ip';
 
-/** Only read client IP headers that the hosting ingress is expected to overwrite. */
+/** The visitor's IP, which a request sent straight to Vercel cannot choose (see lib/client-ip.ts). */
 function getTrustedClientIp(request: NextRequest) {
-  return request.headers.get('cf-connecting-ip')?.trim() || request.headers.get('x-real-ip')?.trim() ||
-    (process.env.NODE_ENV !== 'production' ? 'local-development' : '');
+  return clientIpFromHeaders(request.headers) || (process.env.NODE_ENV !== 'production' ? 'local-development' : '');
 }
 
 /** Distributed Firestore fixed-window limiter. It stores only a one-way IP hash. */

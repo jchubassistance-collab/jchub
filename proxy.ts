@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import createIntlMiddleware from 'next-intl/middleware';
 import { routing } from '@/i18n/routing';
+import { clientIpFromHeaders } from '@/lib/client-ip';
 
 const handleLocale = createIntlMiddleware(routing);
 
@@ -16,7 +17,9 @@ function getContentSecurityPolicy(nonce: string) {
     "object-src 'none'",
     "frame-ancestors 'none'",
     "form-action 'self'",
-    `script-src 'self' 'nonce-${nonce}'${developmentEval} https://www.googletagmanager.com https://www.google-analytics.com https://apis.google.com https://accounts.google.com https://static.cloudflareinsights.com https://tracker.metricool.com https://giscus.app`,
+    // 'strict-dynamic': only scripts carrying the nonce, and those they load, may run; the hosts
+    // below remain for browsers that predate it.
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${developmentEval} https://www.googletagmanager.com https://www.google-analytics.com https://apis.google.com https://accounts.google.com https://static.cloudflareinsights.com https://tracker.metricool.com https://giscus.app`,
     "connect-src 'self' blob: https://vercel.com https://*.blob.vercel-storage.com https://*.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://api.cloudinary.com https://tracker.metricool.com https://cloudflareinsights.com",
     "img-src 'self' data: blob: https:",
     "style-src 'self' 'unsafe-inline' https://giscus.app",
@@ -39,9 +42,8 @@ function isLocalizedPage(pathname: string) {
 }
 
 function getClientIp(request: NextRequest) {
-  // x-forwarded-for can contain values supplied by the client. Use only
-  // headers written by the configured hosting proxy.
-  return request.headers.get('cf-connecting-ip')?.trim() || request.headers.get('x-real-ip')?.trim() || '';
+  // cf-connecting-ip only counts when the request comes from Cloudflare (see lib/client-ip.ts).
+  return clientIpFromHeaders(request.headers);
 }
 
 export function proxy(request: NextRequest) {

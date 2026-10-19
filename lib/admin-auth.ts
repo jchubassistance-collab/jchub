@@ -20,7 +20,18 @@ export function isConfiguredAdmin(user: { email?: string; email_verified?: boole
   return user.email_verified === true && isListedAdminEmail(user.email);
 }
 
+/**
+ * A request that changes data must come from a page of the same site: the session cookie is
+ * SameSite=Lax, which other subdomains of jchub.dev would still receive (CSRF).
+ */
+function assertSameOriginWrite(request: NextRequest) {
+  if (['GET', 'HEAD', 'OPTIONS'].includes(request.method)) return;
+  const origin = request.headers.get('origin');
+  if (!origin || origin !== request.nextUrl.origin) throw new Error('FORBIDDEN');
+}
+
 export async function requireAdmin(request: NextRequest) {
+  assertSameOriginWrite(request);
   const sessionCookie = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
   if (!sessionCookie) throw new Error('UNAUTHORIZED');
 
@@ -43,6 +54,7 @@ export async function requireAdmin(request: NextRequest) {
 
 // Espace CM : rôle cm ou administrateur. isAdmin réserve certaines actions (réglages, canaux non CM) aux administrateurs.
 export async function requireCmActor(request: NextRequest) {
+  assertSameOriginWrite(request);
   const sessionCookie = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
   if (!sessionCookie) throw new Error('UNAUTHORIZED');
   let decodedToken;
