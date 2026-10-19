@@ -70,3 +70,14 @@ test('chaque catégorie a une adresse propre dans chaque langue, et on la retrou
   assert.equal(categorySlug('Sécurité', 'en'), 'security');
   assert.deepEqual(countByCategory(['Design', 'Document', 'Design']), [{ category: 'Design', count: 2 }, { category: 'Document', count: 1 }]);
 });
+
+test('les anciennes adresses françaises sans préfixe mènent à la même page sous /fr', async () => {
+  const { legacyFrenchPath } = await import('../i18n/legacy-paths.ts');
+  assert.equal(legacyFrenchPath('/'), '/fr');
+  assert.equal(legacyFrenchPath('/outils/logo-studio'), '/fr/outils/logo-studio');
+  assert.equal(legacyFrenchPath('/auth/action'), '/fr/auth/action');
+  assert.equal(legacyFrenchPath('/english-guide'), '/fr/english-guide', 'seul le segment exact « en » est une langue');
+  assert.equal(legacyFrenchPath('/fr'), null);
+  assert.equal(legacyFrenchPath('/fr/blog/decoder-jwt'), null);
+  assert.equal(legacyFrenchPath('/en/tools'), null);
+});

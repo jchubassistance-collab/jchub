@@ -4,7 +4,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/lib/firebase-admin';
 import { collectTrends } from '@/lib/content-sources';
 import { getPublishedArticles } from '@/lib/blog';
-import { getPublishedTools } from '@/lib/tools';
+import { getPublishedTools, toolPath } from '@/lib/tools';
 import type { TrendCandidate } from '@/lib/content-sources';
 import { reportUserError } from '@/lib/user-error';
 import { assessEditorialImportance } from '@/lib/editorial-importance';
@@ -264,8 +264,8 @@ export async function collectCatalog(): Promise<CatalogItem[]> {
   const [tools, articles] = await Promise.all([getPublishedTools(), getPublishedArticles()]);
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
   return [
-    ...tools.map((tool) => ({ type: 'tool' as const, slug: tool.slug, title: tool.name, description: tool.description, category: tool.category, url: `${siteUrl}/outils/${tool.slug}` })),
-    ...articles.map((article) => ({ type: 'article' as const, slug: article.slug, title: article.title, description: article.description, category: article.category, url: `${siteUrl}/blog/${article.slug}` })),
+    ...tools.map((tool) => ({ type: 'tool' as const, slug: tool.slug, title: tool.name, description: tool.description, category: tool.category, url: `${siteUrl}${toolPath(tool, 'fr')}` })),
+    ...articles.map((article) => ({ type: 'article' as const, slug: article.slug, title: article.title, description: article.description, category: article.category, url: `${siteUrl}/fr/blog/${article.slug}` })),
   ];
 }
 

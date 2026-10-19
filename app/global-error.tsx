@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
  * global styles and the language provider are not there. The language comes from the address.
  */
 const copy = {
-  fr: { lang: 'fr', title: 'Une erreur est survenue', text: 'Le site n’a pas pu s’afficher. Réessaie dans un instant.', retry: 'Réessayer', home: 'Retour à l’accueil', homeHref: '/' },
+  fr: { lang: 'fr', title: 'Une erreur est survenue', text: 'Le site n’a pas pu s’afficher. Réessaie dans un instant.', retry: 'Réessayer', home: 'Retour à l’accueil', homeHref: '/fr' },
   en: { lang: 'en', title: 'Something went wrong', text: 'The site could not be displayed. Try again in a moment.', retry: 'Try again', home: 'Back to home', homeHref: '/en' },
 };
 

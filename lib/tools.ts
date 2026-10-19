@@ -64,9 +64,9 @@ export function localizeTool(tool: Tool, locale: Locale): Tool {
   };
 }
 
-/** Address of the tool page in `locale`: /outils/<slug> in French, /en/tools/<english-slug> in English. */
+/** Address of the tool page in `locale`: /fr/outils/<slug> in French, /en/tools/<english-slug> in English. */
 export function toolPath(tool: Tool, locale: Locale): string {
-  const prefix = locale === 'en' ? '/en' : '';
+  const prefix = `/${locale}`;
   if (tool.path) return `${prefix}${tool.path}`;
   const slug = locale === 'en' ? tool.translations?.en?.slug || tool.slug : tool.slug;
   return `${prefix}${locale === 'en' ? '/tools' : '/outils'}/${encodeURIComponent(slug)}`;

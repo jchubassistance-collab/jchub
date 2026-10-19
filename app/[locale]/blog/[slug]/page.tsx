@@ -49,29 +49,35 @@ function articlePaths(article: BlogArticle): Record<Locale, string> {
 }
 
 /**
- * Links written in the French text point to French pages; in English they lead to the
- * English version of the same tool or page. A tool missing from the built-in catalog
- * keeps its French slug: the English tool page redirects it to its English address.
+ * Links written in the French text point to French pages, with or without the /fr prefix
+ * French addresses got in October 2026. They lead straight to the page in the reader's
+ * language: /fr/… in French, the English version of the same tool or page in English. A tool
+ * missing from the built-in catalog keeps its French slug: the English tool page redirects it
+ * to its English address. Anchors, relative links, files and other sites are left as written.
  */
-function englishLinkResolver() {
+function localLinkResolver(locale: Locale) {
   const toolsBySlug = new Map(tools.map((tool) => [tool.slug, tool]));
   return (href: string | undefined): string | undefined => {
-    if (!href) return href;
+    const siteLink = href && ((href.startsWith('/') && !href.startsWith('//')) || /^https?:\/\/(www\.)?jchub\.dev(\/|$)/i.test(href));
+    if (!href || !siteLink) return href;
     let url: URL;
     try {
       url = new URL(href, 'https://jchub.dev');
     } catch {
       return href;
     }
-    if (url.hostname !== 'jchub.dev' || url.pathname.startsWith('/en/') || url.pathname === '/en') return href;
-    const [, section, slug] = url.pathname.split('/');
+    if (url.pathname === '/en' || url.pathname.startsWith('/en/') || url.pathname.startsWith('/api/') || /\.[^/]+$/.test(url.pathname)) return href;
+    const pathname = url.pathname.replace(/^\/fr(?=\/|$)/, '').replace(/^\/$/, '');
+    const french = `/fr${pathname}${url.search}${url.hash}`;
+    if (locale === 'fr') return french;
+    const [, section, slug] = pathname.split('/');
     if (section === 'outils' && slug) {
       const tool = toolsBySlug.get(decodeURIComponent(slug));
       return (tool ? toolPath(tool, 'en') : `/en/tools/${slug}`) + url.hash;
     }
     if (section === 'outils') return `/en/tools${url.hash}`;
-    if (section === 'blog') return `/en${url.pathname}${url.hash}`;
-    return href;
+    if (section === 'blog') return `/en${pathname}${url.hash}`;
+    return french;
   };
 }
 
@@ -110,7 +116,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
   if (article.slug !== slug) permanentRedirect(articlePaths(article)[locale]);
   const t = copy[locale];
   const relatedArticles = (await getPublishedArticles(locale)).filter((item) => item.slug !== article.slug && item.category === article.category).slice(0, 3);
-  const resolveLink = locale === 'en' ? englishLinkResolver() : null;
+  const resolveLink = localLinkResolver(locale);
   // The hero already shows the title as the page's only <h1>: drop the article's own leading
   // "# Titre" line, and render any other level-1 heading of the body as <h2>.
   const body = article.content.replace(/^\s*#\s+[^\n]*\n+/, '');
@@ -148,7 +154,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,760px)_260px] lg:px-8 lg:py-16">
         <article className="min-w-0 rounded-[28px] border border-blue-100 bg-white px-5 py-8 shadow-[0_18px_50px_rgba(37,99,235,.08)] sm:px-10 sm:py-12 sm:px-10 sm:py-12">
           {!article.translated && <p className="mb-6 rounded-xl bg-blue-50 px-4 py-3 text-sm text-slate-600">{t.untranslated}</p>}
-          <div className="article-markdown article-markdown--light" lang={article.translated ? undefined : 'fr'}><ReactMarkdown components={{ h1: ({ children }) => <h2>{children}</h2>, ...(resolveLink ? { a: ({ href, title, children }) => <a href={resolveLink(href)} title={title}>{children}</a> } : {}) }}>{body}</ReactMarkdown></div>
+          <div className="article-markdown article-markdown--light" lang={article.translated ? undefined : 'fr'}><ReactMarkdown components={{ h1: ({ children }) => <h2>{children}</h2>, a: ({ href, title, children }) => <a href={resolveLink(href)} title={title}>{children}</a> }}>{body}</ReactMarkdown></div>
           <div className="mt-10 flex flex-wrap gap-2 border-t border-blue-100 pt-6">
             {article.tags.map((tag) => (
               <span key={tag} className="rounded-md bg-blue-50 px-3 py-1.5 text-xs font-semibold text-slate-600">#{tag}</span>

@@ -8,7 +8,7 @@ import { getPublicBaseUrl } from '@/lib/site-url';
 import type { SocialCardInput } from '@/lib/social-card';
 import { generateKitCopy, generateSocialVisual, readSocialVisual, type KitContentSource, type KitCopy, type KitPlatform, type SocialVisual } from '@/lib/social-copy';
 import type { PublicationStatus, SocialSource } from '@/lib/social-types';
-import { getPublishedTools } from '@/lib/tools';
+import { getPublishedTools, toolPath } from '@/lib/tools';
 import { reportUserError } from '@/lib/user-error';
 
 export type CmSource = KitContentSource & { slug: string; readTime?: string; content: string };
@@ -63,13 +63,13 @@ export async function resolveKitSource(kind: 'article' | 'tool', slug: string): 
   if (kind === 'article') {
     const article = await getPublishedArticleBySlug(slug);
     if (article?.status !== 'published') return null;
-    return { kind, slug, title: article.title, description: article.excerpt || article.description, category: article.category, url: `${base}/blog/${encodeURIComponent(slug)}`, tags: article.tags || [], readTime: article.readTime, content: article.content };
+    return { kind, slug, title: article.title, description: article.excerpt || article.description, category: article.category, url: `${base}/fr/blog/${encodeURIComponent(slug)}`, tags: article.tags || [], readTime: article.readTime, content: article.content };
   }
   const tool = (await getPublishedTools({ includeScheduled: true })).find((item) => item.slug === slug);
   if (!tool) return null;
   return {
     kind, slug, title: tool.name, description: tool.description, category: tool.category,
-    url: `${base}${tool.path || `/outils/${encodeURIComponent(slug)}`}`, tags: tool.tags || [],
+    url: `${base}${toolPath(tool, 'fr')}`, tags: tool.tags || [],
     content: [tool.description, tool.seo.description, `Mots-clés : ${[...tool.tags, ...tool.seo.keywords].join(', ')}`].join('\n\n'),
   };
 }

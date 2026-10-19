@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
           title: article.title,
           description: article.description,
           slug: article.slug,
-          path: `/blog/${article.slug}`,
+          path: `/fr/blog/${article.slug}`,
           image: article.image,
           category: article.category,
           label: `${article.category} · ${article.readTime}`,
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
           title: tool.name,
           description: tool.description,
           slug: tool.slug,
-          path: `/outils/${tool.slug}`,
+          path: toolPath(tool, 'fr'),
           category: tool.category,
           label: `${tool.category} · Outil JcHub`,
         });

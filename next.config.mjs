@@ -34,12 +34,13 @@ const nextConfig = {
   async redirects() {
     // Former paid-offer pages: keep any indexed links and backlinks useful.
     return [
-      { source: '/about', destination: '/a-propos', permanent: true },
-      { source: '/pricing', destination: '/outils', permanent: true },
-      { source: '/checkout', destination: '/outils', permanent: true },
-      { source: '/paiement/:path*', destination: '/outils', permanent: true },
-      { source: '/compte/abonnement', destination: '/compte', permanent: true },
-      { source: '/guides', destination: '/blog', permanent: true },
+      { source: '/about', destination: '/fr/a-propos', permanent: true },
+      { source: '/pricing', destination: '/fr/outils', permanent: true },
+      { source: '/checkout', destination: '/fr/outils', permanent: true },
+      { source: '/paiement/:path*', destination: '/fr/outils', permanent: true },
+      { source: '/compte/abonnement', destination: '/fr/compte', permanent: true },
+      { source: '/fr/compte/abonnement', destination: '/fr/compte', permanent: true },
+      { source: '/guides', destination: '/fr/blog', permanent: true },
     ];
   },
   async headers() {

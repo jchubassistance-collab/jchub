@@ -151,7 +151,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       missing,
       generation: serializeGeneration(data.generation),
       pr: { url: pr.html_url, filesUrl: `${pr.html_url}/files`, mergeableState: pr.mergeable_state },
-      preview: { ...preview, toolUrl: preview.url ? `${preview.url.replace(/\/$/, '')}/outils/apercu/${generation.component}` : undefined },
+      preview: { ...preview, toolUrl: preview.url ? `${preview.url.replace(/\/$/, '')}/fr/outils/apercu/${generation.component}` : undefined },
     }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     return failure(error);

@@ -47,14 +47,15 @@ export async function POST(request: NextRequest) {
       }
 
       const content = String(article.data.content || '');
-      const linkPattern = /\]\((\/(?:blog|outils)\/[^)?#\s]+)(?:#[^)\s]*)?\)/g;
+      // French links, with or without the /fr prefix.
+      const linkPattern = /\]\(((?:\/fr)?\/(?:blog|outils)\/[^)?#\s]+)(?:#[^)\s]*)?\)/g;
       let match: RegExpExecArray | null;
       while ((match = linkPattern.exec(content)) !== null) {
         const path = match[1];
         const parts = path.split('/').filter(Boolean);
         let slug = parts[parts.length - 1] || '';
         try { slug = decodeURIComponent(slug); } catch { /* Keep malformed slugs visible as broken links. */ }
-        const known = path.startsWith('/blog/') ? knownBlogSlugs.has(slug) : knownToolSlugs.has(slug);
+        const known = /^(\/fr)?\/blog\//.test(path) ? knownBlogSlugs.has(slug) : knownToolSlugs.has(slug);
         if (!known) findings.push({ type: 'broken-link', title, detail: `Lien interne à vérifier : ${path}` });
       }
     }

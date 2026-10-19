@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
-import { getPublishedTools } from '@/lib/tools';
+import { getPublishedTools, toolPath } from '@/lib/tools';
 import { publishDevToArticle } from '@/lib/social-publishing';
 import { reportUserError } from '@/lib/user-error';
 
@@ -37,10 +37,10 @@ export async function GET(request: NextRequest) {
     const recentSlugs = new Set(history.docs.map((document) => String(document.data().toolSlug || '')));
     const tool = tools.find((candidate) => !recentSlugs.has(candidate.slug)) || tools[0];
     const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
-    const toolUrl = `${siteUrl}/outils/${encodeURIComponent(tool.slug)}`;
+    const toolUrl = `${siteUrl}${toolPath(tool, 'fr')}`;
     const title = `${tool.name} : un outil en ligne pour ${tool.category.toLowerCase()}`;
     const description = `${tool.description} Découvrez l’outil JcHub et son cas d’utilisation.`;
-    const body = `# ${tool.name}\n\n${tool.description}\n\n## Quand cet outil peut vous aider\n\nQuand vous devez effectuer cette tâche dans le cadre de ${tool.category.toLowerCase()}, cet outil JcHub vous propose un point de départ simple. Il est utile pour les développeurs, les créateurs de projets et toute personne qui rencontre ce besoin.\n\n## Comment l’essayer\n\n1. Ouvrez l’outil JcHub.\n2. Suivez les champs et les options affichés sur la page.\n3. Vérifiez le résultat avant de l’utiliser dans votre projet.\n\n## Essayer l’outil\n\n[Ouvrir ${tool.name} sur JcHub](${toolUrl})\n\nConsultez aussi [les autres outils JcHub](${siteUrl}/outils).`;
+    const body = `# ${tool.name}\n\n${tool.description}\n\n## Quand cet outil peut vous aider\n\nQuand vous devez effectuer cette tâche dans le cadre de ${tool.category.toLowerCase()}, cet outil JcHub vous propose un point de départ simple. Il est utile pour les développeurs, les créateurs de projets et toute personne qui rencontre ce besoin.\n\n## Comment l’essayer\n\n1. Ouvrez l’outil JcHub.\n2. Suivez les champs et les options affichés sur la page.\n3. Vérifiez le résultat avant de l’utiliser dans votre projet.\n\n## Essayer l’outil\n\n[Ouvrir ${tool.name} sur JcHub](${toolUrl})\n\nConsultez aussi [les autres outils JcHub](${siteUrl}/fr/outils).`;
     const result = await publishDevToArticle({
       title,
       body,

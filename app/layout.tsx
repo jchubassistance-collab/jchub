@@ -104,7 +104,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} data-scroll-behavior="smooth">
       <head>
-        <link rel="alternate" type="application/rss+xml" href={locale === 'en' ? '/en/rss.xml' : '/rss.xml'} />
+        <link rel="alternate" type="application/rss+xml" href={`/${locale}/rss.xml`} />
       </head>
       <body>
         <script
@@ -116,7 +116,7 @@ export default async function RootLayout({
               '@type': 'WebSite',
               name: 'JcHub',
               alternateName: locale === 'en' ? 'JcHub — Developer tools' : 'JcHub — Outils pour développeurs',
-              url: locale === 'en' ? 'https://jchub.dev/en' : 'https://jchub.dev',
+              url: `https://jchub.dev/${locale}`,
               inLanguage: locale,
               author: {
                 '@type': 'Person',

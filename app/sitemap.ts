@@ -6,6 +6,7 @@ import { localizedPaths, type LocalizedPaths } from '@/lib/seo';
 import { countByCategory } from '@/lib/categories';
 import { blogCategoryPath, toolCategoryPath } from '@/lib/category-paths';
 import type { StaticPathname } from '@/i18n/routing';
+import { getPathname } from '@/i18n/navigation';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -33,8 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { href: '/mentions-legales', changeFrequency: 'yearly', priority: 0.2 },
   ];
 
-  // The home page stays listed as https://jchub.dev, without a trailing slash.
-  const absolute = (path: string) => `${baseUrl}${path === '/' ? '' : path}`;
+  const absolute = (path: string) => `${baseUrl}${path}`;
   const bothLanguages = (paths: LocalizedPaths, entry: Omit<Entry, 'url' | 'alternates'>, english = true): MetadataRoute.Sitemap => {
     const languages = english
       ? { fr: absolute(paths.fr), en: absolute(paths.en), 'x-default': absolute(paths.fr) }
@@ -51,8 +51,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...articles.filter((article) => article.slug.trim()).flatMap((article) => {
       const english = englishById.get(article.id);
       // An article not translated yet is listed in French only: its English address shows the French text.
+      const articlePath = (locale: 'fr' | 'en', slug: string) => getPathname({ locale, href: { pathname: '/blog/[slug]', params: { slug } } });
       return bothLanguages(
-        { fr: `/blog/${article.slug}`, en: `/en/blog/${english?.slug ?? article.slug}` },
+        { fr: articlePath('fr', article.slug), en: articlePath('en', english?.slug ?? article.slug) },
         { lastModified: article.updatedAt || article.publishedAt || undefined, changeFrequency: 'monthly', priority: 0.7 },
         Boolean(english?.translated),
       );

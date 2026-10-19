@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
+import { isLocale } from '@/i18n/routing';
 import { webManifestResponse } from '@/lib/web-manifest';
 
-/** English app manifest at /en/manifest.webmanifest; the French one stays at the root. */
+/** App manifest of each language: /fr/manifest.webmanifest and /en/manifest.webmanifest. */
 export async function GET(_request: Request, { params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  if (locale !== 'en') return new NextResponse('Not found', { status: 404 });
-  return webManifestResponse('en');
+  if (!isLocale(locale)) return new NextResponse('Not found', { status: 404 });
+  return webManifestResponse(locale);
 }

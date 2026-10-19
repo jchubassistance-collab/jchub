@@ -48,9 +48,15 @@ export async function GET(request: NextRequest) {
       }
     }
     const allTools = Array.from(merged.values());
-    const paths = allTools.flatMap((tool) => [tool.path, `/outils/${tool.slug}`].filter((path): path is string => Boolean(path))).filter((path, index, all) => all.indexOf(path) === index);
+    // French page views, before (/outils/…) and after (/fr/outils/…) the language prefix of October 2026.
+    const viewPaths = (tool: AdminToolRow) => Array.from(new Set([tool.path, tool.path && `/fr${tool.path}`, `/outils/${tool.slug}`, `/fr/outils/${tool.slug}`]
+      .filter((path): path is string => Boolean(path))));
+    const paths = Array.from(new Set(allTools.flatMap(viewPaths)));
     const analytics = await getGa4ToolViews(paths).catch(() => ({ configured: false, views: {} as Record<string, number> }));
-    const result = allTools.map((tool) => ({ ...tool, views: analytics.views[tool.path || ''] ?? analytics.views[`/outils/${tool.slug}`] ?? Number(tool.views || 0) })).sort((a, b) => a.name.localeCompare(b.name));
+    const result = allTools.map((tool) => {
+      const counted = viewPaths(tool).filter((path) => path in analytics.views);
+      return { ...tool, views: counted.length ? counted.reduce((sum, path) => sum + analytics.views[path], 0) : Number(tool.views || 0) };
+    }).sort((a, b) => a.name.localeCompare(b.name));
     const components = [...TOOL_COMPONENTS, ...registeredTools.map((tool) => tool.component)].filter((component, index, all) => component && all.indexOf(component) === index);
     return NextResponse.json({ tools: result, viewsConfigured: analytics.configured, components });
   } catch (error) {

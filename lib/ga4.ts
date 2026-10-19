@@ -65,7 +65,8 @@ function rowsToObjects(report: Report) {
 export async function getGa4Overview() {
   const access = await getAccessToken();
   if (!access) return { configured: false as const };
-  const blogPathFilter = { filter: { fieldName: 'pagePath', stringFilter: { matchType: 'BEGINS_WITH', value: '/blog', caseSensitive: true } } };
+  // Blog pages before (/blog) and after (/fr/blog, /en/blog) the language prefix.
+  const blogPathFilter = { filter: { fieldName: 'pagePath', stringFilter: { matchType: 'FULL_REGEXP', value: '^/((fr|en)/)?blog(/.*)?$', caseSensitive: true } } };
   const [summary, timeline, dailyViews, monthlyViews, yearlyViews, pages, sources, channels, devices, countries, events, currentPeriodViews, previousPeriodViews] = await Promise.all([
     runReport(access, [], ['activeUsers', 'sessions', 'conversions', 'bounceRate', 'averageSessionDuration', 'newUsers'], 1),
     runReport(access, ['date'], ['activeUsers', 'newUsers', 'conversions'], 31, '28daysAgo', 'yesterday', true),
@@ -114,7 +115,7 @@ export async function getGa4Overview() {
 export async function getGa4ToolViews(paths: string[]) {
   const access = await getAccessToken();
   if (!access || !paths.length) return { configured: Boolean(access), views: {} as Record<string, number> };
-  const report = await runReport(access, ['pagePath'], ['screenPageViews'], Math.min(paths.length, 100), '28daysAgo', 'yesterday', false, {
+  const report = await runReport(access, ['pagePath'], ['screenPageViews'], Math.min(paths.length, 1000), '28daysAgo', 'yesterday', false, {
     filter: { fieldName: 'pagePath', inListFilter: { values: paths, caseSensitive: true } },
   });
   return { configured: true, views: Object.fromEntries(rowsToObjects(report).map((row) => [String(row.pagePath), Number(row.screenPageViews || 0)])) };

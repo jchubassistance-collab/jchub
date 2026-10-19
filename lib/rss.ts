@@ -29,7 +29,7 @@ const channelDescription: Record<Locale, string> = {
   en: 'Articles, tutorials and tips for developers.',
 };
 
-/** Blog feed of one language: /rss.xml in French, /en/rss.xml in English. */
+/** Blog feed of one language: /fr/rss.xml in French, /en/rss.xml in English. */
 export async function rssResponse(locale: Locale) {
   const baseUrl = getPublicBaseUrl().replace(/\/+$/, '');
 

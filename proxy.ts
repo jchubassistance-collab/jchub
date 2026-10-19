@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import createIntlMiddleware from 'next-intl/middleware';
 import { routing } from '@/i18n/routing';
+import { legacyFrenchPath } from '@/i18n/legacy-paths';
 import { clientIpFromHeaders } from '@/lib/client-ip';
 
 const handleLocale = createIntlMiddleware(routing);
@@ -30,7 +31,7 @@ function getContentSecurityPolicy(nonce: string) {
 }
 
 /**
- * Public pages get a language: /outils is served by app/[locale] as French, /en/tools as
+ * Public pages get a language: /fr/outils is served by app/[locale] as French, /en/tools as
  * English. API routes, the admin, Next.js internals and files (anything with an extension)
  * keep their address untouched.
  */
@@ -95,6 +96,16 @@ export function proxy(request: NextRequest) {
     const deniedResponse = NextResponse.json({ error: 'Accès admin non autorisé depuis cette adresse IP.' }, { status: 403 });
     deniedResponse.headers.set('Content-Security-Policy', contentSecurityPolicy);
     return deniedResponse;
+  }
+
+  // A permanent redirect keeps the search ranking of the former French addresses.
+  const frenchPath = isLocalizedPage(pathname) ? legacyFrenchPath(pathname) : null;
+  if (frenchPath) {
+    const frenchUrl = request.nextUrl.clone();
+    frenchUrl.pathname = frenchPath;
+    const response = NextResponse.redirect(frenchUrl, 308);
+    response.headers.set('Content-Security-Policy', contentSecurityPolicy);
+    return response;
   }
 
   // The locale proxy forwards the headers of the request it receives: give it the nonce and the CSP.

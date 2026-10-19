@@ -123,7 +123,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       const draft = document.data() || {};
       if (draft.status !== 'published' || !draft.publishedSlug) return NextResponse.json({ error: 'Publie d’abord l’article sur JcHub.' }, { status: 409 });
       const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
-      const result = await publishDevToArticle({ title: String(draft.title || 'Article JcHub'), description: String(draft.description || ''), body: `${String(draft.posts?.devto || draft.description || '')}\n\n${String(draft.article || '')}`, canonicalUrl: `${siteUrl}/blog/${encodeURIComponent(String(draft.publishedSlug))}`, tags: Array.isArray(draft.keywords) ? draft.keywords.map(String) : ['development', 'technology'] });
+      const result = await publishDevToArticle({ title: String(draft.title || 'Article JcHub'), description: String(draft.description || ''), body: `${String(draft.posts?.devto || draft.description || '')}\n\n${String(draft.article || '')}`, canonicalUrl: `${siteUrl}/fr/blog/${encodeURIComponent(String(draft.publishedSlug))}`, tags: Array.isArray(draft.keywords) ? draft.keywords.map(String) : ['development', 'technology'] });
       const currentResults = Array.isArray(draft.socialResults) ? draft.socialResults.filter((item: { network?: string }) => item.network !== network) : [];
       await reference.update({ socialResults: [...currentResults, result], updatedAt: FieldValue.serverTimestamp() });
       return NextResponse.json({ id: id, socialResult: result });
@@ -159,7 +159,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         title: String(draft.title || 'Article JcHub'),
         description: String(draft.description || ''),
         body: `${String(draft.posts?.devto || draft.description || '')}\n\n${String(draft.article || '')}`,
-        canonicalUrl: `${siteUrl}/blog/${encodeURIComponent(slug)}`,
+        canonicalUrl: `${siteUrl}/fr/blog/${encodeURIComponent(slug)}`,
         tags: Array.isArray(draft.keywords) ? draft.keywords.map(String) : ['development', 'technology'],
       })];
       await reference.update({ status: 'published', publishedSlug: slug, socialResults, publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });

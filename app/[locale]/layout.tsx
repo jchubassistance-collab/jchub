@@ -9,7 +9,7 @@ const defaults: Record<Locale, { title: string; description: string; keywords: s
     title: 'Outils pratiques pour développeurs | JcHub',
     description: 'JcHub regroupe des outils gratuits, des ressources utiles et des workflows pratiques pour développeurs, créateurs et équipes.',
     keywords: ['JcHub', 'développeur', 'outils dev', 'outils gratuits', 'ressources développeurs', 'IA', 'Jessy Ngnambongo'],
-    manifest: '/manifest.webmanifest',
+    manifest: '/fr/manifest.webmanifest',
   },
   en: {
     title: 'Practical tools for developers | JcHub',

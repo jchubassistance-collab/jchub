@@ -38,7 +38,7 @@ const copy = bilingual({
     { icon: '⚡', title: 'Instantané', description: "Pas d'attente, pas de serveur" },
     { icon: '🎨', title: 'Sans pub', description: 'Pas de tracking, pas de pub' },
   ],
-  relatedHrefs: ['/outils/json-formatter', '/outils/encodeur-url', '/outils/decodeur-jwt'],
+  relatedHrefs: ['/fr/outils/json-formatter', '/fr/outils/encodeur-url', '/fr/outils/decodeur-jwt'],
 }, {
   benefits: [
     { icon: '🔒', title: '100% private', description: 'Everything happens in your browser' },

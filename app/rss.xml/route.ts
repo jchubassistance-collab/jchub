@@ -1,7 +1,6 @@
-import { rssResponse } from '@/lib/rss';
+import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
-
-export function GET() {
-  return rssResponse('fr');
+/** Former address of the French feed: feed readers follow the permanent redirect. */
+export function GET(request: Request) {
+  return NextResponse.redirect(new URL('/fr/rss.xml', request.url), 308);
 }

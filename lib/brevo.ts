@@ -65,7 +65,7 @@ export async function notifyBrevoNewArticle(article: PublishedArticlePayload, lo
     title: article.title,
     description: article.description,
     slug: article.slug,
-    path: `${locale === 'en' ? '/en' : ''}/blog/${article.slug}`,
+    path: `/${locale}/blog/${article.slug}`,
     image: article.image,
     category: article.category,
     label: `${article.category} · ${article.readingTime}`,
