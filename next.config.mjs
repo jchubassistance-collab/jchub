@@ -14,6 +14,9 @@ try {
 }
 
 const nextConfig = {
+  experimental: {
+    agentUpgrade: 'security',
+  },
   allowedDevOrigins: ['127.0.0.1', ...(facebookOAuthHost ? [facebookOAuthHost] : [])],
   images: {
     remotePatterns: [
