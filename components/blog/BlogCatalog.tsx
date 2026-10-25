@@ -98,7 +98,7 @@ export function BlogCatalog({ articles, showCategories = true }: { articles: Blo
 
         <div className="flex items-center justify-between gap-3">
           {showCategories && <p className="text-xs font-bold uppercase tracking-[.14em] text-slate-500">{t.filterByExpertise}</p>}
-          <div className="flex shrink-0 rounded-xl border border-blue-100 bg-white p-1" aria-label={t.chooseView}>
+          <div className="flex shrink-0 rounded-xl border border-blue-100 bg-white p-1" role="group" aria-label={t.chooseView}>
             <button type="button" onClick={() => setView('grid')} aria-label={t.gridView} aria-pressed={view === 'grid'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><Grid2X2 className="h-4 w-4" /></button>
             <button type="button" onClick={() => setView('compact')} aria-label={t.compactView} aria-pressed={view === 'compact'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'compact' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><Grid3X3 className="h-4 w-4" /></button>
             <button type="button" onClick={() => setView('list')} aria-label={t.listView} aria-pressed={view === 'list'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><List className="h-4 w-4" /></button>
@@ -106,7 +106,7 @@ export function BlogCatalog({ articles, showCategories = true }: { articles: Blo
         </div>
       </div>
 
-      {showCategories && <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2" aria-label={t.filterArticles}>
+      {showCategories && <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2" role="group" aria-label={t.filterArticles}>
         {categories.map((item) => (
           <button
             key={item}

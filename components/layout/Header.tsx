@@ -163,7 +163,7 @@ function MobileNavLink({ href, label, icon: Icon, pathname, onClick, index, open
 
 function MobileBrand() {
   return (
-    <span className="inline-flex items-center gap-2.5" aria-label="JcHub">
+    <span className="inline-flex items-center gap-2.5">
       <img src="/jchub-icon-192.png" alt="" aria-hidden="true" className="h-9 w-9 rounded-xl shadow-[0_4px_12px_rgba(15,23,42,.15)]" />
       <span className="text-2xl font-extrabold leading-none tracking-tight text-[#0369fb]">
         JcHub

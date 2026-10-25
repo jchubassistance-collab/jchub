@@ -79,7 +79,7 @@ export function LanguageSwitcher({ light = true, small = false, className = '' }
         {routing.locales.map((target) => (
           <li key={target}>
             {target === locale ? (
-              <span aria-current="true" aria-label={LANGUAGES[target].label} title={LANGUAGES[target].label} className={`block ${small ? 'h-8 w-8 p-px' : 'h-10 w-10 p-[2px]'} overflow-hidden rounded-full border-2 shadow-sm transition-transform ${light ? 'border-blue-600 bg-white shadow-blue-900/15' : 'border-white bg-white/10 shadow-black/20'}`}>
+              <span role="img" aria-current="true" aria-label={LANGUAGES[target].label} title={LANGUAGES[target].label} className={`block ${small ? 'h-8 w-8 p-px' : 'h-10 w-10 p-[2px]'} overflow-hidden rounded-full border-2 shadow-sm transition-transform ${light ? 'border-blue-600 bg-white shadow-blue-900/15' : 'border-white bg-white/10 shadow-black/20'}`}>
                 <Flag locale={target} />
               </span>
             ) : (
