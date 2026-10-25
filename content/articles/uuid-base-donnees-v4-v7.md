@@ -13,6 +13,15 @@ keywords:
   - ulid
 author: Jessy Ngnambongo
 image: /blog/11-uuid-base-donnees.svg
+photo:
+  id: "zUHrrsjEyeM"
+  url: "https://images.unsplash.com/photo-1642356692954-3fbb84baf1a6?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZGF0YWJhc2UlMjBwcmltYXJ5JTIwa2V5JTIwZGlhZ3JhbXxlbnwxfDB8fHwxNzkyOTIxOTAzfDA&ixlib=rb-4.1.0"
+  thumb: "https://images.unsplash.com/photo-1642356692954-3fbb84baf1a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZGF0YWJhc2UlMjBwcmltYXJ5JTIwa2V5JTIwZGlhZ3JhbXxlbnwxfDB8fHwxNzkyOTIxOTAzfDA&ixlib=rb-4.1.0&q=80&w=400"
+  alt: "diagram"
+  author: "Shubham Dhage"
+  authorUrl: "https://unsplash.com/@theshubhamdhage?utm_source=jchub&utm_medium=referral"
+  pageUrl: "https://unsplash.com/photos/diagram-zUHrrsjEyeM?utm_source=jchub&utm_medium=referral"
+  downloadLocation: "https://api.unsplash.com/photos/zUHrrsjEyeM/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZGF0YWJhc2UlMjBwcmltYXJ5JTIwa2V5JTIwZGlhZ3JhbXxlbnwxfDB8fHwxNzkyOTIxOTAzfDA"
 readTime: 4 min
 status: published
 publishedAt: '2026-10-07T09:11:01.648Z'

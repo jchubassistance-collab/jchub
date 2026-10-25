@@ -12,6 +12,15 @@ tags:
   - technologie
 author: JcHub
 image: "https://jchub.dev/api/article-cover?title=S%C3%A9curiser%20vos%20acc%C3%A8s%20%C3%A0%20l'%C3%A8re%20du%20Vibe%20Coding%20%3A%20Bonnes%20pratiques%20et%20g%C3%A9n%C3%A9ration%20de%20secrets&category=G%C3%A9n%C3%A9rateur%20de%20mot%20de%20passe%20s%C3%A9curis%C3%A9"
+photo:
+  id: "cvBBO4PzWPg"
+  url: "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8cmFuZG9tJTIwY2hhcmFjdGVyJTIwc3RyaW5nJTIwZ2VuZXJhdG9yfGVufDF8MHx8fDE3OTI5MjE4ODN8MA&ixlib=rb-4.1.0"
+  thumb: "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8cmFuZG9tJTIwY2hhcmFjdGVyJTIwc3RyaW5nJTIwZ2VuZXJhdG9yfGVufDF8MHx8fDE3OTI5MjE4ODN8MA&ixlib=rb-4.1.0&q=80&w=400"
+  alt: "Lines of colorful JavaScript code displayed on a dark screen"
+  author: "Markus Spiske"
+  authorUrl: "https://unsplash.com/@markusspiske?utm_source=jchub&utm_medium=referral"
+  pageUrl: "https://unsplash.com/photos/javascript-code-on-dark-screen-cvBBO4PzWPg?utm_source=jchub&utm_medium=referral"
+  downloadLocation: "https://api.unsplash.com/photos/cvBBO4PzWPg/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8cmFuZG9tJTIwY2hhcmFjdGVyJTIwc3RyaW5nJTIwZ2VuZXJhdG9yfGVufDF8MHx8fDE3OTI5MjE4ODN8MA"
 readTime: 5 min
 status: published
 publishedAt: '2026-10-11T09:11:04.381Z'

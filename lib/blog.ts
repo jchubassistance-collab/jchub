@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { cache } from 'react';
 import { articlePathOnDisk, parseArticleFiles } from '@/lib/article-files';
 import { categoryLabel } from '@/lib/categories';
+import { readPhoto } from '@/lib/photos';
 import { tools } from '@/lib/tools';
 import type { Locale } from '@/i18n/routing';
 
@@ -21,6 +22,8 @@ export type BlogArticle = {
   categoryKey: string;
   author: string;
   image: string;
+  /** Photographer of the cover photo (Unsplash), credited under the cover. */
+  imageCredit: { name: string; url: string } | null;
   content: string;
   status: 'published' | 'scheduled' | 'draft';
   publishedAt?: string;
@@ -121,6 +124,9 @@ function toArticle(data: Record<string, unknown>, locale: Locale): BlogArticle {
   const category = categoryLabel(categoryKey, locale);
   const status = data.status === 'scheduled' || data.status === 'draft' ? data.status : 'published';
   const slugs = { fr: frenchSlug, en: translation?.slug || frenchSlug };
+  // With a photo, the cover is drawn in the visitor's language over it; otherwise the saved image is used.
+  const photo = readPhoto(data.photo);
+  const photoCover = photo && `/api/article-cover?${new URLSearchParams({ title, category, photo: photo.url, ...(locale === 'en' ? { lang: 'en' } : {}) })}`;
   return {
     id,
     slug: slugs[locale],
@@ -131,7 +137,8 @@ function toArticle(data: Record<string, unknown>, locale: Locale): BlogArticle {
     category,
     categoryKey,
     author: String(data.author || 'JcHub'),
-    image: articleImage(String(data.image || '/blog/default.svg'), title, locale),
+    image: photoCover || articleImage(String(data.image || '/blog/default.svg'), title, locale),
+    imageCredit: photo && { name: photo.author, url: photo.authorUrl },
     content: english?.content ?? String(data.content || ''),
     status,
     publishedAt: toIsoDate(data.publishedAt),

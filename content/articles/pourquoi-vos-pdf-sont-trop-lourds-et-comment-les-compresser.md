@@ -12,6 +12,15 @@ tags:
   - technologie
 author: JcHub
 image: "https://jchub.dev/api/article-cover?title=Pourquoi%20vos%20PDF%20d%C3%A9passent%20les%20limites%20d'envoi%20et%20comment%20les%20all%C3%A9ger%20sans%20perte%20de%20lisibilit%C3%A9&category=Compresser%20un%20PDF%20gratuitement"
+photo:
+  id: "bCmonOgEIlw"
+  url: "https://images.unsplash.com/photo-1663124178703-d2d6a333e6c2?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8Y29tcHJlc3NlZCUyMGRvY3VtZW50JTIwZmlsZSUyMGljb258ZW58MXwwfHx8MTc5MjkyMTg3N3ww&ixlib=rb-4.1.0"
+  thumb: "https://images.unsplash.com/photo-1663124178703-d2d6a333e6c2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8Y29tcHJlc3NlZCUyMGRvY3VtZW50JTIwZmlsZSUyMGljb258ZW58MXwwfHx8MTc5MjkyMTg3N3ww&ixlib=rb-4.1.0&q=80&w=400"
+  alt: "icon"
+  author: "Rubaitul Azad"
+  authorUrl: "https://unsplash.com/@rubaitulazad?utm_source=jchub&utm_medium=referral"
+  pageUrl: "https://unsplash.com/photos/icon-bCmonOgEIlw?utm_source=jchub&utm_medium=referral"
+  downloadLocation: "https://api.unsplash.com/photos/bCmonOgEIlw/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8Y29tcHJlc3NlZCUyMGRvY3VtZW50JTIwZmlsZSUyMGljb258ZW58MXwwfHx8MTc5MjkyMTg3N3ww"
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-11-26T21:08:00.000Z'

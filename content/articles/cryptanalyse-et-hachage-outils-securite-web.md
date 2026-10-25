@@ -12,6 +12,15 @@ tags:
   - technologie
 author: JcHub
 image: /blog/02-hash-generator.svg
+photo:
+  id: "mT7lXZPjk7U"
+  url: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMHBhZGxvY2slMjBlbmNyeXB0aW9ufGVufDF8MHx8fDE3OTI5MjE4MjJ8MA&ixlib=rb-4.1.0"
+  thumb: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMHBhZGxvY2slMjBlbmNyeXB0aW9ufGVufDF8MHx8fDE3OTI5MjE4MjJ8MA&ixlib=rb-4.1.0&q=80&w=400"
+  alt: "red padlock on black computer keyboard"
+  author: "FlyD"
+  authorUrl: "https://unsplash.com/@flyd2069?utm_source=jchub&utm_medium=referral"
+  pageUrl: "https://unsplash.com/photos/red-padlock-on-black-computer-keyboard-mT7lXZPjk7U?utm_source=jchub&utm_medium=referral"
+  downloadLocation: "https://api.unsplash.com/photos/mT7lXZPjk7U/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMHBhZGxvY2slMjBlbmNyeXB0aW9ufGVufDF8MHx8fDE3OTI5MjE4MjJ8MA"
 readTime: 5 min
 status: published
 publishedAt: '2026-09-14T08:00:54.226Z'

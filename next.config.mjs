@@ -33,6 +33,7 @@ const nextConfig = {
     '/api/tools/pdf-to-word': ['./node_modules/pdfjs-dist/standard_fonts/**'],
     '/api/cm/kits/[id]/image': ['./assets/fonts/**', './public/jchub-icon-192.png'],
     '/api/kit-image/[id]': ['./assets/fonts/**', './public/jchub-icon-192.png'],
+    '/api/article-cover': ['./assets/fonts/**', './public/jchub-icon-192.png'],
   },
   async redirects() {
     // Former paid-offer pages: keep any indexed links and backlinks useful.

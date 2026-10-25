@@ -12,6 +12,15 @@ tags:
   - technologie
 author: JcHub
 image: "https://jchub.dev/api/article-cover?title=Agentic%20Web%20et%20Moteurs%20Multimodaux%20%3A%20Optimiser%20l'int%C3%A9gration%20des%20Payloads%20Binaires%20et%20Base64&category=Base64%20Encoder%20%2F%20Decoder"
+photo:
+  id: "iar-afB0QQw"
+  url: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMGRhdGElMjBzdHJlYW18ZW58MXwwfHx8MTc5MjkyMTc5NHww&ixlib=rb-4.1.0"
+  thumb: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMGRhdGElMjBzdHJlYW18ZW58MXwwfHx8MTc5MjkyMTc5NHww&ixlib=rb-4.1.0&q=80&w=400"
+  alt: "Matrix movie still"
+  author: "Markus Spiske"
+  authorUrl: "https://unsplash.com/@markusspiske?utm_source=jchub&utm_medium=referral"
+  pageUrl: "https://unsplash.com/photos/matrix-movie-still-iar-afB0QQw?utm_source=jchub&utm_medium=referral"
+  downloadLocation: "https://api.unsplash.com/photos/iar-afB0QQw/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMGRhdGElMjBzdHJlYW18ZW58MXwwfHx8MTc5MjkyMTc5NHww"
 readTime: 5 min
 status: published
 publishedAt: '2026-10-11T09:11:02.181Z'

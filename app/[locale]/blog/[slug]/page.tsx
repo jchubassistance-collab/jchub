@@ -5,6 +5,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { BlogInteractions } from '@/components/blog/BlogInteractions';
 import { GiscusComments } from '@/components/blog/GiscusComments';
 import { getPublishedArticles, getPublishedArticleBySlug, getPublishedArticleSlugs, type BlogArticle } from '@/lib/blog';
+import { unsplashHomeUrl } from '@/lib/photos';
 import { toolPath, tools } from '@/lib/tools';
 import { getPublicBaseUrl } from '@/lib/site-url';
 import { languageAlternates } from '@/lib/seo';
@@ -27,6 +28,8 @@ const copy = bilingual({
   seeTools: 'Voir les outils',
   readNext: 'À lire ensuite',
   readTime: (time: string) => `${time} de lecture`,
+  photoBy: 'Photo :',
+  photoOn: 'sur',
 }, {
   back: 'Back to the blog',
   published: 'Published',
@@ -36,6 +39,8 @@ const copy = bilingual({
   takeawayText: 'A practical JcHub guide to make progress with concrete examples.',
   practiceTitle: 'Put it into practice',
   practiceText: 'Try the tools related to this article right away.',
+  photoBy: 'Photo by',
+  photoOn: 'on',
   seeTools: 'See the tools',
   readNext: 'Read next',
   readTime: (time: string) => `${time} read`,
@@ -93,7 +98,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const baseUrl = getPublicBaseUrl();
   const paths = articlePaths(article);
   const articleUrl = `${baseUrl}${paths[locale]}`;
-  const imageUrl = `${baseUrl}/api/article-cover?${new URLSearchParams({ title: article.title, category: article.category, ...(locale === 'en' ? { lang: 'en' } : {}) })}`;
+  const imageUrl = article.image.startsWith('/api/article-cover')
+    ? `${baseUrl}${article.image}`
+    : `${baseUrl}/api/article-cover?${new URLSearchParams({ title: article.title, category: article.category, ...(locale === 'en' ? { lang: 'en' } : {}) })}`;
   return {
     title: article.title,
     description: article.description || article.excerpt || article.title,
@@ -146,7 +153,10 @@ export default async function ArticlePage({ params }: { params: Params }) {
                 <BlogInteractions slug={article.slugs.fr} title={article.title} />
               </div>
             </div>
-            <img src={article.image} alt="" className="aspect-[1200/630] w-full rounded-[22px] border border-blue-100 object-cover shadow-[0_20px_60px_rgba(8,15,30,0.6)] transition duration-500 hover:rotate-[0.7deg] hover:scale-[1.01]" />
+            <figure>
+              <img src={article.image} alt="" className="aspect-[1200/630] w-full rounded-[22px] border border-blue-100 object-cover shadow-[0_20px_60px_rgba(8,15,30,0.6)] transition duration-500 hover:rotate-[0.7deg] hover:scale-[1.01]" />
+              {article.imageCredit && <figcaption className="mt-3 text-right text-xs text-slate-500">{t.photoBy} <a href={article.imageCredit.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-700">{article.imageCredit.name}</a> {t.photoOn} <a href={unsplashHomeUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-700">Unsplash</a></figcaption>}
+            </figure>
           </div>
         </div>
       </section>

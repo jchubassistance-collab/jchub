@@ -14,6 +14,15 @@ keywords:
   - postman vs insomnia
 author: Jessy Ngnambongo
 image: /blog/06-tester-api-rest-sans-postman.svg
+photo:
+  id: "YPMFARhHxxw"
+  url: "https://images.unsplash.com/photo-1669630127566-adeac5492686?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YnJvd3NlciUyMG5ldHdvcmslMjByZXF1ZXN0JTIwaW5zcGVjdG9yfGVufDF8MHx8fDE3OTI5MjE5MDB8MA&ixlib=rb-4.1.0"
+  thumb: "https://images.unsplash.com/photo-1669630127566-adeac5492686?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YnJvd3NlciUyMG5ldHdvcmslMjByZXF1ZXN0JTIwaW5zcGVjdG9yfGVufDF8MHx8fDE3OTI5MjE5MDB8MA&ixlib=rb-4.1.0&q=80&w=400"
+  alt: "graphical user interface, text, application"
+  author: "Nebular"
+  authorUrl: "https://unsplash.com/@nebulargroup?utm_source=jchub&utm_medium=referral"
+  pageUrl: "https://unsplash.com/photos/graphical-user-interface-text-application-YPMFARhHxxw?utm_source=jchub&utm_medium=referral"
+  downloadLocation: "https://api.unsplash.com/photos/YPMFARhHxxw/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YnJvd3NlciUyMG5ldHdvcmslMjByZXF1ZXN0JTIwaW5zcGVjdG9yfGVufDF8MHx8fDE3OTI5MjE5MDB8MA"
 readTime: 6 min
 status: published
 publishedAt: '2026-09-12T21:53:01.970Z'

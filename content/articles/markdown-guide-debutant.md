@@ -13,6 +13,15 @@ keywords:
   - readme
 author: Jessy Ngnambongo
 image: /blog/10-markdown-guide-debutant.svg
+photo:
+  id: "ieic5Tq8YMk"
+  url: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8bWFya2Rvd24lMjBzeW50YXglMjBvbiUyMGNvbXB1dGVyJTIwc2NyZWVufGVufDF8MHx8fDE3OTI5MjE4NjN8MA&ixlib=rb-4.1.0"
+  thumb: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8bWFya2Rvd24lMjBzeW50YXglMjBvbiUyMGNvbXB1dGVyJTIwc2NyZWVufGVufDF8MHx8fDE3OTI5MjE4NjN8MA&ixlib=rb-4.1.0&q=80&w=400"
+  alt: "a computer screen with a bunch of code on it"
+  author: "Chris Ried"
+  authorUrl: "https://unsplash.com/@cdr6934?utm_source=jchub&utm_medium=referral"
+  pageUrl: "https://unsplash.com/photos/a-computer-screen-with-a-bunch-of-code-on-it-ieic5Tq8YMk?utm_source=jchub&utm_medium=referral"
+  downloadLocation: "https://api.unsplash.com/photos/ieic5Tq8YMk/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8bWFya2Rvd24lMjBzeW50YXglMjBvbiUyMGNvbXB1dGVyJTIwc2NyZWVufGVufDF8MHx8fDE3OTI5MjE4NjN8MA"
 readTime: 5 min
 status: published
 publishedAt: '2026-10-01T09:11:01.972Z'

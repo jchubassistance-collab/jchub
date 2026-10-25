@@ -13,6 +13,15 @@ keywords:
   - epoch converter
 author: Jessy Ngnambongo
 image: /blog/03-convertir-timestamp-unix.svg
+photo:
+  id: "ft0-Xu4nTvA"
+  url: "https://images.unsplash.com/photo-1456574808786-d2ba7a6aa654?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZGlnaXRhbCUyMGNsb2NrJTIwZGlzcGxheWluZyUyMHRpbWVzdGFtcHxlbnwxfDB8fHwxNzkyOTIxODE1fDA&ixlib=rb-4.1.0"
+  thumb: "https://images.unsplash.com/photo-1456574808786-d2ba7a6aa654?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZGlnaXRhbCUyMGNsb2NrJTIwZGlzcGxheWluZyUyMHRpbWVzdGFtcHxlbnwxfDB8fHwxNzkyOTIxODE1fDA&ixlib=rb-4.1.0&q=80&w=400"
+  alt: "analog clock at 12 am"
+  author: "Djim Loic"
+  authorUrl: "https://unsplash.com/@loic?utm_source=jchub&utm_medium=referral"
+  pageUrl: "https://unsplash.com/photos/analog-clock-at-12-am-ft0-Xu4nTvA?utm_source=jchub&utm_medium=referral"
+  downloadLocation: "https://api.unsplash.com/photos/ft0-Xu4nTvA/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZGlnaXRhbCUyMGNsb2NrJTIwZGlzcGxheWluZyUyMHRpbWVzdGFtcHxlbnwxfDB8fHwxNzkyOTIxODE1fDA"
 readTime: 3 min
 status: published
 publishedAt: '2026-08-25T22:05:20.235Z'

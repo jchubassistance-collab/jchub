@@ -12,6 +12,15 @@ tags:
   - technologie
 author: JcHub
 image: "https://jchub.dev/api/article-cover?title=Analyse%20de%20logs%20et%20m%C3%A9triques%20temporelles%20%C3%A0%20haute%20fr%C3%A9quence%20%3A%20ma%C3%AEtriser%20l'horodatage%20des%20syst%C3%A8mes%20d'inf%C3%A9rence&category=Convertisseur%20Timestamp"
+photo:
+  id: "VHmBX7FnXw0"
+  url: "https://images.unsplash.com/photo-1762163516269-3c143e04175c?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c2VydmVyJTIwcmFjayUyMGJsaW5raW5nJTIwbGlnaHRzfGVufDF8MHx8fDE3OTI5MjE4MDR8MA&ixlib=rb-4.1.0"
+  thumb: "https://images.unsplash.com/photo-1762163516269-3c143e04175c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c2VydmVyJTIwcmFjayUyMGJsaW5raW5nJTIwbGlnaHRzfGVufDF8MHx8fDE3OTI5MjE4MDR8MA&ixlib=rb-4.1.0&q=80&w=400"
+  alt: "Server rack with blinking green lights"
+  author: "Domaintechnik"
+  authorUrl: "https://unsplash.com/@fslfsl?utm_source=jchub&utm_medium=referral"
+  pageUrl: "https://unsplash.com/photos/server-rack-with-blinking-green-lights-VHmBX7FnXw0?utm_source=jchub&utm_medium=referral"
+  downloadLocation: "https://api.unsplash.com/photos/VHmBX7FnXw0/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c2VydmVyJTIwcmFjayUyMGJsaW5raW5nJTIwbGlnaHRzfGVufDF8MHx8fDE3OTI5MjE4MDR8MA"
 readTime: 5 min
 status: published
 publishedAt: '2026-10-25T09:11:00.127Z'

@@ -1,4 +1,5 @@
 import { after, NextRequest, NextResponse } from 'next/server';
+import { findArticlePhoto } from '@/lib/article-photo';
 import { refreshArticle } from '@/lib/article-repository';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
@@ -37,7 +38,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       }
       const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
       const scheduledFor = Timestamp.fromDate(scheduledDate);
+      const photo = await findArticlePhoto({ title: String(draft.title || ''), description: String(draft.description || ''), photo: existingArticle.data()?.photo });
       await articleReference.set({
+        ...(photo ? { photo } : {}),
         slug,
         title: String(draft.title || 'Article JcHub'),
         description: String(draft.description || ''),
@@ -93,7 +96,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
       const articleImage = `${siteUrl}/api/article-cover?title=${encodeURIComponent(String(draft.title || 'Article JcHub'))}&category=${encodeURIComponent(String(draft.promotion?.name || 'JcHub / Journal'))}`;
       const scheduledFor = Timestamp.fromDate(requestedDate);
+      const photo = await findArticlePhoto({ title: String(draft.title || ''), description: String(draft.description || ''), photo: existingArticle.data()?.photo });
       await articleReference.set({
+        ...(photo ? { photo } : {}),
         slug,
         title: String(draft.title || 'Article JcHub'),
         description: String(draft.description || ''),
@@ -138,7 +143,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
       const articleImage = `${siteUrl}/api/article-cover?title=${encodeURIComponent(String(draft.title || 'Article JcHub'))}&category=${encodeURIComponent(String(draft.promotion?.name || 'JcHub / Journal'))}`;
       const articleReference = getAdminDb().collection('articles').doc(slug);
+      const photo = await findArticlePhoto({ title: String(draft.title || ''), description: String(draft.description || ''), photo: (await articleReference.get()).data()?.photo });
       await articleReference.set({
+        ...(photo ? { photo } : {}),
         slug,
         title: String(draft.title || 'Article JcHub'),
         description: String(draft.description || ''),
