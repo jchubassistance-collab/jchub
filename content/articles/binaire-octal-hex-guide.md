@@ -15,9 +15,10 @@ keywords:
 author: Jessy Ngnambongo
 image: /blog/13-binaire-octal-hex-guide.svg
 readTime: 4 min
-status: scheduled
+status: published
+publishedAt: '2026-10-21T09:11:00.946Z'
 scheduledFor: '2026-10-20T22:05:20.235Z'
-updatedAt: '2026-08-25T22:05:36.078Z'
+updatedAt: '2026-10-21T09:11:00.946Z'
 ---
 # Binaire, octal, décimal, hexadécimal : le guide pour ne plus rien confondre
 
