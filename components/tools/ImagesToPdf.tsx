@@ -111,7 +111,7 @@ const PREVIEW_HEIGHT = 440;
 /** Inset of the picture in the margin icons, in pixels. */
 const MARGIN_ICON_INSET: Record<Margin, number> = { none: 0, small: 3, large: 6 };
 
-const choiceClass = (active: boolean) => `flex flex-col items-center justify-center gap-1.5 rounded-xl border px-2 py-3 text-sm font-semibold transition ${active ? 'border-blue-400 bg-blue-500/15 text-blue-200' : 'border-[#9ccbff]/20 bg-[#071526] text-slate-300 hover:border-[#9ccbff]/40'}`;
+const choiceClass = (active: boolean) => `flex flex-col items-center justify-center gap-1.5 rounded-xl border px-2 py-3 text-sm font-semibold transition ${active ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-slate-300 bg-white text-slate-600 hover:border-slate-400'}`;
 const toolButtonClass = 'rounded-lg border border-slate-300 bg-white p-1.5 text-slate-700 hover:border-slate-400 disabled:opacity-40';
 const textButtonClass = 'inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:border-slate-400 disabled:opacity-40';
 const listButtonClass = 'rounded-lg p-2 text-slate-400 hover:bg-blue-500/10 hover:text-blue-500 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400';
@@ -267,7 +267,7 @@ export function ImagesToPdf() {
   return <div className="space-y-5 text-slate-100">
     <div className="rounded-2xl border border-dashed border-[#9ccbff]/40 bg-[#071526] p-6 text-center">
       <input ref={inputRef} type="file" multiple accept="image/jpeg,image/png,.jpg,.jpeg,.png" className="hidden" onChange={addFiles} />
-      <button type="button" onClick={() => inputRef.current?.click()} className="mx-auto flex items-center gap-2 rounded-xl border border-[#9ccbff]/30 bg-[#0c1d31] px-4 py-3 font-semibold text-[#dfeeff] hover:border-[#9ccbff]/50"><UploadCloud className="h-5 w-5" /> {t.add}</button>
+      <button type="button" onClick={() => inputRef.current?.click()} className="btn-upload mx-auto flex items-center gap-2 rounded-xl px-5 py-3"><UploadCloud className="h-5 w-5" /> {t.add}</button>
       <p className="mt-3 text-xs text-slate-400">{t.limits(MAX_FILES)}</p>
     </div>
 
@@ -350,14 +350,14 @@ export function ImagesToPdf() {
           {(['none', 'small', 'large'] as const).map((value) => <button key={value} type="button" aria-pressed={margin === value} onClick={() => setMargin(value)} className={choiceClass(margin === value)}>
             <span aria-hidden="true" className="relative h-7 w-5 rounded-[3px] border-2 border-current"><span className="absolute rounded-[1px] bg-current opacity-60" style={{ inset: MARGIN_ICON_INSET[value] }} /></span>
             {t.margins[value]}
-            {value !== 'none' && <span className="text-xs font-normal text-slate-400">{MARGINS_MM[value]} mm</span>}
+            {value !== 'none' && <span className="text-xs font-normal text-slate-500">{MARGINS_MM[value]} mm</span>}
           </button>)}
         </div></fieldset>
         {pageSize !== 'image' && <label className="block text-sm text-slate-300">{t.placement}<select value={fit} onChange={(e) => setFit(e.target.value as typeof fit)} className="mt-1 w-full rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-3 py-2.5 text-white"><option value="contain">{t.contain}</option><option value="cover">{t.cover}</option></select></label>}
         <p className="flex items-center gap-2 rounded-xl border border-[#9ccbff]/20 bg-[#071526] p-3 text-xs text-slate-300"><FileImage className="h-4 w-4 shrink-0 text-blue-300" />{t.order}</p>
         <button type="button" disabled={!images.length || busy} onClick={convert} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4a74d6] to-[#7a5cf7] px-4 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileText className="h-5 w-5" />}{busy ? t.creating : t.convert}</button>
         {error && <div role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{error}</div>}
-        {result?.key === requestKey && <a href={result.url} download={downloadName(images[0]?.file.name ?? 'images', 'pdf', '', 'images')} className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 font-bold text-emerald-200"><Download className="h-5 w-5" /> {t.download}</a>}
+        {result?.key === requestKey && <a href={result.url} download={downloadName(images[0]?.file.name ?? 'images', 'pdf', '', 'images')} className="btn-download flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3"><Download className="h-5 w-5" /> {t.download}</a>}
         <p className="text-center text-xs text-slate-400">{t.quota}</p>
       </div>
     </div>

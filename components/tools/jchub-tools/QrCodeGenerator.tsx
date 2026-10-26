@@ -173,8 +173,8 @@ export function QrCodeGenerator() {
       </div>
 
       {dataUrl && (
-        <button onClick={download} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-purple-600 py-3 font-semibold text-white transition hover:shadow-lg">
-          <Download className="w-4 h-4" />
+        <button onClick={download} className="btn-download flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3">
+          <Download className="h-5 w-5" />
           {t.download}
         </button>
       )}

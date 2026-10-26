@@ -133,7 +133,7 @@ export function PdfCompressor() {
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="mx-auto flex items-center justify-center gap-2 rounded-xl border border-[#9ccbff]/30 bg-[#0c1d31] px-4 py-3 font-semibold text-[#dfeeff] hover:border-[#9ccbff]/50"
+          className="btn-upload mx-auto flex items-center justify-center gap-2 rounded-xl px-5 py-3"
         >
           <UploadCloud className="h-5 w-5" />
           {t.choose}
@@ -181,7 +181,7 @@ export function PdfCompressor() {
           <a
             href={result.url}
             download={result.name}
-            className={`mt-2 flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-3 font-bold transition ${result.keptOriginal ? 'border-amber-400/40 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20' : 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20'}`}
+            className="btn-download mt-2 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3"
           >
             <Download className="h-5 w-5" />
             {result.keptOriginal ? t.downloadOriginal : t.downloadCompressed}

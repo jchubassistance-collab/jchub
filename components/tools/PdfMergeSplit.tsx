@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react';
-import { ArrowDown, ArrowUp, Combine, Download, FileArchive, FileText, Loader2, Scissors, Trash2, UploadCloud } from 'lucide-react';
+import { ArrowDown, ArrowUp, Combine, Download, FileText, Loader2, Scissors, Trash2, UploadCloud } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { bilingual } from '@/i18n/copy';
 import { pageGroupLabel, parsePageRanges, uniqueNames } from '@/lib/pdf-pages';
@@ -298,7 +298,7 @@ export function PdfMergeSplit() {
       className={`rounded-xl border-2 border-dashed p-6 text-center transition sm:py-8 ${dragging ? 'border-slate-500 bg-slate-50' : 'border-slate-300 bg-white'}`}
     >
       <input ref={inputRef} type="file" multiple={mode === 'merge'} accept="application/pdf,.pdf" className="hidden" onChange={onInput} />
-      <button type="button" onClick={() => inputRef.current?.click()} disabled={busy || (mode === 'merge' && mergeFiles.length >= MAX_FILES)} className="mx-auto flex items-center gap-3 rounded-xl border border-slate-300 bg-white px-5 py-3.5 text-lg font-medium text-slate-900 transition hover:border-slate-400 disabled:opacity-50"><UploadCloud className="h-5 w-5" /> {mode === 'merge' ? t.addMany : splitFile ? t.replace : t.addOne}</button>
+      <button type="button" onClick={() => inputRef.current?.click()} disabled={busy || (mode === 'merge' && mergeFiles.length >= MAX_FILES)} className="btn-upload mx-auto flex items-center gap-3 rounded-xl px-5 py-3.5 text-lg"><UploadCloud className="h-5 w-5" /> {mode === 'merge' ? t.addMany : splitFile ? t.replace : t.addOne}</button>
       <p className="mt-3 text-sm text-slate-500">{t.dropHint} · {mode === 'merge' ? t.mergeLimits(MAX_FILES) : t.splitLimits}</p>
     </div>
 
@@ -344,16 +344,16 @@ export function PdfMergeSplit() {
     {outputs.length > 0 && <div className="space-y-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
       <p role="status" className="text-sm font-medium text-emerald-800">{mode === 'merge' ? t.merged(outputs[0].pages, formatSize(outputs[0].blob.size, locale, t)) : t.ready(outputs.length)}</p>
       {mode === 'merge'
-        ? <button type="button" onClick={() => downloadBlob(outputs[0].blob, outputs[0].name)} className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-300 bg-white px-4 py-3 font-bold text-emerald-800 hover:bg-emerald-100"><Download className="h-5 w-5" /> {t.downloadMerged}</button>
+        ? <button type="button" onClick={() => downloadBlob(outputs[0].blob, outputs[0].name)} className="btn-download flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3"><Download className="h-5 w-5" /> {t.downloadMerged}</button>
         : <>
           <ul className="max-h-72 space-y-2 overflow-auto">
             {outputs.map((output) => <li key={output.name} className="flex items-center gap-3 rounded-lg bg-white p-3">
               <FileText className="h-5 w-5 shrink-0 text-emerald-700" />
               <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium text-slate-900">{output.name}</span><span className="text-xs text-slate-500">{t.pages(output.pages)} · {formatSize(output.blob.size, locale, t)}</span></span>
-              <button type="button" onClick={() => downloadBlob(output.blob, output.name)} className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-50"><Download className="h-4 w-4" /> {t.download}</button>
+              <button type="button" onClick={() => downloadBlob(output.blob, output.name)} className="btn-download inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs"><Download className="h-4 w-4" /> {t.download}</button>
             </li>)}
           </ul>
-          {outputs.length > 1 && <button type="button" onClick={() => void downloadZip()} className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-300 bg-white px-4 py-3 font-bold text-emerald-800 hover:bg-emerald-100"><FileArchive className="h-5 w-5" /> {t.downloadZip}</button>}
+          {outputs.length > 1 && <button type="button" onClick={() => void downloadZip()} className="btn-download flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3"><Download className="h-5 w-5" /> {t.downloadZip}</button>}
         </>}
     </div>}
 

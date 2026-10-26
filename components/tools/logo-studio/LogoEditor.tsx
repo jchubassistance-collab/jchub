@@ -613,7 +613,7 @@ export function LogoEditor({ active, onAddToPack, ref }: { active: boolean; onAd
         <input ref={inputRef} type="file" accept={ACCEPT} className="hidden" onChange={onInput} />
         <span aria-hidden="true" className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-blue-50 text-blue-700 ring-1 ring-blue-100"><ImageIcon className="h-7 w-7" /></span>
         <p className="mt-4 text-xl font-bold text-slate-900">{t.dropTitle}</p>
-        <button type="button" onClick={() => inputRef.current?.click()} disabled={loading} className="mx-auto mt-5 flex items-center gap-3 rounded-xl bg-slate-900 px-5 py-3.5 text-lg font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60">
+        <button type="button" onClick={() => inputRef.current?.click()} disabled={loading} className="btn-upload mx-auto mt-5 flex items-center gap-3 rounded-xl px-5 py-3.5 text-lg">
           {loading ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : <UploadCloud className="h-5 w-5" aria-hidden="true" />}
           {loading ? t.loading : t.choose}
         </button>
@@ -691,7 +691,7 @@ export function LogoEditor({ active, onAddToPack, ref }: { active: boolean; onAd
         <ToolButton icon={UploadCloud} label={t.replace} text={t.replaceShort} onClick={() => inputRef.current?.click()} disabled={loading || exporting} />
         <ToolButton icon={X} label={t.close} text={t.closeShort} onClick={close} disabled={exporting} />
         <ToolButton icon={PackagePlus} label={t.addToPack} text={t.addToPackShort} onClick={() => void addToPack()} disabled={exporting || cropping} />
-        <button type="button" onClick={() => void download()} disabled={exporting || cropping} className="inline-flex h-10 items-center gap-2 rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50">
+        <button type="button" onClick={() => void download()} disabled={exporting || cropping} className="btn-download inline-flex h-10 items-center gap-2 rounded-xl px-4 text-sm">
           {exporting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Download className="h-4 w-4" aria-hidden="true" />}
           {exporting ? t.exporting : t.download(EXPORT_LABELS[format])}
         </button>
@@ -896,7 +896,7 @@ export function LogoEditor({ active, onAddToPack, ref }: { active: boolean; onAd
               {!logo.vector && <p className="text-xs leading-5 text-slate-500">{t.resolutionHint}</p>}
             </>}
             <p className="rounded-lg bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700">{format === 'svg' ? t.dimensions(s.canvasWidth, s.canvasHeight) : t.dimensions(s.canvasWidth * exportScale, s.canvasHeight * exportScale)}</p>
-            <button type="button" onClick={() => void download()} disabled={exporting} className="flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-base font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60">
+            <button type="button" onClick={() => void download()} disabled={exporting} className="btn-download flex min-h-14 w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-base">
               {exporting ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : <Download className="h-5 w-5" aria-hidden="true" />}
               {exporting ? t.exporting : t.download(EXPORT_LABELS[format])}
             </button>

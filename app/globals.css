@@ -1701,6 +1701,127 @@ body {
   color: #fff !important;
 }
 
+/*
+ * The same two buttons in every tool: green to download, brand blue to add files. Each moves a
+ * little on its own so that it never looks inert; the motion stops for reduced motion.
+ */
+.btn-download,
+.btn-upload {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 0;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.2);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-download {
+  background-color: #37bd2e;
+  box-shadow: 0 10px 22px -12px rgb(55 189 46 / 0.9);
+}
+
+.btn-download:hover:not(:disabled) {
+  background-color: #2fa826;
+  box-shadow: 0 16px 28px -12px rgb(55 189 46 / 0.95);
+  transform: translateY(-2px);
+}
+
+/* A glint crosses the button every few seconds, above its colour and under its label. */
+.btn-download::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: '';
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 35%, rgb(255 255 255 / 0.4) 50%, transparent 65%);
+  transform: translateX(-100%);
+  animation: btn-glint 3.5s ease-in-out infinite;
+}
+
+.btn-download:hover:not(:disabled) svg:not(.animate-spin) {
+  animation: btn-download-nudge 0.8s ease-in-out infinite;
+}
+
+.btn-upload {
+  background-color: #2563eb;
+  animation: btn-upload-halo 2.4s ease-out infinite;
+}
+
+.btn-upload:hover:not(:disabled) {
+  background-color: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+.btn-upload:not(:disabled) svg:not(.animate-spin) {
+  animation: btn-upload-float 2.4s ease-in-out infinite;
+}
+
+.btn-download:active:not(:disabled),
+.btn-upload:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-download:focus-visible {
+  outline: 3px solid rgb(55 189 46 / 0.45);
+  outline-offset: 2px;
+}
+
+.btn-upload:focus-visible {
+  outline: 3px solid rgb(37 99 235 / 0.45);
+  outline-offset: 2px;
+}
+
+.btn-download:disabled,
+.btn-upload:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+  animation: none;
+}
+
+.btn-download:disabled::after {
+  display: none;
+}
+
+@keyframes btn-glint {
+  0%, 60% { transform: translateX(-100%); }
+  90%, 100% { transform: translateX(100%); }
+}
+
+@keyframes btn-download-nudge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+@keyframes btn-upload-halo {
+  0% { box-shadow: 0 10px 22px -12px rgb(37 99 235 / 0.9), 0 0 0 0 rgb(37 99 235 / 0.45); }
+  70%, 100% { box-shadow: 0 10px 22px -12px rgb(37 99 235 / 0.9), 0 0 0 12px rgb(37 99 235 / 0); }
+}
+
+@keyframes btn-upload-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-download,
+  .btn-upload,
+  .btn-download::after,
+  .btn-download svg,
+  .btn-upload svg {
+    animation: none !important;
+    transition: none;
+  }
+
+  .btn-download:hover:not(:disabled),
+  .btn-upload:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
 .partner-carousel-slide {
   opacity: .68;
   transform: scale(.985) translateX(8px);

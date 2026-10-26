@@ -94,7 +94,7 @@ export function WordToPdf() {
     <div className="space-y-5 text-slate-100">
       <div className="rounded-2xl border border-dashed border-[#9ccbff]/40 bg-[#071526] p-6 text-center">
         <input ref={inputRef} type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={handleFileChange} />
-        <button type="button" onClick={() => inputRef.current?.click()} className="mx-auto flex items-center justify-center gap-2 rounded-xl border border-[#9ccbff]/30 bg-[#0c1d31] px-4 py-3 font-semibold text-[#dfeeff] hover:border-[#9ccbff]/50">
+        <button type="button" onClick={() => inputRef.current?.click()} className="btn-upload mx-auto flex items-center justify-center gap-2 rounded-xl px-5 py-3">
           <UploadCloud className="h-5 w-5" /> {t.choose}
         </button>
         <div className="mt-4 min-h-10 text-sm text-slate-300">{file ? <span className="font-medium text-white">{file.name}</span> : t.noFile}</div>
@@ -111,7 +111,7 @@ export function WordToPdf() {
         {isLoading ? t.converting : t.convert}
       </button>
       {error && <div role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{error}</div>}
-      {downloadUrl && <a href={downloadUrl} download={fileName} className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 font-bold text-emerald-200 transition hover:bg-emerald-500/20"><Download className="h-5 w-5" /> {t.download}</a>}
+      {downloadUrl && <a href={downloadUrl} download={fileName} className="btn-download flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3"><Download className="h-5 w-5" /> {t.download}</a>}
       <p className="text-center text-xs text-slate-400">{t.quota}</p>
     </div>
   );
