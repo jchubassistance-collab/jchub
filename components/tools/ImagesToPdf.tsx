@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, type ChangeEvent } from 'react';
-import { Download, FileImage, FileText, Loader2, Trash2, UploadCloud } from 'lucide-react';
+import { Download, FileImage, FileText, Loader2, RectangleHorizontal, RectangleVertical, Trash2, UploadCloud } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { bilingual } from '@/i18n/copy';
 
@@ -15,10 +15,14 @@ const copy = bilingual({
   megabytes: 'Mo',
   remove: (name: string) => `Retirer ${name}`,
   pageSize: 'Taille des pages',
+  a4: 'A4 (210 × 297 mm)',
+  letter: 'Lettre US (216 × 279 mm)',
   fitPage: 'Taille adaptée à chaque image',
   orientation: 'Orientation',
   portrait: 'Portrait',
   landscape: 'Paysage',
+  margin: 'Marge',
+  margins: { none: 'Aucune marge', small: 'Petite', large: 'Grande' },
   placement: 'Placement de l’image',
   contain: 'Tout afficher (sans recadrage)',
   cover: 'Remplir la page (peut recadrer)',
@@ -37,10 +41,14 @@ const copy = bilingual({
   megabytes: 'MB',
   remove: (name: string) => `Remove ${name}`,
   pageSize: 'Page size',
+  a4: 'A4 (210 × 297 mm)',
+  letter: 'US Letter (216 × 279 mm)',
   fitPage: 'Size matched to each image',
   orientation: 'Orientation',
   portrait: 'Portrait',
   landscape: 'Landscape',
+  margin: 'Margin',
+  margins: { none: 'No margin', small: 'Small', large: 'Large' },
   placement: 'Image placement',
   contain: 'Show everything (no cropping)',
   cover: 'Fill the page (may crop)',
@@ -52,18 +60,24 @@ const copy = bilingual({
 });
 import { cleanUpConversionFiles, postConversion, uploadConversionFile } from '@/lib/conversion-upload-client';
 import { downloadName } from '@/lib/download-name';
+import { MARGINS_MM, type Fit, type Margin, type Orientation, type PageSize } from '@/lib/images-to-pdf';
 
 type ImageItem = { file: File; url: string };
 const MAX_FILES = 20;
 const MAX_FILE_SIZE = 15 * 1024 * 1024;
+/** Inset of the picture in the margin icons, in pixels. */
+const MARGIN_ICON_INSET: Record<Margin, number> = { none: 0, small: 3, large: 6 };
+
+const choiceClass = (active: boolean) => `flex flex-col items-center justify-center gap-1.5 rounded-xl border px-2 py-3 text-sm font-semibold transition ${active ? 'border-blue-400 bg-blue-500/15 text-blue-200' : 'border-[#9ccbff]/20 bg-[#071526] text-slate-300 hover:border-[#9ccbff]/40'}`;
 
 export function ImagesToPdf() {
   const t = copy[useLocale()];
   const inputRef = useRef<HTMLInputElement>(null);
   const [images, setImages] = useState<ImageItem[]>([]);
-  const [pageSize, setPageSize] = useState<'a4' | 'letter' | 'image'>('a4');
-  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
-  const [fit, setFit] = useState<'contain' | 'cover'>('contain');
+  const [pageSize, setPageSize] = useState<PageSize>('a4');
+  const [orientation, setOrientation] = useState<Orientation>('portrait');
+  const [fit, setFit] = useState<Fit>('contain');
+  const [margin, setMargin] = useState<Margin>('none');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [downloadUrl, setDownloadUrl] = useState('');
@@ -99,6 +113,7 @@ export function ImagesToPdf() {
         pageSize,
         orientation,
         fit,
+        margin,
       });
       setDownloadUrl(URL.createObjectURL(await response.blob()));
     } catch (cause) {
@@ -124,10 +139,21 @@ export function ImagesToPdf() {
       </li>)}
     </ol>}
 
-    <div className="grid gap-3 sm:grid-cols-2">
-      <label className="text-sm text-slate-300">{t.pageSize}<select value={pageSize} onChange={(e) => setPageSize(e.target.value as typeof pageSize)} className="mt-1 w-full rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-3 py-2.5 text-white"><option value="a4">A4</option><option value="letter">Letter</option><option value="image">{t.fitPage}</option></select></label>
-      <label className="text-sm text-slate-300">{t.orientation}<select value={orientation} onChange={(e) => setOrientation(e.target.value as typeof orientation)} className="mt-1 w-full rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-3 py-2.5 text-white"><option value="portrait">{t.portrait}</option><option value="landscape">{t.landscape}</option></select></label>
-    </div>
+    {/* A page matched to the image takes the image's own orientation. */}
+    {pageSize !== 'image' && <fieldset><legend className="mb-1 text-sm text-slate-300">{t.orientation}</legend><div className="grid grid-cols-2 gap-2">
+      {(['portrait', 'landscape'] as const).map((value) => {
+        const Icon = value === 'portrait' ? RectangleVertical : RectangleHorizontal;
+        return <button key={value} type="button" aria-pressed={orientation === value} onClick={() => setOrientation(value)} className={choiceClass(orientation === value)}><Icon className="h-6 w-6" />{t[value]}</button>;
+      })}
+    </div></fieldset>}
+    <label className="block text-sm text-slate-300">{t.pageSize}<select value={pageSize} onChange={(e) => setPageSize(e.target.value as PageSize)} className="mt-1 w-full rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-3 py-2.5 text-white"><option value="a4">{t.a4}</option><option value="letter">{t.letter}</option><option value="image">{t.fitPage}</option></select></label>
+    <fieldset><legend className="mb-1 text-sm text-slate-300">{t.margin}</legend><div className="grid grid-cols-3 gap-2">
+      {(['none', 'small', 'large'] as const).map((value) => <button key={value} type="button" aria-pressed={margin === value} onClick={() => setMargin(value)} className={choiceClass(margin === value)}>
+        <span aria-hidden="true" className="relative h-7 w-5 rounded-[3px] border-2 border-current"><span className="absolute rounded-[1px] bg-current opacity-60" style={{ inset: MARGIN_ICON_INSET[value] }} /></span>
+        {t.margins[value]}
+        {value !== 'none' && <span className="text-xs font-normal text-slate-400">{MARGINS_MM[value]} mm</span>}
+      </button>)}
+    </div></fieldset>
     {pageSize !== 'image' && <label className="block text-sm text-slate-300">{t.placement}<select value={fit} onChange={(e) => setFit(e.target.value as typeof fit)} className="mt-1 w-full rounded-xl border border-[#9ccbff]/20 bg-[#071526] px-3 py-2.5 text-white"><option value="contain">{t.contain}</option><option value="cover">{t.cover}</option></select></label>}
     <p className="flex items-center gap-2 rounded-xl border border-[#9ccbff]/20 bg-[#071526] p-3 text-xs text-slate-300"><FileImage className="h-4 w-4 shrink-0 text-blue-300" />{t.order}</p>
     <button type="button" disabled={!images.length || busy} onClick={convert} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4a74d6] to-[#7a5cf7] px-4 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileText className="h-5 w-5" />}{busy ? t.creating : t.convert}</button>

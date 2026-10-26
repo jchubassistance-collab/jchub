@@ -97,7 +97,6 @@ export const tools: Tool[] = [
       },
     },
     status: 'published',
-    visibleDays: [5],
     seo: {
       title: 'Convertir des images en PDF gratuitement — JcHub',
       description: 'Assemble des images JPG, JPEG et PNG en PDF. Choisis le format et l’orientation des pages ; chaque image occupe une page.',
