@@ -2,6 +2,7 @@ import { apiMessage } from '@/lib/api-messages';
 import { loadImage } from '@napi-rs/canvas';
 import { jsPDF } from 'jspdf';
 import { NextRequest, NextResponse } from 'next/server';
+import { isMargin, isPageSize, layoutImagePage, type Fit, type Orientation } from '@/lib/images-to-pdf';
 import { enforceDailyConversionQuota } from '@/lib/rate-limit';
 import {
   cleanUpTemporaryBlobs,
@@ -33,11 +34,13 @@ export async function POST(request: NextRequest) {
     body.urls.length > MAX_FILES ||
     !body.urls.every((url): url is string => typeof url === 'string') ||
     !('pageSize' in body) ||
-    !['a4', 'letter', 'image'].includes(String(body.pageSize)) ||
+    !isPageSize(body.pageSize) ||
     !('orientation' in body) ||
     (body.orientation !== 'portrait' && body.orientation !== 'landscape') ||
     !('fit' in body) ||
-    (body.fit !== 'contain' && body.fit !== 'cover')
+    (body.fit !== 'contain' && body.fit !== 'cover') ||
+    // A page opened before margins existed sends none: it keeps the edge-to-edge layout.
+    ('margin' in body && !isMargin(body.margin))
   ) {
     return NextResponse.json({ error: apiMessage(request, 'Paramètres de conversion invalides.') }, { status: 400 });
   }
@@ -58,60 +61,37 @@ export async function POST(request: NextRequest) {
     const limited = await enforceDailyConversionQuota(request, 'images-to-pdf');
     if (limited) return limited;
 
-    const pageSize = body.pageSize as 'a4' | 'letter' | 'image';
-    const orientation = body.orientation;
-    const fit = body.fit;
-    const pdf = new jsPDF({
-      orientation,
-      unit: 'mm',
-      format: pageSize === 'image' ? 'a4' : pageSize,
-      compress: true,
-    });
+    const options = {
+      pageSize: body.pageSize,
+      orientation: body.orientation as Orientation,
+      fit: body.fit as Fit,
+      margin: 'margin' in body && isMargin(body.margin) ? body.margin : 'none' as const,
+    };
+    const pdf = new jsPDF({ unit: 'mm', compress: true });
 
     for (let index = 0; index < files.length; index += 1) {
       const file = files[index];
       const image = await loadImage(file.buffer);
-      let width: number;
-      let height: number;
+      const { page, frame, image: placement } = layoutImagePage(image.width, image.height, options);
 
-      if (pageSize === 'image') {
-        width = image.width * 25.4 / 96;
-        height = image.height * 25.4 / 96;
-        if (orientation === 'landscape' && height > width) [width, height] = [height, width];
-        if (orientation === 'portrait' && width > height) [width, height] = [height, width];
-        if (index === 0) pdf.deletePage(1);
-        pdf.addPage([width, height], orientation);
-      } else {
-        if (index > 0) pdf.addPage(pageSize, orientation);
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const imageRatio = image.width / image.height;
-        const pageRatio = pageWidth / pageHeight;
-        if ((fit === 'contain' && imageRatio > pageRatio) || (fit === 'cover' && imageRatio < pageRatio)) {
-          width = pageWidth;
-          height = pageWidth / imageRatio;
-        } else {
-          height = pageHeight;
-          width = pageHeight * imageRatio;
-        }
-        if (fit === 'contain') {
-          width = Math.min(width, pageWidth);
-          height = Math.min(height, pageHeight);
-        }
-      }
-
-      const x = (pdf.internal.pageSize.getWidth() - width) / 2;
-      const y = (pdf.internal.pageSize.getHeight() - height) / 2;
+      // jsPDF swaps the two sides when they disagree with the orientation it is given.
+      pdf.addPage([page.width, page.height], page.width > page.height ? 'landscape' : 'portrait');
+      if (index === 0) pdf.deletePage(1);
+      pdf.saveGraphicsState();
+      pdf.rect(frame.x, frame.y, frame.width, frame.height, null);
+      pdf.clip();
+      pdf.discardPath();
       pdf.addImage(
         file.buffer,
         file.contentType === 'image/png' ? 'PNG' : 'JPEG',
-        x,
-        y,
-        width,
-        height,
+        placement.x,
+        placement.y,
+        placement.width,
+        placement.height,
         undefined,
         'FAST',
       );
+      pdf.restoreGraphicsState();
     }
 
     return new NextResponse(new Uint8Array(pdf.output('arraybuffer')), {
