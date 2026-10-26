@@ -720,6 +720,34 @@ export const tools: Tool[] = [
       keywords: ['url encoder', 'url decoder', 'encodeur url'],
     },
   },
+  {
+    slug: 'redimensionneur-recadreur-images',
+    name: 'Redimensionneur et recadreur d’images pour réseaux sociaux',
+    description: 'Recadre tes images selon les formats Instagram, LinkedIn et Web, ajuste les dimensions et exporte-les directement dans ton navigateur.',
+    category: 'Design',
+    icon: '✂️',
+    tags: ['image', 'recadrage', 'redimensionner', 'instagram', 'linkedin', 'bannière', 'réseaux sociaux'],
+    component: 'SocialImageCropper',
+    translations: {
+      en: {
+        slug: 'social-image-resizer-cropper',
+        name: 'Social media image resizer and cropper',
+        description: 'Crop images to Instagram, LinkedIn and web formats, set custom dimensions, and export right in your browser.',
+        tags: ['image', 'crop', 'resize', 'instagram', 'linkedin', 'banner', 'social media'],
+        seo: {
+          title: 'Social Media Image Resizer and Cropper | JcHub',
+          description: 'Crop and resize images for Instagram, LinkedIn and web banners. Set custom dimensions and export PNG or JPEG in your browser.',
+          keywords: ['social media image resizer', 'image cropper', 'instagram image size', 'linkedin image size'],
+        },
+      },
+    },
+    status: 'published',
+    seo: {
+      title: 'Redimensionneur et recadreur d’images pour réseaux sociaux | JcHub',
+      description: 'Recadre et redimensionne tes images pour Instagram, LinkedIn et les bannières Web. Choisis des dimensions personnalisées et exporte en PNG ou JPEG.',
+      keywords: ['recadreur image', 'redimensionner image réseaux sociaux', 'format image instagram', 'format image linkedin'],
+    },
+  },
 ];
 
 export function isToolVisibleToday(tool: Tool, date = new Date()): boolean {

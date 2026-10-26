@@ -20,6 +20,7 @@ const tools: Record<ToolComponentName, ComponentType> = {
   WordToPdf: dynamic(() => import('@/components/tools/WordToPdf').then((m) => m.WordToPdf)),
   ImagesToPdf: dynamic(() => import('@/components/tools/ImagesToPdf').then((m) => m.ImagesToPdf)),
   ImageOptimizer: dynamic(() => import('@/components/tools/ImageOptimizer').then((m) => m.ImageOptimizer)),
+  SocialImageCropper: dynamic(() => import('@/components/tools/SocialImageCropper').then((m) => m.SocialImageCropper)),
   ColorConverter: dynamic(() => import('@/components/tools/jchub-tools/ColorConverter').then((m) => m.ColorConverter)),
   HashGenerator: dynamic(() => import('@/components/tools/jchub-tools/HashGenerator').then((m) => m.HashGenerator)),
   JwtDecoder: dynamic(() => import('@/components/tools/jchub-tools/JwtDecoder').then((m) => m.JwtDecoder)),
