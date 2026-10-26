@@ -2,7 +2,18 @@ import { apiMessage } from '@/lib/api-messages';
 import { loadImage } from '@napi-rs/canvas';
 import { jsPDF } from 'jspdf';
 import { NextRequest, NextResponse } from 'next/server';
-import { isMargin, isPageSize, layoutImagePage, type Fit, type Orientation } from '@/lib/images-to-pdf';
+import {
+  DEFAULT_ADJUSTMENT,
+  isAdjustment,
+  isMargin,
+  isPageSize,
+  jpegExifRotation,
+  layoutImagePage,
+  pdfImagePlacement,
+  type Fit,
+  type Orientation,
+  type Rotation,
+} from '@/lib/images-to-pdf';
 import { enforceDailyConversionQuota } from '@/lib/rate-limit';
 import {
   cleanUpTemporaryBlobs,
@@ -40,12 +51,19 @@ export async function POST(request: NextRequest) {
     !('fit' in body) ||
     (body.fit !== 'contain' && body.fit !== 'cover') ||
     // A page opened before margins existed sends none: it keeps the edge-to-edge layout.
-    ('margin' in body && !isMargin(body.margin))
+    ('margin' in body && !isMargin(body.margin)) ||
+    // Same for the adjustments made in the preview: each image keeps the plain layout.
+    ('adjustments' in body && (
+      !Array.isArray(body.adjustments) ||
+      body.adjustments.length !== body.urls.length ||
+      !body.adjustments.every(isAdjustment)
+    ))
   ) {
     return NextResponse.json({ error: apiMessage(request, 'Paramètres de conversion invalides.') }, { status: 400 });
   }
 
   const urls = body.urls;
+  const adjustments = 'adjustments' in body && Array.isArray(body.adjustments) ? body.adjustments.filter(isAdjustment) : [];
   try {
     const files = [];
     let totalSize = 0;
@@ -71,8 +89,12 @@ export async function POST(request: NextRequest) {
 
     for (let index = 0; index < files.length; index += 1) {
       const file = files[index];
+      const adjustment = adjustments[index] ?? DEFAULT_ADJUSTMENT;
+      // The decoder applies the EXIF orientation, like the preview: the layout uses the upright size.
       const image = await loadImage(file.buffer);
-      const { page, frame, image: placement } = layoutImagePage(image.width, image.height, options);
+      const { page, frame, image: box } = layoutImagePage(image.width, image.height, options, adjustment);
+      const turn = file.contentType === 'image/png' ? 0 : jpegExifRotation(file.buffer);
+      const placement = pdfImagePlacement(box, ((turn + adjustment.rotation) % 360) as Rotation);
 
       // jsPDF swaps the two sides when they disagree with the orientation it is given.
       pdf.addPage([page.width, page.height], page.width > page.height ? 'landscape' : 'portrait');
@@ -90,6 +112,7 @@ export async function POST(request: NextRequest) {
         placement.height,
         undefined,
         'FAST',
+        placement.angle,
       );
       pdf.restoreGraphicsState();
     }
