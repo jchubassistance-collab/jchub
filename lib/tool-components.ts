@@ -13,6 +13,10 @@ export const TOOL_COMPONENTS = [
   'ImagesToPdf',
   'ImageOptimizer',
   'SocialImageCropper',
+  'BackgroundRemover',
+  'OcrTool',
+  'CvGenerator',
+  'InvoiceGenerator',
   'ColorConverter',
   'HashGenerator',
   'JwtDecoder',
@@ -44,4 +48,5 @@ export const SERVER_PROCESSED_TOOLS: Partial<Record<ToolComponentName, { partner
   CsvToExcelTool: {},
   ImagesToPdf: {},
   ImageOptimizer: {},
+  OcrTool: { partner: 'Adobe PDF Services / OCR.space' },
 };

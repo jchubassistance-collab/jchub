@@ -20,8 +20,9 @@ function getContentSecurityPolicy(nonce: string) {
     "form-action 'self'",
     // 'strict-dynamic': only scripts carrying the nonce, and those they load, may run; the hosts
     // below remain for browsers that predate it.
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${developmentEval} https://www.googletagmanager.com https://www.google-analytics.com https://apis.google.com https://accounts.google.com https://static.cloudflareinsights.com https://tracker.metricool.com https://giscus.app`,
-    "connect-src 'self' blob: https://vercel.com https://*.blob.vercel-storage.com https://*.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://api.cloudinary.com https://tracker.metricool.com https://cloudflareinsights.com",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval'${developmentEval} https://www.googletagmanager.com https://www.google-analytics.com https://apis.google.com https://accounts.google.com https://static.cloudflareinsights.com https://tracker.metricool.com https://giscus.app`,
+    "connect-src 'self' blob: https://vercel.com https://*.blob.vercel-storage.com https://*.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://api.cloudinary.com https://tracker.metricool.com https://cloudflareinsights.com https://huggingface.co https://*.hf.co",
+    "worker-src 'self'",
     "img-src 'self' data: blob: https:",
     "style-src 'self' 'unsafe-inline' https://giscus.app",
     "font-src 'self' data: https:",

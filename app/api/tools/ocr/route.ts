@@ -33,7 +33,8 @@ function normalizeOcrText(value: string): string {
     .normalize('NFC')
     .replace(/[\u0000-\u001F\u007F\u00AD\uFFFE\uFFFF]/g, '')
     .replace(/\s+/g, ' ')
-    .replace(/\s+([,.;:!?])/g, '$1')
+    // French puts a space before ; : ! ?, so only commas and full stops lose theirs.
+    .replace(/\s+([,.])/g, '$1')
     .replace(/([([{])\s+/g, '$1')
     .replace(/\s+»$/g, '')
     .replace(/^MAGERIE\b/, 'IMAGERIE')
@@ -94,8 +95,36 @@ export async function POST(request: NextRequest) {
     if (limited) return limited;
 
     const requestedProvider = request.nextUrl.searchParams.get('provider');
-    if (requestedProvider !== 'ocrspace' && hasAdobeImagePdfConfig() && (file.type === 'image/jpeg' || file.type === 'image/png')) {
-      const pages = await extractPdfLayout(await convertImageToOcrPdfWithAdobe(Buffer.from(await file.arrayBuffer()), file.type));
+    // OCR.space reads first: it was the more faithful of the two in our tests, and its free quota
+    // is far larger than Adobe's, whose credits also serve PDF ↔ Word. Adobe takes over if it fails.
+    const adobeFallback = requestedProvider !== 'ocrspace' && hasAdobeImagePdfConfig() && (file.type === 'image/jpeg' || file.type === 'image/png');
+
+    const ocrForm = new FormData();
+    ocrForm.append('file', file, file.name);
+    ocrForm.append('language', 'fre');
+    ocrForm.append('isOverlayRequired', 'true');
+    ocrForm.append('detectOrientation', 'true');
+    ocrForm.append('scale', 'true');
+    ocrForm.append('OCREngine', '2');
+
+    let payload: OcrSpaceResponse | null = null;
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { apikey: apiKey },
+        body: ocrForm,
+      });
+      const body = await response.json() as OcrSpaceResponse;
+      if (response.ok && !body.IsErroredOnProcessing) payload = body;
+    } catch {
+      payload = null;
+    }
+    if (!payload) {
+      reportUserError();
+      if (!adobeFallback) {
+        return NextResponse.json({ error: apiMessage(request, 'Le service OCR n’a pas pu analyser ce fichier.') }, { status: 502 });
+      }
+      const pages = await extractPdfLayout(await convertImageToOcrPdfWithAdobe(Buffer.from(await file.arrayBuffer()), file.type as 'image/jpeg' | 'image/png'));
       const page = pages[0];
       const lines = page?.lines.map((line) => ({
         text: joinPdfRuns(line.runs).trim(),
@@ -114,26 +143,6 @@ export async function POST(request: NextRequest) {
         height: page?.height ?? 0,
         provider: 'adobe',
       });
-    }
-
-    const ocrForm = new FormData();
-    ocrForm.append('file', file, file.name);
-    ocrForm.append('language', 'fre');
-    ocrForm.append('isOverlayRequired', 'true');
-    ocrForm.append('detectOrientation', 'true');
-    ocrForm.append('scale', 'true');
-    ocrForm.append('OCREngine', '2');
-
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { apikey: apiKey },
-      body: ocrForm,
-    });
-    const payload = await response.json() as OcrSpaceResponse;
-    if (!response.ok || payload.IsErroredOnProcessing) {
-      const message = Array.isArray(payload.ErrorMessage) ? payload.ErrorMessage.join(' ') : payload.ErrorMessage;
-      reportUserError();
-      return NextResponse.json({ error: apiMessage(request, 'Le service OCR n’a pas pu analyser ce fichier.') }, { status: 502 });
     }
 
     const results = payload.ParsedResults ?? [];
@@ -172,9 +181,11 @@ export async function POST(request: NextRequest) {
     ));
 
     return NextResponse.json({
-      text: results.map((result) => normalizeOcrText(result.ParsedText ?? '')).join('\n'),
+      // normalizeOcrText folds line breaks into spaces: the text is rebuilt line by line.
+      text: lines.length ? lines.map((line) => line.text).join('\n') : results.map((result) => normalizeOcrText(result.ParsedText ?? '')).join('\n'),
       words,
       lines,
+      provider: 'ocrspace',
     });
   } catch (error) {
     reportUserError();
