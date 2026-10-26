@@ -13,15 +13,6 @@ keywords:
   - regex phone
 author: Jessy Ngnambongo
 image: /blog/08-regex-email-5-patterns.svg
-photo:
-  id: "HyyHIYz_l0A"
-  url: "https://images.unsplash.com/photo-1683117927786-f146451082fb?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZW1haWwlMjBhZGRyZXNzJTIwY29kZSUyMHNuaXBwZXR8ZW58MXwwfHx8MTc5MjkyMTg4MHww&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1683117927786-f146451082fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZW1haWwlMjBhZGRyZXNzJTIwY29kZSUyMHNuaXBwZXR8ZW58MXwwfHx8MTc5MjkyMTg4MHww&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "a blue button with a white envelope on it"
-  author: "Mariia Berezovsky"
-  authorUrl: "https://unsplash.com/@mariiaberezovsky?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/a-blue-button-with-a-white-envelope-on-it-HyyHIYz_l0A?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/HyyHIYz_l0A/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZW1haWwlMjBhZGRyZXNzJTIwY29kZSUyMHNuaXBwZXR8ZW58MXwwfHx8MTc5MjkyMTg4MHww"
 readTime: 5 min
 status: published
 publishedAt: '2026-09-16T07:15:23.869Z'

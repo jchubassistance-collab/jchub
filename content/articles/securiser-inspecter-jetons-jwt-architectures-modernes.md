@@ -12,15 +12,6 @@ tags:
   - technologie
 author: JcHub
 image: 'https://jchub.dev/api/article-cover?title=Au-del%C3%A0%20du%20code%20automatis%C3%A9%20%3A%20s%C3%A9curiser%20et%20inspecter%20les%20jetons%20JWT%20dans%20vos%20architectures%20modernes&category=D%C3%A9codeur%20JWT'
-photo:
-  id: "cvBBO4PzWPg"
-  url: "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZGVjb2RlZCUyMGp3dCUyMHRva2VuJTIwc3RyaW5nJTIwb24lMjBzY3JlZW58ZW58MXwwfHx8MTc5MjkyMTg4Nnww&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZGVjb2RlZCUyMGp3dCUyMHRva2VuJTIwc3RyaW5nJTIwb24lMjBzY3JlZW58ZW58MXwwfHx8MTc5MjkyMTg4Nnww&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "Lines of colorful JavaScript code displayed on a dark screen"
-  author: "Markus Spiske"
-  authorUrl: "https://unsplash.com/@markusspiske?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/javascript-code-on-dark-screen-cvBBO4PzWPg?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/cvBBO4PzWPg/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZGVjb2RlZCUyMGp3dCUyMHRva2VuJTIwc3RyaW5nJTIwb24lMjBzY3JlZW58ZW58MXwwfHx8MTc5MjkyMTg4Nnww"
 readTime: 5 min
 status: published
 publishedAt: '2026-09-24T13:15:40.525Z'

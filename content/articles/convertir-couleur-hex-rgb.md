@@ -13,15 +13,6 @@ keywords:
   - color picker
 author: Jessy Ngnambongo
 image: /blog/05-convertir-couleur-hex-rgb.svg
-photo:
-  id: "XWDMmk-yW7Q"
-  url: "https://images.unsplash.com/photo-1600832331197-ad575931911b?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8Y29sb3IlMjBoZXglMjBjb2RlJTIwc3dhdGNofGVufDF8MHx8fDE3OTI5MjE4MTN8MA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1600832331197-ad575931911b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8Y29sb3IlMjBoZXglMjBjb2RlJTIwc3dhdGNofGVufDF8MHx8fDE3OTI5MjE4MTN8MA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "blue white green and red textile"
-  author: "Christina Rumpf"
-  authorUrl: "https://unsplash.com/@rumpf?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/blue-white-green-and-red-textile-XWDMmk-yW7Q?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/XWDMmk-yW7Q/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8Y29sb3IlMjBoZXglMjBjb2RlJTIwc3dhdGNofGVufDF8MHx8fDE3OTI5MjE4MTN8MA"
 readTime: 4 min
 status: published
 publishedAt: '2026-08-25T22:05:20.235Z'

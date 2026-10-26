@@ -12,15 +12,6 @@ tags:
   - technologie
 author: JcHub
 image: "https://example.com/api/article-cover?title=Agents%20web%20et%20micro-mod%C3%A8les%20%3A%20comment%20anticiper%20et%20ma%C3%AEtriser%20l'explosion%20de%20vos%20factures%20d'API&category=API%20Cost%20Calculator"
-photo:
-  id: "OnI_TNcIv9U"
-  url: "https://images.unsplash.com/photo-1680992046626-418f7e910589?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c2VydmVyJTIwcmFjayUyMGdsb3dpbmclMjBsaWdodHN8ZW58MXwwfHx8MTc5MjkyMTgwMHww&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1680992046626-418f7e910589?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c2VydmVyJTIwcmFjayUyMGdsb3dpbmclMjBsaWdodHN8ZW58MXwwfHx8MTc5MjkyMTgwMHww&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "a rack of electronic equipment in a dark room"
-  author: "Tyler"
-  authorUrl: "https://unsplash.com/@tylergm?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/a-rack-of-electronic-equipment-in-a-dark-room-OnI_TNcIv9U?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/OnI_TNcIv9U/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c2VydmVyJTIwcmFjayUyMGdsb3dpbmclMjBsaWdodHN8ZW58MXwwfHx8MTc5MjkyMTgwMHww"
 readTime: 5 min
 status: published
 publishedAt: '2026-10-13T09:11:00.475Z'

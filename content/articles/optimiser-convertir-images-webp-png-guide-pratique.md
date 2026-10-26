@@ -12,15 +12,6 @@ tags:
   - technologie
 author: JcHub
 image: 'https://jchub.dev/api/article-cover?title=Comment%20optimiser%20ses%20images%20WebP%20et%20PNG%20pour%20acc%C3%A9l%C3%A9rer%20un%20site%20web%20sans%20perte%20de%20qualit%C3%A9&category=Optimiseur%20et%20Convertisseur%20d%E2%80%99Images%20WebP%20%2F%20PNG'
-photo:
-  id: "nW16bzrcOCs"
-  url: "https://images.unsplash.com/photo-1625296276188-1d149bdaf560?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8d2VicGFnZSUyMGxvYWRpbmclMjBzcGVlZCUyMHByb2dyZXNzJTIwYmFyfGVufDF8MHx8fDE3OTI5MjE4NzN8MA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1625296276188-1d149bdaf560?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8d2VicGFnZSUyMGxvYWRpbmclMjBzcGVlZCUyMHByb2dyZXNzJTIwYmFyfGVufDF8MHx8fDE3OTI5MjE4NzN8MA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "a computer screen with the number 99 on it"
-  author: "Justin Morgan"
-  authorUrl: "https://unsplash.com/@justin_morgan?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/a-computer-screen-with-the-number-99-on-it-nW16bzrcOCs?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/nW16bzrcOCs/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8d2VicGFnZSUyMGxvYWRpbmclMjBzcGVlZCUyMHByb2dyZXNzJTIwYmFyfGVufDF8MHx8fDE3OTI5MjE4NzN8MA"
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-11-19T21:08:00.000Z'

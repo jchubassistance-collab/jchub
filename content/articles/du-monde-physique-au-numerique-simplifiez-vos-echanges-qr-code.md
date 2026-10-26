@@ -12,15 +12,6 @@ tags:
   - technologie
 author: JcHub
 image: 'https://jchub.dev/api/article-cover?title=Du%20monde%20physique%20au%20num%C3%A9rique%20%3A%20simplifiez%20vos%20%C3%A9changes%20gr%C3%A2ce%20au%20QR%20Code&category=G%C3%A9n%C3%A9rateur%20de%20QR%20code'
-photo:
-  id: "Q6uqw_Hjye8"
-  url: "https://images.unsplash.com/photo-1595079676339-1534801ad6cf?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c21hcnRwaG9uZSUyMHNjYW5uaW5nJTIwcXIlMjBjb2RlfGVufDF8MHx8fDE3OTI5MjE4MjZ8MA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1595079676339-1534801ad6cf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c21hcnRwaG9uZSUyMHNjYW5uaW5nJTIwcXIlMjBjb2RlfGVufDF8MHx8fDE3OTI5MjE4MjZ8MA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "black android smartphone displaying qr code"
-  author: "Markus Winkler"
-  authorUrl: "https://unsplash.com/@markuswinkler?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/black-android-smartphone-displaying-qr-code-Q6uqw_Hjye8?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/Q6uqw_Hjye8/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c21hcnRwaG9uZSUyMHNjYW5uaW5nJTIwcXIlMjBjb2RlfGVufDF8MHx8fDE3OTI5MjE4MjZ8MA"
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-11-12T21:08:00.000Z'
