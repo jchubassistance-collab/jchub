@@ -12,6 +12,7 @@ export const TOOL_COMPONENTS = [
   'WordToPdf',
   'ImagesToPdf',
   'ImageOptimizer',
+  'SocialImageCropper',
   'ColorConverter',
   'HashGenerator',
   'JwtDecoder',
