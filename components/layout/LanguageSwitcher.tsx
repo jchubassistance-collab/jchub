@@ -70,6 +70,8 @@ export function LanguageSwitcher({ light = true, small = false, className = '' }
     const address = alternateAddress(target);
     if (!address) return; // The link's own href is the right page.
     event.preventDefault();
+    // Deliberate full load: the other language is another tree of pages and messages.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.assign(`${address}${window.location.search}${window.location.hash}`);
   };
 

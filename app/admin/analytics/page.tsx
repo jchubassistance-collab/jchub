@@ -18,7 +18,7 @@ export default function AnalyticsPage() {
   const [error, setError] = useState('');
   useEffect(() => { fetch('/api/admin/analytics', { cache: 'no-store' }).then(async (response) => { const result = await response.json() as Analytics & { error?: string }; if (!response.ok) throw new Error(result.error || 'Impossible de charger les données Analytics.'); setData(result); }).catch((cause) => setError(cause instanceof Error ? cause.message : 'Analytics indisponibles.')); }, []);
 
-  const channels = data?.channels || [];
+  const channels = useMemo(() => data?.channels || [], [data]);
   const sources = data?.sources || [];
   const channelTotal = channels.reduce((sum, row) => sum + Number(row.sessions || 0), 0);
   const donut = useMemo(() => {

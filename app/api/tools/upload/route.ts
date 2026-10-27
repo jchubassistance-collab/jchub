@@ -81,6 +81,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  // Each call checks then deletes up to 20 blobs, two billed Blob operations per file.
+  const limited = await enforceRateLimit(request, 'conversion-blob-delete', 30, 60_000);
+  if (limited) return limited;
   let body: { tool?: unknown; urls?: unknown };
   try {
     body = await request.json() as { tool?: unknown; urls?: unknown };

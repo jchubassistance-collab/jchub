@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { cache } from 'react';
+import { articleCoverPath } from '@/lib/article-cover';
 import { articlePathOnDisk, parseArticleFiles } from '@/lib/article-files';
 import { categoryLabel } from '@/lib/categories';
 import { tools } from '@/lib/tools';
@@ -96,10 +97,11 @@ export function articleImage(image: string, title: string, locale: Locale): stri
   if (image.includes('/api/article-cover')) {
     try {
       const url = new URL(image, 'https://jchub.dev');
-      // Generated covers are drawn by this site, whatever host was saved with the article.
-      if (locale === 'fr') return `/api/article-cover?${url.searchParams}`;
-      const params = new URLSearchParams({ title, category: englishCoverLabel(url.searchParams.get('category') || 'JcHub'), lang: 'en' });
-      return `/api/article-cover?${params}`;
+      // Generated covers are drawn by this site, whatever host was saved with the article;
+      // they are signed again here, so a saved address without signature still shows its text.
+      const saved = url.searchParams;
+      if (locale === 'fr') return articleCoverPath({ title: saved.get('title'), category: saved.get('category'), photo: saved.get('photo') });
+      return articleCoverPath({ title, category: englishCoverLabel(saved.get('category') || 'JcHub'), lang: 'en' });
     } catch {
       return image;
     }

@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { BlogInteractions } from '@/components/blog/BlogInteractions';
 import { GiscusComments } from '@/components/blog/GiscusComments';
+import { articleCoverPath } from '@/lib/article-cover';
 import { getPublishedArticles, getPublishedArticleBySlug, getPublishedArticleSlugs, type BlogArticle } from '@/lib/blog';
 import { toolPath, tools } from '@/lib/tools';
 import { getPublicBaseUrl } from '@/lib/site-url';
@@ -93,7 +94,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const baseUrl = getPublicBaseUrl();
   const paths = articlePaths(article);
   const articleUrl = `${baseUrl}${paths[locale]}`;
-  const imageUrl = `${baseUrl}/api/article-cover?${new URLSearchParams({ title: article.title, category: article.category, ...(locale === 'en' ? { lang: 'en' } : {}) })}`;
+  const imageUrl = `${baseUrl}${articleCoverPath({ title: article.title, category: article.category, lang: locale === 'en' ? 'en' : null })}`;
   return {
     title: article.title,
     description: article.description || article.excerpt || article.title,

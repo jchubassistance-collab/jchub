@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { CalendarDays, Check, ChevronDown, FileText, Folder, Image as ImageIcon, List, Search, Sparkles, Wrench } from 'lucide-react';
 import { AdminPagination, useAdminPageSize, usePageParam } from '@/components/ui/Pagination';
 
@@ -18,17 +18,17 @@ export function CmCatalogDashboard({ items, kits, kind, onKindChange, onPrepare 
   const [selected, setSelected] = useState<string[]>([]);
   const currentItems = useMemo(() => items.filter(item=>item.kind===kind),[items,kind]);
   const categories = useMemo(()=>Array.from(new Set(currentItems.map(item=>item.category).filter((value):value is string=>Boolean(value)))).sort((a,b)=>a.localeCompare(b,'fr')),[currentItems]);
-  const getKitStatus = (item:CmCatalogItem) => {
+  const getKitStatus = useCallback((item:CmCatalogItem) => {
     const mappedKind = item.kind === 'Article' ? 'article' : 'tool';
     return kits.find(kit=>kit.slug===item.slug&&kit.kind===mappedKind)?.status || 'none';
-  };
+  },[kits]);
   const filtered = useMemo(()=>currentItems.filter(item=>{
     const matchesText = `${item.title} ${item.slug} ${item.description} ${item.category||''}`.toLocaleLowerCase('fr').includes(query.toLocaleLowerCase('fr'));
     const date = item.publishedAt ? new Date(item.publishedAt).getTime() : 0;
     const age = date ? Date.now()-date : Number.POSITIVE_INFINITY;
     const matchesDate = dateRange==='all'||(dateRange==='week'&&age<=7*86400000)||(dateRange==='month'&&age<=30*86400000);
     return matchesText&&(category==='all'||item.category===category)&& (kitStatus==='all'||getKitStatus(item)===kitStatus)&&matchesDate;
-  }),[currentItems,query,category,kitStatus,dateRange,kits]);
+  }),[currentItems,query,category,kitStatus,dateRange,getKitStatus]);
   const safePage = Math.min(page,Math.max(1,Math.ceil(filtered.length/pageSize)));
   const pageItems=filtered.slice((safePage-1)*pageSize,safePage*pageSize);
   const countArticles=items.filter(item=>item.kind==='Article').length;

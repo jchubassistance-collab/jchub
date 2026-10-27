@@ -1,0 +1,13 @@
+# `vercel --prod` uploads this folder as it is: unlike git, the CLI ignores .gitignore.
+# Production reads its keys from the Vercel project settings (all moved there on 2026-10-27):
+# a key added to .env must also be added on Vercel. .env.local is already left out by the CLI.
+/.env
+/.api
+/.claude
+/.vscode
+/.swc-native-cache
+/security.txt
+/teste.html
+/tste.txt
+/backup-securite-*/
+/tests/

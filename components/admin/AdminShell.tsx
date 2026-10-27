@@ -124,6 +124,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const leaveAdmin = async () => {
     await Promise.allSettled([signOut(), fetch('/api/admin/session', { method: 'DELETE' })]);
     sessionStorage.removeItem(ADMIN_LAST_ACTIVITY_KEY);
+    // A full reload drops every admin state kept in memory after signing out.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.assign('/admin/login');
   };
 

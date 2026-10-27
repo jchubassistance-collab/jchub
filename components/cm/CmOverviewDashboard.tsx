@@ -14,14 +14,14 @@ const dateLabel=(value:string)=>new Date(`${value}T00:00:00`).toLocaleDateString
 export function CmOverviewDashboard({reports,onNavigate}:{reports:SocialReport[];onNavigate:(tab:'reports'|'compare'|'kits')=>void}) {
   const [range,setRange]=useState('12');
   const [platform,setPlatform]=useState<Platform>('all');
-  const ordered=[...reports].sort((a,b)=>a.weekStart.localeCompare(b.weekStart));
-  const allWeekStarts=Array.from(new Set(ordered.map(item=>item.weekStart))).sort();
+  const ordered=useMemo(()=>[...reports].sort((a,b)=>a.weekStart.localeCompare(b.weekStart)),[reports]);
+  const allWeekStarts=useMemo(()=>Array.from(new Set(ordered.map(item=>item.weekStart))).sort(),[ordered]);
   const anchor=allWeekStarts[allWeekStarts.length-1];
   const activeReports=useMemo(()=>{
     if(!anchor)return [];
     const selectedWeeks=range==='all'?allWeekStarts:allWeekStarts.slice(-Number(range));
     return ordered.filter(item=>(platform==='all'||item.platform===platform)&&selectedWeeks.includes(item.weekStart));
-  },[reports,range,platform,anchor]);
+  },[ordered,allWeekStarts,range,platform,anchor]);
   const currentPeriod=activeReports;
   const baselineWeeks=range==='all'?[]:allWeekStarts.slice(-Number(range)*2,-Number(range));
   const baseline=ordered.filter(item=>(platform==='all'||item.platform===platform)&&baselineWeeks.includes(item.weekStart));

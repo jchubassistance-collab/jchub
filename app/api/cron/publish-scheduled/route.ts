@@ -43,13 +43,12 @@ export async function POST(request: NextRequest) {
           updatedAt: FieldValue.serverTimestamp(),
         }, { merge: true });
       }
-      const image = String(article.image || `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev'}/blog/default.svg`);
-      const imageUrl = image.startsWith('http') ? image : `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev'}${image.startsWith('/') ? '' : '/'}${image}`;
       const brevoNotified = await notifyBrevoNewArticle({
         title: String(article.title || document.id),
         description: String(article.description || article.excerpt || ''),
         slug: String(article.slug || document.id),
-        image: imageUrl,
+        // Signs a generated cover again; Brevo makes a relative address absolute.
+        image: articleImage(String(article.image || '/blog/default.svg'), String(article.title || document.id), 'fr'),
         readingTime: String(article.readingTime || article.readTime || '5 min'),
         category: String(article.category || 'Développement'),
       });

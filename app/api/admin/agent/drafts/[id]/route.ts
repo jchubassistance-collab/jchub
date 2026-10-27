@@ -1,4 +1,5 @@
 import { after, NextRequest, NextResponse } from 'next/server';
+import { articleCoverPath } from '@/lib/article-cover';
 import { refreshArticle } from '@/lib/article-repository';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
@@ -47,7 +48,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         keywords: ['informatique', 'technologie'],
         tags: ['Informatique', 'technologie'],
         author: 'JcHub',
-        image: `${siteUrl}/api/article-cover?title=${encodeURIComponent(String(draft.title || 'Article JcHub'))}&category=${encodeURIComponent(String(draft.promotion?.name || 'JcHub / Journal'))}`,
+        image: `${siteUrl}${articleCoverPath({ title: String(draft.title || 'Article JcHub'), category: String(draft.promotion?.name || 'JcHub / Journal') })}`,
         readTime: '5 min',
         status: 'scheduled',
         scheduledFor,
@@ -91,7 +92,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       }
 
       const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
-      const articleImage = `${siteUrl}/api/article-cover?title=${encodeURIComponent(String(draft.title || 'Article JcHub'))}&category=${encodeURIComponent(String(draft.promotion?.name || 'JcHub / Journal'))}`;
+      const articleImage = `${siteUrl}${articleCoverPath({ title: String(draft.title || 'Article JcHub'), category: String(draft.promotion?.name || 'JcHub / Journal') })}`;
       const scheduledFor = Timestamp.fromDate(requestedDate);
       await articleReference.set({
         slug,
@@ -136,7 +137,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       if (draft.status !== 'approved') return NextResponse.json({ error: 'Le brouillon doit être approuvé avant publication.' }, { status: 409 });
       const slug = String(draft.slug || id).toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '').slice(0, 90) || id;
       const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
-      const articleImage = `${siteUrl}/api/article-cover?title=${encodeURIComponent(String(draft.title || 'Article JcHub'))}&category=${encodeURIComponent(String(draft.promotion?.name || 'JcHub / Journal'))}`;
+      const articleImage = `${siteUrl}${articleCoverPath({ title: String(draft.title || 'Article JcHub'), category: String(draft.promotion?.name || 'JcHub / Journal') })}`;
       const articleReference = getAdminDb().collection('articles').doc(slug);
       await articleReference.set({
         slug,

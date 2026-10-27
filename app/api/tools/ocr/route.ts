@@ -128,6 +128,8 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: { apikey: apiKey },
       body: ocrForm,
+      // A stalled OCR.space must not hold the function until its time limit.
+      signal: AbortSignal.timeout(45_000),
     });
     const payload = await response.json() as OcrSpaceResponse;
     if (!response.ok || payload.IsErroredOnProcessing) {
