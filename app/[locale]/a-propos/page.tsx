@@ -114,6 +114,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({ locale, title: copy[locale].metaTitle, description: copy[locale].metaDescription, href: '/a-propos' });
 }
 
+// The tool count follows the catalog: tools go live on their publication date.
+export const dynamic = 'force-dynamic';
+
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();

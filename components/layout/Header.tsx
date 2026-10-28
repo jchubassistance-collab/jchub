@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { ChevronRight, Home, Info, Mail, Menu,Newspaper, Wrench, X } from 'lucide-react';
+import { Briefcase, ChevronRight, Home, Info, Mail, Menu,Newspaper, Wrench, X } from 'lucide-react';
 import { useState } from 'react';
 import { ToolFinder } from '@/components/layout/ToolFinder';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
@@ -13,6 +13,7 @@ const copy = bilingual({
   home: 'Accueil',
   about: 'À propos',
   tools: 'Outils',
+  services: 'Services',
   blog: 'Blog', 
   contact: 'Contact',
   homeLabel: 'יָהּ, accueil',
@@ -23,6 +24,7 @@ const copy = bilingual({
   home: 'Home',
   about: 'About',
   tools: 'Tools',
+  services: 'Services',
   blog: 'Blog', 
   contact: 'Contact',
   homeLabel: 'יָהּ, home',
@@ -33,7 +35,7 @@ const copy = bilingual({
 
 /** Pages with the light header. `pathname` is the French internal address of the page. */
 export function isLightPage(pathname: string) {
-  return pathname === '/' || pathname === '/a-propos' || pathname === '/outils' || pathname.startsWith('/outils/') || pathname.startsWith('/tools/') || pathname === '/aide' || pathname === '/contact' || pathname === '/blog' || pathname.startsWith('/blog/') || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(pathname);
+  return pathname === '/' || pathname === '/a-propos' || pathname === '/outils' || pathname.startsWith('/outils/') || pathname.startsWith('/tools/') || pathname === '/aide' || pathname === '/contact' || pathname === '/services' || pathname === '/kit-entrepreneur' || pathname === '/blog' || pathname.startsWith('/blog/') || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(pathname);
 }
 
 export function Header() {
@@ -47,6 +49,7 @@ export function Header() {
     { href: '/', label: t.home, icon: Home },
     { href: '/a-propos', label: t.about, icon: Info },
     { href: '/outils', label: t.tools, icon: Wrench },
+    { href: '/services', label: t.services, icon: Briefcase },
     { href: '/blog', label: t.blog, icon: Newspaper },
     { href: '/contact', label: t.contact, icon: Mail },
   ];
@@ -134,9 +137,9 @@ function NavLink({ href, label, icon: Icon, pathname, isLight = false }: { href:
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
-      className={`group relative flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold transition ${active ? (isLight ? 'bg-blue-600 text-white shadow-sm' : 'bg-white/10 text-white shadow-sm') : (isLight ? 'text-slate-700 hover:bg-blue-50 hover:text-blue-800' : 'text-slate-300 hover:bg-white/5 hover:text-white')}`}
+      className={`group relative flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm font-bold lg:px-3 transition ${active ? (isLight ? 'bg-blue-600 text-white shadow-sm' : 'bg-white/10 text-white shadow-sm') : (isLight ? 'text-slate-700 hover:bg-blue-50 hover:text-blue-800' : 'text-slate-300 hover:bg-white/5 hover:text-white')}`}
     >
-      <Icon className={`h-4 w-4 ${active ? (isLight ? 'text-white' : 'text-[#9ccbff]') : (isLight ? 'text-blue-700 group-hover:text-blue-800' : 'text-slate-300 group-hover:text-[#9ccbff]')}`} />
+      <Icon className={`hidden h-4 w-4 lg:block ${active ? (isLight ? 'text-white' : 'text-[#9ccbff]') : (isLight ? 'text-blue-700 group-hover:text-blue-800' : 'text-slate-300 group-hover:text-[#9ccbff]')}`} />
       {label}
       {active && <span className="absolute -bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-[#9ccbff]" />}
     </Link>

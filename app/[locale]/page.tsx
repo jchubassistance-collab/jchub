@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import NextLink from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowRight, Check, Code2, Compass, Mail, ShieldCheck, Wrench, Zap } from 'lucide-react';
+import { ArrowRight, Briefcase, Check, Code2, Compass, Mail, ShieldCheck, Store, Wrench, Zap } from 'lucide-react';
 import { isToolVisibleToday, localizeTool, toolPath, tools } from '@/lib/tools';
 import { Newsletter } from '@/components/Newsletter';
 import { PartnerCarousel } from '@/components/home/PartnerCarousel';
@@ -52,6 +52,8 @@ const copy = bilingual({
   quickAccess: 'Accès rapides',
   quickTools: ['Outils gratuits', 'Trouver une solution pratique'],
   quickContact: ['Parlons de ton projet', 'Une question ou une idée ?'],
+  quickKit: ['Kit entrepreneur', 'Les outils gratuits pour ton commerce'],
+  quickServices: ['Créer ton site sur mesure', 'Sites, applications, automatisations'],
   toolsEyebrow: 'OUTILS PRATIQUES',
   toolsTitleStart: 'Ce dont tu as besoin,',
   toolsTitleEnd: 'sans distraction.',
@@ -114,6 +116,8 @@ const copy = bilingual({
   quickAccess: 'Quick access',
   quickTools: ['Free tools', 'Find a practical solution'],
   quickContact: ['Let’s talk about your project', 'A question or an idea?'],
+  quickKit: ['Business kit', 'Free tools for your shop'],
+  quickServices: ['Get a custom website', 'Websites, apps, automation'],
   toolsEyebrow: 'PRACTICAL TOOLS',
   toolsTitleStart: 'What you need,',
   toolsTitleEnd: 'without distractions.',
@@ -265,6 +269,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <div className="mx-auto max-w-7xl space-y-20 px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
         <section aria-label={t.quickAccess} className="grid gap-4 sm:grid-cols-2 lg:max-w-4xl">
           <QuickLink href="/outils" icon={<Wrench className="h-5 w-5" />} title={t.quickTools[0]} meta={t.quickTools[1]} />
+          <QuickLink href="/kit-entrepreneur" icon={<Store className="h-5 w-5" />} title={t.quickKit[0]} meta={t.quickKit[1]} />
+          <QuickLink href="/services" icon={<Briefcase className="h-5 w-5" />} title={t.quickServices[0]} meta={t.quickServices[1]} />
           <QuickLink href="/contact" icon={<Mail className="h-5 w-5" />} title={t.quickContact[0]} meta={t.quickContact[1]} />
         </section>
 

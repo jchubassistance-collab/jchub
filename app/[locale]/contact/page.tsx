@@ -34,7 +34,7 @@ const contactMethods = [
   },
 ];
 
-const subjectValues = ['support', 'partnership', 'press', 'feedback', 'other'] as const;
+const subjectValues = ['support', 'project', 'partnership', 'press', 'feedback', 'other'] as const;
 
 const copy = bilingual({
   methods: [
@@ -43,7 +43,7 @@ const copy = bilingual({
     { title: 'Téléphone', description: 'Lun-Ven, 9h-18h (GMT+1)' },
     { title: 'Localisation', description: 'Équipe 100% locale' },
   ],
-  subjects: ['Support technique', 'Partenariat / Auteur', 'Presse / Média', 'Suggestion / Feedback', 'Autre'],
+  subjects: ['Support technique', 'Projet sur mesure / Devis', 'Partenariat / Auteur', 'Presse / Média', 'Suggestion / Feedback', 'Autre'],
   sendFailed: 'Envoi impossible.',
   eyebrow: 'On te répond vite',
   titleStart: 'Une question ?',
@@ -89,7 +89,7 @@ const copy = bilingual({
     { title: 'Phone', description: 'Mon-Fri, 9am-6pm (GMT+1)' },
     { title: 'Location', description: '100% local team' },
   ],
-  subjects: ['Technical support', 'Partnership / Author', 'Press / Media', 'Suggestion / Feedback', 'Other'],
+  subjects: ['Technical support', 'Custom project / Quote', 'Partnership / Author', 'Press / Media', 'Suggestion / Feedback', 'Other'],
   sendFailed: 'Could not send your message.',
   eyebrow: 'We reply fast',
   titleStart: 'Got a question?',

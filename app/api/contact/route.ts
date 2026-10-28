@@ -11,7 +11,7 @@ import { reportOutcome, withReport } from '@/lib/reports/server';
 const contactSchema = z.object({
   name: z.string().trim().min(1).max(120),
   email: z.string().trim().email().max(254),
-  subject: z.enum(['support', 'partnership', 'press', 'feedback', 'other']),
+  subject: z.enum(['support', 'project', 'partnership', 'press', 'feedback', 'other']),
   message: z.string().trim().min(1).max(5000),
 });
 

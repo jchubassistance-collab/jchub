@@ -10,8 +10,8 @@ import type { StaticPathname } from '@/i18n/routing';
 
 const copy = bilingual({
   groups: [
-    { title: 'Plateforme', links: [['Outils', '/outils'], ['Centre d’aide', '/aide']] },
-    { title: 'JcHub', links: [['À propos', '/a-propos'], ['Contact', '/contact'], ['Blog', '/blog']] },
+    { title: 'Plateforme', links: [['Outils', '/outils'], ['Kit entrepreneur', '/kit-entrepreneur'], ['Centre d’aide', '/aide']] },
+    { title: 'JcHub', links: [['À propos', '/a-propos'], ['Services', '/services'], ['Contact', '/contact'], ['Blog', '/blog']] },
     { title: 'Légal', links: [['Conditions d’utilisation', '/cgu'], ['Conditions de vente', '/cgv'], ['Confidentialité', '/confidentialite'], ['Mentions légales', '/mentions-legales']] },
   ] as { title: string; links: [string, StaticPathname][] }[],
   eyebrow: 'L’aventure continue',
@@ -30,8 +30,8 @@ const copy = bilingual({
   createdBy: 'Créé par Jessy Ngnambongo.',
 }, {
   groups: [
-    { title: 'Platform', links: [['Tools', '/outils'], ['Help center', '/aide']] },
-    { title: 'JcHub', links: [['About', '/a-propos'], ['Contact', '/contact'], ['Blog', '/blog']] },
+    { title: 'Platform', links: [['Tools', '/outils'], ['Business kit', '/kit-entrepreneur'], ['Help center', '/aide']] },
+    { title: 'JcHub', links: [['About', '/a-propos'], ['Services', '/services'], ['Contact', '/contact'], ['Blog', '/blog']] },
     { title: 'Legal', links: [['Terms of use', '/cgu'], ['Terms of sale', '/cgv'], ['Privacy', '/confidentialite'], ['Legal notice', '/mentions-legales']] },
   ],
   eyebrow: 'The adventure continues',
