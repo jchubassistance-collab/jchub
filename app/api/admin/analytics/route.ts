@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(await getGa4Overview());
   } catch (error) {
     const code = error instanceof Error ? error.message : 'INTERNAL_ERROR';
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({
       error: code === 'FORBIDDEN' ? 'Accès refusé.' : 'Rapport Analytics indisponible.',
     }, { status: code === 'FORBIDDEN' ? 403 : 500 });

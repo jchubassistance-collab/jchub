@@ -2,11 +2,12 @@ import { randomBytes } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getLinkedInRedirectUri } from '@/lib/linkedin-oauth';
+import { withReport } from '@/lib/reports/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+export const GET = withReport(async function GET(request: NextRequest) {
   try {
     await requireAdmin(request);
     if (process.env.NODE_ENV === 'production') {
@@ -43,4 +44,4 @@ export async function GET(request: NextRequest) {
     const code = error instanceof Error ? error.message : '';
     return NextResponse.json({ error: code === 'UNAUTHORIZED' ? 'Connecte-toi avec un compte administrateur.' : code === 'FORBIDDEN' ? 'Accès administrateur refusé.' : 'Connexion LinkedIn indisponible.' }, { status: code === 'UNAUTHORIZED' ? 401 : code === 'FORBIDDEN' ? 403 : 500 });
   }
-}
+});

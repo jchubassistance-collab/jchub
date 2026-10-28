@@ -41,7 +41,7 @@ Retourne uniquement le texte du courriel, sans objet ni explication.`;
       signal: AbortSignal.timeout(30_000),
     });
     if (!response.ok) {
-      reportUserError();
+      reportUserError(new Error(`Gemini a refusé la préparation de la réponse (${response.status}).`), { request, status: response.status, details: { fournisseur: 'Gemini' } });
       return NextResponse.json({ error: 'Gemini n’a pas pu préparer la réponse. Réessaie plus tard.' }, { status: 502 });
     }
     const data = await response.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
@@ -54,7 +54,7 @@ Retourne uniquement le texte du courriel, sans objet ni explication.`;
     const code = error instanceof Error ? error.message : '';
     if (code === 'UNAUTHORIZED') return NextResponse.json({ error: 'Authentification administrateur requise.' }, { status: 401 });
     if (code === 'FORBIDDEN') return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 });
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: 'Impossible de préparer une réponse.' }, { status: 500 });
   }
 }

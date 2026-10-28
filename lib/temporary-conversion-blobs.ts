@@ -110,7 +110,8 @@ export async function deleteTemporaryBlob(url: string, tool: TemporaryConversion
 
 export async function cleanUpTemporaryBlobs(urls: string[], tool: TemporaryConversionTool) {
   const results = await Promise.allSettled(urls.map((url) => deleteTemporaryBlob(url, tool)));
-  if (results.some((result) => result.status === 'rejected')) reportUserError();
+  const failure = results.find((result): result is PromiseRejectedResult => result.status === 'rejected');
+  if (failure) reportUserError(failure.reason, { action: 'Suppression des fichiers temporaires après conversion', details: { outil: tool, échecs: results.filter((result) => result.status === 'rejected').length } });
 }
 
 export async function cleanUpExpiredConversionBlobs() {

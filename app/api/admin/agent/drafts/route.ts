@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const message = error instanceof Error ? error.message : 'Erreur interne.';
     if (message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
     if (message === 'FORBIDDEN') return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 });
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: 'Impossible de charger les brouillons.' }, { status: 500 });
   }
 }

@@ -5,13 +5,14 @@ import { convertPdfWithAdobe, hasAdobePdfServicesConfig } from '@/lib/document-s
 import { reportUserError } from '@/lib/user-error';
 import { enforceDailyConversionQuota } from '@/lib/rate-limit';
 import { downloadName } from '@/lib/download-name';
+import { reportOutcome, withReport } from '@/lib/reports/server';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const MAX_PDF_SIZE_BYTES = 4 * 1024 * 1024;
 
-export async function POST(request: NextRequest) {
+export const POST = withReport(async function POST(request: NextRequest) {
   try {
     const contentLength = Number(request.headers.get('content-length') || 0);
     if (contentLength > MAX_PDF_SIZE_BYTES + 128 * 1024) {
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
         output = await convertPdfWithAdobe(bytes);
         usedAdobe = true;
       } catch (adobeError) {
-        reportUserError();
+        reportUserError(adobeError, { request, action: 'Conversion PDF → Word via Adobe (repli sur le moteur local)', details: { fournisseur: 'Adobe PDF Services', taille: file.size } });
         output = await buildVisuallyFaithfulWordDocument(bytes);
       }
     } else {
@@ -71,9 +72,10 @@ export async function POST(request: NextRequest) {
         }, { merge: true });
       }
     } catch (statsError) {
-      reportUserError();
+      reportUserError(statsError, { request });
     }
 
+    reportOutcome(request, { summary: `Document Word créé (${usedAdobe ? 'Adobe PDF Services' : 'moteur local'}) : PDF de ${Math.ceil(file.size / 1024)} Ko → ${Math.ceil(output.length / 1024)} Ko` });
     const response = new NextResponse(new Uint8Array(output), {
       status: 200,
       headers: {
@@ -86,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: apiMessage(request, 'Erreur pendant la conversion du PDF en Word.') }, { status: 500 });
   }
-}
+});

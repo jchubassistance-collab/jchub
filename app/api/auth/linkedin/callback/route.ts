@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getLinkedInRedirectUri, isMatchingOAuthState, updateEnvFile } from '@/lib/linkedin-oauth';
 import { reportUserError } from '@/lib/user-error';
+import { withReport } from '@/lib/reports/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,7 +21,7 @@ function finish(request: NextRequest, result: 'connected' | 'error', status = 30
   return response;
 }
 
-export async function GET(request: NextRequest) {
+export const GET = withReport(async function GET(request: NextRequest) {
   try {
     await requireAdmin(request);
   } catch (error) {
@@ -59,8 +60,8 @@ export async function GET(request: NextRequest) {
       redirect: 'error',
       signal: AbortSignal.timeout(12_000),
     });
-  } catch {
-    reportUserError();
+  } catch (error) {
+    reportUserError(error, { request });
     return finish(request, 'error');
   }
 
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest) {
   try { tokenData = await tokenResponse.json(); }
   catch { return finish(request, 'error'); }
   if (!tokenResponse.ok || !tokenData.access_token || tokenData.access_token.length > 8192) {
-    reportUserError();
+    reportUserError(new Error(`LinkedIn a refusé l’échange du code de connexion (${tokenResponse.status}).`), { request, status: tokenResponse.status, details: { fournisseur: 'LinkedIn' } });
     return finish(request, 'error');
   }
 
@@ -105,9 +106,9 @@ export async function GET(request: NextRequest) {
     process.env.LINKEDIN_ACCESS_TOKEN = tokenData.access_token;
     process.env.LINKEDIN_AUTHOR_URN = authorUrn;
     return finish(request, 'connected');
-  } catch {
+  } catch (error) {
     await import('node:fs/promises').then(({ rm }) => rm(tempPath, { force: true })).catch(() => undefined);
-    reportUserError();
+    reportUserError(error, { request });
     return finish(request, 'error');
   }
-}
+});

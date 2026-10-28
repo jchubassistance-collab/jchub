@@ -269,8 +269,8 @@ export default function AgentPage() {
           ))}
         </div>
       )}
-      {pendingToolProposal && <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/50 p-4" role="presentation">
-        <section role="dialog" aria-modal="true" aria-labelledby="complete-tool-title" className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
+      {pendingToolProposal && <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/50 p-2 sm:p-4" role="presentation">
+        <section role="dialog" aria-modal="true" aria-labelledby="complete-tool-title" className="max-h-[96dvh] sm:max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
           <h2 id="complete-tool-title" className="text-lg font-black text-slate-900">Compléter l’idée d’outil</h2>
           <p className="mt-1 text-sm text-slate-600">« {pendingToolProposal.recommendation.title} » ne contient pas tous les détails requis. Complète-les pour créer un brouillon à vérifier.</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">

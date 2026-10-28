@@ -3,8 +3,9 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { reportUserError } from '@/lib/user-error';
 import { enforceRateLimit } from '@/lib/rate-limit';
+import { withReport } from '@/lib/reports/server';
 
-export async function POST(_request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+export const POST = withReport(async function POST(_request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const limited = await enforceRateLimit(_request, 'blog-view', 30, 60_000);
   if (limited) return limited;
   const { slug } = await params;
@@ -15,7 +16,7 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
     const snapshot = await ref.get();
     return NextResponse.json({ views: Number(snapshot.data()?.views || 0) }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
-    reportUserError();
+    reportUserError(error, { request: _request, details: { article: slug } });
     return NextResponse.json({ views: null }, { status: 503 });
   }
-}
+});

@@ -5,6 +5,7 @@ import { completedWeeks } from '@/lib/cm-metrics';
 import { getFacebookInsights, getFacebookPostInsights } from '@/lib/facebook-insights';
 import { getInstagramPostInsights, getInstagramWeeklyInsights } from '@/lib/instagram-insights';
 import { isCronBearerAuthorized } from '@/lib/social-utils';
+import { withReport } from '@/lib/reports/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,7 +14,7 @@ export const maxDuration = 120;
 type WeeklyMetrics = { followersStart: number | null; followersEnd: number | null; views: number | null; reach: number | null; interactions: number | null };
 
 // Chaque lundi : la semaine précédente. ?weeks=N (1 à 12) remplit aussi l'historique, de la plus ancienne semaine à la plus récente.
-export async function GET(request: NextRequest) {
+export const GET = withReport(async function GET(request: NextRequest) {
   if (!isCronBearerAuthorized(request.headers.get('authorization'), process.env.CRON_SECRET)) return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
   const db = getAdminDb();
   const weeks = completedWeeks(new Date(), Number(request.nextUrl.searchParams.get('weeks') || 1));
@@ -84,6 +85,6 @@ export async function GET(request: NextRequest) {
     }));
   }
   return NextResponse.json({ weeks: weeks.map((week) => week.start), results, postsChecked: eligible.length }, { headers: { 'Cache-Control': 'no-store' } });
-}
+});
 
 export const POST = GET;

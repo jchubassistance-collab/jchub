@@ -4,6 +4,7 @@ import { facebookAppSecretProof, facebookGraphApiVersion, getFacebookAppId, getF
 import { saveLocalEnvValues } from '@/lib/local-env-store';
 import { isMatchingOAuthState } from '@/lib/linkedin-oauth';
 import { reportUserError } from '@/lib/user-error';
+import { withReport } from '@/lib/reports/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,7 +31,7 @@ async function readJson<T>(response: Response): Promise<T | null> {
   try { return await response.json() as T; } catch { return null; }
 }
 
-export async function GET(request: NextRequest) {
+export const GET = withReport(async function GET(request: NextRequest) {
   try {
     await requireAdmin(request);
   } catch (error) {
@@ -64,10 +65,10 @@ export async function GET(request: NextRequest) {
   let shortTokenResponse: Response;
   try {
     shortTokenResponse = await fetch(tokenUrl, { cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(12_000) });
-  } catch { reportUserError(); return finish(request, 'error'); }
+  } catch (error) { reportUserError(error, { request }); return finish(request, 'error'); }
   const shortTokenData = await readJson<TokenResponse>(shortTokenResponse);
   if (!shortTokenResponse.ok || !shortTokenData?.access_token || shortTokenData.access_token.length > 8192) {
-    reportUserError();
+    reportUserError(new Error(`Facebook a refusé l’échange du code de connexion (${shortTokenResponse.status}).`), { request, status: shortTokenResponse.status, details: { fournisseur: 'Facebook Graph', étape: 'jeton court' } });
     return finish(request, 'error');
   }
 
@@ -79,11 +80,11 @@ export async function GET(request: NextRequest) {
   let longTokenResponse: Response;
   try {
     longTokenResponse = await fetch(longTokenUrl, { cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(12_000) });
-  } catch { reportUserError(); return finish(request, 'error'); }
+  } catch (error) { reportUserError(error, { request }); return finish(request, 'error'); }
   const longTokenData = await readJson<TokenResponse>(longTokenResponse);
   const userToken = longTokenData?.access_token;
   if (!longTokenResponse.ok || !userToken || userToken.length > 8192) {
-    reportUserError();
+    reportUserError(new Error(`Facebook a refusé le jeton longue durée (${longTokenResponse.status}).`), { request, status: longTokenResponse.status, details: { fournisseur: 'Facebook Graph', étape: 'jeton longue durée' } });
     return finish(request, 'error');
   }
 
@@ -94,10 +95,10 @@ export async function GET(request: NextRequest) {
   let pagesResponse: Response;
   try {
     pagesResponse = await fetch(pagesUrl, { headers: { Authorization: `Bearer ${userToken}` }, cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(12_000) });
-  } catch { reportUserError(); return finish(request, 'error'); }
+  } catch (error) { reportUserError(error, { request }); return finish(request, 'error'); }
   const pagesData = await readJson<PagesResponse>(pagesResponse);
   if (!pagesResponse.ok || !Array.isArray(pagesData?.data)) {
-    reportUserError();
+    reportUserError(new Error(`Facebook n’a pas renvoyé la liste des pages (${pagesResponse.status}).`), { request, status: pagesResponse.status, details: { fournisseur: 'Facebook Graph', étape: 'pages gérées' } });
     return finish(request, 'error');
   }
 
@@ -116,13 +117,13 @@ export async function GET(request: NextRequest) {
     const instagramResponse = await fetch(instagramUrl, { headers: { Authorization: `Bearer ${selected.access_token}` }, cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(12_000) });
     const instagramId = (await readJson<PageInstagramResponse>(instagramResponse))?.instagram_business_account?.id;
     if (instagramResponse.ok && typeof instagramId === 'string' && /^[0-9]+$/.test(instagramId)) values.INSTAGRAM_USER_ID = instagramId;
-  } catch { reportUserError(); }
+  } catch (error) { reportUserError(error, { request }); }
 
   try {
     await saveLocalEnvValues(values);
     return finish(request, 'connected', values.INSTAGRAM_USER_ID ? 'connected' : 'missing');
-  } catch {
-    reportUserError();
+  } catch (error) {
+    reportUserError(error, { request });
     return finish(request, 'error');
   }
-}
+});

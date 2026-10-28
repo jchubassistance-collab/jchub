@@ -3,10 +3,11 @@ import { getPublishedArticlesByLocale } from '@/lib/blog';
 import { notifyBrevoNewContent, wasNotified } from '@/lib/brevo';
 import { getPublishedTools, localizeTool, toolPath } from '@/lib/tools';
 import { reportUserError } from '@/lib/user-error';
+import { withReport } from '@/lib/reports/server';
 
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest) {
+export const GET = withReport(async function GET(request: NextRequest) {
   if (!process.env.CRON_SECRET || request.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
   }
@@ -72,9 +73,9 @@ export async function GET(request: NextRequest) {
     ]);
     return NextResponse.json({ checked: results.length, sent: results.filter(Boolean).length });
   } catch (error) {
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: 'Notification newsletter impossible.' }, { status: 500 });
   }
-}
+});
 
 export const POST = GET;

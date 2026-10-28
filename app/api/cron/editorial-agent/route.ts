@@ -3,10 +3,11 @@ import { start } from 'workflow/api';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { runEditorialAgent } from '@/workflows/editorial-agent';
 import { reportUserError } from '@/lib/user-error';
+import { withReport } from '@/lib/reports/server';
 
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest) {
+export const GET = withReport(async function GET(request: NextRequest) {
   const authorization = request.headers.get('authorization');
   if (!process.env.CRON_SECRET || authorization !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
@@ -29,9 +30,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ started: true, runId: run.runId, date: dateKey }, { status: 202 });
   } catch (error) {
     await lockReference.update({ status: 'failed', error: error instanceof Error ? error.message : 'Erreur inconnue', updatedAt: new Date() });
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: 'Impossible de démarrer l’agent.' }, { status: 500 });
   }
-}
+});
 
 export const POST = GET;

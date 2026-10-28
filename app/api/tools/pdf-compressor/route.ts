@@ -9,13 +9,14 @@ import {
   TemporaryBlobError,
 } from '@/lib/temporary-conversion-blobs';
 import { reportUserError } from '@/lib/user-error';
+import { reportOutcome, withReport } from '@/lib/reports/server';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const MAX_PAGES = 100;
 
-export async function POST(request: NextRequest) {
+export const POST = withReport(async function POST(request: NextRequest) {
   let body: unknown;
   try {
     body = await request.json();
@@ -82,6 +83,7 @@ export async function POST(request: NextRequest) {
 
     const compressed = Buffer.from(output.output('arraybuffer'));
     const keptOriginal = compressed.length >= file.buffer.length;
+    reportOutcome(request, { summary: keptOriginal ? `PDF de ${Math.ceil(file.buffer.length / 1024)} Ko déjà optimal : original renvoyé` : `PDF compressé : ${Math.ceil(file.buffer.length / 1024)} Ko → ${Math.ceil(compressed.length / 1024)} Ko` });
     return new NextResponse(new Uint8Array(keptOriginal ? file.buffer : compressed), {
       headers: {
         'Content-Type': 'application/pdf',
@@ -93,9 +95,9 @@ export async function POST(request: NextRequest) {
     if (error instanceof TemporaryBlobError) {
       return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: apiMessage(request, 'La compression du PDF a échoué. Vérifie le fichier puis réessaie.') }, { status: 500 });
   } finally {
     await cleanUpTemporaryBlobs([url], 'pdf-compressor');
   }
-}
+});

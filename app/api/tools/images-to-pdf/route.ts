@@ -21,6 +21,7 @@ import {
   TemporaryBlobError,
 } from '@/lib/temporary-conversion-blobs';
 import { reportUserError } from '@/lib/user-error';
+import { withReport } from '@/lib/reports/server';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -28,7 +29,7 @@ export const runtime = 'nodejs';
 const MAX_FILES = 20;
 const MAX_TOTAL_SIZE = 50 * 1024 * 1024;
 
-export async function POST(request: NextRequest) {
+export const POST = withReport(async function POST(request: NextRequest) {
   let body: unknown;
   try {
     body = await request.json();
@@ -124,9 +125,9 @@ export async function POST(request: NextRequest) {
     if (error instanceof TemporaryBlobError) {
       return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: apiMessage(request, 'La création du PDF a échoué. Vérifie les images puis réessaie.') }, { status: 500 });
   } finally {
     await cleanUpTemporaryBlobs(urls, 'images-to-pdf');
   }
-}
+});

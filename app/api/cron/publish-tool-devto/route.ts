@@ -4,10 +4,11 @@ import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { getPublishedTools, toolPath } from '@/lib/tools';
 import { publishDevToArticle } from '@/lib/social-publishing';
 import { reportUserError } from '@/lib/user-error';
+import { withReport } from '@/lib/reports/server';
 
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest) {
+export const GET = withReport(async function GET(request: NextRequest) {
   const authorization = request.headers.get('authorization');
   if (!process.env.CRON_SECRET || authorization !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
@@ -63,9 +64,9 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Dev.to publication failed.';
     await runRef.set({ status: 'failed', error: message, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: 'Could not publish the daily tool on Dev.to.', detail: message }, { status: 502 });
   }
-}
+});
 
 export const POST = GET;

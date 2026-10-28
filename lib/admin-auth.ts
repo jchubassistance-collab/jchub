@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
+import { reportOutcome } from '@/lib/reports/server';
 
 export const ADMIN_SESSION_COOKIE = 'jchub_admin_session';
 
@@ -49,6 +50,8 @@ export async function requireAdmin(request: NextRequest) {
     throw new Error('FORBIDDEN');
   }
 
+  // The site reports name the account behind each admin action.
+  reportOutcome(request, { user: decodedToken.email || decodedToken.uid });
   return decodedToken;
 }
 
@@ -66,7 +69,10 @@ export async function requireCmActor(request: NextRequest) {
   const profile = await getAdminDb().collection('users').doc(decodedToken.uid).get();
   const role = (decodedToken as typeof decodedToken & { role?: string }).role;
   const isAdmin = role === 'admin' || decodedToken.admin === true || profile.data()?.role === 'admin' || isConfiguredAdmin(decodedToken);
-  if (isAdmin || role === 'cm') return { token: decodedToken, isAdmin };
+  if (isAdmin || role === 'cm') {
+    reportOutcome(request, { user: decodedToken.email || decodedToken.uid });
+    return { token: decodedToken, isAdmin };
+  }
   throw new Error('FORBIDDEN');
 }
 

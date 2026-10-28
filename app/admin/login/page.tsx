@@ -45,7 +45,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <main className="relative isolate grid min-h-screen place-items-center overflow-hidden bg-[#064d82] px-5 py-10 text-white">
+    <main className="relative isolate grid min-h-dvh place-items-center overflow-hidden bg-[#064d82] px-5 py-10 text-white">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-[radial-gradient(ellipse_at_48%_8%,rgba(42,157,225,.62),transparent_56%),radial-gradient(ellipse_at_88%_76%,rgba(5,108,170,.38),transparent_48%),linear-gradient(118deg,#075389_0%,#08639e_46%,#064875_100%)]">
         <div className="absolute -left-[18%] top-[38%] h-52 w-[138%] rotate-[-7deg] rounded-[50%] bg-[#063f70]/55 blur-3xl" />
         <div className="absolute left-[12%] top-[18%] h-40 w-40 rounded-full bg-cyan-300/10 blur-3xl" />
@@ -73,7 +73,7 @@ export default function AdminLoginPage() {
           {resetMode ? (
             <form className="space-y-3" onSubmit={handleResetPassword}>
               <label className="sr-only" htmlFor="admin-email-reset">Email</label>
-              <input id="admin-email-reset" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="h-11 w-full border border-white/15 bg-white px-3.5 text-[15px] text-slate-700 outline-none placeholder:text-slate-400 transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200/40" placeholder="Email" />
+              <input id="admin-email-reset" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="h-11 w-full border border-white/15 bg-white px-3.5 text-base text-slate-700 outline-none placeholder:text-slate-400 transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200/40" placeholder="Email" />
               {resetSent && <p className="text-sm leading-5 text-emerald-100">If this email is linked to an account, a reset link has been sent.</p>}
               {error && <ErrorMessage text={error} />}
               <div className="flex items-center justify-between pt-1"><button type="button" onClick={() => { setResetMode(false); setError(''); setResetSent(false); }} className="text-sm italic text-white/70 transition hover:text-white">Back to Sign In</button><button type="submit" disabled={loading} className="group inline-flex items-center gap-1.5 text-[20px] font-medium text-white transition hover:text-sky-100 disabled:opacity-60">{loading ? 'Sending…' : 'Go'}<ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" /></button></div>
@@ -81,9 +81,9 @@ export default function AdminLoginPage() {
           ) : (
             <form className="space-y-3" onSubmit={handleSubmit}>
               <label className="sr-only" htmlFor="admin-email">Email</label>
-              <input id="admin-email" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="h-11 w-full border border-white/15 bg-white px-3.5 text-[15px] text-slate-700 outline-none placeholder:text-slate-400 transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200/40" placeholder="Email" />
+              <input id="admin-email" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="h-11 w-full border border-white/15 bg-white px-3.5 text-base text-slate-700 outline-none placeholder:text-slate-400 transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200/40" placeholder="Email" />
               <label className="sr-only" htmlFor="admin-password">Password</label>
-              <input id="admin-password" type="password" required autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="h-11 w-full border border-white/15 bg-white px-3.5 text-[15px] text-slate-700 outline-none placeholder:text-slate-400 transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200/40" placeholder="Password" />
+              <input id="admin-password" type="password" required autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="h-11 w-full border border-white/15 bg-white px-3.5 text-base text-slate-700 outline-none placeholder:text-slate-400 transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200/40" placeholder="Password" />
               {error && <ErrorMessage text={error} />}
               <div className="flex items-center justify-between pt-1"><button type="button" onClick={() => { setResetMode(true); setError(''); setResetSent(false); }} className="text-sm italic text-white/70 transition hover:text-white">Forgot Password</button><button type="submit" disabled={loading} className="group inline-flex items-center gap-1.5 text-[20px] font-medium text-white transition hover:text-sky-100 disabled:opacity-60"><span>{loading ? 'Signing in…' : 'Go'}</span><ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" /></button></div>
             </form>

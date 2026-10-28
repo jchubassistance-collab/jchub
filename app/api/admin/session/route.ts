@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     });
     return response;
   } catch (error) {
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: 'Session Firebase invalide.' }, { status: 401 });
   }
 }

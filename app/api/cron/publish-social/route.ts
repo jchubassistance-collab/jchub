@@ -4,11 +4,12 @@ import { listDuePublications, getSocialSettings } from '@/lib/social-publication
 import { runSocialPublication } from '@/workflows/social-publishing';
 import { reportUserError } from '@/lib/user-error';
 import { isCronBearerAuthorized, isPlatformEnabled } from '@/lib/social-utils';
+import { withReport } from '@/lib/reports/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+export const GET = withReport(async function GET(request: NextRequest) {
   if (!isCronBearerAuthorized(request.headers.get('authorization'), process.env.CRON_SECRET)) return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
   try {
     const settings = await getSocialSettings();
@@ -18,14 +19,14 @@ export async function GET(request: NextRequest) {
       try {
         const run = await start(runSocialPublication, [item.id, false]);
         return { id: item.id, queued: true, runId: run.runId };
-      } catch {
-        reportUserError();
+      } catch (error) {
+        reportUserError(error, { request });
         return { id: item.id, queued: false };
       }
     }));
     return NextResponse.json({ queued: results.filter((item) => item.queued).length, results });
-  } catch {
-    reportUserError();
+  } catch (error) {
+    reportUserError(error, { request });
     return NextResponse.json({ error: 'Planificateur social indisponible.' }, { status: 503 });
   }
-}
+});

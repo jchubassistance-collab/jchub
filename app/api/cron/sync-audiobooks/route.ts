@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { getAdminDb } from '@/lib/firebase-admin';
 import { reportUserError } from '@/lib/user-error';
+import { withReport } from '@/lib/reports/server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -14,7 +15,7 @@ function titleFromFileName(value: string) {
   return value.replace(/\.[a-z0-9]+$/i, '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-export async function GET(request: NextRequest) {
+export const GET = withReport(async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
   if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.json({ success: true, scanned: result.resources?.length || 0, draftsCreated: created });
   } catch (error) {
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ success: false, error: 'Synchronisation impossible.' }, { status: 500 });
   }
-}
+});

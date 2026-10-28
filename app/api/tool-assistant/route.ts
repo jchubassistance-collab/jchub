@@ -9,6 +9,7 @@ import { findToolsByKeywords, type KeywordMatch } from '@/lib/tool-search';
 import { bilingual } from '@/i18n/copy';
 import { isLocale, type Locale } from '@/i18n/routing';
 import { requestLocale } from '@/i18n/request-locale';
+import { withReport } from '@/lib/reports/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -80,7 +81,7 @@ function present(answer: ToolAssistantAnswer, catalog: (Tool & { href: string })
  * without calling the server, and only asks the AI (POST) when the catalog cannot answer.
  * ?lang=en returns the English names, keywords and addresses.
  */
-export async function GET(request: NextRequest) {
+export const GET = withReport(async function GET(request: NextRequest) {
   const lang = request.nextUrl.searchParams.get('lang');
   const locale: Locale = isLocale(lang) ? lang : 'fr';
   try {
@@ -100,9 +101,9 @@ export async function GET(request: NextRequest) {
   } catch {
     return NextResponse.json({ tools: [] }, { status: 503, headers: { 'Cache-Control': 'no-store' } });
   }
-}
+});
 
-export async function POST(request: NextRequest) {
+export const POST = withReport(async function POST(request: NextRequest) {
   const locale = requestLocale(request);
   const t = copy[locale];
   let body: unknown;
@@ -155,4 +156,4 @@ export async function POST(request: NextRequest) {
     const quotaUnavailable = error instanceof Error && /Firebase Admin|Firestore/i.test(error.message);
     return NextResponse.json({ error: quotaUnavailable ? t.unavailable : t.retry }, { status: 502, headers: { 'Cache-Control': 'no-store' } });
   }
-}
+});

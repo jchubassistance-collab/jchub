@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     const code = error instanceof Error ? error.message : '';
     if (code === 'UNAUTHORIZED') return NextResponse.json({ error: 'Authentification administrateur requise.' }, { status: 401 });
     if (code === 'FORBIDDEN') return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 });
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: 'L’audit du contenu a échoué.' }, { status: 500 });
   }
 }

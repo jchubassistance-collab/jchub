@@ -9,6 +9,7 @@ import {
   type TemporaryConversionTool,
 } from '@/lib/temporary-conversion-blobs';
 import { reportUserError } from '@/lib/user-error';
+import { withReport } from '@/lib/reports/server';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -17,7 +18,7 @@ function isTemporaryConversionTool(value: string): value is TemporaryConversionT
   return Object.hasOwn(temporaryUploadPolicies, value);
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withReport(async function POST(request: NextRequest) {
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     return NextResponse.json({ error: apiMessage(request, 'Le stockage temporaire des fichiers n’est pas configuré.') }, { status: 503 });
   }
@@ -75,12 +76,12 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (rateLimitResponse) return rateLimitResponse;
     if (invalidUpload) return NextResponse.json({ error: apiMessage(request, 'Paramètres de transfert invalides.') }, { status: 400 });
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: apiMessage(request, 'Impossible de transférer le fichier temporairement.') }, { status: 503 });
   }
-}
+});
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = withReport(async function DELETE(request: NextRequest) {
   // Each call checks then deletes up to 20 blobs, two billed Blob operations per file.
   const limited = await enforceRateLimit(request, 'conversion-blob-delete', 30, 60_000);
   if (limited) return limited;
@@ -109,7 +110,7 @@ export async function DELETE(request: NextRequest) {
     if (error instanceof TemporaryBlobError) {
       return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: apiMessage(request, 'Impossible de supprimer le fichier temporaire.') }, { status: 503 });
   }
-}
+});

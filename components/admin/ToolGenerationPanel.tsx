@@ -93,8 +93,8 @@ export function ToolGenerationPanel({ tool, onClose, onChanged }: { tool: Genera
   const step = !generation || canGenerate || status === 'generating' ? 1 : status === 'pr_open' ? (previewState === 'ready' ? 3 : 2) : 4;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4" role="dialog" aria-modal="true" aria-labelledby="tool-generation-title">
-      <section className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-7">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-2 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="tool-generation-title">
+      <section className="max-h-[96dvh] sm:max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-7">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-violet-700"><Sparkles className="h-3.5 w-3.5" />Création par IA</p>

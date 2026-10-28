@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       kit = await createKit(parsed.data.kind, parsed.data.slug, actor.uid);
     } catch (error) {
       if (error instanceof KitSourceNotFoundError) return NextResponse.json({ error: error.message }, { status: 404 });
-      reportUserError();
+      reportUserError(error, { request });
       const diagnostic = error instanceof Error ? error.message : '';
       // Garder les détails des fournisseurs hors de la réponse : certaines erreurs contiennent des éléments de requête.
       console.error('[cm/kits] Kit generation failed:', diagnostic.replace(/Bearer\s+\S+/gi, 'Bearer [redacted]').slice(0, 400));
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ kit }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Error && (error.message === 'UNAUTHORIZED' || error.message === 'FORBIDDEN' || error.message === 'CSRF')) return cmError(error);
-    reportUserError();
+    reportUserError(error, { request });
     console.error('[cm/kits] Request failed:', error instanceof Error ? error.message.slice(0, 400) : 'unknown error');
     return NextResponse.json({ error: 'La demande du kit a échoué. Consulte le terminal du serveur pour connaître la cause.' }, { status: 500, headers: { 'Cache-Control': 'no-store' } });
   }

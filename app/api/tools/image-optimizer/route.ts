@@ -8,13 +8,14 @@ import {
   TemporaryBlobError,
 } from '@/lib/temporary-conversion-blobs';
 import { reportUserError } from '@/lib/user-error';
+import { withReport } from '@/lib/reports/server';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const MAX_IMAGE_PIXELS = 40_000_000;
 
-export async function POST(request: NextRequest) {
+export const POST = withReport(async function POST(request: NextRequest) {
   let body: unknown;
   try {
     body = await request.json();
@@ -86,16 +87,16 @@ export async function POST(request: NextRequest) {
       if (error instanceof TemporaryBlobError) {
         return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
       }
-      reportUserError();
+      reportUserError(error, { request });
       return NextResponse.json({ error: apiMessage(request, 'La conversion de cette image a échoué.') }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof TemporaryBlobError) {
       return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: apiMessage(request, 'Impossible de lire le fichier temporaire.') }, { status: 503 });
   } finally {
     await cleanUpTemporaryBlobs([url], 'image-optimizer');
   }
-}
+});

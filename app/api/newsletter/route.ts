@@ -7,6 +7,7 @@ import { reportUserError } from '@/lib/user-error';
 import { enforceRateLimit } from '@/lib/rate-limit';
 import { newsletterListId } from '@/lib/brevo';
 import { requestLocale } from '@/i18n/request-locale';
+import { withReport } from '@/lib/reports/server';
 
 const WELCOME_EMAIL = {
   fr: {
@@ -29,7 +30,7 @@ function getRequiredEnvironment(name: string): string {
   return value;
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withReport(async function POST(request: NextRequest) {
   const limited = await enforceRateLimit(request, 'newsletter', 3, 10 * 60_000);
   if (limited) return limited;
   try {
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     if (!brevoResponse.ok) {
       const brevoError = await brevoResponse.text();
-      reportUserError();
+      reportUserError(new Error(`Brevo a refusé l’inscription (${brevoResponse.status}) : ${brevoError.slice(0, 300)}`), { request, status: brevoResponse.status, details: { fournisseur: 'Brevo', liste: listId } });
       await subscriberRef.update({
         status: 'pending',
         brevoStatus: 'failed',
@@ -137,14 +138,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (!confirmationResponse.ok) {
-      reportUserError();
+      reportUserError(new Error(`Brevo n’a pas envoyé l’e-mail de bienvenue (${confirmationResponse.status}).`), { request, status: confirmationResponse.status, details: { fournisseur: 'Brevo' } });
     }
 
     return NextResponse.json({
       success: true,
     });
   } catch (error) {
-    reportUserError();
+    reportUserError(error, { request });
 
     return NextResponse.json(
       {
@@ -156,4 +157,4 @@ export async function POST(request: NextRequest) {
       }
     );
   }
-}
+});

@@ -9,11 +9,12 @@ import {
   TemporaryBlobError,
 } from '@/lib/temporary-conversion-blobs';
 import { downloadName } from '@/lib/download-name';
+import { withReport } from '@/lib/reports/server';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function POST(request: NextRequest) {
+export const POST = withReport(async function POST(request: NextRequest) {
   let body: unknown;
   try {
     body = await request.json();
@@ -60,8 +61,8 @@ export async function POST(request: NextRequest) {
           updatedAt: now.toISOString(),
         }, { merge: true });
       }
-    } catch {
-      reportUserError();
+    } catch (error) {
+      reportUserError(error, { request });
     }
 
     return new NextResponse(new Uint8Array(output), {
@@ -77,9 +78,9 @@ export async function POST(request: NextRequest) {
     if (error instanceof TemporaryBlobError) {
       return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: apiMessage(request, 'Erreur pendant la conversion du document Word en PDF.') }, { status: 500 });
   } finally {
     await cleanUpTemporaryBlobs([url], 'word-to-pdf');
   }
-}
+});

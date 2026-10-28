@@ -9,8 +9,9 @@ import { categoryLabel } from '@/lib/categories';
 import { reportUserError } from '@/lib/user-error';
 import { start } from 'workflow/api';
 import { runSocialPreparation } from '@/workflows/social-publishing';
+import { withReport } from '@/lib/reports/server';
 
-export async function POST(request: NextRequest) {
+export const POST = withReport(async function POST(request: NextRequest) {
   const authorization = request.headers.get('authorization');
   if (!process.env.CRON_SECRET || authorization !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
@@ -31,10 +32,10 @@ export async function POST(request: NextRequest) {
       }
       // The English version goes live with the French one; a failure is retried by the translate-content cron.
       try { await ensureArticleTranslation(document.id); }
-      catch { reportUserError(); }
+      catch (error) { reportUserError(error, { request, details: { étape: 'traduction anglaise', article: document.id } }); }
       await document.ref.update({ status: 'published', publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
       try { await start(runSocialPreparation, [String(article.slug || document.id)]); }
-      catch { reportUserError(); }
+      catch (error) { reportUserError(error, { request, details: { étape: 'préparation des réseaux sociaux', article: document.id } }); }
       if (article.sourceDraftId) {
         await getAdminDb().collection('agent_drafts').doc(String(article.sourceDraftId)).set({
           status: 'published',
@@ -69,9 +70,9 @@ export async function POST(request: NextRequest) {
     const files = articles.length ? await syncArticleFiles(articles).catch((error) => { logSyncError(error); return null; }) : null;
     return NextResponse.json({ published: articles.length, articles, files: files?.status ?? null });
   } catch (error) {
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: 'Publication impossible.' }, { status: 500 });
   }
-}
+});
 
 export const GET = POST;

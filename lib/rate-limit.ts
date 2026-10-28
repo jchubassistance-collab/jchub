@@ -85,8 +85,8 @@ export async function enforceDailyToolAssistantQuota(request: NextRequest): Prom
       status: 429,
       headers: { 'Retry-After': String(Math.max(1, Math.ceil((tomorrow.getTime() - now.getTime()) / 1000))) },
     });
-  } catch {
-    reportUserError();
+  } catch (error) {
+    reportUserError(error, { request });
     return NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 });
   }
 }
@@ -129,8 +129,8 @@ export async function enforceDailyConversionQuota(
       { error: apiMessage(request, 'Limite atteinte : 5 conversions par outil et par jour. Réessaie demain.') },
       { status: 429, headers: { 'Retry-After': String(retryAfter) } },
     );
-  } catch {
-    reportUserError();
+  } catch (error) {
+    reportUserError(error, { request });
     return NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 });
   }
 }

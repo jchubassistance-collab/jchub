@@ -26,8 +26,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         'X-Content-Type-Options': 'nosniff',
       },
     });
-  } catch {
-    reportUserError();
+  } catch (error) {
+    reportUserError(error, { request });
     return NextResponse.json({ error: 'Visuel indisponible.' }, { status: 500 });
   }
 }

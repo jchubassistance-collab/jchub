@@ -8,11 +8,12 @@ import {
   TemporaryBlobError,
 } from '@/lib/temporary-conversion-blobs';
 import { reportUserError } from '@/lib/user-error';
+import { withReport } from '@/lib/reports/server';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function POST(request: NextRequest) {
+export const POST = withReport(async function POST(request: NextRequest) {
   let body: unknown;
   try {
     body = await request.json();
@@ -64,9 +65,9 @@ export async function POST(request: NextRequest) {
     if (error instanceof TemporaryBlobError) {
       return NextResponse.json({ error: apiMessage(request, error.message) }, { status: error.status });
     }
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: apiMessage(request, 'Erreur lors de la conversion en CSV.') }, { status: 500 });
   } finally {
     await cleanUpTemporaryBlobs([url], 'excel-to-csv');
   }
-}
+});
