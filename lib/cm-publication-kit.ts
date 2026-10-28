@@ -2,12 +2,13 @@ import 'server-only';
 
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getPublishedArticleBySlug } from '@/lib/blog';
-import { generateConfiguredText, generateOpenRouterText } from '@/lib/content-agent';
+import { generateOpenRouterText, generateQuickText } from '@/lib/content-agent';
 import { getAdminDb } from '@/lib/firebase-admin';
+import { findPhotos, photosEnabled, readPhoto, trackPhotoDownload, type Photo } from '@/lib/photos';
 import { getPublicBaseUrl } from '@/lib/site-url';
 import type { SocialCardInput } from '@/lib/social-card';
-import { generateKitCopy, generateSocialVisual, readSocialVisual, type KitContentSource, type KitCopy, type KitPlatform, type SocialVisual } from '@/lib/social-copy';
-import type { PublicationStatus, SocialSource } from '@/lib/social-types';
+import { generateKitCopy, type KitContentSource, type KitCopy, type KitPlatform } from '@/lib/social-copy';
+import type { PublicationStatus } from '@/lib/social-types';
 import { getPublishedTools, toolPath } from '@/lib/tools';
 import { reportUserError } from '@/lib/user-error';
 
@@ -17,7 +18,7 @@ export type CmKit = KitCopy & Omit<CmSource, 'content'> & {
   id: string;
   status: 'draft' | 'ready' | 'published';
   provider: string;
-  visual: SocialVisual | null;
+  photo: Photo | null;
   channels: Partial<Record<KitPlatform, KitChannel>>;
   publishRequestedAt: string | null;
   createdAt: string | null;
@@ -48,9 +49,10 @@ export function toKit(id: string, data: Record<string, any>): CmKit {
     // Les kits créés avant le passage de Snapchat à Facebook gardent leurs anciens champs.
     facebookCaption: String(data.facebookCaption ?? data.snapchatCaption ?? ''),
     facebookHashtags: strings(data.facebookHashtags ?? data.snapchatHashtags),
+    photoQueries: strings(data.photoQueries).slice(0, 3),
     status: data.status === 'ready' || data.status === 'published' ? data.status : 'draft',
     provider: String(data.provider || ''),
-    visual: readSocialVisual(data.visual),
+    photo: readPhoto(data.photo),
     channels: (data.channels && typeof data.channels === 'object' ? data.channels : {}) as CmKit['channels'],
     publishRequestedAt: asIso(data.publishRequestedAt),
     createdAt: asIso(data.createdAt),
@@ -74,43 +76,46 @@ export async function resolveKitSource(kind: 'article' | 'tool', slug: string): 
   };
 }
 
-// Fournisseur configuré (Gemini) d'abord : openrouter/free tire un modèle gratuit au hasard, et beaucoup
-// raisonnent jusqu'à la limite de tokens, oublient une consigne ou ne renvoient pas de JSON. Il reste en secours.
+// Modèles Gemini légers d'abord (2 s environ, chaque essai rejette une sortie non conforme). openrouter/free
+// tire un modèle gratuit au hasard, souvent lent ou hors consigne : un seul essai, en secours.
 async function generateWithFallback<T>(run: (generate: (prompt: string) => Promise<string>, attempts: number) => Promise<T>): Promise<{ value: T; provider: string }> {
   let provider = '';
-  const fromConfiguredProvider = async (prompt: string) => {
-    const result = await generateConfiguredText(prompt);
+  const fromQuickModels = async (prompt: string) => {
+    const result = await generateQuickText(prompt);
     provider = result.provider;
     return result.text;
   };
   try {
-    return { value: await run(fromConfiguredProvider, 2), provider };
+    return { value: await run(fromQuickModels, 3), provider };
   } catch {
     reportUserError();
-    return { value: await run((prompt) => generateOpenRouterText(prompt, 5000), 3), provider: 'openrouter' };
+    return { value: await run((prompt) => generateOpenRouterText(prompt, 5000), 1), provider: 'openrouter' };
   }
 }
 
-const asSocialSource = (source: CmSource): SocialSource => ({
-  id: source.slug, title: source.title, description: source.description, content: source.content,
-  url: source.url, tags: source.tags, category: source.category, author: 'JcHub',
-});
+// Première photo des recherches proposées par l'IA; le CM peut en choisir une autre dans le kit.
+async function pickKitPhoto(queries: string[]): Promise<Photo | null> {
+  if (!photosEnabled() || !queries.length) return null;
+  try {
+    const [photo] = await findPhotos(queries, 'landscape', 3);
+    if (photo) await trackPhotoDownload(photo);
+    return photo ?? null;
+  } catch {
+    reportUserError();
+    return null;
+  }
+}
 
-// Textes et schéma du visuel générés en parallèle; sans schéma, le visuel s'affiche avec le titre seul.
 export async function createKit(kind: 'article' | 'tool', slug: string, actorUid: string): Promise<CmKit> {
   const source = await resolveKitSource(kind, slug);
   if (!source) throw new KitSourceNotFoundError('Ce contenu n’est plus publié ou disponible.');
-  const [copy, visual] = await Promise.all([
-    generateWithFallback((generate, attempts) => generateKitCopy(source, generate, attempts)),
-    generateWithFallback((generate, attempts) => generateSocialVisual(asSocialSource(source), generate, attempts))
-      .then((result) => result.value)
-      .catch(() => { reportUserError(); return null; }),
-  ]);
+  const copy = await generateWithFallback((generate, attempts) => generateKitCopy(source, generate, attempts));
+  const photo = await pickKitPhoto(copy.value.photoQueries);
   const ref = getAdminDb().collection(KITS).doc();
   const data = {
     kind: source.kind, slug: source.slug, title: source.title, description: source.description, category: source.category,
     url: source.url, tags: source.tags, ...(source.readTime ? { readTime: source.readTime } : {}),
-    ...copy.value, provider: copy.provider, visual, status: 'draft', channels: {},
+    ...copy.value, provider: copy.provider, photo, status: 'draft', channels: {},
     createdBy: actorUid, updatedBy: actorUid, createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
   };
   await ref.set(data);
@@ -146,13 +151,13 @@ export async function setKitChannel(id: string, platform: KitPlatform, channel: 
   });
 }
 
-// Contenu du visuel : titre et sous-titre relus par le CM, schéma généré par l'IA.
+// Contenu du visuel : titre et sous-titre relus par le CM, photo choisie pour le sujet.
 export function kitCardInput(kit: CmKit): SocialCardInput {
   return {
     title: kit.imageTitle || kit.title,
     subtitle: kit.imageSubtitle,
-    badge: kit.visual?.badge || kit.category,
-    footer: kit.kind === 'tool' ? ['Outil gratuit', 'jchub.dev/outils'] : [kit.readTime ? `Temps de lecture : ${kit.readTime}` : 'À lire sur JcHub', 'jchub.dev/blog'],
-    diagram: kit.visual?.diagram ?? null,
+    badge: kit.category,
+    footer: kit.kind === 'tool' ? ['Outil gratuit', 'jchub.dev/outils'] : [kit.readTime ? `Lecture ${kit.readTime}` : 'À lire sur JcHub', 'jchub.dev/blog'],
+    photo: kit.photo?.url ?? null,
   };
 }

@@ -36,6 +36,7 @@
 - `app/api/contact/` : réception des messages contact.
 - `app/api/cron/` : tâches planifiées Vercel.
 - `app/api/admin/` : opérations réservées à l'administrateur.
+- `app/api/redaction/` : articles de l'espace rédaction (rôle `writer`), voir `docs/redaction.md`.
 
 ## Agent d'administration
 

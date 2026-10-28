@@ -22,7 +22,7 @@ Deploy the file only after confirming that the supplied rules still match the ru
 3. Once the account has set its password, its Firebase token receives the `role: "cm"` claim at sign-in. The user signs in through `/admin/login` and is routed to `/admin/cm`.
 4. Merge and deploy the Firestore restrictions above only after comparing them with the currently deployed rules.
 
-The account-management endpoint has no dedicated admin screen yet. The Firestore emulator configuration is not present, so rule and session-revocation integration scenarios still need to be exercised in the configured Firebase environment.
+CM accounts can also be created and managed from **Administration > Utilisateurs > Ajouter un utilisateur**, which calls `POST /api/admin/users` (see `docs/redaction.md`). The Firestore emulator configuration is not present, so rule and session-revocation integration scenarios still need to be exercised in the configured Firebase environment.
 
 ## Publication kits
 

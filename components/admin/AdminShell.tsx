@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { BarChart3, Bot, ChevronDown, ClipboardList, FileText, Home, LineChart, LogOut, Menu, Settings, Users, Wrench, X, Send, Inbox, Bell, Search, ExternalLink, Sparkles, ScrollText } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { signOut } from '@/lib/firebase-auth';
+import { prefetchPage } from '@/lib/admin-cache';
 
 const ADMIN_IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 const ADMIN_LAST_ACTIVITY_KEY = 'jchub_admin_last_activity';
@@ -39,7 +40,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [cmTab, setCmTab] = useState('dashboard');
   const publicSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-  const isAdminPage = Boolean(pathname?.startsWith('/admin') && pathname !== '/admin/login' && !pathname.startsWith('/admin/cm'));
+  // The writing space has its own frame (components/redaction/WriterShell.tsx), and no admin session to watch.
+  const isWriterPage = Boolean(pathname?.startsWith('/admin/redaction'));
+  const isAdminPage = Boolean(pathname?.startsWith('/admin') && pathname !== '/admin/login' && !pathname.startsWith('/admin/cm') && !isWriterPage);
 
   useEffect(() => {
     if (!isAdminPage) return;
@@ -83,7 +86,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       try {
         const response = await fetch('/api/admin/session', { cache: 'no-store' });
         if (!response.ok && (response.status === 401 || response.status === 403)) {
-          void expireSession();
+          const { home } = await response.json().catch(() => ({})) as { home?: string };
+          if (home === '/admin/redaction' || home === '/admin/cm') window.location.replace(home);
+          else void expireSession();
         }
       } catch {
         // A temporary network failure should not sign the administrator out.
@@ -131,7 +136,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('hashchange', updateTab);
   }, [isCmPage]);
 
-  if (pathname === '/admin/login' || pathname === '/login') return <>{children}</>;
+  if (pathname === '/admin/login' || pathname === '/login' || isWriterPage) return <>{children}</>;
 
   const leaveAdmin = async () => {
     await Promise.allSettled([signOut(), fetch('/api/admin/session', { method: 'DELETE' })]);
@@ -157,7 +162,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             const active = isCmPage ? cmTab === href.split('#')[1] : pathname === href || (href !== '/admin' && pathname?.startsWith(`${href}/`));
             const className = `flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition ${isCmPage ? active ? 'bg-[#1e3766] text-[#4387ff]' : 'text-slate-300 hover:bg-slate-800 hover:text-white' : active ? 'bg-[#eaf0ff] text-[#2859c5]' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`;
             if (isCmPage) return <a key={href} href={href} onClick={() => setOpen(false)} aria-current={active ? 'page' : undefined} className={className}><Icon className="h-[17px] w-[17px]" />{label}</a>;
-            return <Link key={href} href={href} onClick={() => setOpen(false)} aria-current={active ? 'page' : undefined} className={className}><Icon className="h-[17px] w-[17px]" />{label}</Link>;
+            return <Link key={href} href={href} onClick={() => setOpen(false)} onPointerEnter={() => prefetchPage(href)} onFocus={() => prefetchPage(href)} aria-current={active ? 'page' : undefined} className={className}><Icon className="h-[17px] w-[17px]" />{label}</Link>;
           })}
         </nav>
         <div className={`mt-5 shrink-0 rounded-2xl p-3 ${isCmPage?'border border-slate-700 bg-[#172233]':'bg-[#f7f8fc]'}`}>

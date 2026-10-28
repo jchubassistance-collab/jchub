@@ -17,7 +17,7 @@
     "test:cm": "node --experimental-strip-types --test tests/cm-metrics.test.js",
     "test:tool-generator": "node --experimental-strip-types --test tests/tool-generation-rules.test.js",
     "test:tool-search": "node --experimental-strip-types --test tests/tool-search.test.js",
-    "test": "npm run -s test:social && npm run -s test:api-cost-calculator && npm run -s test:pdf && npm run -s test:csv && npm run -s test:cm && npm run -s test:tool-generator && npm run -s test:tool-search && npm run -s test:i18n && npm run -s test:articles && npm run -s test:pdf-pages && npm run -s test:images-to-pdf && npm run -s test:background-removal && npm run -s test:documents && npm run -s test:client-ip && npm run -s test:logo-studio && npm run -s test:download-name && npm run -s test:pagination && npm run -s test:article-cover && npm run -s test:reports",
+    "test": "npm run -s test:social && npm run -s test:api-cost-calculator && npm run -s test:pdf && npm run -s test:csv && npm run -s test:cm && npm run -s test:tool-generator && npm run -s test:tool-search && npm run -s test:i18n && npm run -s test:articles && npm run -s test:pdf-pages && npm run -s test:images-to-pdf && npm run -s test:background-removal && npm run -s test:documents && npm run -s test:client-ip && npm run -s test:logo-studio && npm run -s test:download-name && npm run -s test:pagination && npm run -s test:article-cover && npm run -s test:reports && npm run -s test:writer",
     "test:i18n": "node --experimental-strip-types --test tests/i18n.test.js",
     "test:articles": "node --experimental-strip-types --test tests/article-files.test.js",
     "test:pdf-pages": "node --experimental-strip-types --test tests/pdf-pages.test.js",
@@ -30,7 +30,8 @@
     "test:pagination": "node --experimental-strip-types --test tests/pagination.test.js",
     "test:article-cover": "node --experimental-strip-types --test tests/article-cover.test.js",
     "test:reports": "node --experimental-strip-types --test tests/reports.test.js",
-    "articles:export": "node --experimental-strip-types --env-file=.env scripts/export-articles.mjs"
+    "articles:export": "node --experimental-strip-types --env-file=.env scripts/export-articles.mjs",
+    "test:writer": "node --experimental-strip-types --test tests/writer-rules.test.js"
   },
   "dependencies": {
     "@adobe/pdfservices-node-sdk": "^4.1.0",

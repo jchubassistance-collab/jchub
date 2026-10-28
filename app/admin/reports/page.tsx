@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Activity, AlertTriangle, Bot, Globe2, Pause, Play, RefreshCw, Search } from 'lucide-react';
 import { AdminPagination, useAdminPageSize, usePageParam } from '@/components/ui/Pagination';
+import { cachedJson, fetchJson } from '@/lib/admin-cache';
 import { countryName, type ErrorReport, type RequestKind, type RequestReport, type RequestStats } from '@/lib/reports/core';
 import { KIND_LABELS, place, shortTime, StatusBadge } from './report-ui';
 
@@ -60,11 +61,15 @@ function Reports() {
     controller.current?.abort();
     const current = new AbortController();
     controller.current = current;
+    const url = `/api/admin/reports?${key}`;
+    type Answer = ListResponse<RequestReport & ErrorReport> & { tab?: Tab };
+    const toLoaded = (result: Answer): Loaded => result.tab === 'errors' ? { key, tab: 'errors', errors: result } : { key, tab: 'requests', requests: result };
+    // Filters seen before in this tab show their last answer while the new one comes.
+    const seen = cachedJson<Answer>(url);
+    if (seen) setLoaded((previous) => previous?.key === key ? previous : toLoaded(seen));
     try {
-      const response = await fetch(`/api/admin/reports?${key}`, { cache: 'no-store', signal: current.signal });
-      const result = await response.json().catch(() => ({})) as ListResponse<RequestReport & ErrorReport> & { error?: string; tab?: Tab };
-      if (!response.ok) throw new Error(result.error || 'Les rapports sont indisponibles.');
-      setLoaded(result.tab === 'errors' ? { key, tab: 'errors', errors: result } : { key, tab: 'requests', requests: result });
+      const result = await fetchJson<Answer>(url, 'Les rapports sont indisponibles.', current.signal);
+      setLoaded(toLoaded(result));
       setError('');
       setNow(Date.now());
     } catch (cause) {
@@ -170,7 +175,6 @@ function Reports() {
     {current?.truncated && <p className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">Période très chargée : seules les entrées les plus récentes de chaque jour sont lues. Réduis la période pour tout voir.</p>}
 
     <section className="min-w-0 rounded-2xl border border-slate-200 bg-white shadow-sm">
-      {!current && !error && <p className="p-8 text-center text-sm text-slate-500">Chargement des rapports…</p>}
       {current && (tab === 'requests'
         ? <RequestList items={(current as ListResponse<RequestReport>).items} now={now} />
         : <ErrorList items={(current as ListResponse<ErrorReport>).items} now={now} />)}

@@ -7,6 +7,7 @@ import { CmCatalogDashboard, type CmCatalogItem } from '@/components/cm/CmCatalo
 import { CmOverviewDashboard } from '@/components/cm/CmOverviewDashboard';
 import { CmComparisonDashboard } from '@/components/cm/CmComparisonDashboard';
 import { CmPerformanceDashboard } from '@/components/cm/CmPerformanceDashboard';
+import { cachedJson, fetchJson } from '@/lib/admin-cache';
 
 type Report = { id: string; weekStart: string; weekEnd: string; platform: 'instagram'|'facebook'; followersStart: number|null; followersEnd: number|null; planned: number; published: number; views: number|null; reach: number|null; reactions: number|null; comments: number|null; shares: number|null; saves: number|null; clicks: number|null; bestPost: string; bestPostUrl: string; observations: string };
 type CatalogItem = CmCatalogItem;
@@ -18,14 +19,13 @@ const formatCount = (value: number | null | undefined) => value == null ? 'Non r
 
 export default function CmPage() {
   const [tab, setTab] = useState<'dashboard'|'articles'|'tools'|'reports'|'compare'|'performance'|'kits'>('dashboard');
-  const [reports, setReports] = useState<Report[]>([]); const [catalog, setCatalog] = useState<CatalogItem[]>([]); const [kits, setKits] = useState<KitSummary[]>([]);
+  const [reports, setReports] = useState<Report[]>(() => cachedJson<{ reports?: Report[] }>('/api/cm/reports')?.reports || []); const [catalog, setCatalog] = useState<CatalogItem[]>(() => cachedJson<{ content?: CatalogItem[] }>('/api/cm/catalog')?.content || []); const [kits, setKits] = useState<KitSummary[]>(() => cachedJson<{ kits?: KitSummary[] }>('/api/cm/kits')?.kits || []);
   const [reportDraft, setReportDraft] = useState<Omit<Report,'id'>>(blankReport);
 const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false); const [message, setMessage] = useState(''); const [realtime, setRealtime] = useState(false);
   const [kitSelection, setKitSelection] = useState('');
   const refresh = useCallback(async () => {
-    const [reportsResponse, catalogResponse, kitsResponse] = await Promise.all([fetch('/api/cm/reports',{cache:'no-store'}),fetch('/api/cm/catalog',{cache:'no-store'}),fetch('/api/cm/kits',{cache:'no-store'})]);
-    const [r,c,k] = await Promise.all([reportsResponse.json(),catalogResponse.json(),kitsResponse.json()]);
-    for (const response of [reportsResponse,catalogResponse,kitsResponse]) if (!response.ok) throw new Error('Impossible de charger les données CM. Vérifie ta session.');
+    const failure = 'Impossible de charger les données CM. Vérifie ta session.';
+    const [r,c,k] = await Promise.all([fetchJson<{ reports?: Report[] }>('/api/cm/reports',failure),fetchJson<{ content?: CatalogItem[] }>('/api/cm/catalog',failure),fetchJson<{ kits?: KitSummary[] }>('/api/cm/kits',failure)]);
     setReports(r.reports || []); setCatalog(c.content || []); setKits(k.kits || []);
   },[]);
   useEffect(()=>{ refresh().catch((error)=>setMessage(error.message)).finally(()=>setLoading(false)); },[refresh]);

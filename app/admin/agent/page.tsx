@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Bot, CheckCircle2, CircleAlert, Clock3, ExternalLink, Lightbulb, Radar, RefreshCw, Send, Sparkles, ClipboardCheck } from 'lucide-react';
+import { cachedJson, fetchJson } from '@/lib/admin-cache';
 
 type Draft = {
   id: string;
@@ -25,9 +26,11 @@ type ToolRecommendation = NonNullable<Draft['recommendations']>[number];
 type ToolProposalDetails = { problem: string; targetUser: string; solution: string; reason: string; suggestedSlug: string; features: string[] };
 type AuditFinding = { type: 'stale' | 'duplicate' | 'broken-link'; title: string; detail: string };
 
+const DRAFTS_URL = '/api/admin/agent/drafts';
+
 export default function AgentPage() {
-  const [drafts, setDrafts] = useState<Draft[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [drafts, setDrafts] = useState<Draft[]>(() => cachedJson<{ drafts?: Draft[] }>(DRAFTS_URL)?.drafts || []);
+  const [loading, setLoading] = useState(() => cachedJson(DRAFTS_URL) === undefined);
   const [running, setRunning] = useState(false);
   const [message, setMessage] = useState('');
   const [scheduleValues, setScheduleValues] = useState<Record<string, string>>({});
@@ -41,10 +44,7 @@ export default function AgentPage() {
   const [toolProposalError, setToolProposalError] = useState('');
 
   const loadDrafts = async () => {
-    const response = await fetch('/api/admin/agent/drafts', { cache: 'no-store' });
-    const data = await response.json() as { drafts?: Draft[]; error?: string };
-    if (!response.ok) throw new Error(data.error || 'Chargement impossible.');
-    const nextDrafts = data.drafts || [];
+    const nextDrafts = (await fetchJson<{ drafts?: Draft[] }>(DRAFTS_URL)).drafts || [];
     setDrafts(nextDrafts);
     return nextDrafts;
   };
@@ -236,7 +236,7 @@ export default function AgentPage() {
 
       <section className="flex flex-col justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center"><div><h2 className="text-sm font-extrabold text-slate-900">Brouillons de l’IA</h2><p className="mt-1 text-xs text-slate-500">Révisez le texte, approuvez-le, puis publiez-le ou programmez sa sortie.</p></div><div className="flex items-center gap-2"><label htmlFor="draft-status" className="text-xs font-semibold text-slate-500">Statut</label><select id="draft-status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700"><option value="all">Tous ({drafts.length})</option><option value="draft">À réviser ({pendingCount})</option><option value="approved">Prêts ({approvedCount})</option><option value="published">Publiés ({publishedCount})</option><option value="scheduled">Programmés ({drafts.filter((draft) => draft.status === 'scheduled').length})</option><option value="rejected">Refusés ({drafts.filter((draft) => draft.status === 'rejected').length})</option></select></div></section>
 
-      {loading ? <p className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm">Chargement des brouillons…</p> : visibleDrafts.length === 0 ? (
+      {loading && !visibleDrafts.length ? null : visibleDrafts.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center shadow-sm"><Lightbulb className="mx-auto h-8 w-8 text-amber-400" /><p className="mt-3 font-bold text-slate-700">{drafts.length ? 'Aucun brouillon pour ce statut.' : 'Aucun brouillon pour le moment.'}</p><p className="mt-1 text-sm text-slate-500">{drafts.length ? 'Choisis un autre statut pour afficher les propositions.' : 'Lance une analyse pour générer la prochaine idée.'}</p></div>
       ) : (
         <div className="space-y-4">

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Mail, MailCheck, MessageSquare, RefreshCw, Send, Users, Sparkles } from 'lucide-react';
+import { cachedJson, fetchJson } from '@/lib/admin-cache';
 
 type Reply = { body: string; sentAt: string | null; adminEmail: string };
 type ContactMessage = { id: string; name: string; email: string; subject: string; message: string; status: string; createdAt: string | null; replies: Reply[] };
@@ -12,10 +13,12 @@ function formatDate(value: string | null) {
   return value ? new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : 'Date inconnue';
 }
 
+const INBOX_URL = '/api/admin/inbox';
+
 export default function AdminInboxPage() {
-  const [data, setData] = useState<InboxData>({ messages: [], subscribers: [] });
+  const [data, setData] = useState<InboxData>(() => cachedJson<InboxData>(INBOX_URL) || { messages: [], subscribers: [] });
   const [tab, setTab] = useState<'contact' | 'newsletter'>('contact');
-  const [selectedId, setSelectedId] = useState('');
+  const [selectedId, setSelectedId] = useState(() => cachedJson<InboxData>(INBOX_URL)?.messages[0]?.id || '');
   const [reply, setReply] = useState('');
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
@@ -26,9 +29,7 @@ export default function AdminInboxPage() {
   async function load() {
     setLoading(true); setError('');
     try {
-      const response = await fetch('/api/admin/inbox', { cache: 'no-store' });
-      const result = await response.json() as InboxData & { error?: string };
-      if (!response.ok) throw new Error(result.error || 'Chargement impossible.');
+      const result = await fetchJson<InboxData>(INBOX_URL);
       setData(result);
       setSelectedId((current) => result.messages.some((message) => message.id === current) ? current : result.messages[0]?.id || '');
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Chargement impossible.'); }
@@ -89,7 +90,7 @@ export default function AdminInboxPage() {
 
     {tab === 'contact' ? <div className="grid min-h-[460px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:grid-cols-[minmax(250px,.75fr)_minmax(0,1.5fr)]">
       <section className="border-b border-slate-200 lg:border-b-0 lg:border-r" aria-label="Liste des messages">
-        {loading && !data.messages.length ? <p className="p-6 text-sm text-slate-500">Chargement des messages…</p> : data.messages.length ? <ul className="max-h-[620px] divide-y divide-slate-100 overflow-y-auto">{data.messages.map((message) => <li key={message.id}><button type="button" onClick={() => { setSelectedId(message.id); setNotice(''); }} className={`w-full p-4 text-left transition hover:bg-blue-50/70 ${selectedId === message.id ? 'bg-blue-50' : ''}`}><span className="flex items-center justify-between gap-2"><strong className="truncate text-sm text-slate-900">{message.name || message.email}</strong><span className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-bold ${message.status === 'replied' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'}`}>{message.status === 'replied' ? 'Répondu' : 'À traiter'}</span></span><span className="mt-1 block truncate text-xs text-slate-500">{message.subject}</span><span className="mt-2 block text-[11px] text-slate-400">{formatDate(message.createdAt)}</span></button></li>)}</ul> : <Empty text="Aucun message de contact pour le moment." />}
+        {loading && !data.messages.length ? null : data.messages.length ? <ul className="max-h-[620px] divide-y divide-slate-100 overflow-y-auto">{data.messages.map((message) => <li key={message.id}><button type="button" onClick={() => { setSelectedId(message.id); setNotice(''); }} className={`w-full p-4 text-left transition hover:bg-blue-50/70 ${selectedId === message.id ? 'bg-blue-50' : ''}`}><span className="flex items-center justify-between gap-2"><strong className="truncate text-sm text-slate-900">{message.name || message.email}</strong><span className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-bold ${message.status === 'replied' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'}`}>{message.status === 'replied' ? 'Répondu' : 'À traiter'}</span></span><span className="mt-1 block truncate text-xs text-slate-500">{message.subject}</span><span className="mt-2 block text-[11px] text-slate-400">{formatDate(message.createdAt)}</span></button></li>)}</ul> : <Empty text="Aucun message de contact pour le moment." />}
       </section>
 
       <section className="flex min-w-0 flex-col p-5 sm:p-6" aria-label="Détail du message">
@@ -97,10 +98,10 @@ export default function AdminInboxPage() {
           <div className="border-b border-slate-100 pb-4"><p className="text-xs font-bold uppercase tracking-wider text-blue-600">{selected.subject || 'Message de contact'}</p><h2 className="mt-2 text-xl font-black text-slate-950">{selected.name}</h2><a className="mt-1 inline-block text-sm text-blue-700 hover:underline" href={`mailto:${selected.email}`}>{selected.email}</a><p className="mt-2 text-xs text-slate-400">Reçu le {formatDate(selected.createdAt)}</p></div>
           <div className="flex-1 space-y-4 py-5"><div className="whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">{selected.message}</div>{selected.replies.map((item, index) => <div key={`${item.sentAt}-${index}`} className="ml-5 rounded-xl border border-blue-100 bg-blue-50/70 p-4"><p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-blue-700">Ta réponse · {formatDate(item.sentAt)}</p><p className="whitespace-pre-wrap text-sm leading-6 text-slate-700">{item.body}</p></div>)}</div>
           <form onSubmit={sendReply} className="border-t border-slate-100 pt-4"><div className="mb-2 flex flex-wrap items-center justify-between gap-2"><label htmlFor="reply" className="text-sm font-bold text-slate-800">Répondre par e-mail</label>{/parten|partnership|sponsor|collab|affiliat/i.test(`${selected.subject} ${selected.message}`) && <button type="button" onClick={() => void draftPartnershipReply()} disabled={drafting} className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 px-3 py-2 text-xs font-bold text-violet-700 hover:bg-violet-50 disabled:opacity-50"><Sparkles className="h-3.5 w-3.5" />{drafting ? 'Préparation…' : 'Préparer une réponse avec l’agent'}</button>}</div><textarea id="reply" required maxLength={5000} rows={4} value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Écris ta réponse…" className="w-full resize-y rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" /><div className="mt-3 flex flex-wrap items-center justify-between gap-3"><span className="text-xs text-slate-400">La proposition de l’agent n’est jamais envoyée automatiquement. Envoi via Brevo après ton clic.</span><button type="submit" disabled={sending || !reply.trim()} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"><Send className="h-4 w-4" />{sending ? 'Envoi…' : 'Envoyer la réponse'}</button></div></form>
-        </> : <Empty text={loading ? 'Chargement…' : 'Sélectionne un message pour le lire et y répondre.'} />}
+        </> : <Empty text={loading && !data.messages.length ? '' : 'Sélectionne un message pour le lire et y répondre.'} />}
       </section>
     </div> : <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      {loading && !data.subscribers.length ? <p className="p-6 text-sm text-slate-500">Chargement des abonnés…</p> : data.subscribers.length ? <div className="overflow-x-auto"><table className="w-full min-w-[600px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-5 py-3">Adresse e-mail</th><th className="px-5 py-3">Inscription</th><th className="px-5 py-3">Statut</th><th className="px-5 py-3">Synchronisation Brevo</th></tr></thead><tbody className="divide-y divide-slate-100">{data.subscribers.map((subscriber) => <tr key={subscriber.email}><td className="px-5 py-4 font-semibold text-slate-800">{subscriber.email}</td><td className="px-5 py-4 text-slate-500">{formatDate(subscriber.subscribedAt)}</td><td className="px-5 py-4"><Status value={subscriber.status} /></td><td className="px-5 py-4 text-slate-500">{subscriber.brevoStatus}</td></tr>)}</tbody></table></div> : <Empty text="Aucun abonné newsletter pour le moment." />}
+      {loading && !data.subscribers.length ? null : data.subscribers.length ? <div className="overflow-x-auto"><table className="w-full min-w-[600px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-5 py-3">Adresse e-mail</th><th className="px-5 py-3">Inscription</th><th className="px-5 py-3">Statut</th><th className="px-5 py-3">Synchronisation Brevo</th></tr></thead><tbody className="divide-y divide-slate-100">{data.subscribers.map((subscriber) => <tr key={subscriber.email}><td className="px-5 py-4 font-semibold text-slate-800">{subscriber.email}</td><td className="px-5 py-4 text-slate-500">{formatDate(subscriber.subscribedAt)}</td><td className="px-5 py-4"><Status value={subscriber.status} /></td><td className="px-5 py-4 text-slate-500">{subscriber.brevoStatus}</td></tr>)}</tbody></table></div> : <Empty text="Aucun abonné newsletter pour le moment." />}
       <p className="border-t border-slate-100 px-5 py-3 text-xs text-slate-400">Les abonnements et désabonnements restent gérés par le formulaire et Brevo.</p>
     </section>}
   </div>;

@@ -139,16 +139,15 @@ function parseDraft(text: string, sources: TrendCandidate[], catalog: CatalogIte
   };
 }
 
-async function generateWithGemini(prompt: string): Promise<string> {
+async function generateWithGemini(prompt: string, model = process.env.GEMINI_MODEL?.trim() || 'gemini-2.5-flash', timeoutMs = 45_000): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new Error('GEMINI_API_KEY est manquante.');
-  const model = process.env.GEMINI_MODEL?.trim() || 'gemini-2.5-flash';
   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4, responseMimeType: 'application/json' } }),
     cache: 'no-store',
-    signal: AbortSignal.timeout(45_000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   const data = await response.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>; error?: { message?: string } };
   if (!response.ok) throw new Error(data.error?.message || `Gemini a répondu ${response.status}.`);
@@ -239,6 +238,24 @@ async function generateWithProvider(provider: AiProvider, prompt: string): Promi
   if (provider === 'ollama') return generateWithOllama(prompt);
   if (provider === 'gemini') return generateWithGemini(prompt);
   return generateWithCompatibleProvider(provider, prompt);
+}
+
+// Textes courts (kits du CM, recherches de photo) : modèles Gemini légers, qui répondent en quelques secondes
+// quand le modèle principal est saturé. 3.1 garde mieux les accents que 3.5, qui reste en secours.
+// Chacun est essayé à son tour; GEMINI_QUICK_MODEL passe en premier.
+const QUICK_GEMINI_MODELS = ['gemini-3.1-flash-lite', 'gemini-3.5-flash-lite'];
+
+export async function generateQuickText(prompt: string): Promise<{ text: string; provider: AiProvider }> {
+  const models = Array.from(new Set([process.env.GEMINI_QUICK_MODEL?.trim(), ...QUICK_GEMINI_MODELS].filter((model): model is string => Boolean(model))));
+  let lastError: unknown;
+  for (const model of models) {
+    try {
+      return { text: await generateWithGemini(prompt, model, 20_000), provider: 'gemini' };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error('Aucun modèle Gemini rapide disponible.');
 }
 
 export async function generateOpenRouterText(prompt: string, maxTokens?: number): Promise<string> {

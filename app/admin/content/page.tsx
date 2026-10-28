@@ -4,16 +4,20 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Archive, CalendarDays, Check, ChevronDown, Eye, FileText, Folder, List, Loader2, MoreVertical, Pencil, Plus, Search, Sparkles, X } from 'lucide-react';
 import { AdminPagination, useAdminPageSize, usePageParam } from '@/components/ui/Pagination';
+import { cachedJson, fetchJson } from '@/lib/admin-cache';
 
 type Article = { id: string; slug: string; title: string; description: string; category: string; status: string; author: string; image: string; views: number; publishedAt: string | null; updatedAt: string | null; content?: string };
 type Draft = { id: string; title: string; status: string; createdAt: string | null };
 type EditorArticle = Pick<Article, 'id' | 'slug' | 'title' | 'description' | 'category' | 'status'> & { content: string };
 const statusLabels: Record<string, string> = { published: 'Publié', draft: 'Brouillon', archived: 'Archivé', scheduled: 'Programmé' };
 
+type ContentData = { articles?: Article[]; drafts?: Draft[] };
+const CONTENT_URL = '/api/admin/content';
+
 export default function AdminContentPage() {
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [drafts, setDrafts] = useState<Draft[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [articles, setArticles] = useState<Article[]>(() => cachedJson<ContentData>(CONTENT_URL)?.articles || []);
+  const [drafts, setDrafts] = useState<Draft[]>(() => cachedJson<ContentData>(CONTENT_URL)?.drafts || []);
+  const [loaded, setLoaded] = useState(() => cachedJson(CONTENT_URL) !== undefined);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [query, setQuery] = useState('');
@@ -31,14 +35,11 @@ export default function AdminContentPage() {
   const publicSiteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
 
   const load = useCallback(async () => {
-    setLoading(true); setError('');
+    setError('');
     try {
-      const response = await fetch('/api/admin/content', { cache: 'no-store' });
-      const result = await response.json() as { articles?: Article[]; drafts?: Draft[]; error?: string };
-      if (!response.ok) throw new Error(result.error || 'Chargement impossible.');
-      setArticles(result.articles || []); setDrafts(result.drafts || []);
+      const result = await fetchJson<ContentData>(CONTENT_URL);
+      setArticles(result.articles || []); setDrafts(result.drafts || []); setLoaded(true);
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Chargement impossible.'); }
-    finally { setLoading(false); }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
@@ -141,11 +142,11 @@ export default function AdminContentPage() {
 
     <section className="overflow-visible rounded-2xl border border-slate-200 bg-white shadow-sm">
       {selected.length > 0 && <div className="flex flex-wrap items-center justify-between gap-3 rounded-t-2xl border-b border-blue-100 bg-blue-50 px-4 py-3"><span className="text-xs font-bold text-blue-900">{selected.length} article(s) sélectionné(s)</span><div className="flex flex-wrap gap-2"><button disabled={bulkWorking} onClick={() => void bulkAction('publish')} className="rounded-lg bg-emerald-600 px-3 py-2 text-[10px] font-bold text-white disabled:opacity-50">Publier</button><button disabled={bulkWorking} onClick={() => void bulkAction('draft')} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-bold text-slate-700 disabled:opacity-50">Déplacer en brouillon</button><button disabled={bulkWorking} onClick={() => void bulkAction('archive')} className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-[10px] font-bold text-amber-700 disabled:opacity-50">Archiver</button><button disabled={bulkWorking} onClick={() => setSelected([])} className="rounded-lg px-3 py-2 text-[10px] font-bold text-slate-500">Annuler sélection</button></div></div>}
-      {loading ? <div className="grid min-h-64 place-items-center text-sm text-slate-500"><span className="inline-flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" />Chargement des articles…</span></div> : <>
+      <>
         <div className="overflow-x-auto rounded-t-2xl"><table className="w-full min-w-[900px] border-collapse text-left"><thead><tr className="border-b border-slate-200 bg-slate-50/70 text-[10px] font-bold text-slate-500"><th className="w-10 px-3 py-3"><input aria-label="Sélectionner cette page" type="checkbox" checked={currentPageIds.length > 0 && currentPageIds.every((id) => selected.includes(id))} onChange={selectPage} className="rounded border-slate-300" /></th><th className="px-3 py-3">Article</th><th className="px-3 py-3">Catégorie</th><th className="px-3 py-3">Statut</th><th className="px-3 py-3">Auteur</th><th className="px-3 py-3">Date</th><th className="px-3 py-3">Vues</th><th className="px-3 py-3">Actions</th></tr></thead>
           <tbody>{visible.map((article) => <tr key={article.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60"><td className="px-3 py-2.5"><input aria-label={`Sélectionner ${article.title}`} type="checkbox" checked={selected.includes(article.id)} onChange={() => toggleSelected(article.id)} className="rounded border-slate-300" /></td><td className="max-w-[380px] px-3 py-2.5"><div className="flex min-w-0 items-center gap-3">{article.image ? <img src={article.image} alt="" className="h-10 w-12 shrink-0 rounded-lg border border-slate-100 object-cover" /> : <span className="grid h-10 w-12 shrink-0 place-items-center rounded-lg bg-slate-900 text-xs font-black text-white">Jc</span>}<span className="min-w-0"><strong className="block truncate text-[11px] font-bold text-slate-800">{article.title}</strong><small className="block truncate text-[9px] text-slate-400">/{article.slug}</small></span></div></td><td className="px-3 py-2.5"><span className="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-[9px] font-semibold text-blue-700">{article.category}</span></td><td className="px-3 py-2.5"><StatusBadge status={article.status} /></td><td className="px-3 py-2.5"><span className="text-[10px] font-medium text-slate-600">{article.author}</span></td><td className="px-3 py-2.5"><span className="block text-[10px] font-semibold text-slate-600">{dateLabel(article.publishedAt || article.updatedAt)}</span><small className="text-[9px] text-slate-400">{article.publishedAt ? new Date(article.publishedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—'}</small></td><td className="px-3 py-2.5"><span className="inline-flex items-center gap-1.5 text-[10px] text-slate-600"><Eye className="h-3 w-3 text-slate-400" />{compact(article.views)}</span></td><td className="px-3 py-2.5"><div className="flex items-center gap-1.5"><button title="Modifier" onClick={() => void openEditor(article)} className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-700"><Pencil className="h-3.5 w-3.5" /></button><a title="Voir" href={`${publicSiteUrl}/fr/blog/${encodeURIComponent(article.slug)}`} target="_blank" rel="noreferrer" className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-700"><Eye className="h-3.5 w-3.5" /></a><div className="relative"><button title="Plus d’actions" onClick={() => setMenuId(menuId === article.id ? null : article.id)} className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200 text-slate-600 hover:border-blue-300"><MoreVertical className="h-3.5 w-3.5" /></button>{menuId === article.id && <div className="absolute right-0 z-20 mt-1 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl">{article.status !== 'published' && <button onClick={() => void changeStatus(article, 'published')} className="w-full rounded-lg px-3 py-2 text-left text-xs text-emerald-700 hover:bg-emerald-50">Publier</button>}{article.status !== 'draft' && <button onClick={() => void changeStatus(article, 'draft')} className="w-full rounded-lg px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-50">Déplacer en brouillon</button>}{article.status !== 'archived' && <button onClick={() => void changeStatus(article, 'archived')} className="w-full rounded-lg px-3 py-2 text-left text-xs text-amber-700 hover:bg-amber-50">Archiver</button>}</div>}</div></div></td></tr>)}</tbody></table></div>
-        <AdminPagination page={currentPage} pageSize={pageSize} total={filtered.length} noun="articles" empty="Aucun article correspondant" onPage={setPage} onPageSize={setPageSize} />
-      </>}
+        <AdminPagination page={currentPage} pageSize={pageSize} total={filtered.length} noun="articles" empty={loaded ? "Aucun article correspondant" : ""} onPage={setPage} onPageSize={setPageSize} />
+      </>
     </section>
 
     <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-violet-100 bg-violet-50/70 p-4"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-white text-violet-600"><Sparkles className="h-5 w-5" /></span><span><strong className="block text-sm text-slate-800">Brouillons générés par l’IA <span className="text-violet-600">{pendingAi}</span></strong><small className="text-xs text-slate-500">Révisez, modifiez et publiez les propositions de l’agent éditorial.</small></span></div><Link href="/admin/agent" className="rounded-xl bg-violet-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-violet-700">Ouvrir les brouillons</Link></section>

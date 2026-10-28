@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Copy, Download, Image as ImageIcon, Instagram, LoaderCircle, RefreshCw, Save, Search, Send, Sparkles, WandSparkles } from 'lucide-react';
 import { PublishingSettings } from '@/components/cm/PublishingSettings';
+import { cachedJson, fetchJson } from '@/lib/admin-cache';
 
 type CatalogItem = { kind: string; title: string; slug: string; description: string; category?: string };
 type Kit = { id: string; kind: 'article'|'tool'; slug: string; title: string; category: string; imageTitle: string; imageSubtitle: string; instagramCaption: string; instagramHashtags: string[]; facebookCaption: string; facebookHashtags: string[]; status: 'draft'|'ready'|'published'; createdAt?: string|null; channels?: Partial<Record<KitNetwork, KitChannel>>; visual?: { diagram?: { kind:string }|null }|null; socialResults?: Array<{ platform:string; publishedAt:string|null; externalUrl:string|null; insights:Record<string,number|null>|null; insightsFetchedAt:string|null }> };
@@ -14,10 +15,10 @@ type KitFields = Pick<Kit,'imageTitle'|'imageSubtitle'|'instagramCaption'|'insta
 const input = 'w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100';
 
 export function PublicationKits({ initialSelection = '' }: { initialSelection?: string }) {
-  const [catalog, setCatalog] = useState<CatalogItem[]>([]);
-  const [kits, setKits] = useState<Kit[]>([]);
+  const [catalog, setCatalog] = useState<CatalogItem[]>(() => cachedJson<{ content?: CatalogItem[] }>('/api/cm/catalog')?.content || []);
+  const [kits, setKits] = useState<Kit[]>(() => cachedJson<{ kits?: Kit[] }>('/api/cm/kits')?.kits || []);
   const [selection, setSelection] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => cachedJson('/api/cm/kits') === undefined);
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState<string|null>(null);
   const [message, setMessage] = useState('');
@@ -26,12 +27,10 @@ export function PublicationKits({ initialSelection = '' }: { initialSelection?: 
   const [search, setSearch] = useState('');
 
   const refresh = useCallback(async () => {
-    const [cRes, kRes] = await Promise.all([fetch('/api/cm/catalog',{cache:'no-store'}),fetch('/api/cm/kits',{cache:'no-store'})]);
-    const [c,k] = await Promise.all([cRes.json(),kRes.json()]);
-    if (!cRes.ok || !kRes.ok) throw new Error(c.error || k.error || 'Impossible de charger les kits.');
-    const items = (c.content || []) as CatalogItem[];
+    const [c,k] = await Promise.all([fetchJson<{ content?: CatalogItem[] }>('/api/cm/catalog','Impossible de charger les kits.'),fetchJson<{ kits?: Kit[] }>('/api/cm/kits','Impossible de charger les kits.')]);
+    const items = c.content || [];
     setCatalog(items);
-    setKits((k.kits || []) as Kit[]);
+    setKits(k.kits || []);
     if (!selection && !initialSelection && items[0]) setSelection(`${items[0].kind === 'Outil' ? 'tool' : 'article'}:${items[0].slug}`);
   },[selection,initialSelection]);
   useEffect(()=>{refresh().catch(e=>setMessage(e.message)).finally(()=>setLoading(false));},[refresh]);
@@ -108,7 +107,7 @@ export function PublicationKits({ initialSelection = '' }: { initialSelection?: 
     {message&&<p role="status" className="flex items-center gap-2 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-900"><Sparkles className="h-4 w-4 shrink-0"/>{message}</p>}
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h3 className="text-lg font-extrabold text-slate-900">Votre bibliothèque</h3><p className="mt-0.5 text-xs text-slate-500">Retrouvez les textes et visuels de vos publications.</p></div><label className="relative block sm:w-64"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Rechercher un kit…" className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-xs outline-none focus:border-indigo-400"/></label></div>
     <div className="flex gap-2 overflow-x-auto pb-1">{([['all','Tous'],['draft','Brouillons'],['ready','Prêts à publier'],['published','Publiés']] as const).map(([key,label])=><button key={key} onClick={()=>setFilter(key)} className={`shrink-0 rounded-lg px-3.5 py-2 text-xs font-bold transition ${filter===key?'bg-indigo-600 text-white shadow-sm':'border border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:text-indigo-700'}`}>{label}<span className="ml-1.5 opacity-70">{key==='all'?kits.length:kits.filter(k=>k.status===key).length}</span></button>)}</div>
-    {loading?<div className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500"><LoaderCircle className="mx-auto mb-2 h-5 w-5 animate-spin text-indigo-600"/>Chargement des kits…</div>:kits.length===0?<div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center"><span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-indigo-50 text-indigo-500"><ImageIcon className="h-7 w-7"/></span><p className="mt-4 font-bold text-slate-800">Votre bibliothèque est vide</p><p className="mx-auto mt-1 max-w-md text-sm text-slate-500">Choisissez un article ou un outil ci-dessus pour préparer votre première publication.</p></div>:visibleKits.length===0?<div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">Aucun kit ne correspond à cette recherche.</div>:<div className="space-y-5">{visibleKits.map(kit=>{
+    {loading&&!kits.length?null:kits.length===0?<div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center"><span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-indigo-50 text-indigo-500"><ImageIcon className="h-7 w-7"/></span><p className="mt-4 font-bold text-slate-800">Votre bibliothèque est vide</p><p className="mx-auto mt-1 max-w-md text-sm text-slate-500">Choisissez un article ou un outil ci-dessus pour préparer votre première publication.</p></div>:visibleKits.length===0?<div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">Aucun kit ne correspond à cette recherche.</div>:<div className="space-y-5">{visibleKits.map(kit=>{
       const imageUrl=`/api/cm/kits/${kit.id}/image?format=${formats[kit.id]||'instagram'}`;
       return <article key={kit.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md"><div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white p-4 sm:p-5"><div><div className="flex items-center gap-2"><span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-wider text-indigo-700">{kit.kind==='tool'?'Outil':'Article'}</span><span className={`rounded-full px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-wider ${kit.status==='published'?'bg-emerald-100 text-emerald-800':kit.status==='ready'?'bg-indigo-100 text-indigo-800':'bg-amber-100 text-amber-800'}`}>{kit.status==='published'?'Publié':kit.status==='ready'?'Prêt à publier':'Brouillon'}</span></div><h3 className="mt-2 text-lg font-extrabold text-slate-900">{kit.title}</h3><p className="mt-1 text-xs text-slate-500">{kit.category}{kit.createdAt?` · Créé le ${new Date(kit.createdAt).toLocaleDateString('fr-FR')}`:''}</p></div><div className="flex flex-wrap gap-2"><button type="button" disabled={saving===kit.id} onClick={()=>save(kit)} className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-bold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50 disabled:opacity-50"><Save className="h-4 w-4"/>{saving===kit.id?'Enregistrement…':'Enregistrer'}</button><button type="button" disabled={saving===kit.id||kit.status==='published'} onClick={()=>setStatus(kit,'ready')} className="rounded-lg border border-indigo-200 bg-white px-3 py-2 text-[10px] font-bold text-indigo-700 hover:bg-indigo-50 disabled:opacity-50">Marquer prêt</button><button type="button" disabled={saving===kit.id||kit.status==='published'} onClick={()=>publish(kit)} className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-[10px] font-bold text-white transition hover:bg-emerald-700 disabled:opacity-50">{saving===kit.id?<LoaderCircle className="h-4 w-4 animate-spin"/>:<Send className="h-4 w-4"/>}Publier sur Facebook et Instagram</button></div></div>
       {channelRow(kit)}

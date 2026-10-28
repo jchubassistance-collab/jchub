@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Activity, ArrowDownRight, ArrowUpRight, BarChart3, CalendarDays, Users } from 'lucide-react';
+import { cachedJson, fetchJson } from '@/lib/admin-cache';
+
+const ANALYTICS_URL = '/api/admin/analytics';
 
 type Row = Record<string, string | number>;
 type Analytics = {
@@ -14,9 +17,9 @@ const duration = (seconds: unknown) => { const n = Math.max(0, Math.round(Number
 const palette = ['#18b4b2', '#4269d0', '#e69b2e', '#8a57bd', '#ed6f58', '#61a66b', '#de5d94', '#808b9a'];
 
 export default function AnalyticsPage() {
-  const [data, setData] = useState<Analytics | null>(null);
+  const [data, setData] = useState<Analytics | null>(() => cachedJson<Analytics>(ANALYTICS_URL) ?? null);
   const [error, setError] = useState('');
-  useEffect(() => { fetch('/api/admin/analytics', { cache: 'no-store' }).then(async (response) => { const result = await response.json() as Analytics & { error?: string }; if (!response.ok) throw new Error(result.error || 'Impossible de charger les données Analytics.'); setData(result); }).catch((cause) => setError(cause instanceof Error ? cause.message : 'Analytics indisponibles.')); }, []);
+  useEffect(() => { fetchJson<Analytics>(ANALYTICS_URL, 'Impossible de charger les données Analytics.').then(setData).catch((cause) => setError(cause instanceof Error ? cause.message : 'Analytics indisponibles.')); }, []);
 
   const channels = useMemo(() => data?.channels || [], [data]);
   const sources = data?.sources || [];

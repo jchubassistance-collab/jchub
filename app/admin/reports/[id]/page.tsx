@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AlertTriangle, ArrowLeft, Check, Copy, ExternalLink } from 'lucide-react';
+import { cachedJson, fetchJson } from '@/lib/admin-cache';
 import { countryName, formatLagosTime, type ErrorReport, type RequestReport } from '@/lib/reports/core';
 import { KIND_LABELS, StatusBadge } from '../report-ui';
 
@@ -16,17 +17,13 @@ function fullPlace(report: { city: string; region: string; country: string }): s
 
 export default function ReportDetailPage() {
   const id = useParams<{ id: string }>()?.id ?? '';
-  const [detail, setDetail] = useState<Detail | null>(null);
+  const [detail, setDetail] = useState<Detail | null>(() => cachedJson<Detail>(`/api/admin/reports/${encodeURIComponent(id)}`) ?? null);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch(`/api/admin/reports/${encodeURIComponent(id)}`, { cache: 'no-store', signal: controller.signal })
-      .then(async (response) => {
-        const result = await response.json().catch(() => ({})) as Detail & { error?: string };
-        if (!response.ok) throw new Error(result.error || 'Ce rapport est indisponible.');
-        setDetail(result);
-      })
+    fetchJson<Detail>(`/api/admin/reports/${encodeURIComponent(id)}`, 'Ce rapport est indisponible.', controller.signal)
+      .then(setDetail)
       .catch((cause) => { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : 'Ce rapport est indisponible.'); });
     return () => controller.abort();
   }, [id]);
@@ -45,7 +42,6 @@ export default function ReportDetailPage() {
     </div>
 
     {error && <p className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700" role="alert">{error}</p>}
-    {!detail && !error && <p className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">Chargement du rapport…</p>}
 
     {detail && <>
       <header className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">

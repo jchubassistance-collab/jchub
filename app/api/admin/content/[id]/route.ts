@@ -1,5 +1,7 @@
 import { after, NextRequest, NextResponse } from 'next/server';
+import { articleCoverPath } from '@/lib/article-cover';
 import { isPublicArticleStatus } from '@/lib/article-files';
+import { addCoverPhoto } from '@/lib/article-photo';
 import { refreshArticle } from '@/lib/article-repository';
 import { FieldValue } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
@@ -44,18 +46,27 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       if (existing.docs.some((doc) => doc.id !== id)) return NextResponse.json({ error: 'Ce slug est déjà utilisé.' }, { status: 409 });
       update.slug = slug;
     }
+    const publishing = body.status === 'published' && snapshot.data()?.status !== 'published';
     if (body.status !== undefined) {
       if (!['draft', 'published', 'archived'].includes(body.status)) return NextResponse.json({ error: 'Statut invalide.' }, { status: 400 });
       if (body.status === 'published' && !(String(body.content ?? snapshot.data()?.content ?? '').trim())) return NextResponse.json({ error: 'Ajoute le contenu avant de publier.' }, { status: 400 });
       update.status = body.status;
       if (body.status === 'published' && !snapshot.data()?.publishedAt) update.publishedAt = FieldValue.serverTimestamp();
+      // Without an image of its own, the article shows the card drawn with its title, as from the writing space.
+      if (publishing && !snapshot.data()?.image) {
+        const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
+        update.image = `${siteUrl}${articleCoverPath({ title: String(update.title ?? snapshot.data()?.title ?? ''), category: String(update.category ?? snapshot.data()?.category ?? '') })}`;
+      }
     }
     await reference.update(update);
     // Edited or newly published text gets its English version refreshed. A draft saved again
     // has no file to update; an article published, edited or withdrawn has its files rewritten.
     const translate = body.title !== undefined || body.description !== undefined || body.content !== undefined || body.status === 'published';
     const sync = isPublicArticleStatus(snapshot.data()?.status) || isPublicArticleStatus(body.status ?? snapshot.data()?.status);
-    if (translate || sync) after(() => refreshArticle(id, { translate, sync }));
+    if (translate || sync) after(async () => {
+      if (publishing) await addCoverPhoto(reference);
+      await refreshArticle(id, { translate, sync });
+    });
     return NextResponse.json({ id, ok: true });
   } catch (error) {
     const code = error instanceof Error ? error.message : 'INTERNAL_ERROR';

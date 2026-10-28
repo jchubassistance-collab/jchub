@@ -26,18 +26,21 @@ export async function POST(request: NextRequest) {
     const claimRole = (decodedToken as typeof decodedToken & { role?: string }).role;
     const hasAdminRole = userDocument.data()?.role === 'admin' || decodedToken.admin === true || claimRole === 'admin';
     const hasCmRole = claimRole === 'cm';
+    const hasWriterRole = claimRole === 'writer';
     const isEmailAdmin = isConfiguredAdmin(decodedToken);
-    if (!hasAdminRole && !hasCmRole && !isEmailAdmin) {
+    if (!hasAdminRole && !hasCmRole && !hasWriterRole && !isEmailAdmin) {
       const message = isListedAdminEmail(decodedToken.email)
         ? 'Adresse administrateur non vérifiée. Vérifie cette adresse e-mail dans Firebase, ou attribue le rôle admin avec « npm run create-admin -- adresse@email », puis reconnecte-toi.'
         : userDocument.data()?.role === 'cm'
           ? 'Profil CM trouvé, mais le claim Firebase role=cm manque. Un administrateur doit attribuer le rôle dans Administration > Accès CM, puis le compte doit se reconnecter.'
-          : 'Compte Firebase connecté, mais aucun rôle autorisé. Demande à un administrateur de provisionner ce compte.';
+          : userDocument.data()?.role === 'writer'
+            ? 'Profil rédaction trouvé, mais le claim Firebase role=writer manque. Un administrateur doit donner l’accès dans Administration > Accès rédaction, puis le compte doit se reconnecter.'
+            : 'Compte Firebase connecté, mais aucun rôle autorisé. Demande à un administrateur de provisionner ce compte.';
       return NextResponse.json({ error: message }, { status: 403 });
     }
 
     const sessionCookie = await getAdminAuth().createSessionCookie(parsedBody.data.idToken, { expiresIn: 1000 * 60 * 60 * 8 });
-    const response = NextResponse.json({ authenticated: true, role: hasAdminRole || isEmailAdmin ? 'admin' : 'cm' });
+    const response = NextResponse.json({ authenticated: true, role: hasAdminRole || isEmailAdmin ? 'admin' : hasCmRole ? 'cm' : 'writer' });
     response.cookies.set(ADMIN_SESSION_COOKIE, sessionCookie, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -73,6 +76,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ authenticated: true }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     const status = error instanceof Error && error.message === 'FORBIDDEN' ? 403 : 401;
-    return NextResponse.json({ authenticated: false }, { status, headers: { 'Cache-Control': 'no-store' } });
+    // A writer or a CM who opens an admin page goes back to their own space instead of being signed out.
+    let home: string | undefined;
+    if (status === 403) {
+      try {
+        const token = await getAdminAuth().verifySessionCookie(request.cookies.get(ADMIN_SESSION_COOKIE)?.value || '', true);
+        const role = (token as typeof token & { role?: string }).role;
+        home = role === 'writer' ? '/admin/redaction' : role === 'cm' ? '/admin/cm' : undefined;
+      } catch { /* No space to send the account to: the admin page signs it out. */ }
+    }
+    return NextResponse.json({ authenticated: false, ...(home ? { home } : {}) }, { status, headers: { 'Cache-Control': 'no-store' } });
   }
 }
