@@ -57,7 +57,7 @@ Toutes les images OG respectent :
 - **Accent** : Vert JcHub (#22c55e)
 - **Grid pattern** subtil en arrière-plan
 - **Glow effect** en haut à droite
-- **Logo watermark** "J jchub.io/outils/[slug]"
+- **Logo watermark** "J jchub.dev/outils/[slug]"
 
 Tu peux les remplacer par des visuels custom plus tard si tu veux.
 

@@ -112,7 +112,7 @@ curl -s https://api.github.com/users/jchub | jq '.name, .bio, .public_repos'
 
 ### 4. **Online tool (for non-devs or when you're in a rush)**
 
-I have a [free JSON Formatter](https://jchub.io/outils/json-formatter) on JcHub. Paste, click, and you get the formatted version. Bonus: it tells you whether your JSON is valid (parsing errors).
+I have a [free JSON Formatter](https://jchub.dev/en/tools/json-formatter) on JcHub. Paste, click, and you get the formatted version. Bonus: it tells you whether your JSON is valid (parsing errors).
 
 ## How to debug invalid JSON
 
@@ -194,7 +194,6 @@ If you work with an API that returns complex JSON, **generate a JSON Schema**. I
 Then validate your JSON against the schema. If the API changes and returns something unexpected, you'll know right away.
 
 Tools to generate a schema from JSON:
-- [jsonschema.net](https://www.jsonschema.net/)
 - VS Code with the "JSON to JSON Schema" extension
 
 ## The workflow I use
@@ -216,12 +215,12 @@ If the JSON comes up often, I generate a JSON Schema and use it to validate ever
 - **VS Code**: Shift+Alt+F to format
 - **Chrome console**: `JSON.stringify(JSON.parse(data), null, 2)`
 - **jq** on the CLI for advanced filters
-- **Quick tool**: [jchub.io/outils/json-formatter](https://jchub.io/outils/json-formatter)
+- **Quick tool**: [jchub.dev/en/tools/json-formatter](https://jchub.dev/en/tools/json-formatter)
 - **5 common mistakes**: trailing comma, missing quotes, single quotes, comments, escaping
 
 ---
 
-**Working on an API and need to test it quickly?** My [API Tester](https://jchub.io/outils/api-tester) formats JSON responses automatically. Combined with the JSON Formatter, you're all set.
+**Working on an API that returns tokens?** My [JWT decoder](https://jchub.dev/en/tools/jwt-decoder) shows what they contain in one click. Combined with the JSON Formatter, you're all set.
 
-There are 14 free dev tools on JcHub → [jchub.io/outils](https://jchub.io/outils)
+There are 14 free dev tools on JcHub → [jchub.dev/en/tools](https://jchub.dev/en/tools)
 

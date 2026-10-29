@@ -117,7 +117,7 @@ redirectUrl.searchParams.set("state", state);
 
 ## L'outil rapide pour tester
 
-J'ai un [URL Encoder gratuit](https://jchub.io/outils/url-encoder) sur JcHub. Tu colles une URL ou une string, t'as l'encodage en `encodeURI` et `encodeURIComponent` en un clic. Très utile pour débugger un OAuth qui marche pas.
+J'ai un [URL Encoder gratuit](https://jchub.dev/fr/outils/encodeur-url) sur JcHub. Tu colles une URL ou une string, t'as l'encodage en `encodeURI` et `encodeURIComponent` en un clic. Très utile pour débugger un OAuth qui marche pas.
 
 ## Le tableau qui résume tout
 
@@ -139,11 +139,11 @@ J'ai un [URL Encoder gratuit](https://jchub.io/outils/url-encoder) sur JcHub. Tu
 - `encodeURI` = URL complète
 - `encodeURIComponent` = valeur de paramètre (utilise ça 95% du temps)
 - Pour être tranquille : `new URL()` + `searchParams.set()`
-- Outil gratuit : [jchub.io/outils/url-encoder](https://jchub.io/outils/url-encoder)
+- Outil gratuit : [jchub.dev/fr/outils/encodeur-url](https://jchub.dev/fr/outils/encodeur-url)
 - **Si ton OAuth marche pas, commence par vérifier ton encoding** (c'est le bug #1)
 
 ---
 
-**Tu codes une API et t'as besoin de tester tes endpoints ?** Découvre mon [API Tester Postman-like](https://jchub.io/outils/api-tester) gratuit et 100% en ligne.
+**Tu codes une API et t'as besoin de tester tes endpoints ?** Découvre mon [API Tester Postman-like](https://jchub.dev/fr/outils/api-tester) gratuit et 100% en ligne.
 
-Et si t'as d'autres questions dev, j'ai 14 outils gratuits sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Et si t'as d'autres questions dev, j'ai 14 outils gratuits sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

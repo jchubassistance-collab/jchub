@@ -23,7 +23,7 @@ C'est le format que la plupart des backends utilisent parce que c'est simple à 
 
 ### Méthode 1 : Outil en ligne (la plus rapide)
 
-Va sur [JcHub Timestamp Converter](https://jchub.io/outils/timestamp-converter), colle ton nombre, et t'as la conversion en :
+Va sur [JcHub Timestamp Converter](https://jchub.dev/fr/outils/convertisseur-timestamp), colle ton nombre, et t'as la conversion en :
 
 - **Date locale** (selon ton fuseau horaire)
 - **Date UTC** (temps universel)
@@ -125,10 +125,10 @@ C'est pour ça que les bases de données (PostgreSQL, MySQL, MongoDB) stockent s
 - Pour convertir : `new Date(timestamp * 1000)` en JS
 - Multiplie par 1000 en JS (ms), pas en Python
 - Toujours en UTC, conversion locale côté frontend
-- Outil rapide : [jchub.io/outils/timestamp-converter](https://jchub.io/outils/timestamp-converter)
+- Outil rapide : [jchub.dev/fr/outils/convertisseur-timestamp](https://jchub.dev/fr/outils/convertisseur-timestamp)
 
 ---
 
-**Tu bosses sur une API et t'as besoin de tester tes dates ?** J'ai aussi un [API Tester gratuit](https://jchub.io/outils/api-tester) pour faire tes requêtes HTTP sans Postman.
+**Tu bosses sur une API et t'as besoin de tester tes dates ?** J'ai aussi un [API Tester gratuit](https://jchub.dev/fr/outils/api-tester) pour faire tes requêtes HTTP sans Postman.
 
-Et si t'as d'autres questions dev, j'ai 14 outils gratuits en ligne sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Et si t'as d'autres questions dev, j'ai 14 outils gratuits en ligne sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

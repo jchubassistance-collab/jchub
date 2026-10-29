@@ -50,7 +50,7 @@ I looked for an alternative. I found 3 that are worth it. And I built one too (m
 
 I built a 100% free HTTP client that runs in the browser. No install, no account, no ads.
 
-**[JcHub API Tester](https://jchub.io/outils/api-tester)**
+**[JcHub API Tester](https://jchub.dev/en/tools/api-tester)**
 
 Why I use it every day:
 
@@ -126,7 +126,7 @@ You get:
 You get a 401 on your protected endpoint. Here's how to diagnose it:
 
 1. **Check your `Authorization` header**: is the token actually there?
-2. **Decode your JWT**: has it expired? → [JWT Decoder](https://jchub.io/outils/jwt-decoder)
+2. **Decode your JWT**: has it expired? → [JWT Decoder](https://jchub.dev/en/tools/jwt-decoder)
 3. **Check the scheme**: `Bearer` or `Basic`? What does the backend expect?
 4. **Test with curl**: `curl -H "Authorization: Bearer xxx" https://api.com/me`
 5. **Look at the server logs**: there's often more info on the backend side
@@ -184,13 +184,13 @@ Copy it, paste it into your project, and you're done. No guessing the syntax.
 ## TL;DR
 
 - **3 alternatives to Postman**: Insomnia (native), Hoppscotch (web), Bruno (CLI + files)
-- **My free tool**: [jchub.io/outils/api-tester](https://jchub.io/outils/api-tester) (29 KB, in the browser)
+- **My free tool**: [jchub.dev/en/tools/api-tester](https://jchub.dev/en/tools/api-tester) (29 KB, in the browser)
 - **HTTP codes**: 2xx = OK, 4xx = you messed up, 5xx = the server messed up
 - **Code generation**: copy-paste straight into your project
 - **For CORS**: generate the cURL and test in the terminal
 
 ---
 
-**Want to try it?** Go to [JcHub API Tester](https://jchub.io/outils/api-tester), paste any URL, and see.
+**Want to try it?** Go to [JcHub API Tester](https://jchub.dev/en/tools/api-tester), paste any URL, and see.
 
-There are also 13 other free dev tools on JcHub → [jchub.io/outils](https://jchub.io/outils)
+There are also 13 other free dev tools on JcHub → [jchub.dev/en/tools](https://jchub.dev/en/tools)

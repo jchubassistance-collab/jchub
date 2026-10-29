@@ -37,7 +37,7 @@ Historically, many systems only handled text (emails, URLs, JSON). But sometimes
 
 ### Online tool
 
-My [free Base64 Tool](https://jchub.io/outils/base64-encoder) on JcHub. Paste your text and get the encoding in 1 click. Same in the other direction (decoding).
+My [free Base64 Tool](https://jchub.dev/en/tools/base64-encoder) on JcHub. Paste your text and get the encoding in 1 click. Same in the other direction (decoding).
 
 ### In JavaScript
 
@@ -192,10 +192,10 @@ It's like saying "I secured my password by writing it backwards". Trivially reve
 - **5 real uses**: CSS data URIs, MIME email, Basic Auth, JWT, NoSQL storage
 - **+33% size**: not for large images
 - **If you want security**: AES, bcrypt, argon2
-- **Free tool**: [jchub.io/outils/base64-encoder](https://jchub.io/outils/base64-encoder)
+- **Free tool**: [jchub.dev/en/tools/base64-encoder](https://jchub.dev/en/tools/base64-encoder)
 
 ---
 
-**Debugging a JWT and need to decode its payload?** A JWT payload is in Base64, so use my [JWT Decoder](https://jchub.io/outils/jwt-decoder) (free).
+**Debugging a JWT and need to decode its payload?** A JWT payload is in Base64, so use my [JWT Decoder](https://jchub.dev/en/tools/jwt-decoder) (free).
 
-There are 14 free dev tools on JcHub → [jchub.io/outils](https://jchub.io/outils)
+There are 14 free dev tools on JcHub → [jchub.dev/en/tools](https://jchub.dev/en/tools)

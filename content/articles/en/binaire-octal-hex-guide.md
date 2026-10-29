@@ -253,11 +253,11 @@ If you read raw bytes from a file or the network, this is crucial.
 - **2 hex digits** = 8 bits = 1 byte
 - **Used for**: CSS colors, memory addresses, ASCII, hashes
 - **Quick conversion**: binary ↔ hex = groups of 4 bits
-- **Free tool**: [jchub.io/outils/number-base-converter](https://jchub.io/outils/number-base-converter)
+- **Free tool**: [jchub.dev/en/tools/number-base-converter](https://jchub.dev/en/tools/number-base-converter)
 
 ---
 
-**Debugging a binary payload and need a quick conversion?** My [Number Base Converter](https://jchub.io/outils/number-base-converter) does all 4 conversions in real time.
+**Debugging a binary payload and need a quick conversion?** My [Number Base Converter](https://jchub.dev/en/tools/number-base-converter) does all 4 conversions in real time.
 
-There are 14 free dev tools on JcHub → [jchub.io/outils](https://jchub.io/outils)
+There are 14 free dev tools on JcHub → [jchub.dev/en/tools](https://jchub.dev/en/tools)
 

@@ -32,7 +32,7 @@ Ceci est un **paragraphe** avec du *texte en italique*.
 - Item 2
 - Item 3
 
-[Un lien](https://jchub.io)
+[Un lien](https://jchub.dev)
 ```
 
 Ça donne :
@@ -45,7 +45,7 @@ Ceci est un **paragraphe** avec du *texte en italique*.
   <li>Item 2</li>
   <li>Item 3</li>
 </ul>
-<p><a href="https://jchub.io">Un lien</a></p>
+<p><a href="https://jchub.dev">Un lien</a></p>
 ```
 
 Le but : un texte lisible **même sans être rendu**, et qui se transforme en HTML joli.
@@ -99,7 +99,7 @@ Le but : un texte lisible **même sans être rendu**, et qui se transforme en HT
 
 ```markdown
 ![Texte alternatif](url-image.png)
-![Logo](https://jchub.io/logo.png "Mon logo")
+![Logo](https://jchub.dev/logo.png "Mon logo")
 ```
 
 ⚠️ La différence avec un lien : le `!` devant.
@@ -268,7 +268,7 @@ C'est la structure que j'utilise pour **tous** mes projets. Lisible, complète, 
 
 ## Comment tester ton Markdown en temps réel
 
-Mon outil gratuit : [Markdown Preview](https://jchub.io/outils/markdown-preview). Tu tapes à gauche, tu vois le rendu à droite. Très utile quand tu débutes et que tu veux voir si ta syntaxe marche.
+Mon outil gratuit : [Markdown Preview](https://jchub.dev/fr/outils/apercu-markdown). Tu tapes à gauche, tu vois le rendu à droite. Très utile quand tu débutes et que tu veux voir si ta syntaxe marche.
 
 **Bonus** : ça marche aussi pour rédiger des articles de blog, de la doc, ou des emails stylés.
 
@@ -277,11 +277,11 @@ Mon outil gratuit : [Markdown Preview](https://jchub.io/outils/markdown-preview)
 - **Markdown** = texte formaté avec symboles simples
 - **À connaître** : `#` titre, `**gras**`, `*italique*`, `[lien](url)`, `![image](url)`, listes, code blocks
 - **GitHub** ajoute : mentions, alerts, emoji, tâches
-- **Outil gratuit** : [jchub.io/outils/markdown-preview](https://jchub.io/outils/markdown-preview)
+- **Outil gratuit** : [jchub.dev/fr/outils/apercu-markdown](https://jchub.dev/fr/outils/apercu-markdown)
 - **1h d'apprentissage** pour les bases, **1 jour** pour être à l'aise
 
 ---
 
-**Tu rédiges un README et t'as besoin d'aide ?** Mon [Markdown Preview](https://jchub.io/outils/markdown-preview) te montre le rendu en temps réel.
+**Tu rédiges un README et t'as besoin d'aide ?** Mon [Markdown Preview](https://jchub.dev/fr/outils/apercu-markdown) te montre le rendu en temps réel.
 
-Y'a 14 outils dev gratuits sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Y'a 14 outils dev gratuits sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

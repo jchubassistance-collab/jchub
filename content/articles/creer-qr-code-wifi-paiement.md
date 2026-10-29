@@ -60,8 +60,8 @@ VERSION:3.0
 FN:Jean Dupont
 ORG:JcHub
 TEL:+242069550625
-EMAIL:jean@jchub.io
-URL:https://jchub.io
+EMAIL:jean@jchub.dev
+URL:https://jchub.dev
 END:VCARD
 ```
 
@@ -105,7 +105,7 @@ DTSTART:20261225T190000Z
 DTEND:20261225T230000Z
 SUMMARY:Noël JcHub
 LOCATION:En ligne
-URL:https://jchub.io/noel
+URL:https://jchub.dev/noel
 END:VEVENT
 END:VCALENDAR
 ```
@@ -127,7 +127,7 @@ C'est utile pour les **cartes de visite offline** ou les **docs d'évacuation** 
 
 ### Outil en ligne (le plus rapide)
 
-J'ai un [QR Code Generator gratuit](https://jchub.io/outils/qr-code-generator) sur JcHub. Tu colles ton texte/URL, tu choisis la taille, tu télécharges en PNG.
+J'ai un [QR Code Generator gratuit](https://jchub.dev/fr/outils/generateur-de-qr-code) sur JcHub. Tu colles ton texte/URL, tu choisis la taille, tu télécharges en PNG.
 
 ### En JavaScript (pour ton app)
 
@@ -154,7 +154,7 @@ QRCode.toFile('qrcode.png', 'WIFI:T:WPA;S:JcHub-Guest;P:Welcome2026;;', {
 import qrcode
 
 qr = qrcode.QRCode(version=1, box_size=10, border=5)
-qr.add_data('https://jchub.io')
+qr.add_data('https://jchub.dev')
 qr.make(fit=True)
 img = qr.make_image(fill_color="black", back_color="white")
 img.save("qrcode.png")
@@ -188,10 +188,10 @@ Services dynamiques : bit.ly, qr-code-generator.com (version pro), CinetPay pour
 - **Format vCard** : `BEGIN:VCARD...END:VCARD`
 - **Mobile money** : USSD pré-rempli ou CinetPay
 - **Limites** : 3000 chars max, 2cm de large minimum
-- **Outil gratuit** : [jchub.io/outils/qr-code-generator](https://jchub.io/outils/qr-code-generator)
+- **Outil gratuit** : [jchub.dev/fr/outils/generateur-de-qr-code](https://jchub.dev/fr/outils/generateur-de-qr-code)
 
 ---
 
-**Tu codes une feature de partage et t'as besoin de QR codes dynamiques ?** Mon [QR Code Generator](https://jchub.io/outils/qr-code-generator) te sort un PNG prêt à utiliser en 1 clic.
+**Tu codes une feature de partage et t'as besoin de QR codes dynamiques ?** Mon [QR Code Generator](https://jchub.dev/fr/outils/generateur-de-qr-code) te sort un PNG prêt à utiliser en 1 clic.
 
-Y'a 14 outils dev gratuits sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Y'a 14 outils dev gratuits sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

@@ -51,7 +51,7 @@ Les cas où t'as besoin de "regarder à l'intérieur" d'un JWT :
 
 ### Méthode 1 : Avec un outil en ligne (la plus rapide)
 
-1. Va sur [https://jchub.io/outils/jwt-decoder](https://jchub.io/outils/jwt-decoder)
+1. Va sur [https://jchub.dev/fr/outils/decodeur-jwt](https://jchub.dev/fr/outils/decodeur-jwt)
 2. Colle ton token dans le champ
 3. L'outil te montre instantanément :
    - Le **header** en JSON formaté
@@ -123,10 +123,10 @@ Pour les données sensibles, utilise plutôt un **token chiffré** (JWE) ou gard
 
 Décoder un JWT, c'est pas sorcier. C'est juste du Base64 + du JSON. Mais avoir un outil qui te montre tout ça bien formaté, avec l'indicateur d'expiration, ça te sauve 10 minutes de debug à chaque fois.
 
-👉 **Essaie gratuitement** : [https://jchub.io/outils/jwt-decoder](https://jchub.io/outils/jwt-decoder)
+👉 **Essaie gratuitement** : [https://jchub.dev/fr/outils/decodeur-jwt](https://jchub.dev/fr/outils/decodeur-jwt)
 
 **Tu copies ton token, tu colles, tu as ta réponse.** C'est tout.
 
 ---
 
-**Tu veux d'autres outils dev gratuits ?** JcHub propose 14 outils (JWT, hash, timestamp, API tester, regex, color, QR code, etc.). Tous gratuits, tous en ligne, zéro install. → [Découvrir tous les outils](https://jchub.io/outils)
+**Tu veux d'autres outils dev gratuits ?** JcHub propose 14 outils (JWT, hash, timestamp, regex, color, QR code, etc.). Tous gratuits, tous en ligne, zéro install. → [Découvrir tous les outils](https://jchub.dev/fr/outils)

@@ -65,7 +65,7 @@ The only password you need to know by heart: your Bitwarden one. It must be **ve
 CorrectHorseBatteryStaple42!
 ```
 
-Or use my [password generator](https://jchub.io/outils/generateur-mot-de-passe) on JcHub. Generate 24+ characters, copy it into Bitwarden, forget it.
+Or use my [password generator](https://jchub.dev/en/tools/password-generator) on JcHub. Generate 24+ characters, copy it into Bitwarden, forget it.
 
 ### 3. **2FA wherever possible**
 
@@ -83,7 +83,7 @@ Or use my [password generator](https://jchub.io/outils/generateur-mot-de-passe) 
 
 ### Online tool (the fastest)
 
-My [Password Generator](https://jchub.io/outils/generateur-mot-de-passe) on JcHub. You choose:
+My [Password Generator](https://jchub.dev/en/tools/password-generator) on JcHub. You choose:
 - The length (16+ recommended)
 - Whether you want capital letters
 - Whether you want numbers
@@ -182,10 +182,10 @@ If you're a dev, you have **API keys**, **JWT tokens** and **database passwords*
 - **Manager**: Bitwarden (free, open source)
 - **2FA**: wherever possible, app > SMS
 - **No real security answers**: generate random answers
-- **Free generator**: [jchub.io/outils/generateur-mot-de-passe](https://jchub.io/outils/generateur-mot-de-passe)
+- **Free generator**: [jchub.dev/en/tools/password-generator](https://jchub.dev/en/tools/password-generator)
 
 ---
 
-**Want to check whether your current passwords are strong?** My [Password Generator](https://jchub.io/outils/generateur-mot-de-passe) includes a real-time strength indicator.
+**Want to check whether your current passwords are strong?** My [Password Generator](https://jchub.dev/en/tools/password-generator) includes a real-time strength indicator.
 
-There are 14 free dev tools on JcHub → [jchub.io/outils](https://jchub.io/outils)
+There are 14 free dev tools on JcHub → [jchub.dev/en/tools](https://jchub.dev/en/tools)

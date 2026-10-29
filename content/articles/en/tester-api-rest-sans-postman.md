@@ -23,7 +23,7 @@ I've been using Postman since 2017. But in 2024, I decided to stop. Why?
 - The Electron app that eats 1.5 GB of RAM
 - Premium features hidden behind a paywall
 
-I looked for an alternative. I found 3 that are worth it. And I built one too (more on that below).
+I looked for an alternative. I found 3 that are worth it, plus a tool you already have on your machine.
 
 ## The 3 alternatives to Postman in 2026
 
@@ -42,7 +42,7 @@ I looked for an alternative. I found 3 that are worth it. And I built one too (m
 - ✅ Open source
 - ✅ Self-hostable
 - ❌ Somewhat cluttered UI
-- ❌ No native code generation
+- ✅ Generates the code of your request (cURL, fetch, axios, Python…)
 
 **For whom**: devs who want something web-based, free and open source.
 
@@ -51,26 +51,25 @@ I looked for an alternative. I found 3 that are worth it. And I built one too (m
 - ✅ Open source
 - ✅ Stores requests as `.bru` files in your repo
 - ✅ Versioned with Git (no more lost collections)
-- ❌ CLI-only at first, the desktop app is young
+- ❌ A desktop app to install
 
 **For whom**: teams that want to version their API requests alongside the code.
 
-## And my tool: JcHub API Tester
+## The bonus: curl, already installed
 
-I built a 100% free HTTP client that runs in the browser. No install, no account, no ads.
+Before installing anything, look at your terminal. `curl` ships with macOS, Linux and Windows 10/11.
 
-**[JcHub API Tester](https://jchub.io/outils/api-tester)**
+```bash
+curl -i https://jsonplaceholder.typicode.com/todos/1
+```
 
-Why I use it every day:
+- ✅ Nothing to install, no account
+- ✅ No CORS issue: the request doesn't come from a browser
+- ❌ Less comfortable for large JSON bodies
 
-- **29 KB** vs 200 MB for Postman
-- **No install**: open the tab and it's ready
-- **No account**: everything stays in localStorage
-- **Code generation**: cURL, fetch, axios, Python requests
-- **History**: the last 20 requests
-- **Saving**: my favorite requests stay put
+**For whom**: quick tests and scripts.
 
-**Known limit**: CORS can block some requests from the browser. To get around it, use a Chrome "Allow CORS" extension (at your own risk).
+**Known limit of web tools**: CORS can block some requests sent from the browser. Hoppscotch offers an extension and a proxy to get around it. Otherwise, fall back on curl.
 
 ## How to test an API in 5 steps
 
@@ -135,7 +134,7 @@ You get:
 You get a 401 on your protected endpoint. Here's how to diagnose it:
 
 1. **Check your `Authorization` header**: is the token actually there?
-2. **Decode your JWT**: has it expired? → [JWT Decoder](https://jchub.io/outils/jwt-decoder)
+2. **Decode your JWT**: has it expired? → [JWT Decoder](https://jchub.dev/en/tools/jwt-decoder)
 3. **Check the scheme**: `Bearer` or `Basic`? What does the backend expect?
 4. **Test with curl**: `curl -H "Authorization: Bearer xxx" https://api.com/me`
 5. **Look at the server logs**: there's often more info on the backend side
@@ -143,7 +142,7 @@ You get a 401 on your protected endpoint. Here's how to diagnose it:
 ## The workflow I use every day
 
 ```
-1. Test locally with my API Tester
+1. Test locally with Hoppscotch (or curl)
 2. Check the status, the body, the headers
 3. Copy the generated code (fetch, axios, cURL)
 4. Paste it into my production code
@@ -155,7 +154,7 @@ You get a 401 on your protected endpoint. Here's how to diagnose it:
 
 ## The feature that changes everything: code generation
 
-You make a POST request with a JSON body and an Authorization header, then click "Code". The tool gives you:
+You make a POST request with a JSON body and an Authorization header. Hoppscotch, Insomnia and Bruno can all generate the matching code:
 
 ```javascript
 // fetch
@@ -192,15 +191,15 @@ Copy it, paste it into your project, and you're done. No guessing the syntax.
 
 ## TL;DR
 
-- **3 alternatives to Postman**: Insomnia (native), Hoppscotch (web), Bruno (CLI + files)
-- **My free tool**: [jchub.io/outils/api-tester](https://jchub.io/outils/api-tester) (29 KB, in the browser)
+- **3 alternatives to Postman**: Insomnia (native), Hoppscotch (web), Bruno (requests as files)
+- **Nothing to install**: curl, right in your terminal
 - **HTTP codes**: 2xx = OK, 4xx = you messed up, 5xx = the server messed up
 - **Code generation**: copy-paste straight into your project
 - **For CORS**: generate the cURL and test in the terminal
 
 ---
 
-**Want to try it?** Go to [JcHub API Tester](https://jchub.io/outils/api-tester), paste any URL, and see.
+**Getting a 401?** Paste your token into my [JWT decoder](https://jchub.dev/en/tools/jwt-decoder) to see whether it has expired.
 
-There are also 13 other free dev tools on JcHub → [jchub.io/outils](https://jchub.io/outils)
+There are more free dev tools on JcHub → [jchub.dev/en/tools](https://jchub.dev/en/tools)
 

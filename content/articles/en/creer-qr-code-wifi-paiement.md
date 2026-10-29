@@ -54,8 +54,8 @@ VERSION:3.0
 FN:Jean Dupont
 ORG:JcHub
 TEL:+242069550625
-EMAIL:jean@jchub.io
-URL:https://jchub.io
+EMAIL:jean@jchub.dev
+URL:https://jchub.dev
 END:VCARD
 ```
 
@@ -99,7 +99,7 @@ DTSTART:20261225T190000Z
 DTEND:20261225T230000Z
 SUMMARY:Noël JcHub
 LOCATION:En ligne
-URL:https://jchub.io/noel
+URL:https://jchub.dev/noel
 END:VEVENT
 END:VCALENDAR
 ```
@@ -121,7 +121,7 @@ It's useful for **offline business cards** or **evacuation documents** (in case 
 
 ### Online tool (the fastest)
 
-I have a [free QR Code Generator](https://jchub.io/outils/qr-code-generator) on JcHub. Paste your text/URL, choose the size, and download it as a PNG.
+I have a [free QR Code Generator](https://jchub.dev/en/tools/qr-code-generator) on JcHub. Paste your text/URL, choose the size, and download it as a PNG.
 
 ### In JavaScript (for your app)
 
@@ -148,7 +148,7 @@ QRCode.toFile('qrcode.png', 'WIFI:T:WPA;S:JcHub-Guest;P:Welcome2026;;', {
 import qrcode
 
 qr = qrcode.QRCode(version=1, box_size=10, border=5)
-qr.add_data('https://jchub.io')
+qr.add_data('https://jchub.dev')
 qr.make(fit=True)
 img = qr.make_image(fill_color="black", back_color="white")
 img.save("qrcode.png")
@@ -182,11 +182,11 @@ Dynamic services: bit.ly, qr-code-generator.com (pro version), CinetPay for paym
 - **vCard format**: `BEGIN:VCARD...END:VCARD`
 - **Mobile money**: pre-filled USSD or CinetPay
 - **Limits**: 3,000 chars max, at least 2 cm wide
-- **Free tool**: [jchub.io/outils/qr-code-generator](https://jchub.io/outils/qr-code-generator)
+- **Free tool**: [jchub.dev/en/tools/qr-code-generator](https://jchub.dev/en/tools/qr-code-generator)
 
 ---
 
-**Coding a sharing feature and need dynamic QR codes?** My [QR Code Generator](https://jchub.io/outils/qr-code-generator) gives you a ready-to-use PNG in 1 click.
+**Coding a sharing feature and need dynamic QR codes?** My [QR Code Generator](https://jchub.dev/en/tools/qr-code-generator) gives you a ready-to-use PNG in 1 click.
 
-There are 14 free dev tools on JcHub → [jchub.io/outils](https://jchub.io/outils)
+There are 14 free dev tools on JcHub → [jchub.dev/en/tools](https://jchub.dev/en/tools)
 

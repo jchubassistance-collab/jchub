@@ -54,7 +54,7 @@ id = str(uuid.uuid4())
 # "550e8400-e29b-41d4-a716-446655440000"
 
 // En ligne (mon outil)
-# https://jchub.io/outils/uuid-generator
+# https://jchub.dev/fr/outils/uuid-generator
 ```
 
 **Avantages** :
@@ -133,7 +133,7 @@ UUID v7 est presque aussi rapide que SERIAL, avec les avantages d'un UUID unique
 
 ### Outil en ligne (le plus rapide)
 
-J'ai un [UUID Generator gratuit](https://jchub.io/outils/uuid-generator) sur JcHub. Tu cliques, t'as un UUID v4. Besoin de plusieurs ? Tu peux en générer par lot.
+J'ai un [UUID Generator gratuit](https://jchub.dev/fr/outils/uuid-generator) sur JcHub. Tu cliques, t'as un UUID v4. Besoin de plusieurs ? Tu peux en générer par lot.
 
 ### En ligne de commande
 
@@ -213,10 +213,10 @@ Si tu utilises v4 sur une grosse table, attends-toi à des problèmes de perform
 - **UUID v7** = tri naturel, best en 2026, presque aussi rapide qu'un INT
 - **Stocke en binaire** (16 bytes) pas en string
 - **Pour nouvelle table** : utilise v7, c'est le futur
-- **Outil gratuit** : [jchub.io/outils/uuid-generator](https://jchub.io/outils/uuid-generator)
+- **Outil gratuit** : [jchub.dev/fr/outils/uuid-generator](https://jchub.dev/fr/outils/uuid-generator)
 
 ---
 
-**Tu codes un nouveau projet et t'hésites sur le type d'ID ?** V7, sans hésiter. Mon [UUID Generator](https://jchub.io/outils/uuid-generator) te permet de tester les deux formats.
+**Tu codes un nouveau projet et t'hésites sur le type d'ID ?** V7, sans hésiter. Mon [UUID Generator](https://jchub.dev/fr/outils/uuid-generator) te permet de tester les deux formats.
 
-Y'a 14 outils dev gratuits sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Y'a 14 outils dev gratuits sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

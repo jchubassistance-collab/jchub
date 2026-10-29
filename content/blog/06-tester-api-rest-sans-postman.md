@@ -54,7 +54,7 @@ J'ai cherché une alternative. J'en ai trouvé 3 qui valent le coup. Et j'en ai 
 
 J'ai construit un client HTTP 100% gratuit dans le navigateur. Pas d'install, pas de compte, pas de pub.
 
-**[JcHub API Tester](https://jchub.io/outils/api-tester)**
+**[JcHub API Tester](https://jchub.dev/fr/outils/api-tester)**
 
 Pourquoi je l'utilise au quotidien :
 
@@ -130,7 +130,7 @@ Tu reçois :
 Tu reçois un 401 sur ton endpoint protégé. Voici comment diagnostiquer :
 
 1. **Vérifie ton header** `Authorization` : est-ce que le token est bien là ?
-2. **Décode ton JWT** : est-ce qu'il est expiré ? → [JWT Decoder](https://jchub.io/outils/jwt-decoder)
+2. **Décode ton JWT** : est-ce qu'il est expiré ? → [JWT Decoder](https://jchub.dev/fr/outils/decodeur-jwt)
 3. **Vérifie l'algo** : `Bearer` ou `Basic` ? Le backend attend quoi ?
 4. **Teste avec curl** : `curl -H "Authorization: Bearer xxx" https://api.com/me`
 5. **Regarde les logs serveur** : souvent y'a plus d'info côté backend
@@ -188,13 +188,13 @@ Tu copies, tu colles dans ton projet, c'est prêt. Pas de guessing sur la syntax
 ## TL;DR
 
 - **3 alternatives à Postman** : Insomnia (natif), Hoppscotch (web), Bruno (CLI + files)
-- **Mon outil gratuit** : [jchub.io/outils/api-tester](https://jchub.io/outils/api-tester) (29 KB, dans le navigateur)
+- **Mon outil gratuit** : [jchub.dev/fr/outils/api-tester](https://jchub.dev/fr/outils/api-tester) (29 KB, dans le navigateur)
 - **Codes HTTP** : 2xx = OK, 4xx = t'as merdé, 5xx = serveur a merdé
 - **Génération de code** : copy-paste direct dans ton projet
 - **Pour CORS** : génère le cURL et teste en terminal
 
 ---
 
-**Tu veux essayer ?** Va sur [JcHub API Tester](https://jchub.io/outils/api-tester), colle n'importe quelle URL, et regarde.
+**Tu veux essayer ?** Va sur [JcHub API Tester](https://jchub.dev/fr/outils/api-tester), colle n'importe quelle URL, et regarde.
 
-Y'a aussi 13 autres outils dev gratuits sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Y'a aussi 13 autres outils dev gratuits sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

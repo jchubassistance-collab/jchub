@@ -84,7 +84,7 @@ Argon2 a gagné le Password Hashing Competition en 2015. C'est l'état de l'art 
 
 Si t'as un vieux projet et tu veux savoir si tes hashs sont costauds, colle-les dans mon outil gratuit :
 
-👉 [JcHub Hash Generator](https://jchub.io/outils/hash-generator)
+👉 [JcHub Hash Generator](https://jchub.dev/fr/outils/generateur-de-hash)
 
 Tu peux hasher une string en MD5, SHA-1, SHA-256 ou SHA-512 et comparer. C'est utile pour :
 - Vérifier qu'un hash correspond à un password (tests unitaires)
@@ -116,6 +116,6 @@ Depuis, je fais toujours :
 
 ---
 
-**Tu veux tester ?** Hash n'importe quoi en MD5, SHA-1, SHA-256 ou SHA-512 ici : [Hash Generator gratuit](https://jchub.io/outils/hash-generator)
+**Tu veux tester ?** Hash n'importe quoi en MD5, SHA-1, SHA-256 ou SHA-512 ici : [Hash Generator gratuit](https://jchub.dev/fr/outils/generateur-de-hash)
 
-Et si t'as d'autres questions sécurité, j'ai 14 outils dev gratuits sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Et si t'as d'autres questions sécurité, j'ai 14 outils dev gratuits sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

@@ -10,7 +10,7 @@ import { downloadName } from '@/lib/download-name';
 const strings = bilingual({
   failed: 'Impossible de générer ce QR code. Vérifie le contenu saisi.',
   input: 'Texte ou URL à encoder',
-  placeholder: 'https://jchub.io ou un texte...',
+  placeholder: 'https://jchub.dev ou un texte...',
   characters: (count: number) => `${count} caractères`,
   copied: 'Copié !',
   copyText: 'Copier le texte',
@@ -22,7 +22,7 @@ const strings = bilingual({
 }, {
   failed: 'Could not generate this QR code. Check the content you entered.',
   input: 'Text or URL to encode',
-  placeholder: 'https://jchub.io or some text...',
+  placeholder: 'https://jchub.dev or some text...',
   characters: (count: number) => `${count} characters`,
   copied: 'Copied!',
   copyText: 'Copy the text',

@@ -27,7 +27,7 @@ It's the format most backends use because it's simple to store (a number, not a 
 
 ### Method 1: Online tool (the fastest)
 
-Go to the [JcHub Timestamp Converter](https://jchub.io/outils/timestamp-converter), paste your number, and you get the conversion as:
+Go to the [JcHub Timestamp Converter](https://jchub.dev/en/tools/timestamp-converter), paste your number, and you get the conversion as:
 
 - **Local date** (based on your time zone)
 - **UTC date** (universal time)
@@ -129,11 +129,11 @@ That's why databases (PostgreSQL, MySQL, MongoDB) often store dates as timestamp
 - To convert: `new Date(timestamp * 1000)` in JS
 - Multiply by 1000 in JS (ms), not in Python
 - Always UTC, local conversion on the frontend
-- Quick tool: [jchub.io/outils/timestamp-converter](https://jchub.io/outils/timestamp-converter)
+- Quick tool: [jchub.dev/en/tools/timestamp-converter](https://jchub.dev/en/tools/timestamp-converter)
 
 ---
 
-**Working on an API and need to test your dates?** I also have a [free API Tester](https://jchub.io/outils/api-tester) to send your HTTP requests without Postman.
+**Working on an API and your dates come inside a JWT?** My free [JWT decoder](https://jchub.dev/en/tools/jwt-decoder) shows what the token contains, `exp` and `iat` included.
 
-And if you have other dev questions, I have 14 free online tools on JcHub → [jchub.io/outils](https://jchub.io/outils)
+And if you have other dev questions, I have 14 free online tools on JcHub → [jchub.dev/en/tools](https://jchub.dev/en/tools)
 

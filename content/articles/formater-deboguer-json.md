@@ -118,7 +118,7 @@ curl -s https://api.github.com/users/jchub | jq '.name, .bio, .public_repos'
 
 ### 4. **Outil en ligne (pour les non-devs ou en rush)**
 
-J'ai un [JSON Formatter gratuit](https://jchub.io/outils/json-formatter) sur JcHub. Tu colles, tu cliques, t'as la version formatée. Bonus : il te dit si ton JSON est valide (parsing errors).
+J'ai un [JSON Formatter gratuit](https://jchub.dev/fr/outils/json-formatter) sur JcHub. Tu colles, tu cliques, t'as la version formatée. Bonus : il te dit si ton JSON est valide (parsing errors).
 
 ## Comment débugger du JSON invalide
 
@@ -200,7 +200,6 @@ Si tu bosses avec une API qui renvoie du JSON complexe, **génère un schéma JS
 Ensuite, valide ton JSON contre le schéma. Si l'API change et renvoie un truc inattendu, tu le sauras tout de suite.
 
 Outils pour générer un schéma depuis un JSON :
-- [jsonschema.net](https://www.jsonschema.net/)
 - VS Code avec l'extension "JSON to JSON Schema"
 
 ## Le workflow que j'utilise
@@ -222,11 +221,11 @@ Si le JSON est récurrent, je génère un JSON Schema et je l'utilise pour valid
 - **VS Code** : Shift+Alt+F pour formatter
 - **Chrome console** : `JSON.stringify(JSON.parse(data), null, 2)`
 - **jq** en CLI pour les filtres avancés
-- **Outil rapide** : [jchub.io/outils/json-formatter](https://jchub.io/outils/json-formatter)
+- **Outil rapide** : [jchub.dev/fr/outils/json-formatter](https://jchub.dev/fr/outils/json-formatter)
 - **5 erreurs courantes** : virgule en trop, guillemets manquants, apostrophes, commentaires, échappement
 
 ---
 
-**Tu bosses sur une API et t'as besoin de tester rapidement ?** Mon [API Tester](https://jchub.io/outils/api-tester) formate les réponses JSON automatiquement. Combiné avec le JSON Formatter, t'es tranquille.
+**Tu bosses sur une API qui renvoie des tokens ?** Mon [décodeur JWT](https://jchub.dev/fr/outils/decodeur-jwt) te montre leur contenu en un clic. Combiné avec le JSON Formatter, t'es tranquille.
 
-Y'a 14 outils dev gratuits sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Y'a 14 outils dev gratuits sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

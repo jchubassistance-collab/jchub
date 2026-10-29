@@ -75,14 +75,14 @@ const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/;
 const urlRegexStrict = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/;
 ```
 
-✅ Accepts: `https://jchub.io`, `http://example.com/path?query=1#hash`
+✅ Accepts: `https://jchub.dev`, `http://example.com/path?query=1#hash`
 ❌ Rejects: `ftp://...`, `not a url`
 
 **Even better**: use `new URL()` in JavaScript, it's native and safer.
 
 ```javascript
 try {
-  new URL("https://jchub.io");
+  new URL("https://jchub.dev");
   // It's valid
 } catch {
   // Not valid
@@ -136,7 +136,7 @@ Up-to-date list: [github.com/disposable-email-domains](https://github.com/dispos
 
 ## How to test your regexes
 
-My free tool: [Regex Tester](https://jchub.io/outils/regex-tester). Paste your regex and your test text, and it tells you in real time:
+My free tool: [Regex Tester](https://jchub.dev/en/tools/regex-tester). Paste your regex and your test text, and it tells you in real time:
 - Whether it matches
 - The captured groups
 - The positions of the matches
@@ -149,11 +149,11 @@ Really handy to debug a regex that doesn't work.
 - **5 useful patterns**: basic email, strict email, phone, URL, password
 - **Normalize**: trim + lowercase
 - **Block disposable emails** if needed
-- **Test with**: [jchub.io/outils/regex-tester](https://jchub.io/outils/regex-tester)
+- **Test with**: [jchub.dev/en/tools/regex-tester](https://jchub.dev/en/tools/regex-tester)
 - **Prefer `new URL()`** over a regex for URLs
 
 ---
 
-**Coding a sign-up form and need help?** My [Regex Tester](https://jchub.io/outils/regex-tester) lets you test your patterns in real time.
+**Coding a sign-up form and need help?** My [Regex Tester](https://jchub.dev/en/tools/regex-tester) lets you test your patterns in real time.
 
-There are 14 free dev tools on JcHub → [jchub.io/outils](https://jchub.io/outils)
+There are 14 free dev tools on JcHub → [jchub.dev/en/tools](https://jchub.dev/en/tools)
