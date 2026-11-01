@@ -271,7 +271,8 @@ export async function generateConfiguredText(prompt: string): Promise<{ text: st
       return { text: await generateWithProvider(candidate, prompt), provider: candidate };
     } catch (error) {
       lastError = error;
-      if (candidate !== candidates[candidates.length - 1]) reportUserError();
+      // Says which provider failed, so a wrong key or an exhausted quota shows in the logs.
+      if (candidate !== candidates[candidates.length - 1]) reportUserError(error, { action: `Génération IA via ${candidate}, essai du fournisseur suivant` });
     }
   }
   throw lastError instanceof Error ? lastError : new Error('Aucun fournisseur IA disponible.');
