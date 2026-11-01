@@ -2,7 +2,7 @@ import type { Tool } from '@/lib/tools';
 
 // French and English function words and request phrasing: they say nothing about the tool
 // wanted, and short ones such as "de" used to match multi-word tags like "mot de passe".
-const STOP_WORDS = new Set([
+export const STOP_WORDS = new Set([
   'au', 'aux', 'avec', 'ce', 'ces', 'cet', 'cette', 'dans', 'de', 'des', 'du', 'en', 'et', 'la', 'le', 'les', 'leur', 'leurs',
   'ma', 'mais', 'me', 'mes', 'moi', 'mon', 'ne', 'nos', 'notre', 'nous', 'ou', 'par', 'pas', 'pour', 'qu', 'que', 'qui', 'quoi',
   'quel', 'quelle', 'quels', 'quelles', 'quand', 'sa', 'sans', 'se', 'ses', 'si', 'son', 'sur', 'ta', 'te', 'tes', 'toi', 'ton',

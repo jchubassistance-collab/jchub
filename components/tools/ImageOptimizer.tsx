@@ -142,7 +142,7 @@ export function ImageOptimizer() {
   return <div className="space-y-5 text-slate-700">
     <div className="rounded-xl border-2 border-dashed border-slate-300 bg-white p-6 text-center sm:py-8">
       <input ref={inputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" className="hidden" onChange={addFiles} />
-      <button type="button" onClick={() => inputRef.current?.click()} disabled={busy || images.length >= MAX_FILES} className="mx-auto flex items-center gap-3 rounded-xl border border-slate-300 bg-white px-5 py-3.5 text-lg font-medium text-slate-900 transition hover:border-slate-400 disabled:opacity-50"><UploadCloud className="h-5 w-5" /> {t.add}</button>
+      <button type="button" onClick={() => inputRef.current?.click()} disabled={busy || images.length >= MAX_FILES} className="btn-upload mx-auto flex items-center gap-3 rounded-xl px-5 py-3.5 text-lg"><UploadCloud className="h-5 w-5" /> {t.add}</button>
       <p className="mt-3 text-sm text-slate-500">{t.limits(MAX_FILES)}</p>
     </div>
 
@@ -150,7 +150,7 @@ export function ImageOptimizer() {
       {images.map(({ id, file, result, keptOriginal, error: imageError }) => <li key={id} className="flex flex-wrap items-center gap-3 rounded-lg bg-slate-50 p-3">
         <FileImage className="h-5 w-5 shrink-0 text-slate-500" />
         <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium text-slate-900">{file.name}</span><span className="text-xs text-slate-500">{formatBytes(file.size, locale)}{result ? ` → ${formatBytes(result.size, locale)} (${result.size <= file.size ? t.saved(Math.round((1 - result.size / file.size) * 100)) : t.heavier(Math.round((result.size / file.size - 1) * 100))})` : ''}</span>{keptOriginal && <span className="mt-1 block text-xs text-amber-700">{t.keptOriginal}</span>}{imageError && <span role="alert" className="mt-1 block text-xs text-rose-700">{imageError}</span>}</span>
-        {result && <button type="button" onClick={() => downloadImage(file, result)} className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-50"><Download className="h-4 w-4" /> {t.download}</button>}
+        {result && <button type="button" onClick={() => downloadImage(file, result)} className="btn-download inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs"><Download className="h-4 w-4" /> {t.download}</button>}
         <button type="button" onClick={() => removeImage(id)} disabled={busy} aria-label={t.remove(file.name)} className="rounded-lg p-2 text-slate-500 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>
       </li>)}
     </ol>}

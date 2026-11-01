@@ -13,7 +13,16 @@ keywords:
   - ascii table
   - base 2 8 16
 author: Jessy Ngnambongo
-image: /blog/13-binaire-octal-hex-guide.svg
+image: /blog/covers/binaire-octal-hex-guide.jpg
+photo:
+  id: "iar-afB0QQw"
+  url: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMGRpZ2l0cyUyMHNjcmVlbnxlbnwxfDB8fHwxNzkyOTIxODA4fDA&ixlib=rb-4.1.0"
+  thumb: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMGRpZ2l0cyUyMHNjcmVlbnxlbnwxfDB8fHwxNzkyOTIxODA4fDA&ixlib=rb-4.1.0&q=80&w=400"
+  alt: "Matrix movie still"
+  author: "Markus Spiske"
+  authorUrl: "https://unsplash.com/@markusspiske?utm_source=jchub&utm_medium=referral"
+  pageUrl: "https://unsplash.com/photos/matrix-movie-still-iar-afB0QQw?utm_source=jchub&utm_medium=referral"
+  downloadLocation: "https://api.unsplash.com/photos/iar-afB0QQw/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMGRpZ2l0cyUyMHNjcmVlbnxlbnwxfDB8fHwxNzkyOTIxODA4fDA"
 readTime: 4 min
 status: scheduled
 scheduledFor: '2026-10-20T22:05:20.235Z'

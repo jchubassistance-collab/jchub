@@ -97,7 +97,7 @@ export function ToolsCatalog({ tools, initialQuery = '', showCategories = true }
           <input value={query} onChange={(event) => updateQuery(event.target.value)} placeholder={t.searchPlaceholder} className="w-full rounded-full border border-blue-100 bg-[#f8fbff] py-3 pl-11 pr-10 text-sm text-[#0f172a] outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:ring-2 focus:ring-blue-100" aria-label={t.searchLabel} />
           {query && <button type="button" onClick={() => updateQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-700" aria-label={t.clearSearch}><X className="h-4 w-4" /></button>}
         </label>
-        {showCategories && <div className="flex min-w-0 items-center gap-2 pb-1 sm:max-w-xl sm:justify-end sm:pb-0" aria-label={t.filterLabel}>
+        {showCategories && <div className="flex min-w-0 items-center gap-2 pb-1 sm:max-w-xl sm:justify-end sm:pb-0" role="group" aria-label={t.filterLabel}>
           <button type="button" onClick={() => chooseCategory(ALL)} className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-bold transition ${category === ALL ? 'border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'border-blue-100 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800'}`}>{t.all}</button>
           <div className="tools-category-scroll flex min-w-0 gap-2 overflow-x-auto">
             {categories.filter((item) => item !== ALL).map((item) => <button key={item} type="button" onClick={() => chooseCategory(item)} className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-bold transition ${category === item ? 'border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'border-blue-100 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800'}`}>{item}</button>)}
@@ -114,7 +114,7 @@ export function ToolsCatalog({ tools, initialQuery = '', showCategories = true }
           {visibleTools.map((tool, index) => (
             <Link key={tool.slug} href={tool.href} onClick={() => trackEvent('tool_click', { tool: tool.slug, category: tool.category })} style={{ animationDelay: `${(index % STEP) * 55}ms` }} className="template-tools__card tool-card group flex min-h-[230px] flex-col rounded-[22px] border border-blue-100/80 bg-white p-6 shadow-[0_2px_6px_rgba(15,23,42,.04)] transition duration-300 hover:border-blue-200 hover:shadow-[0_25px_50px_rgba(37,99,235,.14)]">
               <div className="mb-5 flex items-start justify-between gap-3">
-                <span className="template-tools__icon grid h-14 w-14 place-items-center rounded-2xl bg-[#eff6ff] text-3xl text-blue-700 transition duration-300 group-hover:rotate-[-5deg] group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white" aria-label={tool.name}>{tool.icon}</span>
+                <span className="template-tools__icon grid h-14 w-14 place-items-center rounded-2xl bg-[#eff6ff] text-3xl text-blue-700 transition duration-300 group-hover:rotate-[-5deg] group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white" aria-hidden="true">{tool.icon}</span>
                 <span className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-800">{tool.category}</span>
               </div>
               <h2 className="mb-2 text-base font-bold leading-snug text-[#0f172a] transition-colors group-hover:text-blue-700">{tool.name}</h2>

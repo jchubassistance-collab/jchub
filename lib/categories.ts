@@ -16,6 +16,7 @@ const CATEGORY_LABELS_EN: Record<string, string> = {
   'Base de données': 'Database',
   Produit: 'Product',
   Numérique: 'Digital',
+  Réseau: 'Networking',
 };
 
 export function categoryLabel(category: string, locale: Locale): string {

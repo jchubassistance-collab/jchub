@@ -7,9 +7,10 @@ import { articleCoverPath } from '@/lib/article-cover';
 import { addCoverPhoto } from '@/lib/article-photo';
 import { refreshArticle } from '@/lib/article-repository';
 import { hasFirebaseAdminConfig } from '@/lib/firebase-admin';
+import { revalidateBlog } from '@/lib/live-articles';
 import { enforceRateLimit } from '@/lib/rate-limit';
 import { ownedArticle, slugTaken, toWriterArticle, uniqueSlug, viewsBySlug, writerError } from '@/lib/writer-articles';
-import { parseKeywords, publicationChecks, readTime, slugify, WRITER_CATEGORIES, WRITER_EDITABLE_STATUSES, WRITER_LIMITS } from '@/lib/writer-rules';
+import { parseKeywords, publicationChecks, readTime, slugify, WRITER_EDITABLE_STATUSES, WRITER_LIMITS } from '@/lib/writer-rules';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -18,7 +19,7 @@ const updateSchema = z.object({
   title: z.string().trim().min(1).max(WRITER_LIMITS.title).optional(),
   description: z.string().trim().max(WRITER_LIMITS.description).optional(),
   content: z.string().max(WRITER_LIMITS.content).optional(),
-  category: z.enum(WRITER_CATEGORIES).optional(),
+  category: z.string().trim().min(1).max(WRITER_LIMITS.category).optional(),
   keywords: z.array(z.string().max(WRITER_LIMITS.keyword)).max(WRITER_LIMITS.keywords).optional(),
   slug: z.string().trim().min(1).max(WRITER_LIMITS.slug).optional(),
   plannedFor: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
@@ -109,6 +110,8 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     await reference.update(update);
 
     if (wasPublished || publishing) {
+      // Online at once; the cover photo and the English version follow and refresh it again.
+      revalidateBlog();
       after(async () => {
         if (publishing) await addCoverPhoto(reference);
         await refreshArticle(id, { translate: true });

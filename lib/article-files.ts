@@ -23,7 +23,7 @@ export function articlePathOnDisk(file: string = ARTICLES_DIRECTORY): string {
 }
 
 /** Fields of the French document written to the file, in this order. */
-const FRENCH_FIELDS = ['slug', 'title', 'description', 'excerpt', 'category', 'keywords', 'tags', 'author', 'image', 'readTime', 'status', 'publishedAt', 'scheduledFor', 'updatedAt'] as const;
+const FRENCH_FIELDS = ['slug', 'title', 'description', 'excerpt', 'category', 'keywords', 'tags', 'author', 'image', 'photo', 'readTime', 'status', 'publishedAt', 'scheduledFor', 'updatedAt'] as const;
 const ENGLISH_FIELDS = ['slug', 'title', 'description', 'excerpt', 'keywords', 'sourceHash', 'translatedAt'] as const;
 const DATE_FIELDS = new Set(['publishedAt', 'scheduledFor', 'updatedAt', 'translatedAt']);
 

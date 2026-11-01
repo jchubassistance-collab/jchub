@@ -19,7 +19,7 @@ const copy = bilingual({
   seeAll: 'Voir tous les outils',
   suggest: 'Suggérer un outil',
   perks: ['Résultats immédiats', 'Traitement privé', 'Accès gratuit'],
-  imageAlt: 'Composants électroniques représentant les outils numériques',
+  imageAlt: 'Illustration d’un ordinateur avec un classeur',
   badgeInstant: 'Instantané',
   badgeNoWait: 'Sans attente',
   badgeSecure: 'Sécurisé',
@@ -54,7 +54,7 @@ const copy = bilingual({
   seeAll: 'See all the tools',
   suggest: 'Suggest a tool',
   perks: ['Instant results', 'Private processing', 'Free access'],
-  imageAlt: 'Electronic components representing digital tools',
+  imageAlt: 'Illustration of a computer and filing cabinet',
   badgeInstant: 'Instant',
   badgeNoWait: 'No waiting',
   badgeSecure: 'Secure',
@@ -127,7 +127,7 @@ export default async function ToolsPage({ params, searchParams }: { params: Prom
             <div className="template-tools__cube template-tools__cube--one" aria-hidden="true">{Array.from({ length: 6 }, (_, index) => <span key={index} />)}</div>
             <div className="template-tools__cube template-tools__cube--two" aria-hidden="true">{Array.from({ length: 6 }, (_, index) => <span key={index} />)}</div>
             <div className="template-home__circle relative aspect-square w-[min(82vw,340px)] rounded-full bg-gradient-to-br from-[#dbeafe] to-[#bfdbfe] p-[18px] shadow-[40px_40px_80px_rgba(37,99,235,.2),-15px_-15px_40px_rgba(255,255,255,.9)] ring-1 ring-white/60 sm:w-[380px] lg:w-[440px]">
-              <div className="template-home__circle-image relative h-full w-full overflow-hidden rounded-full border-[10px] border-white bg-white shadow-inner"><img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&h=900&fit=crop" alt={t.imageAlt} className="absolute inset-0 h-full w-full object-cover" fetchPriority="high" /></div>
+              <div className="template-home__circle-image relative h-full w-full overflow-hidden rounded-full border-[10px] border-white bg-white shadow-inner"><img src="/hero.svg" alt={t.imageAlt} className="absolute inset-0 h-full w-full object-contain" fetchPriority="high" /></div>
               <div className="template-home__badge template-home__badge--bottom absolute -bottom-1 left-0 flex items-center gap-3 rounded-2xl border border-blue-100 bg-white px-4 py-3 shadow-[0_16px_35px_rgba(15,23,42,.12)] sm:-left-8"><span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-700"><Zap className="h-5 w-5" /></span><span><span className="block text-xs font-medium text-slate-500">{t.badgeInstant}</span><strong className="mt-0.5 block text-sm text-[#0f172a]">{t.badgeNoWait}</strong></span></div>
               <div className="template-home__badge template-home__badge--top absolute -right-1 top-7 hidden items-center gap-3 rounded-2xl border border-blue-100 bg-white px-4 py-3 shadow-[0_16px_35px_rgba(15,23,42,.12)] sm:flex"><span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-700"><ShieldCheck className="h-5 w-5" /></span><span><span className="block text-xs font-medium text-slate-500">{t.badgeSecure}</span><strong className="mt-0.5 block text-sm text-[#0f172a]">{t.badgeProtected}</strong></span></div>
             </div>

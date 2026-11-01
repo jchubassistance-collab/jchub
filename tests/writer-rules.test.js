@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isWriterCategory, parseKeywords, publicationChecks, readTime, slugify, wordCount, writingTips, MIN_PUBLISHED_WORDS } from '../lib/writer-rules.ts';
+import { categoryKey, isValidWriterCategory, normalizeCategory, isWriterCategory, parseKeywords, publicationChecks, readTime, slugify, wordCount, writingTips, MIN_PUBLISHED_WORDS, WRITER_LIMITS } from '../lib/writer-rules.ts';
 
 const words = (count) => Array.from({ length: count }, (_, index) => `mot${index}`).join(' ');
 const ready = { title: 'Installer Windows 11 sur un ancien PC', description: 'Le pas-à-pas pour installer Windows 11 sur un PC que Microsoft juge trop ancien, sans perdre tes fichiers ni tes logiciels.', content: `## Avant de commencer\n\n${words(MIN_PUBLISHED_WORDS)}`, category: 'Technologie' };
@@ -31,7 +31,8 @@ test('un article complet peut être publié', () => {
 
 test('il manque ce qui empêche la publication', () => {
   const missing = publicationChecks({ title: 'Court', description: 'Trop court', content: words(120), category: 'Windows' }).filter((check) => !check.ok).map((check) => check.id);
-  assert.deepEqual(missing, ['title', 'description', 'content', 'category']);
+  assert.deepEqual(missing, ['title', 'description', 'content']);
+  assert.deepEqual(publicationChecks({ ...ready, category: '  ' }).filter((check) => !check.ok).map((check) => check.id), ['category']);
   assert.match(publicationChecks({ ...ready, content: words(120) }).find((check) => check.id === 'content').label, /120 pour l’instant/);
 });
 
@@ -41,9 +42,28 @@ test('seules les catégories traduites sont proposées', () => {
   assert.ok(!isWriterCategory(undefined));
 });
 
+test('une catégorie personnalisée valide peut être publiée', () => {
+  assert.ok(isValidWriterCategory('Windows'));
+  assert.ok(!isValidWriterCategory('  '));
+  assert.ok(!isValidWriterCategory('x'.repeat(WRITER_LIMITS.category + 1)));
+  assert.ok(publicationChecks({ ...ready, category: 'Windows' }).every((check) => check.ok));
+});
+
 test('les conseils signalent un # de trop et l’absence de sous-titres', () => {
   assert.deepEqual(writingTips(ready), []);
   const tips = writingTips({ ...ready, content: `# Mon titre\n\n${words(20)}` });
   assert.ok(tips.some((tip) => tip.includes('##')));
   assert.ok(tips.some((tip) => tip.includes('pas #')));
+});
+
+test('Réseau fait partie des catégories de départ', () => {
+  assert.ok(isWriterCategory('Réseau'));
+});
+
+test('une catégorie ajoutée est nettoyée et reconnue quelle que soit son écriture', () => {
+  assert.equal(normalizeCategory('  intelligence   artificielle '), 'Intelligence artificielle');
+  assert.equal(normalizeCategory('é'.repeat(80)).length, WRITER_LIMITS.category);
+  assert.equal(categoryKey('reseau'), categoryKey('Réseau'));
+  assert.equal(categoryKey('Base de données'), 'base-de-donnees');
+  assert.equal(categoryKey(' !! '), '');
 });

@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ExternalLink, FileText, Loader2, MoreVertical, Trash2 } from 'lucide-react';
-import { cachedJson, fetchJson } from '@/lib/admin-cache';
-import type { WriterArticleSummary } from '@/lib/writer-rules';
+import { Check, ChevronDown, ExternalLink, FileText, Loader2, MoreVertical, Plus, Trash2 } from 'lucide-react';
+import { cachedJson, fetchJson, rememberJson } from '@/lib/admin-cache';
+import { categoryKey, normalizeCategory, WRITER_CATEGORIES, WRITER_LIMITS, type WriterArticleSummary } from '@/lib/writer-rules';
 import { publicSiteUrl } from '@/components/redaction/WriterShell';
 
 export type { WriterArticleSummary };
@@ -25,6 +25,78 @@ export function useWriterArticles() {
   }, []);
   useEffect(() => { void load(); }, [load]);
   return { articles, loaded, error, reload: load };
+}
+
+const CATEGORIES_URL = '/api/redaction/categories';
+
+/** Categories writers choose from, built-in and added ones; `add` stores a new one for every writer. */
+export function useWriterCategories() {
+  const [categories, setCategories] = useState<string[]>(() => cachedJson<{ categories?: string[] }>(CATEGORIES_URL)?.categories || [...WRITER_CATEGORIES]);
+  useEffect(() => {
+    fetchJson<{ categories?: string[] }>(CATEGORIES_URL).then((data) => { if (data.categories) setCategories(data.categories); }).catch(() => undefined);
+  }, []);
+  const add = useCallback(async (name: string) => {
+    const response = await fetch(CATEGORIES_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
+    const data = await response.json().catch(() => ({})) as { error?: string; name?: string; categories?: string[] };
+    if (!response.ok || !data.name || !data.categories) throw new Error(data.error || 'Ajout de la catégorie impossible.');
+    rememberJson(CATEGORIES_URL, { categories: data.categories });
+    setCategories(data.categories);
+    return data.name;
+  }, []);
+  return { categories, add };
+}
+
+/** Category picker: the list opens on click and narrows as the writer types; a new name can be added to everyone's list. */
+export function CategoryField({ id, value, onChange, disabled, className }: { id: string; value: string; onChange: (value: string) => void; disabled?: boolean; className: string }) {
+  const { categories, add } = useWriterCategories();
+  const [adding, setAdding] = useState(false);
+  const [error, setError] = useState('');
+  const [open, setOpen] = useState(false);
+  // What the writer typed since the list opened: an opened list shows every category.
+  const [query, setQuery] = useState('');
+  const [active, setActive] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const typed = normalizeCategory(value);
+  const isNew = typed.length >= 2 && !categories.some((category) => categoryKey(category) === categoryKey(typed));
+  const shown = query ? categories.filter((category) => categoryKey(category).includes(categoryKey(query))) : categories;
+  const show = (text: string) => { setQuery(text); setOpen(true); setActive(0); };
+  const pick = (category: string) => { setError(''); onChange(category); setOpen(false); };
+  const save = async () => {
+    setAdding(true); setError('');
+    try { onChange(await add(typed)); setOpen(false); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Ajout de la catégorie impossible.'); }
+    finally { setAdding(false); }
+  };
+  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (!open) { show(''); return; }
+      const step = event.key === 'ArrowDown' ? 1 : -1;
+      setActive((current) => (current + step + shown.length) % Math.max(shown.length, 1));
+    } else if (event.key === 'Enter' && open && shown[active]) {
+      event.preventDefault(); pick(shown[active]);
+    } else if (event.key === 'Escape') setOpen(false);
+  };
+  return <>
+    <span className="relative block">
+      <input
+        ref={inputRef} id={id} value={value} disabled={disabled} autoComplete="off"
+        role="combobox" aria-expanded={open} aria-controls={`${id}-list`} aria-autocomplete="list"
+        onFocus={() => show('')} onClick={() => !open && show('')} onBlur={() => setOpen(false)}
+        onChange={(event) => { setError(''); onChange(event.target.value); show(event.target.value); }}
+        onKeyDown={onKeyDown} maxLength={WRITER_LIMITS.category} placeholder="Choisir ou saisir une catégorie" className={`${className} pr-9`}
+      />
+      <button type="button" tabIndex={-1} aria-label="Afficher les catégories" disabled={disabled} onMouseDown={(event) => { event.preventDefault(); if (open) setOpen(false); else { inputRef.current?.focus(); show(''); } }} className="absolute right-1 top-1/2 mt-[3px] grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md text-slate-400 hover:text-slate-600">
+        <ChevronDown className={`h-4 w-4 transition ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && shown.length > 0 && <ul id={`${id}-list`} role="listbox" className="absolute left-0 right-0 z-20 mt-1 max-h-60 overflow-auto rounded-lg border border-slate-200 bg-white py-1 text-sm font-normal shadow-lg">
+        {shown.map((category, index) => <li key={category} role="option" aria-selected={categoryKey(category) === categoryKey(value)} onMouseDown={(event) => { event.preventDefault(); pick(category); }} onMouseEnter={() => setActive(index)} className={`flex cursor-pointer items-center justify-between px-3 py-2 text-slate-700 ${index === active ? 'bg-blue-50 text-blue-800' : ''}`}>
+          {category}{categoryKey(category) === categoryKey(value) && <Check className="h-4 w-4 text-blue-600" />}
+        </li>)}
+      </ul>}
+    </span>
+    {isNew && <button type="button" onClick={() => void save()} disabled={disabled || adding} className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 disabled:opacity-60">{adding ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}Ajouter « {typed} » aux catégories</button>}
+    {error && <span role="alert" className="mt-1 block text-xs font-normal text-red-600">{error}</span>}
+  </>;
 }
 
 export const statusLabels: Record<string, string> = { draft: 'Brouillon', published: 'Publié', archived: 'Archivé', scheduled: 'Programmé' };

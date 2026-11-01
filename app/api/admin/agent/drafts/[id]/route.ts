@@ -1,5 +1,6 @@
 import { after, NextRequest, NextResponse } from 'next/server';
 import { articleCoverPath } from '@/lib/article-cover';
+import { findArticlePhoto } from '@/lib/article-photo';
 import { refreshArticle } from '@/lib/article-repository';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
@@ -38,7 +39,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       }
       const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
       const scheduledFor = Timestamp.fromDate(scheduledDate);
+      const photo = await findArticlePhoto({ title: String(draft.title || ''), description: String(draft.description || ''), photo: existingArticle.data()?.photo });
       await articleReference.set({
+        ...(photo ? { photo } : {}),
         slug,
         title: String(draft.title || 'Article JcHub'),
         description: String(draft.description || ''),
@@ -94,7 +97,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
       const articleImage = `${siteUrl}${articleCoverPath({ title: String(draft.title || 'Article JcHub'), category: String(draft.promotion?.name || 'JcHub / Journal') })}`;
       const scheduledFor = Timestamp.fromDate(requestedDate);
+      const photo = await findArticlePhoto({ title: String(draft.title || ''), description: String(draft.description || ''), photo: existingArticle.data()?.photo });
       await articleReference.set({
+        ...(photo ? { photo } : {}),
         slug,
         title: String(draft.title || 'Article JcHub'),
         description: String(draft.description || ''),
@@ -139,7 +144,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
       const articleImage = `${siteUrl}${articleCoverPath({ title: String(draft.title || 'Article JcHub'), category: String(draft.promotion?.name || 'JcHub / Journal') })}`;
       const articleReference = getAdminDb().collection('articles').doc(slug);
+      const photo = await findArticlePhoto({ title: String(draft.title || ''), description: String(draft.description || ''), photo: (await articleReference.get()).data()?.photo });
       await articleReference.set({
+        ...(photo ? { photo } : {}),
         slug,
         title: String(draft.title || 'Article JcHub'),
         description: String(draft.description || ''),
@@ -166,7 +173,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       await reference.update({ status: 'published', publishedSlug: slug, socialResults, publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
       after(() => refreshArticle(slug, { translate: true }));
       try { await start(runSocialPreparation, [slug]); }
-      catch { reportUserError(); }
+      catch (error) { reportUserError(error, { request }); }
       return NextResponse.json({ id: id, status: 'published', slug, socialResults });
     }
     if (body.status !== 'approved' && body.status !== 'rejected') {
@@ -181,7 +188,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const message = error instanceof Error ? error.message : 'Erreur interne.';
     if (message === 'UNAUTHORIZED') return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
     if (message === 'FORBIDDEN') return NextResponse.json({ error: 'Accès refusé.' }, { status: 403 });
-    reportUserError();
+    reportUserError(error, { request });
     return NextResponse.json({ error: 'Impossible de mettre à jour le brouillon.' }, { status: 500 });
   }
 }

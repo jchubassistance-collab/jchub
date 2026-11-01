@@ -5,11 +5,11 @@
  * This module has no Next.js or Firebase import so that the tests and the browser can use it.
  */
 
-/** Categories a writer can choose: each one has its English label in lib/categories.ts. */
-export const WRITER_CATEGORIES = ['Développement', 'Technologie', 'Informatique', 'Sécurité', 'Productivité', 'Frontend', 'Base de données', 'Design', 'Numérique'] as const;
+/** Categories every writer starts with: each one has its English label in lib/categories.ts. Writers add others (writer_categories). */
+export const WRITER_CATEGORIES = ['Développement', 'Technologie', 'Informatique', 'Réseau', 'Sécurité', 'Productivité', 'Frontend', 'Base de données', 'Design', 'Numérique'] as const;
 export type WriterCategory = (typeof WRITER_CATEGORIES)[number];
 
-export const WRITER_LIMITS = { title: 140, description: 500, content: 100_000, keyword: 40, keywords: 8, slug: 90 } as const;
+export const WRITER_LIMITS = { title: 140, description: 500, content: 100_000, category: 50, keyword: 40, keywords: 8, slug: 90 } as const;
 export const MIN_TITLE_LENGTH = 10;
 export const MIN_DESCRIPTION_LENGTH = 50;
 export const MIN_PUBLISHED_WORDS = 300;
@@ -43,6 +43,21 @@ export type WriterArticle = WriterArticleSummary & {
 
 export function isWriterCategory(value: unknown): value is WriterCategory {
   return (WRITER_CATEGORIES as readonly unknown[]).includes(value);
+}
+
+export function isValidWriterCategory(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0 && value.trim().length <= WRITER_LIMITS.category;
+}
+
+/** Category as stored: trimmed, single spaces, first letter in capital. */
+export function normalizeCategory(value: string): string {
+  const name = value.trim().replace(/\s+/g, ' ').slice(0, WRITER_LIMITS.category).trim();
+  return name.charAt(0).toLocaleUpperCase('fr-FR') + name.slice(1);
+}
+
+/** Same category whatever its case or accents: « reseau » is « Réseau ». */
+export function categoryKey(value: string): string {
+  return value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
 /** Address segment made from a title or typed by the writer: same rule as the admin editor. */
@@ -80,7 +95,7 @@ export function publicationChecks(article: { title: string; description: string;
     { id: 'title', label: `Un titre d’au moins ${MIN_TITLE_LENGTH} caractères`, ok: article.title.trim().length >= MIN_TITLE_LENGTH },
     { id: 'description', label: `Un résumé d’au moins ${MIN_DESCRIPTION_LENGTH} caractères`, ok: article.description.trim().length >= MIN_DESCRIPTION_LENGTH },
     { id: 'content', label: `Au moins ${MIN_PUBLISHED_WORDS} mots (${words} pour l’instant)`, ok: words >= MIN_PUBLISHED_WORDS },
-    { id: 'category', label: 'Une catégorie', ok: isWriterCategory(article.category) },
+    { id: 'category', label: 'Une catégorie', ok: isValidWriterCategory(article.category) },
   ];
 }
 

@@ -111,9 +111,10 @@ export async function uploadToCloudinary(
     folder: string;
     publicId?: string;
     resourceType?: 'image' | 'video' | 'raw' | 'auto';
+    transformation?: string;
   }
 ): Promise<CloudinaryResource> {
-  const { folder, publicId, resourceType = 'auto' } = options;
+  const { folder, publicId, resourceType = 'auto', transformation } = options;
 
   if (!API_KEY || !API_SECRET) {
     throw new Error('Cloudinary non configuré');
@@ -124,6 +125,7 @@ export async function uploadToCloudinary(
     `folder=${folder}`,
     ...(publicId ? [`public_id=${publicId}`] : []),
     `timestamp=${timestamp}`,
+    ...(transformation ? [`transformation=${transformation}`] : []),
   ].join('&');
   const signature = createHash('sha1')
     .update(`${signatureParameters}${API_SECRET}`)
@@ -138,6 +140,7 @@ export async function uploadToCloudinary(
   formData.append('folder', folder);
   if (publicId) formData.append('public_id', publicId);
   formData.append('timestamp', String(timestamp));
+  if (transformation) formData.append('transformation', transformation);
   formData.append('signature', signature);
 
   const response = await fetch(

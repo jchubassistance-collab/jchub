@@ -6,6 +6,7 @@ import { refreshArticle } from '@/lib/article-repository';
 import { FieldValue } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
+import { revalidateBlog } from '@/lib/live-articles';
 
 export const runtime = 'nodejs';
 
@@ -63,6 +64,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     // has no file to update; an article published, edited or withdrawn has its files rewritten.
     const translate = body.title !== undefined || body.description !== undefined || body.content !== undefined || body.status === 'published';
     const sync = isPublicArticleStatus(snapshot.data()?.status) || isPublicArticleStatus(body.status ?? snapshot.data()?.status);
+    if (sync) revalidateBlog();
     if (translate || sync) after(async () => {
       if (publishing) await addCoverPhoto(reference);
       await refreshArticle(id, { translate, sync });

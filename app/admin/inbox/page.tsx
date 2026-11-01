@@ -5,7 +5,7 @@ import { Mail, MailCheck, MessageSquare, RefreshCw, Send, Users, Sparkles } from
 import { cachedJson, fetchJson } from '@/lib/admin-cache';
 
 type Reply = { body: string; sentAt: string | null; adminEmail: string };
-type ContactMessage = { id: string; name: string; email: string; subject: string; message: string; status: string; createdAt: string | null; replies: Reply[] };
+type ContactMessage = { id: string; name: string; email: string; subject: string; message: string; status: string; rating: number | null; testimonialImageUrl: string | null; testimonialStatus: string | null; createdAt: string | null; replies: Reply[] };
 type Subscriber = { email: string; status: string; subscribedAt: string | null; brevoStatus: string };
 type InboxData = { messages: ContactMessage[]; subscribers: Subscriber[] };
 
@@ -25,6 +25,7 @@ export default function AdminInboxPage() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [drafting, setDrafting] = useState(false);
+  const [moderating, setModerating] = useState(false);
 
   async function load() {
     setLoading(true); setError('');
@@ -50,6 +51,18 @@ export default function AdminInboxPage() {
       setReply(''); setNotice(`Réponse envoyée à ${selected.email}.`); await load();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Envoi impossible.'); }
     finally { setSending(false); }
+  }
+
+  async function moderateTestimonial(action: 'publish' | 'unpublish') {
+    if (!selected) return;
+    setModerating(true); setError(''); setNotice('');
+    try {
+      const response = await fetch('/api/admin/inbox', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messageId: selected.id, action }) });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || 'Action impossible.');
+      setNotice(action === 'publish' ? 'Témoignage publié sur la page d’accueil.' : 'Témoignage retiré de la page d’accueil.'); await load();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Action impossible.'); }
+    finally { setModerating(false); }
   }
 
   async function draftPartnershipReply() {
@@ -96,7 +109,7 @@ export default function AdminInboxPage() {
       <section className="flex min-w-0 flex-col p-5 sm:p-6" aria-label="Détail du message">
         {selected ? <>
           <div className="border-b border-slate-100 pb-4"><p className="text-xs font-bold uppercase tracking-wider text-blue-600">{selected.subject || 'Message de contact'}</p><h2 className="mt-2 text-xl font-black text-slate-950">{selected.name}</h2><a className="mt-1 inline-block text-sm text-blue-700 hover:underline" href={`mailto:${selected.email}`}>{selected.email}</a><p className="mt-2 text-xs text-slate-400">Reçu le {formatDate(selected.createdAt)}</p></div>
-          <div className="flex-1 space-y-4 py-5"><div className="whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">{selected.message}</div>{selected.replies.map((item, index) => <div key={`${item.sentAt}-${index}`} className="ml-5 rounded-xl border border-blue-100 bg-blue-50/70 p-4"><p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-blue-700">Ta réponse · {formatDate(item.sentAt)}</p><p className="whitespace-pre-wrap text-sm leading-6 text-slate-700">{item.body}</p></div>)}</div>
+          <div className="flex-1 space-y-4 py-5">{selected.subject === 'testimonial' && <div className="rounded-xl border border-amber-100 bg-amber-50/70 p-4"><div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-bold text-slate-800">Note du témoignage <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${selected.testimonialStatus === 'published' ? 'bg-emerald-100 text-emerald-700' : selected.testimonialStatus === 'hidden' ? 'bg-slate-200 text-slate-600' : 'bg-amber-100 text-amber-800'}`}>{selected.testimonialStatus === 'published' ? 'Publié' : selected.testimonialStatus === 'hidden' ? 'Retiré' : 'En attente'}</span></p>{selected.testimonialStatus === 'published' ? <button type="button" onClick={() => void moderateTestimonial('unpublish')} disabled={moderating} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50">Retirer du site</button> : <button type="button" onClick={() => void moderateTestimonial('publish')} disabled={moderating} className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-500 disabled:opacity-50">Publier sur le site</button>}</div><p className="mt-1 text-lg font-black text-amber-600"><span role="img" aria-label={`${selected.rating || 0} sur 5`}>{'★'.repeat(selected.rating || 0)}{'☆'.repeat(5 - (selected.rating || 0))}</span><span className="ml-2 text-sm text-slate-600">{selected.rating || '—'}/5</span></p>{selected.testimonialImageUrl && <img src={selected.testimonialImageUrl} alt={`Photo envoyée par ${selected.name}`} className="mt-3 max-h-72 w-full rounded-lg border border-amber-100 bg-white object-contain" />}</div>}<div className="whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">{selected.message}</div>{selected.replies.map((item, index) => <div key={`${item.sentAt}-${index}`} className="ml-5 rounded-xl border border-blue-100 bg-blue-50/70 p-4"><p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-blue-700">Ta réponse · {formatDate(item.sentAt)}</p><p className="whitespace-pre-wrap text-sm leading-6 text-slate-700">{item.body}</p></div>)}</div>
           <form onSubmit={sendReply} className="border-t border-slate-100 pt-4"><div className="mb-2 flex flex-wrap items-center justify-between gap-2"><label htmlFor="reply" className="text-sm font-bold text-slate-800">Répondre par e-mail</label>{/parten|partnership|sponsor|collab|affiliat/i.test(`${selected.subject} ${selected.message}`) && <button type="button" onClick={() => void draftPartnershipReply()} disabled={drafting} className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 px-3 py-2 text-xs font-bold text-violet-700 hover:bg-violet-50 disabled:opacity-50"><Sparkles className="h-3.5 w-3.5" />{drafting ? 'Préparation…' : 'Préparer une réponse avec l’agent'}</button>}</div><textarea id="reply" required maxLength={5000} rows={4} value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Écris ta réponse…" className="w-full resize-y rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100" /><div className="mt-3 flex flex-wrap items-center justify-between gap-3"><span className="text-xs text-slate-400">La proposition de l’agent n’est jamais envoyée automatiquement. Envoi via Brevo après ton clic.</span><button type="submit" disabled={sending || !reply.trim()} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"><Send className="h-4 w-4" />{sending ? 'Envoi…' : 'Envoyer la réponse'}</button></div></form>
         </> : <Empty text={loading && !data.messages.length ? '' : 'Sélectionne un message pour le lire et y répondre.'} />}
       </section>

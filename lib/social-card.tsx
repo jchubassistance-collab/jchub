@@ -135,10 +135,11 @@ export async function renderSocialCard(input: SocialCardInput, format: SocialCar
 }
 
 // JPEG, seul format d'image accepté par l'API de publication Instagram.
-export async function renderSocialCardJpeg(input: SocialCardInput, format: SocialCardFormat): Promise<Uint8Array<ArrayBuffer>> {
+// Aussi pour les couvertures d'articles : un PNG avec photo pèse ~900 Ko.
+export async function renderSocialCardJpeg(input: SocialCardInput, format: SocialCardFormat, quality = 90): Promise<Uint8Array<ArrayBuffer>> {
   const png = await (await renderSocialCard(input, format)).arrayBuffer();
   const image = await loadImage(Buffer.from(png));
   const canvas = createCanvas(image.width, image.height);
   canvas.getContext('2d').drawImage(image, 0, 0);
-  return new Uint8Array(await canvas.encode('jpeg', 90));
+  return new Uint8Array(await canvas.encode('jpeg', quality));
 }

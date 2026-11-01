@@ -32,7 +32,7 @@ const sections = [
       <li><strong>Conclusion</strong> : ce qu’il faut retenir, et la prochaine action pour le lecteur.</li>
     </ul>
     <p>Visez 800 à 1 500 mots. Un article doit en compter au moins {MIN_PUBLISHED_WORDS} pour être publié.</p>
-    <p>Catégories disponibles : {WRITER_CATEGORIES.join(', ')}.</p>
+    <p>Catégories de départ : {WRITER_CATEGORIES.join(', ')}. Si aucune ne convient, saisissez la vôtre dans le champ Catégorie et ajoutez-la : elle sera proposée à tous les rédacteurs.</p>
   </> },
   { id: 'liens', title: 'Liens et images', icon: Link2, body: <>
     <p><strong>Liens vers JcHub</strong> : quand un outil JcHub aide le lecteur, citez-le. Ouvrez sa page sur le site et gardez l’adresse à partir de <code>/fr/</code>, par exemple <code>[le générateur de QR code](/fr/outils/…)</code> : le lien suivra aussi la version anglaise.</p>

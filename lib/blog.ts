@@ -5,6 +5,8 @@ import { cache } from 'react';
 import { articleCoverPath } from '@/lib/article-cover';
 import { articlePathOnDisk, parseArticleFiles } from '@/lib/article-files';
 import { categoryLabel } from '@/lib/categories';
+import { getLiveArticles } from '@/lib/live-articles';
+import { readPhoto } from '@/lib/photos';
 import { tools } from '@/lib/tools';
 import type { Locale } from '@/i18n/routing';
 
@@ -22,6 +24,8 @@ export type BlogArticle = {
   categoryKey: string;
   author: string;
   image: string;
+  /** Photographer of the cover photo (Unsplash), credited under the cover. */
+  imageCredit: { name: string; url: string } | null;
   content: string;
   status: 'published' | 'scheduled' | 'draft';
   publishedAt?: string;
@@ -123,6 +127,9 @@ function toArticle(data: Record<string, unknown>, locale: Locale): BlogArticle {
   const category = categoryLabel(categoryKey, locale);
   const status = data.status === 'scheduled' || data.status === 'draft' ? data.status : 'published';
   const slugs = { fr: frenchSlug, en: translation?.slug || frenchSlug };
+  // With a photo, the cover is drawn in the visitor's language over it; otherwise the saved image is used.
+  const photo = readPhoto(data.photo);
+  const photoCover = photo && articleCoverPath({ title, category, photo: photo.url, lang: locale === 'en' ? 'en' : null });
   return {
     id,
     slug: slugs[locale],
@@ -133,7 +140,8 @@ function toArticle(data: Record<string, unknown>, locale: Locale): BlogArticle {
     category,
     categoryKey,
     author: String(data.author || 'JcHub'),
-    image: articleImage(String(data.image || '/blog/default.svg'), title, locale),
+    image: photoCover || articleImage(String(data.image || '/blog/default.svg'), title, locale),
+    imageCredit: photo && { name: photo.author, url: photo.authorUrl },
     content: english?.content ?? String(data.content || ''),
     status,
     publishedAt: toIsoDate(data.publishedAt),
@@ -173,9 +181,27 @@ function readArticleRecords(): Record<string, unknown>[] {
   return records;
 }
 
+/**
+ * Every public article: Firestore's copy wins over the files, which only follow it after a
+ * commit and a redeploy. An article Firestore no longer shows is hidden even if its file stays.
+ * Without Firestore, the files alone.
+ */
+async function articleSources(): Promise<Record<string, unknown>[]> {
+  const files = readArticleRecords();
+  const live = await getLiveArticles();
+  if (!live) return files;
+  const hidden = new Set(live.hidden);
+  const liveIds = new Set(live.records.map((record) => String(record.id)));
+  const liveSlugs = new Set(live.records.map((record) => String(record.slug)));
+  return [
+    ...files.filter((record) => !hidden.has(String(record.id)) && !liveIds.has(String(record.id)) && !liveSlugs.has(String(record.slug))),
+    ...live.records,
+  ].sort((a, b) => String(a.id).localeCompare(String(b.id)));
+}
+
 /** Published articles, and scheduled ones whose date has come: they go live on time, before the cron. */
-function publishedRecords(now = Date.now()): Record<string, unknown>[] {
-  return readArticleRecords().flatMap((record) => {
+async function publishedRecords(now = Date.now()): Promise<Record<string, unknown>[]> {
+  return (await articleSources()).flatMap((record) => {
     if (record.status === 'published') return [record];
     const scheduledFor = Date.parse(String(record.scheduledFor || ''));
     if (record.status !== 'scheduled' || !Number.isFinite(scheduledFor) || scheduledFor > now) return [];
@@ -183,9 +209,9 @@ function publishedRecords(now = Date.now()): Record<string, unknown>[] {
   });
 }
 
-/** Published articles in every language, read from the files of content/articles. */
+/** Published articles in every language, from Firestore and the files of content/articles. */
 export const getPublishedArticlesByLocale = cache(async (): Promise<Record<Locale, BlogArticle[]>> => {
-  const records = publishedRecords();
+  const records = await publishedRecords();
   return {
     fr: records.map((record) => toArticle(record, 'fr')),
     en: records.map((record) => toArticle(record, 'en')),

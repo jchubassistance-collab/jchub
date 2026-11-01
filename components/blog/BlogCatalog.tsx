@@ -98,7 +98,7 @@ export function BlogCatalog({ articles, showCategories = true }: { articles: Blo
 
         <div className="flex items-center justify-between gap-3">
           {showCategories && <p className="text-xs font-bold uppercase tracking-[.14em] text-slate-500">{t.filterByExpertise}</p>}
-          <div className="flex shrink-0 rounded-xl border border-blue-100 bg-white p-1" aria-label={t.chooseView}>
+          <div className="flex shrink-0 rounded-xl border border-blue-100 bg-white p-1" role="group" aria-label={t.chooseView}>
             <button type="button" onClick={() => setView('grid')} aria-label={t.gridView} aria-pressed={view === 'grid'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><Grid2X2 className="h-4 w-4" /></button>
             <button type="button" onClick={() => setView('compact')} aria-label={t.compactView} aria-pressed={view === 'compact'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'compact' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><Grid3X3 className="h-4 w-4" /></button>
             <button type="button" onClick={() => setView('list')} aria-label={t.listView} aria-pressed={view === 'list'} className={`grid h-8 w-8 place-items-center rounded-lg transition ${view === 'list' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-blue-700'}`}><List className="h-4 w-4" /></button>
@@ -106,7 +106,7 @@ export function BlogCatalog({ articles, showCategories = true }: { articles: Blo
         </div>
       </div>
 
-      {showCategories && <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2" aria-label={t.filterArticles}>
+      {showCategories && <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2" role="group" aria-label={t.filterArticles}>
         {categories.map((item) => (
           <button
             key={item}
@@ -132,7 +132,7 @@ export function BlogCatalog({ articles, showCategories = true }: { articles: Blo
             className={`group relative overflow-hidden rounded-[20px] border border-blue-100 bg-white shadow-[0_8px_24px_rgba(37,99,235,.06)] transition-all duration-300 ease-out will-change-transform hover:-translate-y-1 hover:translate-x-0.5 hover:border-blue-300 hover:shadow-[0_18px_40px_rgba(37,99,235,.12)] motion-safe:animate-[fadeIn_0.5s_ease-out] ${view === 'list' ? 'flex items-center gap-3 p-2.5 sm:gap-4 sm:p-3' : 'hover:shadow-[0_20px_50px_rgba(50,140,255,0.18)]'}`}
           >
             <div className={view === 'list' ? 'h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-slate-800 sm:h-24 sm:w-36' : view === 'compact' ? 'aspect-[4/3] overflow-hidden rounded-t-[20px] bg-slate-800' : 'aspect-[16/9] overflow-hidden rounded-t-[20px] bg-slate-800'}>
-              <img src={article.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+              <img src={article.image} alt="" loading={index < 4 ? 'eager' : 'lazy'} decoding="async" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
             </div>
             <div className={view === 'list' ? 'min-w-0 flex-1 py-0.5 pr-0.5' : view === 'compact' ? 'p-2.5' : 'p-3.5'}>
               <div className="mb-2 flex flex-wrap items-center gap-2 text-[10px] text-slate-500">

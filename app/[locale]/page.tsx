@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import NextLink from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowRight, Briefcase, Check, Code2, Compass, Mail, ShieldCheck, Store, Wrench, Zap } from 'lucide-react';
+import { ArrowRight, BookOpen, Briefcase, Check, Code2, Compass, Info, Mail, ShieldCheck, Store, Wrench, Zap } from 'lucide-react';
+import { getPublishedArticles } from '@/lib/blog';
 import { isToolVisibleToday, localizeTool, toolPath, tools } from '@/lib/tools';
 import { Newsletter } from '@/components/Newsletter';
 import { PartnerCarousel } from '@/components/home/PartnerCarousel';
@@ -21,7 +22,7 @@ const copy = bilingual({
   explore: 'Explorer les outils',
   learnMore: 'En savoir plus',
   perks: ['Des outils gratuits', 'Simples à utiliser', 'Pensés pour le quotidien'],
-  imageAlt: 'Travail en équipe',
+  imageAlt: 'Composants électroniques représentant les outils numériques',
   badgeBottomLabel: 'Rapide à prendre en main',
   badgeBottomTitle: 'Un outil à la fois',
   badgeTopLabel: 'Un espace pratique',
@@ -54,6 +55,12 @@ const copy = bilingual({
   quickContact: ['Parlons de ton projet', 'Une question ou une idée ?'],
   quickKit: ['Kit entrepreneur', 'Les outils gratuits pour ton commerce'],
   quickServices: ['Créer ton site sur mesure', 'Sites, applications, automatisations'],
+  aboutEyebrow: 'QUI SOMMES-NOUS ?',
+  aboutTitle: 'Le numérique, plus simple et plus accessible.',
+  aboutText: 'JcHub est un espace numérique conçu pour rendre la technologie plus simple au quotidien. Nous créons des outils pratiques et des ressources claires pour accompagner les créateurs, les développeurs et toutes les personnes qui font avancer leurs projets.',
+  aboutText2: 'Des solutions utiles, accessibles et pensées pour transformer une idée en quelque chose de concret.',
+  aboutLink: 'Découvrir JcHub',
+  aboutImageAlt: 'Illustration de la curiosité et de la recherche',
   toolsEyebrow: 'OUTILS PRATIQUES',
   toolsTitleStart: 'Ce dont tu as besoin,',
   toolsTitleEnd: 'sans distraction.',
@@ -70,6 +77,10 @@ const copy = bilingual({
   whyTitle: 'Une plateforme utile, sans surplus.',
   whyText: 'Nous réunissons des outils clairs et des ressources pratiques pour faire avancer tes projets numériques plus sereinement.',
   benefits: ['Des outils gratuits à utiliser immédiatement', 'Des étapes simples pour résoudre un besoin précis', 'Des ressources pensées pour les projets numériques', 'Un accès direct aux outils, sans détour'],
+  articlesEyebrow: 'À LIRE SUR LE BLOG',
+  articlesTitle: 'Les articles récents',
+  allArticles: 'Tous les articles',
+  readArticle: 'Lire l’article',
   newsletterTitle: 'Une dose utile, pas de bruit.',
   newsletterText: 'Nouveaux outils, ressources utiles et conseils pratiques directement dans ta boîte mail.',
   unsubscribe: 'Tu peux te désinscrire à tout moment.',
@@ -85,7 +96,7 @@ const copy = bilingual({
   explore: 'Explore the tools',
   learnMore: 'Learn more',
   perks: ['Free tools', 'Easy to use', 'Built for everyday work'],
-  imageAlt: 'Teamwork',
+  imageAlt: 'Electronic components representing digital tools',
   badgeBottomLabel: 'Quick to get started',
   badgeBottomTitle: 'One tool at a time',
   badgeTopLabel: 'A practical space',
@@ -118,6 +129,12 @@ const copy = bilingual({
   quickContact: ['Let’s talk about your project', 'A question or an idea?'],
   quickKit: ['Business kit', 'Free tools for your shop'],
   quickServices: ['Get a custom website', 'Websites, apps, automation'],
+  aboutEyebrow: 'WHO WE ARE',
+  aboutTitle: 'Digital tools, simpler and more accessible.',
+  aboutText: 'JcHub is a digital space designed to make technology simpler in everyday life. We create practical tools and clear resources for creators, developers and everyone moving a project forward.',
+  aboutText2: 'Useful, accessible solutions designed to turn an idea into something real.',
+  aboutLink: 'Discover JcHub',
+  aboutImageAlt: 'Illustration of curiosity and discovery',
   toolsEyebrow: 'PRACTICAL TOOLS',
   toolsTitleStart: 'What you need,',
   toolsTitleEnd: 'without distractions.',
@@ -134,6 +151,10 @@ const copy = bilingual({
   whyTitle: 'A useful platform, without the clutter.',
   whyText: 'We bring together clear tools and practical resources to move your digital projects forward with peace of mind.',
   benefits: ['Free tools you can use immediately', 'Simple steps to solve a specific need', 'Resources designed for digital projects', 'Direct access to the tools, without detours'],
+  articlesEyebrow: 'FROM THE BLOG',
+  articlesTitle: 'Latest articles',
+  allArticles: 'All articles',
+  readArticle: 'Read article',
   newsletterTitle: 'A useful dose, no noise.',
   newsletterText: 'New tools, useful resources and practical tips straight to your inbox.',
   unsubscribe: 'You can unsubscribe at any time.',
@@ -153,6 +174,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   if (!isLocale(locale)) notFound();
   const t = copy[locale];
   const featuredTools = tools.filter((tool) => tool.status !== 'draft' && isToolVisibleToday(tool)).slice(0, 3);
+  const recentArticles = (await getPublishedArticles(locale))
+    .filter((article) => article.publishedAt)
+    .sort((a, b) => Date.parse(b.publishedAt || '') - Date.parse(a.publishedAt || ''))
+    .slice(0, 3);
   return (
     <div className="template-home overflow-hidden bg-[#eff6ff] text-[#0f172a]" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
       <section className="template-home__hero relative isolate overflow-hidden bg-[radial-gradient(circle_at_12%_20%,rgba(147,197,253,.48),transparent_30%),radial-gradient(circle_at_90%_80%,rgba(191,219,254,.55),transparent_32%),#eff6ff]">
@@ -193,7 +218,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <span className="template-home__tech-dot template-home__tech-dot--three" aria-hidden="true" />
             <div className="template-home__circle relative aspect-square w-[min(82vw,400px)] rounded-full bg-gradient-to-br from-[#dbeafe] to-[#bfdbfe] p-[18px] shadow-[40px_40px_80px_rgba(37,99,235,.2),-15px_-15px_40px_rgba(255,255,255,.9)] ring-1 ring-white/60 sm:w-[440px] lg:w-[480px]">
               <div className="template-home__circle-image relative h-full w-full overflow-hidden rounded-full border-[10px] border-white bg-white shadow-inner">
-                <Image src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=800&fit=crop" alt={t.imageAlt} fill priority fetchPriority="high" sizes="(max-width: 640px) 82vw, (max-width: 1024px) 440px, 480px" className="object-cover" />
+                <Image src="/home-256-jchub.png" alt={t.imageAlt} fill loading="eager" fetchPriority="high" sizes="(min-width: 1024px) 424px, (min-width: 640px) 384px, calc(82vw - 56px)" className="object-contain" />
               </div>
               <div className="template-home__badge template-home__badge--bottom absolute -bottom-1 left-0 flex items-center gap-3 rounded-2xl border border-blue-100 bg-white px-4 py-3 shadow-[0_16px_35px_rgba(15,23,42,.12)] sm:-left-8">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-700"><Zap className="h-5 w-5" /></span>
@@ -274,6 +299,25 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <QuickLink href="/contact" icon={<Mail className="h-5 w-5" />} title={t.quickContact[0]} meta={t.quickContact[1]} />
         </section>
 
+        <section aria-labelledby="home-about-title" className="overflow-hidden rounded-[1.75rem] border border-blue-100 bg-white px-6 py-10 shadow-[0_10px_40px_rgba(37,99,235,.06)] sm:px-10 sm:py-12 lg:px-14 lg:py-14">
+          <div className="grid items-center gap-8 sm:grid-cols-[minmax(0,1.2fr)_minmax(260px,.8fr)] sm:gap-12 lg:gap-16">
+            <div className="order-2 max-w-2xl sm:order-1">
+              <p className="inline-flex items-center gap-1.5 text-sm font-medium uppercase tracking-wide text-slate-600"><Info className="h-4 w-4 fill-slate-600 text-white" />{t.aboutEyebrow}</p>
+              <h2 id="home-about-title" className="mt-7 text-3xl font-extrabold leading-tight tracking-tight text-[#30343b] sm:text-4xl lg:text-[2.5rem]" style={{ fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif' }}>{t.aboutTitle}</h2>
+              <p className="mt-6 text-base leading-7 text-slate-600 sm:text-lg sm:leading-[1.75]">{t.aboutText}</p>
+              <p className="mt-5 text-base leading-7 text-slate-600 sm:text-lg sm:leading-[1.75]">{t.aboutText2}</p>
+              <Link href="/a-propos" className="group mt-6 inline-flex items-center gap-2 text-base font-extrabold text-[#102b57] hover:text-blue-700">{t.aboutLink}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></Link>
+            </div>
+            <div className="relative order-1 mx-auto flex w-full max-w-[360px] flex-col items-center justify-center gap-2 sm:order-2 sm:max-w-none">
+              <Image src="/jchub-icon-192.png" alt="JcHub" width={192} height={192} className="relative z-10 h-10 w-10 object-contain" />
+              <div className="relative flex h-56 w-full items-center justify-center sm:h-72">
+                <div className="absolute h-48 w-48 rounded-full bg-blue-100/70 blur-2xl sm:h-64 sm:w-64" />
+                <Image src="/about_jc.png" alt={t.aboutImageAlt} width={600} height={700} sizes="(min-width: 640px) 288px, 224px" className="relative h-full w-auto object-contain" />
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="space-y-9">
           <SectionTitle eyebrow={t.toolsEyebrow} title={<>{t.toolsTitleStart}<br /><span className="text-slate-500">{t.toolsTitleEnd}</span></>} action={t.allTools} href="/outils" />
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -319,6 +363,29 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </div>
           </div>
         </section>
+        <section aria-labelledby="recent-articles-title" className="space-y-9">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <Badge><BookOpen className="h-3.5 w-3.5" /> {t.articlesEyebrow}</Badge>
+              <h2 id="recent-articles-title" className="mt-4 text-3xl font-extrabold tracking-tight text-[#0f172a] sm:text-4xl" style={{ fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif' }}>{t.articlesTitle}</h2>
+            </div>
+            <Link href="/blog" className="group inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-700 hover:text-blue-900">{t.allArticles} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></Link>
+          </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            {recentArticles.map((article) => (
+              <Link key={article.slug} href={{ pathname: '/blog/[slug]', params: { slug: article.slug } }} className="group overflow-hidden rounded-[1.25rem] border border-blue-100/80 bg-white shadow-[0_2px_8px_rgba(15,23,42,.035)] transition-all duration-500 ease-out hover:-translate-y-2 hover:border-blue-300 hover:shadow-[0_24px_55px_rgba(37,99,235,.2)] motion-reduce:transform-none">
+                <div className="aspect-[16/9] overflow-hidden bg-blue-50"><img src={article.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-110 group-hover:rotate-1 motion-reduce:transform-none" /></div>
+                <div className="p-6">
+                  <span className="inline-block rounded-full bg-blue-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-blue-800">{article.category}</span>
+                  <h3 className="mt-3 line-clamp-2 text-lg font-bold text-[#0f172a] group-hover:text-blue-700" style={{ fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif' }}>{article.title}</h3>
+                  <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-600">{article.description}</p>
+                  <span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-700">{t.readArticle} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         <section className="rounded-[1.75rem] border border-blue-100 bg-white p-7 shadow-[0_10px_40px_rgba(37,99,235,.06)] sm:p-10">
           <div className="mx-auto max-w-2xl text-center">
             <Badge><Mail className="h-3.5 w-3.5" /> NEWSLETTER</Badge>

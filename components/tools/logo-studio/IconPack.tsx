@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useImperativeHandle, useRef, useState, type ChangeEvent, type CSSProperties, type DragEvent, type ReactNode, type Ref } from 'react';
-import { Brush, ChevronUp, Copy, Download, Loader2, Package, Trash2, UploadCloud } from 'lucide-react';
+import { Brush, ChevronUp, Copy, Download, Loader2, Trash2, UploadCloud } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { bilingual } from '@/i18n/copy';
 import { downloadBaseName } from '@/lib/download-name';
@@ -548,11 +548,10 @@ export function IconPack({ onEdit, ref }: { onEdit: (file: File) => void; ref?: 
           onDrop={onDrop}
           className={`flex flex-col items-center gap-2 rounded-xl border-2 border-dashed px-4 py-6 text-center transition ${dragging ? 'border-blue-500 bg-blue-50' : 'border-slate-300 bg-slate-50'}`}
         >
-          <UploadCloud className="h-6 w-6 text-blue-600" aria-hidden="true" />
           <strong className="text-base text-slate-900">{t.dropTitle}</strong>
           <span className="text-sm text-slate-500">{t.dropFormats}</span>
           <input id={inputId} type="file" accept={ACCEPT} multiple className="peer sr-only" onChange={onInput} />
-          <label htmlFor={inputId} className="mt-1 inline-flex min-h-11 cursor-pointer items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-800 transition hover:bg-slate-100 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blue-600">{t.choose}</label>
+          <label htmlFor={inputId} className="btn-upload mt-1 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blue-600"><UploadCloud className="h-4 w-4" aria-hidden="true" />{t.choose}</label>
         </div>
 
         <h3 className="mt-6 text-base font-bold text-slate-900">{t.libraryTitle}</h3>
@@ -631,15 +630,15 @@ export function IconPack({ onEdit, ref }: { onEdit: (file: File) => void; ref?: 
           </>}
           <p className="text-xs leading-5 text-slate-500">{infoOf(selected, t)}</p>
           <div className="grid grid-cols-2 gap-2">
-            <SmallButton onClick={() => void downloadOneSvg(selected)}>{t.downloadSvg}</SmallButton>
-            <SmallButton onClick={() => void downloadOnePng(selected)}>{t.downloadPng}</SmallButton>
+            <SmallButton onClick={() => void downloadOneSvg(selected)} className="btn-download"><Download className="h-4 w-4" aria-hidden="true" />{t.downloadSvg}</SmallButton>
+            <SmallButton onClick={() => void downloadOnePng(selected)} className="btn-download"><Download className="h-4 w-4" aria-hidden="true" />{t.downloadPng}</SmallButton>
             <SmallButton onClick={() => onEdit(itemFile(selected, slugs[selected.id] || t.fallbackName))} className="col-span-2"><Brush className="h-4 w-4" aria-hidden="true" /> {t.editInEditor}</SmallButton>
             <SmallButton onClick={() => removeItem(selected.id)} danger className="col-span-2"><Trash2 className="h-4 w-4" aria-hidden="true" /> {t.removeItem}</SmallButton>
           </div>
         </div>}
       </Panel>
 
-      {items.length > 0 && !exportOpen && <button type="button" onClick={() => setExportOpen(true)} className="flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 text-base font-bold text-white shadow-sm transition hover:bg-blue-700 md:col-span-2">
+      {items.length > 0 && !exportOpen && <button type="button" onClick={() => setExportOpen(true)} className="btn-download flex min-h-14 items-center justify-center gap-2 rounded-2xl px-5 text-base md:col-span-2">
         <Download className="h-5 w-5" aria-hidden="true" /> {t.openExport(items.length)}
       </button>}
 
@@ -675,8 +674,8 @@ export function IconPack({ onEdit, ref }: { onEdit: (file: File) => void; ref?: 
             {familyChoice === 'custom' && <Field label={t.familyCustomLabel}>
               {(id) => <input id={id} type="text" maxLength={30} autoComplete="off" value={customFamily} placeholder={autoFamily} onChange={(event) => setCustomFamily(event.target.value)} className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none" />}
             </Field>}
-            <button type="button" onClick={() => void downloadPack()} disabled={building} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-base font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60">
-              {building ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : <Package className="h-5 w-5" aria-hidden="true" />} {t.downloadZip}
+            <button type="button" onClick={() => void downloadPack()} disabled={building} className="btn-download flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-4 text-base">
+              {building ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : <Download className="h-5 w-5" aria-hidden="true" />} {t.downloadZip}
             </button>
             <p role="status" aria-live="polite" className={`min-h-5 text-sm ${packMessage?.tone === 'ok' ? 'font-semibold text-emerald-700' : packMessage?.tone === 'error' ? 'font-semibold text-rose-700' : 'text-slate-500'}`}>{packMessage?.text}</p>
             <p className="text-xs leading-5 text-slate-500">{t.exportNote}</p>

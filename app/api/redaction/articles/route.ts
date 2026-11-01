@@ -5,7 +5,7 @@ import { requireWriter } from '@/lib/admin-auth';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { enforceRateLimit } from '@/lib/rate-limit';
 import { toWriterSummary, uniqueSlug, viewsBySlug, writerError } from '@/lib/writer-articles';
-import { parseKeywords, readTime, slugify, WRITER_CATEGORIES, WRITER_LIMITS } from '@/lib/writer-rules';
+import { parseKeywords, readTime, slugify, WRITER_LIMITS } from '@/lib/writer-rules';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,7 +14,7 @@ const createSchema = z.object({
   title: z.string().trim().min(1).max(WRITER_LIMITS.title),
   description: z.string().trim().max(WRITER_LIMITS.description).default(''),
   content: z.string().max(WRITER_LIMITS.content).default(''),
-  category: z.enum(WRITER_CATEGORIES).default('Technologie'),
+  category: z.string().trim().min(1).max(WRITER_LIMITS.category).default('Technologie'),
   keywords: z.array(z.string().max(WRITER_LIMITS.keyword)).max(WRITER_LIMITS.keywords).default([]),
   plannedFor: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().default(null),
 }).strict();

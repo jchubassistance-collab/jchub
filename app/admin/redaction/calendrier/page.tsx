@@ -3,8 +3,7 @@
 import Link from 'next/link';
 import { FormEvent, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Lightbulb, Loader2, Plus } from 'lucide-react';
-import { Card, Notice, statusLabels, useWriterArticles, type WriterArticleSummary } from '@/components/redaction/shared';
-import { WRITER_CATEGORIES } from '@/lib/writer-rules';
+import { Card, CategoryField, Notice, statusLabels, useWriterArticles, type WriterArticleSummary } from '@/components/redaction/shared';
 
 const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 const dotTones: Record<string, string> = { published: 'bg-emerald-500', draft: 'bg-blue-500', archived: 'bg-slate-400', scheduled: 'bg-violet-500' };
@@ -110,7 +109,7 @@ export default function WriterCalendarPage() {
           <h2 className="flex items-center gap-2 text-base font-bold text-[#0f1c3f]"><Lightbulb className="h-5 w-5 text-amber-500" />Nouvelle idée</h2>
           <form onSubmit={addIdea} className="mt-4 space-y-3">
             <label className="block text-sm font-medium text-slate-700">Sujet<input ref={titleRef} required maxLength={140} value={idea.title} onChange={(event) => setIdea({ ...idea, title: event.target.value })} placeholder="Ex. : Installer Windows 11 sur un ancien PC" className="mt-1.5 h-10 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" /></label>
-            <label className="block text-sm font-medium text-slate-700">Catégorie<select value={idea.category} onChange={(event) => setIdea({ ...idea, category: event.target.value })} className="mt-1.5 h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-blue-400">{WRITER_CATEGORIES.map((category) => <option key={category}>{category}</option>)}</select></label>
+            <label htmlFor="idea-category" className="block text-sm font-medium text-slate-700">Catégorie<CategoryField id="idea-category" value={idea.category} onChange={(category) => setIdea((current) => ({ ...current, category }))} className="mt-1.5 h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-blue-400" /></label>
             <label className="block text-sm font-medium text-slate-700">Date prévue<input type="date" value={idea.plannedFor} onChange={(event) => setIdea({ ...idea, plannedFor: event.target.value })} className="mt-1.5 h-10 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:border-blue-400" /></label>
             {message && <Notice tone={message.tone}>{message.text}</Notice>}
             <button disabled={busy} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#1f6feb] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60">{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}Ajouter au calendrier</button>

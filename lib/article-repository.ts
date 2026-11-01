@@ -7,10 +7,12 @@ import { ensureArticleTranslation } from '@/lib/content-translation';
 import { reportUserError } from '@/lib/user-error';
 import { ARTICLES_DIRECTORY, articleFilePaths, articlePathOnDisk, buildArticleFiles, gitBlobSha, isSafeArticleId } from '@/lib/article-files';
 import { commitFilesOnBase, getGithubConfig, listRepoDirectory, type GithubConfig } from '@/lib/github';
+import { revalidateBlog } from '@/lib/live-articles';
 
 /**
  * Keeps content/articles in line with Firestore after each change made from the admin, the
- * editorial agent or the crons. In production the files are committed to GitHub with the
+ * editorial agent or the crons. The blog shows Firestore's copy at once (lib/live-articles.ts):
+ * the files are its fallback and the history of the articles. In production the files are committed to GitHub with the
  * token of the tool generator (lib/github.ts), which redeploys the site; in development they
  * are written to the local folder.
  */
@@ -95,6 +97,7 @@ async function apply(wanted: Record<string, string>, ids: string[], removeOthers
 export async function syncArticleFiles(ids: string[]): Promise<ArticleSyncResult> {
   const safeIds = Array.from(new Set(ids)).filter(isSafeArticleId);
   if (!safeIds.length || !hasFirebaseAdminConfig()) return { status: 'skipped', changed: [] };
+  revalidateBlog();
   const db = getAdminDb();
   const snapshots = await db.getAll(...safeIds.map((id) => db.collection('articles').doc(id)));
   const wanted: Record<string, string> = {};
@@ -107,6 +110,7 @@ export async function syncArticleFiles(ids: string[]): Promise<ArticleSyncResult
 /** Daily catch-up: every public article gets its files, and files of articles no longer public go. */
 export async function syncAllArticleFiles(): Promise<ArticleSyncResult> {
   if (!hasFirebaseAdminConfig()) return { status: 'skipped', changed: [] };
+  revalidateBlog();
   const snapshot = await getAdminDb().collection('articles').where('status', 'in', ['published', 'scheduled']).get();
   const wanted: Record<string, string> = {};
   for (const document of snapshot.docs) Object.assign(wanted, buildArticleFiles(document.id, document.data()));

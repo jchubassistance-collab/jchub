@@ -116,7 +116,7 @@ export function CsvToExcelTool() {
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="mx-auto flex items-center justify-center gap-2 rounded-xl border border-[#9ccbff]/30 bg-[#0c1d31] px-4 py-3 font-semibold text-[#dfeeff] hover:border-[#9ccbff]/50"
+          className="btn-upload mx-auto flex items-center justify-center gap-2 rounded-xl px-5 py-3"
         >
           <FileUp className="h-5 w-5" />
           {t.choose}
@@ -148,7 +148,7 @@ export function CsvToExcelTool() {
         <a
           href={downloadUrl}
           download={outputName}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 font-bold text-emerald-200 transition hover:bg-emerald-500/20"
+          className="btn-download flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3"
         >
           <Download className="h-5 w-5" />
           {t.download}

@@ -22,7 +22,7 @@ La même fenêtre crée aussi les comptes Community manager (`role: "cm"`).
 ## Ce qu'un rédacteur peut faire
 
 - Créer un brouillon (éditeur ou idée du calendrier éditorial). Les brouillons s'enregistrent seuls pendant la frappe.
-- Publier directement, si l'article passe les contrôles de `lib/writer-rules.ts` (titre, résumé, 300 mots, catégorie traduite). La publication choisit une photo de couverture Unsplash, crée la version anglaise, écrit les fichiers de `content/articles` (commit GitHub, puis déploiement) et prévient l'administrateur par e-mail (Brevo, `CONTACT_NOTIFICATION_EMAIL`).
+- Publier directement, si l'article passe les contrôles de `lib/writer-rules.ts` (titre, résumé, 300 mots, catégorie renseignée). Dans l'éditeur, la rédactrice peut choisir une catégorie suggérée ou en saisir une nouvelle ; celle-ci est enregistrée avec l'article. La publication choisit une photo de couverture Unsplash, crée la version anglaise, écrit les fichiers de `content/articles` (commit GitHub, puis déploiement) et prévient l'administrateur par e-mail (Brevo, `CONTACT_NOTIFICATION_EMAIL`).
 - Modifier un article publié avec « Mettre à jour l'article » : chaque mise à jour est redéployée. Limite de 30 publications ou mises à jour par heure.
 - Supprimer un brouillon jamais publié.
 

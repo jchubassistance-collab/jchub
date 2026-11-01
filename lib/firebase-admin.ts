@@ -19,6 +19,7 @@ import {
   type Firestore,
 } from 'firebase-admin/firestore';
 
+
 export function hasFirebaseAdminConfig(): boolean {
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
@@ -63,3 +64,4 @@ export function getAdminDb(): Firestore {
 export function getAdminAuth(): Auth {
   return getAuth(getFirebaseAdminApp());
 }
+

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useLocale } from 'next-intl';
-import { Facebook, Instagram, Mail, MessageCircle, MapPin, Phone, Send, Sparkles, ArrowRight, Check, Clock } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Mail, MessageCircle, MapPin, Phone, Send, Sparkles, ArrowRight, Check, Clock } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { bilingual } from '@/i18n/copy';
 import { LOCALE_HEADER } from '@/i18n/request-locale';
@@ -59,6 +59,7 @@ const copy = bilingual({
   socialTitle: 'Retrouve JcHub sur les réseaux',
   onFacebook: 'JcHub sur Facebook',
   onInstagram: 'JcHub sur Instagram',
+  onLinkedIn: 'JcHub sur LinkedIn',
   sentTitle: 'Message envoyé ! 🎉',
   sentText: 'On revient vers toi sous 24h ouvrées maximum.',
   sendAnother: 'Envoyer un autre message →',
@@ -105,6 +106,7 @@ const copy = bilingual({
   socialTitle: 'Find JcHub on social media',
   onFacebook: 'JcHub on Facebook',
   onInstagram: 'JcHub on Instagram',
+  onLinkedIn: 'JcHub on LinkedIn',
   sentTitle: 'Message sent! 🎉',
   sentText: 'We’ll get back to you within 24 business hours at most.',
   sendAnother: 'Send another message →',
@@ -148,10 +150,15 @@ export default function ContactPage() {
     setLoading(true);
     setError('');
     try {
+      const body = new FormData();
+      body.set('name', form.name);
+      body.set('email', form.email);
+      body.set('subject', form.subject);
+      body.set('message', form.message);
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', [LOCALE_HEADER]: locale },
-        body: JSON.stringify(form),
+        headers: { [LOCALE_HEADER]: locale },
+        body,
       });
       const result = await response.json();
       if (!response.ok) {
@@ -208,7 +215,7 @@ export default function ContactPage() {
             <span className="template-home__tech-dot template-home__tech-dot--three" aria-hidden="true" />
             <div className="template-home__circle relative aspect-square w-[min(82vw,400px)] rounded-full bg-gradient-to-br from-[#dbeafe] to-[#bfdbfe] p-[18px] shadow-[40px_40px_80px_rgba(37,99,235,.2),-15px_-15px_40px_rgba(255,255,255,.9)] ring-1 ring-white/60 sm:w-[440px] lg:w-[480px]">
               <div className="template-home__circle-image relative h-full w-full overflow-hidden rounded-full border-[10px] border-white bg-white shadow-inner">
-                <img src="/contact-abstract.svg" alt={t.imageAlt} className="absolute inset-0 h-full w-full object-contain p-8" />
+                <img src="/contact-abstract.svg" alt={t.imageAlt} className="absolute inset-0 h-full w-full object-contain p-0" />
               </div>
               <div className="template-home__badge template-home__badge--bottom absolute -bottom-1 left-0 flex items-center gap-3 rounded-2xl border border-blue-100 bg-white px-4 py-3 shadow-[0_16px_35px_rgba(15,23,42,.12)] sm:-left-8">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-700"><Mail className="h-5 w-5" /></span>
@@ -249,8 +256,9 @@ export default function ContactPage() {
           <div className="mt-8 rounded-2xl border border-blue-100 bg-white p-6 text-center shadow-sm">
             <h2 className="text-lg font-bold text-[#0f172a]">{t.socialTitle}</h2>
             <div className="mt-4 flex flex-wrap justify-center gap-3">
-              <a href="https://www.facebook.com/1393952223791842" target="_blank" rel="noopener noreferrer" aria-label={t.onFacebook} className="inline-flex items-center gap-2 rounded-full bg-blue-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-blue-800"><Facebook className="h-4 w-4" aria-hidden="true" />Facebook</a>
-              <a href="https://www.instagram.com/jchub.tech/" target="_blank" rel="noopener noreferrer" aria-label={t.onInstagram} className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 px-5 py-2.5 text-sm font-bold text-white transition hover:brightness-110"><Instagram className="h-4 w-4" aria-hidden="true" />Instagram</a>
+              <a href="https://www.facebook.com/1393952223791842" target="_blank" rel="noopener noreferrer" aria-label={t.onFacebook} className="inline-flex items-center gap-1.5 rounded-full bg-blue-700 px-3.5 py-2 text-xs font-bold text-white transition hover:bg-blue-800 sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm"><Facebook className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />Facebook</a>
+              <a href="https://www.instagram.com/jchub.tech/" target="_blank" rel="noopener noreferrer" aria-label={t.onInstagram} className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 px-3.5 py-2 text-xs font-bold text-white transition hover:brightness-110 sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm"><Instagram className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />Instagram</a>
+              <a href="https://www.linkedin.com/in/jessy-ngnambongo-904b50401/" target="_blank" rel="noopener noreferrer" aria-label={t.onLinkedIn} className="inline-flex items-center gap-1.5 rounded-full bg-[#0a66c2] px-3.5 py-2 text-xs font-bold text-white transition hover:bg-[#004182] sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm"><Linkedin className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />LinkedIn</a>
             </div>
           </div>
         </div>

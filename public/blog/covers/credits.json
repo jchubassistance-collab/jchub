@@ -1,0 +1,198 @@
+[
+  {
+    "cover": "agentic-web-moteurs-multimodaux-base64-payloads.jpg",
+    "photographer": "Ketut Subiyanto",
+    "photoCredit": "Photo by Ketut Subiyanto on Pexels",
+    "photoPage": "https://www.pexels.com/photo/4963010/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "agents-web-apis-encodage-url-erreurs-requetes.jpg",
+    "photographer": "Christina Morillo",
+    "photoCredit": "Photo by Christina Morillo on Pexels",
+    "photoPage": "https://www.pexels.com/photo/1181370/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "agents-web-micro-modeles-maitriser-couts-api.jpg",
+    "photographer": "Kindel Media",
+    "photoCredit": "Photo by Kindel Media on Pexels",
+    "photoPage": "https://www.pexels.com/photo/6773646/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "analyse-logs-metrics-temporelles-horodatage-inference.jpg",
+    "photographer": "Mizuno K",
+    "photoCredit": "Photo by Mizuno K on Pexels",
+    "photoPage": "https://www.pexels.com/photo/12903349/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "binaire-octal-hex-guide.jpg",
+    "photographer": "Davut ERDEM",
+    "photoCredit": "Photo by Davut ERDEM on Pexels",
+    "photoPage": "https://www.pexels.com/photo/26173076/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "convertir-couleur-hex-rgb.jpg",
+    "photographer": "Monstera Production",
+    "photoCredit": "Photo by Monstera Production on Pexels",
+    "photoPage": "https://www.pexels.com/photo/9429373/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "convertir-timestamp-unix-date.jpg",
+    "photographer": "Alena Darmel",
+    "photoCredit": "Photo by Alena Darmel on Pexels",
+    "photoPage": "https://www.pexels.com/photo/7710091/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "creer-qr-code-wifi-paiement.jpg",
+    "photographer": "cottonbro studio",
+    "photoCredit": "Photo by cottonbro studio on Pexels",
+    "photoPage": "https://www.pexels.com/photo/7223932/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "cryptanalyse-et-hachage-outils-securite-web.jpg",
+    "photographer": "Diva Plavalaguna",
+    "photoCredit": "Photo by Diva Plavalaguna on Pexels",
+    "photoPage": "https://www.pexels.com/photo/6937848/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "decoder-jwt-sans-postman.jpg",
+    "photographer": "Mikhail Nilov",
+    "photoCredit": "Photo by Mikhail Nilov on Pexels",
+    "photoPage": "https://www.pexels.com/photo/8872698/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "du-monde-physique-au-numerique-simplifiez-vos-echanges-qr-code.jpg",
+    "photographer": "Abdulla Hafeez",
+    "photoCredit": "Photo by Abdulla Hafeez on Pexels",
+    "photoPage": "https://www.pexels.com/photo/10225663/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "encoder-image-base64.jpg",
+    "photographer": "Polina Tankilevitch",
+    "photoCredit": "Photo by Polina Tankilevitch on Pexels",
+    "photoPage": "https://www.pexels.com/photo/7382467/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "encoder-url-correctement.jpg",
+    "photographer": "Vitaly Gariev",
+    "photoCredit": "Photo by Vitaly Gariev on Pexels",
+    "photoPage": "https://www.pexels.com/photo/36712998/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "flux-de-travail-markdown-et-outils-de-generation.jpg",
+    "photographer": "Mizuno K",
+    "photoCredit": "Photo by Mizuno K on Pexels",
+    "photoPage": "https://www.pexels.com/photo/12899196/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "formater-deboguer-json.jpg",
+    "photographer": "cottonbro studio",
+    "photoCredit": "Photo by cottonbro studio on Pexels",
+    "photoPage": "https://www.pexels.com/photo/6804602/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "generation-identifiants-uniques-pipelines-rendu-automatiques.jpg",
+    "photographer": "Mikhail Nilov",
+    "photoCredit": "Photo by Mikhail Nilov on Pexels",
+    "photoPage": "https://www.pexels.com/photo/7988746/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "hasher-mot-de-passe-md5-sha256.jpg",
+    "photographer": "Mohammad Hossein Mirzagol",
+    "photoCredit": "Photo by Mohammad Hossein Mirzagol on Pexels",
+    "photoPage": "https://www.pexels.com/photo/16764124/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "ia-codage-validation-json-chaine-de-traitement.jpg",
+    "photographer": "fauxels",
+    "photoCredit": "Photo by fauxels on Pexels",
+    "photoPage": "https://www.pexels.com/photo/3184357/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "maitriser-filtrage-flux-textuels-regex.jpg",
+    "photographer": "cottonbro studio",
+    "photoCredit": "Photo by cottonbro studio on Pexels",
+    "photoPage": "https://www.pexels.com/photo/8875514/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "markdown-guide-debutant.jpg",
+    "photographer": "Mikhail Nilov",
+    "photoCredit": "Photo by Mikhail Nilov on Pexels",
+    "photoPage": "https://www.pexels.com/photo/9159635/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "mot-de-passe-securise.jpg",
+    "photographer": "George Pak",
+    "photoCredit": "Photo by George Pak on Pexels",
+    "photoPage": "https://www.pexels.com/photo/7972331/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "optimiser-convertir-images-webp-png-guide-pratique.jpg",
+    "photographer": "Wolf Art",
+    "photoCredit": "Photo by Wolf Art on Pexels",
+    "photoPage": "https://www.pexels.com/photo/29249664/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "pourquoi-vos-pdf-sont-trop-lourds-et-comment-les-compresser.jpg",
+    "photographer": "Los Muertos Crew",
+    "photoCredit": "Photo by Los Muertos Crew on Pexels",
+    "photoPage": "https://www.pexels.com/photo/8809559/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "regex-email-5-patterns.jpg",
+    "photographer": "Mikhail Nilov",
+    "photoCredit": "Photo by Mikhail Nilov on Pexels",
+    "photoPage": "https://www.pexels.com/photo/9158994/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "securiser-acces-vibe-coding-generation-secrets.jpg",
+    "photographer": "fauxels",
+    "photoCredit": "Photo by fauxels on Pexels",
+    "photoPage": "https://www.pexels.com/photo/3184359/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "securiser-inspecter-jetons-jwt-architectures-modernes.jpg",
+    "photographer": "Ksenia Chernaya",
+    "photoCredit": "Photo by Ksenia Chernaya on Pexels",
+    "photoPage": "https://www.pexels.com/photo/7301134/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "tester-api-rest-sans-postman.jpg",
+    "photographer": "Daniel Friday Danzor",
+    "photoCredit": "Photo by Daniel Friday Danzor on Pexels",
+    "photoPage": "https://www.pexels.com/photo/13634916/",
+    "license": "https://www.pexels.com/license/"
+  },
+  {
+    "cover": "uuid-base-donnees-v4-v7.jpg",
+    "photographer": "Kampus Production",
+    "photoCredit": "Photo by Kampus Production on Pexels",
+    "photoPage": "https://www.pexels.com/photo/5940715/",
+    "license": "https://www.pexels.com/license/"
+  }
+]

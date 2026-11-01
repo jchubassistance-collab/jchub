@@ -1,16 +1,12 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { LoaderCircle, Search, Sparkles, X } from 'lucide-react';
-import type { Tool } from '@/lib/tools';
-import { findToolsByKeywords, normalizeSearchText } from '@/lib/tool-search';
+import { normalizeSearchText } from '@/lib/tool-search';
 import { bilingual } from '@/i18n/copy';
 import { LOCALE_HEADER } from '@/i18n/request-locale';
-import type { Locale } from '@/i18n/routing';
-
-type CatalogTool = Tool & { href: string };
 
 const copy = bilingual({
   searchFailed: 'La recherche a échoué.',
@@ -46,35 +42,21 @@ const copy = bilingual({
 
 type Suggestion = { slug: string; name: string; description: string; href: string; reason: string; icon: string };
 type Result = { message: string; suggestions: Suggestion[]; source: 'catalog' | 'ai' | 'cache' };
+type SearchItem = { id: string; title: string; description: string; href: string; icon: string };
+
+// The server ranks articles and tools (matching, visitors' searches, views, trends) after a short pause.
+const SEARCH_PAUSE_MS = 150;
 
 // The AI is asked only after a pause on a real sentence the catalog cannot answer:
 // every AI request counts against the visitor's daily quota.
 const AI_PAUSE_MS = 1_400;
 const MIN_AI_WORDS = 3;
 
-// Shared by the header and mobile menu instances; loaded on first focus, in the page's language.
-const catalogRequests: Partial<Record<Locale, Promise<CatalogTool[]>>> = {};
-function loadCatalog(locale: Locale): Promise<CatalogTool[]> {
-  catalogRequests[locale] ??= fetch(`/api/tool-assistant?lang=${locale}`)
-    .then((response) => (response.ok ? response.json() : { tools: [] }))
-    .then((data: { tools?: CatalogTool[] }) => data.tools ?? [])
-    .catch(() => {
-      delete catalogRequests[locale];
-      return [];
-    });
-  return catalogRequests[locale];
-}
-
-function toSuggestion(tool: CatalogTool): Suggestion {
-  return { slug: tool.slug, name: tool.name, description: tool.description, href: tool.href, reason: tool.description, icon: tool.icon };
-}
-
 /** `pill`: the outlined, centered field of the mobile menu; the results open centered below it. */
 export function ToolFinder({ compact = false, dark = false, pill = false, menu = false, onNavigate }: { compact?: boolean; dark?: boolean; pill?: boolean; menu?: boolean; onNavigate?: () => void }) {
   const locale = useLocale();
   const t = copy[locale];
   const [query, setQuery] = useState('');
-  const [catalog, setCatalog] = useState<CatalogTool[] | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -84,14 +66,11 @@ export function ToolFinder({ compact = false, dark = false, pill = false, menu =
   const aiTimer = useRef<number | undefined>(undefined);
   const aiRequest = useRef<AbortController | null>(null);
   const lastAiQuery = useRef('');
+  // Whether the catalog alone answered this text: Enter then has no reason to ask the AI.
+  const catalogAnswer = useRef<{ query: string; confident: boolean } | null>(null);
   const panelId = useId();
 
-  const prepare = () => {
-    setOpen(true);
-    if (!catalog) void loadCatalog(locale).then(setCatalog);
-  };
-
-  const askAi = async (text: string) => {
+  const askAi = useCallback(async (text: string) => {
     const normalized = normalizeSearchText(text);
     if (normalized === lastAiQuery.current) return;
     lastAiQuery.current = normalized;
@@ -118,9 +97,9 @@ export function ToolFinder({ compact = false, dark = false, pill = false, menu =
       window.clearTimeout(slowTimer);
       if (aiRequest.current === controller) { setSlow(false); setLoading(false); }
     }
-  };
+  }, [locale, t.searchFailed]);
 
-  // Instant catalog suggestions on every keystroke; the AI only after a pause.
+  // Catalog suggestions while typing; the AI only after a pause, when the catalog cannot answer.
   useEffect(() => {
     window.clearTimeout(aiTimer.current);
     // An answer to the previous text must not overwrite suggestions for the new one.
@@ -130,18 +109,36 @@ export function ToolFinder({ compact = false, dark = false, pill = false, menu =
       setResult(null); setError(''); setLoading(false); setSlow(false);
       return;
     }
-    if (!catalog) return;
-    const match = findToolsByKeywords(text, catalog);
+    const normalized = normalizeSearchText(text);
+    const words = normalized.split(' ').filter((word) => word.length >= 3).length;
+    const controller = new AbortController();
+    let current = true;
     setError('');
-    setResult(match.tools.length
-      ? { message: match.confident ? t.confident : t.close, suggestions: (match.tools as CatalogTool[]).map(toSuggestion), source: 'catalog' }
-      : null);
-    const words = normalizeSearchText(text).split(' ').filter((word) => word.length >= 3).length;
-    if (!match.confident && words >= MIN_AI_WORDS) {
-      aiTimer.current = window.setTimeout(() => { void askAi(text); }, AI_PAUSE_MS);
-    }
-    return () => window.clearTimeout(aiTimer.current);
-  }, [query, catalog]);
+    const searchTimer = window.setTimeout(() => {
+      void fetch(`/api/nav-search?lang=${locale}&q=${encodeURIComponent(text)}`, { signal: controller.signal })
+        .then((response) => response.json())
+        .then((data: { items?: SearchItem[]; confident?: boolean }) => {
+          if (!current) return;
+          const confident = Boolean(data.confident);
+          catalogAnswer.current = { query: normalized, confident };
+          const suggestions = (data.items || []).map((item) => ({ slug: item.id, name: item.title, description: item.description, href: item.href, reason: item.description, icon: item.icon }));
+          setResult(suggestions.length ? { message: confident ? t.confident : t.close, suggestions, source: 'catalog' } : null);
+          if (!confident && words >= MIN_AI_WORDS) aiTimer.current = window.setTimeout(() => { void askAi(text); }, AI_PAUSE_MS);
+        })
+        .catch(() => undefined);
+    }, SEARCH_PAUSE_MS);
+    // Searched terms feed the server's ranking; each one counts once per browser session.
+    const termKey = `jchub-nav-search:${normalized}`;
+    const termTimer = window.setTimeout(() => {
+      try {
+        if (!sessionStorage.getItem(termKey)) {
+          sessionStorage.setItem(termKey, '1');
+          void fetch('/api/nav-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: text }) });
+        }
+      } catch { /* Search still works when browser storage is unavailable. */ }
+    }, 700);
+    return () => { current = false; controller.abort(); window.clearTimeout(searchTimer); window.clearTimeout(aiTimer.current); window.clearTimeout(termTimer); };
+  }, [query, locale, askAi, t.confident, t.close]);
 
   // Close the panel on Escape or on a click outside the search.
   useEffect(() => {
@@ -164,8 +161,9 @@ export function ToolFinder({ compact = false, dark = false, pill = false, menu =
     if (text.length < 2) return;
     setOpen(true);
     window.clearTimeout(aiTimer.current);
-    // Enter asks the AI at once, unless the catalog already answered confidently.
-    if (!catalog || !findToolsByKeywords(text, catalog).confident) void askAi(text);
+    // Enter asks the AI at once, unless the catalog already answered this text confidently.
+    const answer = catalogAnswer.current;
+    if (answer?.query !== normalizeSearchText(text) || !answer.confident) void askAi(text);
   };
 
   const reset = () => {
@@ -189,7 +187,7 @@ export function ToolFinder({ compact = false, dark = false, pill = false, menu =
         ? 'flex h-12 items-center gap-2 rounded-full border border-white/70 bg-transparent px-5 text-white transition focus-within:border-white'
         : `flex items-center gap-2 rounded-full border px-3 py-2 ${shell}`}>
       {loading && !menu ? <LoaderCircle className={`h-4 w-4 shrink-0 animate-spin ${pill ? 'text-white' : 'text-indigo-500'}`}/> : !pill && !menu && <Search className={`h-4 w-4 shrink-0 ${dark ? 'text-slate-300' : 'text-blue-600'}`}/>}
-      <input value={query} onChange={(event) => { setQuery(event.target.value); setOpen(true); }} onFocus={prepare} maxLength={500} role="combobox" aria-autocomplete="list" aria-label={t.describe} aria-expanded={showPanel} aria-controls={panelId} placeholder={compact || pill || menu ? t.placeholderCompact : t.placeholder} className={pill
+      <input value={query} onChange={(event) => { setQuery(event.target.value); setOpen(true); }} onFocus={() => setOpen(true)} maxLength={500} role="combobox" aria-autocomplete="list" aria-label={t.describe} aria-expanded={showPanel} aria-controls={panelId} placeholder={compact || pill || menu ? t.placeholderCompact : t.placeholder} className={pill
         ? 'min-w-0 flex-1 bg-transparent text-center text-[0.95rem] font-light tracking-[0.06em] text-white outline-none placeholder:text-white/85'
         : menu
           ? 'h-12 min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#0369fb] focus:ring-2 focus:ring-[#0369fb]/15'

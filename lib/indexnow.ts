@@ -1,4 +1,4 @@
-const INDEXNOW_KEY = "TA_CLE_INDEXNOW";
+const INDEXNOW_KEY = "5e886238e3c7464ea6f9ea2d26f5610b";
 const HOST = "jchub.dev";
 
 interface IndexNowPayload {

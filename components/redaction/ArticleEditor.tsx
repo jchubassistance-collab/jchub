@@ -5,10 +5,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { AlertCircle, ArrowLeft, Bold, Check, CircleDashed, Code, ExternalLink, Eye, Heading2, Heading3, Italic, Link2, List, ListOrdered, Loader2, Lock, Pencil, Quote, Send, Trash2, X } from 'lucide-react';
-import { articleUrl, canDelete, Card, deleteArticle, formatDay, Notice, StatusBadge } from '@/components/redaction/shared';
+import { articleUrl, canDelete, Card, CategoryField, deleteArticle, formatDay, Notice, StatusBadge } from '@/components/redaction/shared';
 import { publicSiteUrl, useWriter } from '@/components/redaction/WriterShell';
 import { cachedJson, fetchJson, rememberJson } from '@/lib/admin-cache';
-import { isWriterCategory, parseKeywords, publicationChecks, readTime, slugify, wordCount, writingTips, WRITER_CATEGORIES, WRITER_LIMITS, type WriterArticle } from '@/lib/writer-rules';
+import { parseKeywords, publicationChecks, readTime, slugify, wordCount, writingTips, WRITER_LIMITS, type WriterArticle } from '@/lib/writer-rules';
 
 type Form = { title: string; description: string; content: string; category: string; keywords: string; plannedFor: string; slug: string };
 type Format = 'h2' | 'h3' | 'bold' | 'italic' | 'list' | 'ordered' | 'quote' | 'code' | 'link';
@@ -141,8 +141,7 @@ export function ArticleEditor({ id: initialId, initialPlannedFor = '' }: { id?: 
       title: form.title.trim(),
       description: form.description.trim(),
       content: form.content,
-      // A category set by the admin outside the writer's list is kept as long as it is not changed.
-      ...(isWriterCategory(form.category) ? { category: form.category } : {}),
+      category: form.category.trim(),
       keywords: parseKeywords(form.keywords),
       plannedFor: form.plannedFor || null,
     };
@@ -302,11 +301,9 @@ export function ArticleEditor({ id: initialId, initialPlannedFor = '' }: { id?: 
 
         <Card className="p-5">
           <fieldset disabled={readOnly || loading} className="space-y-4">
-            <label className="block text-sm font-semibold text-slate-700">Catégorie
-              <select value={form.category} onChange={(event) => update('category', event.target.value)} className={`${field} mt-1.5 h-10`}>
-                {!isWriterCategory(form.category) && <option value={form.category}>{form.category || 'Choisir…'}</option>}
-                {WRITER_CATEGORIES.map((category) => <option key={category}>{category}</option>)}
-              </select>
+            <label htmlFor="article-category" className="block text-sm font-semibold text-slate-700">Catégorie
+              <CategoryField id="article-category" value={form.category} onChange={(value) => update('category', value)} className={`${field} mt-1.5 h-10`} />
+              <span className="mt-1 block text-xs font-normal text-slate-500">Choisissez une suggestion, ou saisissez une nouvelle catégorie et ajoutez-la à la liste.</span>
             </label>
             <label className="block text-sm font-semibold text-slate-700">Mots-clés
               <input value={form.keywords} onChange={(event) => update('keywords', event.target.value)} placeholder="windows 11, ancien pc, installation" className={`${field} mt-1.5 h-10`} />

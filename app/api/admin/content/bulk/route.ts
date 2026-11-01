@@ -2,6 +2,7 @@ import { after, NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
+import { revalidateBlog } from '@/lib/live-articles';
 import { logSyncError, syncArticleFiles } from '@/lib/article-repository';
 import { articleCoverPath } from '@/lib/article-cover';
 import { addCoverPhoto } from '@/lib/article-photo';
@@ -33,6 +34,7 @@ export async function POST(request: NextRequest) {
       batch.update(snapshot.ref, update);
     }
     await batch.commit();
+    revalidateBlog();
     // Published articles get their cover photo, then their files (withdrawn ones lose them), in a
     // single commit. Photos are looked for one at a time and for 10 articles at most: the Unsplash
     // key allows 50 requests an hour; the others keep the card drawn with their title.

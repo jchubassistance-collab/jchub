@@ -120,3 +120,16 @@ export async function getGa4ToolViews(paths: string[]) {
   });
   return { configured: true, views: Object.fromEntries(rowsToObjects(report).map((row) => [String(row.pagePath), Number(row.screenPageViews || 0)])) };
 }
+
+/** Page views for a rolling 30-day window and the preceding 30-day window. */
+export async function getGa4ContentViews(paths: string[]) {
+  const access = await getAccessToken();
+  if (!access || !paths.length) return { configured: Boolean(access), current: {} as Record<string, number>, previous: {} as Record<string, number> };
+  const filter = { filter: { fieldName: 'pagePath', inListFilter: { values: paths, caseSensitive: true } } };
+  const [current, previous] = await Promise.all([
+    runReport(access, ['pagePath'], ['screenPageViews'], Math.min(paths.length, 1000), '30daysAgo', 'yesterday', false, filter),
+    runReport(access, ['pagePath'], ['screenPageViews'], Math.min(paths.length, 1000), '60daysAgo', '31daysAgo', false, filter),
+  ]);
+  const mapRows = (report: Report) => Object.fromEntries(rowsToObjects(report).map((row) => [String(row.pagePath), Number(row.screenPageViews || 0)]));
+  return { configured: true, current: mapRows(current), previous: mapRows(previous) };
+}

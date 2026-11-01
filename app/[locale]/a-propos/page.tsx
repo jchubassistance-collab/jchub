@@ -26,7 +26,7 @@ const copy = bilingual({
   intro: 'JcHub est né d’une conviction simple : le numérique doit être un outil au service des gens, pas une source de frustration. Nous construisons des outils clairs, utiles et accessibles à tous.',
   explore: 'Explorer les outils',
   contactUs: 'Nous contacter',
-  imageAlt: 'Une équipe JcHub échange autour d’un projet',
+  imageAlt: 'Une femme afro souriante pointant vers la gauche',
   badgeBottomLabel: 'Une communauté',
   badgeBottomTitle: 'qui progresse ensemble',
   badgeTopLabel: 'Créé avec',
@@ -75,7 +75,7 @@ const copy = bilingual({
   intro: 'JcHub was born from a simple belief: digital tools should serve people, not frustrate them. We build clear, useful tools that are accessible to everyone.',
   explore: 'Explore the tools',
   contactUs: 'Contact us',
-  imageAlt: 'A JcHub team discussing a project',
+  imageAlt: 'A smiling Black woman pointing to the left',
   badgeBottomLabel: 'A community',
   badgeBottomTitle: 'growing together',
   badgeTopLabel: 'Made with',
@@ -98,7 +98,7 @@ const copy = bilingual({
   teamText: 'A passionate team that believes digital can be simple and useful.',
   team: [
     { initials: 'JN', name: 'Jessy Ngnambongo', role: 'Founder & developer', text: 'Passionate about technology and simplicity.' },
-    { initials: 'JC', name: 'JcHub Team', role: 'Contributors', text: 'A growing community.' },
+    { initials: 'EV', name: 'Emilia Victoire', role: 'Rédactrice', text: 'Des contenus de qualité pour informer, conseiller et accompagner notre communauté.' },
     { initials: '+', name: 'You?', role: 'Join us', text: 'We’re always looking for talent.' },
   ],
   collabEyebrow: 'Want to collaborate?',
@@ -147,7 +147,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             <span className="template-home__tech-dot template-home__tech-dot--one" aria-hidden="true" /><span className="template-home__tech-dot template-home__tech-dot--two" aria-hidden="true" /><span className="template-home__tech-dot template-home__tech-dot--three" aria-hidden="true" />
             <div className="template-home__circle relative aspect-square w-[min(82vw,400px)] rounded-full bg-gradient-to-br from-[#dbeafe] to-[#bfdbfe] p-[18px] shadow-[40px_40px_80px_rgba(37,99,235,.2),-15px_-15px_40px_rgba(255,255,255,.9)] ring-1 ring-white/60 sm:w-[440px] lg:w-[480px]">
               <div className="template-home__circle-image relative h-full w-full overflow-hidden rounded-full border-[10px] border-white bg-white shadow-inner">
-                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=800&fit=crop" alt={t.imageAlt} className="absolute inset-0 h-full w-full object-cover" />
+                <img src="/hero_about.svg" alt={t.imageAlt} className="absolute inset-0 h-full w-full object-contain" />
               </div>
               <div className="template-home__badge template-home__badge--bottom absolute -bottom-1 left-0 flex items-center gap-3 rounded-2xl border border-blue-100 bg-white px-4 py-3 shadow-[0_16px_35px_rgba(15,23,42,.12)] sm:-left-8"><span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-700"><Users className="h-5 w-5" /></span><span><span className="block text-xs font-medium text-slate-500">{t.badgeBottomLabel}</span><strong className="mt-0.5 block text-sm text-[#0f172a]">{t.badgeBottomTitle}</strong></span></div>
               <div className="template-home__badge template-home__badge--top absolute -right-1 top-7 hidden items-center gap-3 rounded-2xl border border-blue-100 bg-white px-4 py-3 shadow-[0_16px_35px_rgba(15,23,42,.12)] sm:flex"><span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-700"><Heart className="h-5 w-5" /></span><span><span className="block text-xs font-medium text-slate-500">{t.badgeTopLabel}</span><strong className="mt-0.5 block text-sm text-[#0f172a]">{t.badgeTopTitle}</strong></span></div>

@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { buildKitCopyPrompt, buildSocialVisualPrompt, generateKitCopy, generateSocialVisual, kitPostText, parseKitCopy, parseSocialVisual, readSocialVisual, usesFormalAddress, validateKitPost } from '../lib/social-copy.ts';
+import { buildKitCopyPrompt, buildPhotoQueriesPrompt, generateKitCopy, kitPostText, lostApostrophe, parseKitCopy, parsePhotoQueries, usesFormalAddress, validateKitPost } from '../lib/social-copy.ts';
+import { isUnsplashImage, photoImageUrl, readPhoto } from '../lib/photos.ts';
 import { publicImageUrl, publishToPlatform, PlatformError } from '../lib/social-platforms.ts';
 import { canRetryPublication, externalPublishingEnabled, isCronBearerAuthorized, isPlatformEnabled, publicationGuardId, publicationId, zonedDateTimeToUtc, shouldAutoPublish, settleIndependently } from '../lib/social-utils.ts';
 import { getLinkedInRedirectUri, isMatchingOAuthState, updateEnvFile } from '../lib/linkedin-oauth.ts';
@@ -38,6 +39,7 @@ const kitCopy = {
   instagramHashtags: ['#securite', 'webdev', '#jchub'],
   facebookCaption: 'Un formulaire accepte-t-il tout ce qu’on lui envoie ? Découvre comment valider côté serveur.',
   facebookHashtags: ['#securite', '#webdev'],
+  photoQueries: ['padlock on laptop keyboard', 'web form on screen'],
 };
 
 test('les textes du kit sont générés en JSON, tutoient le lecteur et normalisent les hashtags', async () => {
@@ -73,36 +75,34 @@ test('le texte publié depuis un kit ajoute les hashtags et garde un lien cliqua
   assert.match(validateKitPost('facebook', ' '), /vide/);
 });
 
-const jwtVisual = {
-  badge: 'Technique',
-  subtitle: 'Comprends et débogue tes tokens JWT sans quitter ton navigateur',
-  diagram: { kind: 'flow', blocks: [
-    { label: 'header', lines: [], tone: 'red' },
-    { label: 'payload', lines: ['{', '  "userId": "12345",', '  "role": "admin",', '  "exp": 1625184000', '}'], tone: 'green' },
-    { label: 'signature', lines: [], tone: 'violet' },
-  ] },
-};
+test('le kit lit un extrait du contenu et demande des recherches de photo en anglais', () => {
+  const prompt = buildKitCopyPrompt({ ...kitSource, content: 'Valide les entrées. ```js\nconst secret = 1;\n``` Limite la taille.' });
+  assert.match(prompt, /Extrait du contenu :\n"Valide les entrées\. Limite la taille\."/);
+  assert.match(prompt, /"photoQueries"/);
+  assert.match(buildPhotoQueriesPrompt({ title: source.title, description: source.description }), /3 recherches en anglais/);
+  assert.deepEqual(parsePhotoQueries('{"photoQueries":["padlock on laptop keyboard","server room"]}'), ['padlock on laptop keyboard', 'server room']);
+  assert.throws(() => parsePhotoQueries('{"photoQueries":[]}'));
+  assert.throws(() => parseKitCopy(JSON.stringify({ ...kitCopy, photoQueries: undefined })));
+  assert.throws(() => parseKitCopy(JSON.stringify({ ...kitCopy, facebookCaption: 'Vérifie la date d expiration d un JWT sans installer Postman.' })), /apostrophes/);
+  assert.equal(lostApostrophe('Vérifie l’expiration et le payload, c’est rapide.'), false);
+  assert.equal(lostApostrophe('Un QR code à scanner avec ton téléphone.'), false);
+});
 
-test('le schéma du visuel est validé pour tenir dans l’image et tutoyer le lecteur', async () => {
-  assert.deepEqual(parseSocialVisual(JSON.stringify(jwtVisual)), jwtVisual);
-  const prompt = buildSocialVisualPrompt(source);
-  assert.match(prompt, /"flow"/);
-  assert.match(prompt, /"code"/);
-  assert.match(prompt, /"steps"/);
-  const longLine = structuredClone(jwtVisual);
-  longLine.diagram.blocks[1].lines.push('"email": "john.doe@example.com", "ok": 1');
-  assert.throws(() => parseSocialVisual(JSON.stringify(longLine)), /30 caractères/);
-  const twoBlocks = structuredClone(jwtVisual);
-  twoBlocks.diagram.blocks = [twoBlocks.diagram.blocks[0], { ...twoBlocks.diagram.blocks[1], lines: ['"email": "john.doe@example.com", "ok": 1'] }];
-  assert.equal(parseSocialVisual(JSON.stringify(twoBlocks)).diagram.blocks.length, 2);
-  assert.throws(() => parseSocialVisual(JSON.stringify({ ...jwtVisual, subtitle: 'Comprenez et déboguez vos tokens JWT facilement' })), /tutoyer/);
-  assert.throws(() => parseSocialVisual(JSON.stringify({ ...jwtVisual, diagram: { kind: 'steps', items: [{ title: 'Un', text: 'a', tone: 'blue' }] } })));
-  assert.throws(() => parseSocialVisual(JSON.stringify({ ...jwtVisual, diagram: { kind: 'chart' } })));
-  assert.equal(readSocialVisual({ badge: 'x' }), null);
-  let calls = 0;
-  const generated = await generateSocialVisual(source, async () => (calls++ === 0 ? 'pas du JSON' : JSON.stringify(jwtVisual)), 2);
-  assert.equal(calls, 2);
-  assert.equal(generated.diagram.kind, 'flow');
+test('les photos viennent uniquement d’Unsplash et sont recadrées à la taille du visuel', () => {
+  const photo = {
+    id: 'abc-123', url: 'https://images.unsplash.com/photo-1?ixid=x', thumb: 'https://images.unsplash.com/photo-1?w=400', alt: 'cadenas', author: 'Jane',
+    authorUrl: 'https://unsplash.com/@jane?utm_source=jchub&utm_medium=referral', pageUrl: 'https://unsplash.com/photos/abc-123', downloadLocation: 'https://api.unsplash.com/photos/abc-123/download',
+  };
+  assert.deepEqual(readPhoto(photo), photo);
+  assert.equal(readPhoto({ ...photo, url: 'https://evil.example/photo.jpg' }), null);
+  assert.equal(readPhoto({ ...photo, url: 'http://images.unsplash.com/photo-1' }), null);
+  assert.equal(readPhoto({ ...photo, authorUrl: 'https://unsplash.com.evil.example/@jane' }), null);
+  assert.equal(isUnsplashImage('https://images.unsplash.com.evil.example/x'), false);
+  const cropped = new URL(photoImageUrl(photo.url, 760, 630));
+  assert.equal(cropped.searchParams.get('w'), '760');
+  assert.equal(cropped.searchParams.get('h'), '630');
+  assert.equal(cropped.searchParams.get('ixid'), 'x');
+  assert.equal(cropped.searchParams.get('fm'), 'jpg');
 });
 
 test('repère le vouvoiement sans confondre « Chez » ni les impératifs tutoyés', () => {

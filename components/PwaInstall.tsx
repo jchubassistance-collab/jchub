@@ -62,7 +62,7 @@ export function PwaInstall() {
         </div>
 
         <div className="shrink-0 rounded-2xl bg-white p-3 shadow-[0_12px_28px_rgba(15,23,42,.12)]">
-          {qrCode ? <img src={qrCode} alt="QR code pour ouvrir JcHub" className="h-40 w-40 sm:h-44 sm:w-44" /> : <div className="h-40 w-40 animate-pulse bg-slate-200 sm:h-44 sm:w-44" aria-label="Génération du QR code" />}
+          {qrCode ? <img src={qrCode} alt="QR code pour ouvrir JcHub" className="h-40 w-40 sm:h-44 sm:w-44" /> : <div className="h-40 w-40 animate-pulse bg-slate-200 sm:h-44 sm:w-44" role="status" aria-label="Génération du QR code" />}
         </div>
       </div>
     </section>

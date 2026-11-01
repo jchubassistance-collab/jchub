@@ -748,6 +748,122 @@ export const tools: Tool[] = [
       keywords: ['recadreur image', 'redimensionner image réseaux sociaux', 'format image instagram', 'format image linkedin'],
     },
   },
+  {
+    slug: 'supprimer-arriere-plan-image',
+    name: 'Supprimer l’arrière-plan d’une image',
+    description: 'Détoure une photo en un clic grâce à l’IA : fond transparent, blanc ou de couleur, pour tes produits, ton CV ou tes visuels. L’image reste sur ton appareil.',
+    category: 'Design',
+    icon: '🪄',
+    tags: ['image', 'arrière-plan', 'fond transparent', 'détourage', 'ia', 'png', 'photo produit'],
+    component: 'BackgroundRemover',
+    translations: {
+      en: {
+        slug: 'background-remover',
+        name: 'Image background remover',
+        description: 'Remove the background of a photo in one click with AI: transparent, white or colored background, for your products, resume or visuals. The image stays on your device.',
+        tags: ['image', 'background', 'transparent background', 'cut out', 'ai', 'png', 'product photo'],
+        seo: {
+          title: 'Remove an image background for free with AI | JcHub',
+          description: 'Remove the background of any photo in your browser: people, products, logos. Download a transparent PNG or pick a background color. No upload, no sign-up.',
+          keywords: ['remove background', 'background remover', 'transparent background', 'remove image background free'],
+        },
+      },
+    },
+    status: 'published',
+    publishAt: '2026-10-30T00:00:00+01:00',
+    seo: {
+      title: 'Supprimer l’arrière-plan d’une image gratuitement avec l’IA | JcHub',
+      description: 'Détoure n’importe quelle photo dans ton navigateur : personnes, produits, logos. Télécharge un PNG transparent ou choisis une couleur de fond. Sans envoi ni inscription.',
+      keywords: ['supprimer arrière-plan', 'détourer image', 'fond transparent', 'enlever le fond d’une photo'],
+    },
+  },
+  {
+    slug: 'generateur-cv',
+    name: 'Générateur de CV',
+    description: 'Crée un CV professionnel en remplissant un formulaire : deux modèles, ta photo, tes couleurs, un aperçu en direct et l’export en PDF.',
+    category: 'Productivité',
+    icon: '📄',
+    tags: ['cv', 'curriculum vitae', 'pdf', 'emploi', 'modèle de cv', 'candidature'],
+    component: 'CvGenerator',
+    translations: {
+      en: {
+        slug: 'resume-builder',
+        name: 'Resume builder',
+        description: 'Create a professional resume by filling in a form: two templates, your photo, your colors, a live preview and PDF export.',
+        tags: ['resume', 'cv', 'pdf', 'job', 'resume template', 'application'],
+        seo: {
+          title: 'Free resume builder with PDF export | JcHub',
+          description: 'Fill in your details and get a clean resume in PDF: modern or classic template, photo, accent color and live preview. No sign-up, nothing sent to a server.',
+          keywords: ['resume builder', 'free cv maker', 'resume pdf', 'resume template'],
+        },
+      },
+    },
+    status: 'published',
+    publishAt: '2026-11-05T00:00:00+01:00',
+    seo: {
+      title: 'Générateur de CV gratuit avec export PDF | JcHub',
+      description: 'Remplis tes informations et obtiens un CV soigné en PDF : modèle moderne ou classique, photo, couleur et aperçu en direct. Sans inscription, rien n’est envoyé.',
+      keywords: ['générateur de cv', 'créer un cv gratuit', 'cv pdf', 'modèle de cv'],
+    },
+  },
+  {
+    slug: 'generateur-facture',
+    name: 'Générateur de factures et de devis',
+    description: 'Rédige une facture ou un devis en quelques minutes : logo, TVA par taux, euros ou francs CFA, calculs automatiques et export en PDF.',
+    category: 'Productivité',
+    icon: '🧾',
+    tags: ['facture', 'devis', 'pdf', 'freelance', 'tva', 'auto-entrepreneur'],
+    component: 'InvoiceGenerator',
+    translations: {
+      en: {
+        slug: 'invoice-generator',
+        name: 'Invoice and quote generator',
+        description: 'Write an invoice or a quote in minutes: logo, VAT by rate, any major currency, automatic totals and PDF export.',
+        tags: ['invoice', 'quote', 'pdf', 'freelance', 'vat', 'small business'],
+        seo: {
+          title: 'Free invoice generator with PDF export | JcHub',
+          description: 'Create invoices and quotes with your logo, VAT and automatic totals, then download them as PDF. Works in your browser, no sign-up.',
+          keywords: ['invoice generator', 'free invoice maker', 'invoice pdf', 'quote generator'],
+        },
+      },
+    },
+    status: 'published',
+    publishAt: '2026-11-05T00:00:00+01:00',
+    seo: {
+      title: 'Générateur de factures et de devis gratuit en PDF | JcHub',
+      description: 'Crée tes factures et tes devis avec ton logo, la TVA et des totaux calculés automatiquement, en euros ou en francs CFA, puis télécharge-les en PDF. Sans inscription.',
+      keywords: ['générateur de facture', 'faire une facture gratuite', 'facture pdf', 'modèle de devis'],
+    },
+  },
+  {
+    slug: 'ocr-image-en-texte',
+    name: 'OCR : extraire le texte d’une image',
+    description: 'Récupère le texte d’une photo, d’une capture d’écran ou d’un scan, puis copie-le ou télécharge-le en .txt.',
+    category: 'Document',
+    icon: '🔎',
+    tags: ['ocr', 'image', 'texte', 'scan', 'extraction', 'photo'],
+    component: 'OcrTool',
+    translations: {
+      en: {
+        slug: 'image-to-text-ocr',
+        name: 'OCR: extract text from an image',
+        description: 'Get the text out of a photo, a screenshot or a scan, then copy it or download it as .txt.',
+        tags: ['ocr', 'image', 'text', 'scan', 'extraction', 'photo'],
+        seo: {
+          title: 'Image to text: free online OCR | JcHub',
+          description: 'Extract the text of a photo, screenshot or scanned page in seconds. Edit it, copy it or download it as a text file. Free, no sign-up.',
+          keywords: ['image to text', 'ocr online', 'extract text from image', 'photo to text'],
+        },
+      },
+    },
+    status: 'published',
+    publishAt: '2026-11-10T00:00:00+01:00',
+    seo: {
+      title: 'Extraire le texte d’une image : OCR gratuit en ligne | JcHub',
+      description: 'Transforme une photo, une capture d’écran ou un scan en texte modifiable en quelques secondes. Copie-le ou télécharge-le. Gratuit, sans inscription.',
+      keywords: ['image en texte', 'ocr en ligne', 'extraire texte image', 'photo en texte'],
+    },
+  },
 ];
 
 export function isToolVisibleToday(tool: Tool, date = new Date()): boolean {

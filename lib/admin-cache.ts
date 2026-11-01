@@ -46,7 +46,7 @@ export function fetchJson<T>(url: string, fallbackError = 'Chargement impossible
 
 /** Addresses each page reads first, started as soon as a link to the page is hovered. */
 const PAGE_DATA: [prefix: string, urls: string[]][] = [
-  ['/admin/redaction', ['/api/redaction/articles']],
+  ['/admin/redaction', ['/api/redaction/articles', '/api/redaction/categories']],
   ['/admin/users', ['/api/admin/users']],
   ['/admin/content', ['/api/admin/content']],
   ['/admin/analytics', ['/api/admin/analytics']],
