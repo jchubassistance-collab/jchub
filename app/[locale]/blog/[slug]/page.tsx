@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { BlogInteractions } from '@/components/blog/BlogInteractions';
-import { GiscusComments } from '@/components/blog/GiscusComments';
+import { ArticleComments } from '@/components/blog/ArticleComments';
 import { articleCoverPath } from '@/lib/article-cover';
 import { getPublishedArticles, getPublishedArticleBySlug, getPublishedArticleSlugs, type BlogArticle } from '@/lib/blog';
 import { unsplashHomeUrl } from '@/lib/photos';
@@ -189,7 +189,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
       </div>
 
       <div className="mx-auto max-w-4xl px-4 pb-16 sm:px-6 lg:px-8">
-        <GiscusComments articleId={article.id} />
+        <ArticleComments articleId={article.id} />
         {relatedArticles.length > 0 && (
           <section className="mt-12">
             <h2 className="mb-5 text-2xl font-black text-slate-900">{t.readNext}</h2>

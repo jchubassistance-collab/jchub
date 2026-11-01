@@ -53,7 +53,7 @@ const PAGE_DATA: [prefix: string, urls: string[]][] = [
   ['/admin/tools', ['/api/admin/tools']],
   ['/admin/agent', ['/api/admin/agent/drafts']],
   ['/admin/cm', ['/api/cm/reports', '/api/cm/catalog', '/api/cm/kits']],
-  ['/admin/inbox', ['/api/admin/inbox']],
+  ['/admin/inbox', ['/api/admin/inbox', '/api/admin/comments']],
   ['/admin/settings', ['/api/admin/settings']],
 ];
 

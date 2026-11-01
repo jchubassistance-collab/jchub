@@ -26,6 +26,14 @@ const ENGLISH: Record<string, string> = {
   'Le service de contact est temporairement indisponible.': 'The contact service is temporarily unavailable.',
   'Vérifie les champs du formulaire.': 'Check the form fields.',
   'Impossible d’envoyer ton message pour le moment.': 'We can’t send your message right now.',
+  // Article comments
+  'Article introuvable.': 'Article not found.',
+  'Impossible de charger les commentaires.': 'Could not load the comments.',
+  'Indique un nom de 2 à 60 caractères.': 'Enter a name of 2 to 60 characters.',
+  'Ton commentaire contient trop de liens (2 au maximum).': 'Your comment contains too many links (2 at most).',
+  'Ton commentaire doit faire entre 3 et 2000 caractères.': 'Your comment must be 3 to 2000 characters long.',
+  'Les commentaires sont momentanément indisponibles.': 'Comments are temporarily unavailable.',
+  'Impossible de publier ton commentaire pour le moment.': 'We can’t post your comment right now.',
   // File conversion tools
   'Demande de conversion invalide.': 'Invalid conversion request.',
   'Fichier temporaire manquant.': 'Missing temporary file.',

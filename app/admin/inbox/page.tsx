@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Mail, MailCheck, MessageSquare, RefreshCw, Send, Users, Sparkles } from 'lucide-react';
+import { Mail, MailCheck, MessageCircle, MessageSquare, RefreshCw, Send, Users, Sparkles } from 'lucide-react';
+import { CommentsModeration } from '@/components/admin/CommentsModeration';
 import { cachedJson, fetchJson } from '@/lib/admin-cache';
 
 type Reply = { body: string; sentAt: string | null; adminEmail: string };
@@ -17,7 +18,8 @@ const INBOX_URL = '/api/admin/inbox';
 
 export default function AdminInboxPage() {
   const [data, setData] = useState<InboxData>(() => cachedJson<InboxData>(INBOX_URL) || { messages: [], subscribers: [] });
-  const [tab, setTab] = useState<'contact' | 'newsletter'>('contact');
+  const [tab, setTab] = useState<'contact' | 'newsletter' | 'comments'>('contact');
+  const [commentCount, setCommentCount] = useState<number | null>(null);
   const [selectedId, setSelectedId] = useState(() => cachedJson<InboxData>(INBOX_URL)?.messages[0]?.id || '');
   const [reply, setReply] = useState('');
   const [notice, setNotice] = useState('');
@@ -96,12 +98,13 @@ export default function AdminInboxPage() {
       <Stat icon={<Users className="h-5 w-5" />} label="Abonnés actifs" value={activeSubscribers} />
     </div>
 
-    <div className="grid grid-cols-2 gap-2 border-b border-slate-200 sm:flex">
+    <div className="grid grid-cols-3 gap-2 border-b border-slate-200 sm:flex">
       <TabButton active={tab === 'contact'} onClick={() => setTab('contact')} icon={<MessageSquare className="h-4 w-4" />}>Messages de contact ({data.messages.length})</TabButton>
       <TabButton active={tab === 'newsletter'} onClick={() => setTab('newsletter')} icon={<MailCheck className="h-4 w-4" />}>Abonnés newsletter ({data.subscribers.length})</TabButton>
+      <TabButton active={tab === 'comments'} onClick={() => setTab('comments')} icon={<MessageCircle className="h-4 w-4" />}>Commentaires{commentCount !== null ? ` (${commentCount})` : ''}</TabButton>
     </div>
 
-    {tab === 'contact' ? <div className="grid min-h-[460px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:grid-cols-[minmax(250px,.75fr)_minmax(0,1.5fr)]">
+    {tab === 'comments' ? <CommentsModeration onCount={setCommentCount} /> : tab === 'contact' ? <div className="grid min-h-[460px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:grid-cols-[minmax(250px,.75fr)_minmax(0,1.5fr)]">
       <section className="border-b border-slate-200 lg:border-b-0 lg:border-r" aria-label="Liste des messages">
         {loading && !data.messages.length ? null : data.messages.length ? <ul className="max-h-[620px] divide-y divide-slate-100 overflow-y-auto">{data.messages.map((message) => <li key={message.id}><button type="button" onClick={() => { setSelectedId(message.id); setNotice(''); }} className={`w-full p-4 text-left transition hover:bg-blue-50/70 ${selectedId === message.id ? 'bg-blue-50' : ''}`}><span className="flex items-center justify-between gap-2"><strong className="truncate text-sm text-slate-900">{message.name || message.email}</strong><span className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-bold ${message.status === 'replied' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'}`}>{message.status === 'replied' ? 'Répondu' : 'À traiter'}</span></span><span className="mt-1 block truncate text-xs text-slate-500">{message.subject}</span><span className="mt-2 block text-[11px] text-slate-400">{formatDate(message.createdAt)}</span></button></li>)}</ul> : <Empty text="Aucun message de contact pour le moment." />}
       </section>
