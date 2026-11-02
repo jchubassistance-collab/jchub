@@ -21,7 +21,6 @@ const tools: Record<ToolComponentName, ComponentType> = {
   ImagesToPdf: dynamic(() => import('@/components/tools/ImagesToPdf').then((m) => m.ImagesToPdf)),
   ImageOptimizer: dynamic(() => import('@/components/tools/ImageOptimizer').then((m) => m.ImageOptimizer)),
   SocialImageCropper: dynamic(() => import('@/components/tools/SocialImageCropper').then((m) => m.SocialImageCropper)),
-  BackgroundRemover: dynamic(() => import('@/components/tools/BackgroundRemover').then((m) => m.BackgroundRemover)),
   OcrTool: dynamic(() => import('@/components/tools/OcrTool').then((m) => m.OcrTool)),
   CvGenerator: dynamic(() => import('@/components/tools/CvGenerator').then((m) => m.CvGenerator)),
   InvoiceGenerator: dynamic(() => import('@/components/tools/InvoiceGenerator').then((m) => m.InvoiceGenerator)),

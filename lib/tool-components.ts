@@ -13,7 +13,6 @@ export const TOOL_COMPONENTS = [
   'ImagesToPdf',
   'ImageOptimizer',
   'SocialImageCropper',
-  'BackgroundRemover',
   'OcrTool',
   'CvGenerator',
   'InvoiceGenerator',

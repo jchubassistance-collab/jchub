@@ -14,14 +14,14 @@ import { isLocale, type Locale } from '@/i18n/routing';
 const NEEDS = [
   { icon: Palette, slugs: ['logo-studio', 'convertisseur-couleurs'] },
   { icon: Receipt, slugs: ['generateur-facture'] },
-  { icon: Store, slugs: ['generateur-de-qr-code', 'supprimer-arriere-plan-image', 'redimensionneur-recadreur-images', 'optimiseur-convertisseur-webp-png'] },
+  { icon: Store, slugs: ['generateur-de-qr-code', 'redimensionneur-recadreur-images', 'optimiseur-convertisseur-webp-png'] },
   { icon: FolderOpen, slugs: ['fusionner-decouper-pdf', 'compresser-pdf', 'images-en-pdf', 'ocr-image-en-texte', 'word-to-pdf'] },
   { icon: Briefcase, slugs: ['generateur-cv'] },
 ];
 
 /** Step-by-step paths through the tools. A scenario with fewer than two live steps is hidden. */
 const SCENARIOS = [
-  ['logo-studio', 'generateur-de-qr-code', 'supprimer-arriere-plan-image', 'redimensionneur-recadreur-images'],
+  ['logo-studio', 'generateur-de-qr-code', 'redimensionneur-recadreur-images'],
   ['generateur-facture', 'compresser-pdf'],
   ['ocr-image-en-texte', 'images-en-pdf', 'fusionner-decouper-pdf'],
 ];
@@ -43,7 +43,7 @@ const copy = bilingual({
     {
       title: 'J’ouvre ma boutique',
       text: 'Une identité, un moyen simple de te contacter et des photos qui donnent envie.',
-      steps: ['Crée ou retouche ton logo.', 'Fais un QR code vers ton WhatsApp ou ta page, à afficher en boutique.', 'Détoure les photos de tes produits.', 'Mets-les au bon format pour tes réseaux.'],
+      steps: ['Crée ou retouche ton logo.', 'Fais un QR code vers ton WhatsApp ou ta page, à afficher en boutique.', 'Mets-les au bon format pour tes réseaux.'],
     },
     {
       title: 'Je fais ma première facture',
@@ -87,7 +87,7 @@ const copy = bilingual({
     {
       title: 'I’m opening my shop',
       text: 'An identity, an easy way to reach you and photos that make people want to buy.',
-      steps: ['Create or edit your logo.', 'Make a QR code to your WhatsApp or page, to display in your shop.', 'Remove the background from your product photos.', 'Resize them for your social networks.'],
+      steps: ['Create or edit your logo.', 'Make a QR code to your WhatsApp or page, to display in your shop.', 'Resize them for your social networks.'],
     },
     {
       title: 'I’m sending my first invoice',

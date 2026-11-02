@@ -749,35 +749,6 @@ export const tools: Tool[] = [
     },
   },
   {
-    slug: 'supprimer-arriere-plan-image',
-    name: 'Supprimer l’arrière-plan d’une image',
-    description: 'Détoure une photo en un clic grâce à l’IA : fond transparent, blanc ou de couleur, pour tes produits, ton CV ou tes visuels. L’image reste sur ton appareil.',
-    category: 'Design',
-    icon: '🪄',
-    tags: ['image', 'arrière-plan', 'fond transparent', 'détourage', 'ia', 'png', 'photo produit'],
-    component: 'BackgroundRemover',
-    translations: {
-      en: {
-        slug: 'background-remover',
-        name: 'Image background remover',
-        description: 'Remove the background of a photo in one click with AI: transparent, white or colored background, for your products, resume or visuals. The image stays on your device.',
-        tags: ['image', 'background', 'transparent background', 'cut out', 'ai', 'png', 'product photo'],
-        seo: {
-          title: 'Remove an image background for free with AI | JcHub',
-          description: 'Remove the background of any photo in your browser: people, products, logos. Download a transparent PNG or pick a background color. No upload, no sign-up.',
-          keywords: ['remove background', 'background remover', 'transparent background', 'remove image background free'],
-        },
-      },
-    },
-    status: 'published',
-    publishAt: '2026-10-30T00:00:00+01:00',
-    seo: {
-      title: 'Supprimer l’arrière-plan d’une image gratuitement avec l’IA | JcHub',
-      description: 'Détoure n’importe quelle photo dans ton navigateur : personnes, produits, logos. Télécharge un PNG transparent ou choisis une couleur de fond. Sans envoi ni inscription.',
-      keywords: ['supprimer arrière-plan', 'détourer image', 'fond transparent', 'enlever le fond d’une photo'],
-    },
-  },
-  {
     slug: 'generateur-cv',
     name: 'Générateur de CV',
     description: 'Crée un CV professionnel en remplissant un formulaire : deux modèles, ta photo, tes couleurs, un aperçu en direct et l’export en PDF.',

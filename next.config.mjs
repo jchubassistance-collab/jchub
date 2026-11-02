@@ -45,6 +45,11 @@ const nextConfig = {
       { source: '/compte/abonnement', destination: '/fr/compte', permanent: true },
       { source: '/fr/compte/abonnement', destination: '/fr/compte', permanent: true },
       { source: '/guides', destination: '/fr/blog', permanent: true },
+      // Background remover, withdrawn in November 2026: its pages lead to the catalog.
+      { source: '/fr/outils/supprimer-arriere-plan-image', destination: '/fr/outils', permanent: true },
+      { source: '/outils/supprimer-arriere-plan-image', destination: '/fr/outils', permanent: true },
+      { source: '/en/tools/background-remover', destination: '/en/tools', permanent: true },
+      { source: '/en/tools/supprimer-arriere-plan-image', destination: '/en/tools', permanent: true },
     ];
   },
   async headers() {

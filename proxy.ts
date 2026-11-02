@@ -21,9 +21,9 @@ function getContentSecurityPolicy(nonce: string) {
     "object-src 'none'",
     "frame-ancestors 'none'",
     "form-action 'self'",
-    // wasm-unsafe-eval only lets WebAssembly compile (background remover model), not eval().
+    // wasm-unsafe-eval only lets WebAssembly compile (pdf.js image decoders), not eval().
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval'${developmentEval} https://www.googletagmanager.com https://www.google-analytics.com https://apis.google.com https://accounts.google.com https://static.cloudflareinsights.com https://tracker.metricool.com`,
-    "connect-src 'self' blob: https://vercel.com https://*.blob.vercel-storage.com https://*.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://api.cloudinary.com https://tracker.metricool.com https://cloudflareinsights.com https://huggingface.co https://*.hf.co",
+    "connect-src 'self' blob: https://vercel.com https://*.blob.vercel-storage.com https://*.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://api.cloudinary.com https://tracker.metricool.com https://cloudflareinsights.com",
     "worker-src 'self'",
     "img-src 'self' data: blob: https:",
     "style-src 'self' 'unsafe-inline'",
