@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown, ExternalLink, FileText, Loader2, MoreVertical, Plus, Trash2 } from 'lucide-react';
 import { cachedJson, fetchJson, rememberJson } from '@/lib/admin-cache';
 import { categoryKey, normalizeCategory, WRITER_CATEGORIES, WRITER_LIMITS, type WriterArticleSummary } from '@/lib/writer-rules';
+import type { PerformanceRange, WriterPerformance } from '@/lib/writer-performance';
 import { publicSiteUrl } from '@/components/redaction/WriterShell';
 
 export type { WriterArticleSummary };
@@ -190,4 +191,24 @@ function ArticleActions({ article, onChanged, onError }: { article: WriterArticl
       {canDelete(article) && <button onClick={() => void remove()} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-red-600 hover:bg-red-50"><Trash2 className="h-3.5 w-3.5" />Supprimer le brouillon</button>}
     </div>}
   </div>;
+}
+
+/** Performance of the writer's articles over 7, 30 or 90 days: the last answer at once, then a fresh one. */
+export function useWriterPerformance(days: PerformanceRange) {
+  const url = `/api/redaction/performance?jours=${days}`;
+  const [data, setData] = useState<WriterPerformance | undefined>(() => cachedJson<WriterPerformance>(url));
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true); setError('');
+    const kept = cachedJson<WriterPerformance>(url);
+    if (kept) setData(kept);
+    fetchJson<WriterPerformance>(url, 'Impossible de charger vos statistiques.')
+      .then((fresh) => { if (!cancelled) setData(fresh); })
+      .catch((cause) => { if (!cancelled) setError(cause instanceof Error ? cause.message : 'Impossible de charger vos statistiques.'); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [url]);
+  return { data, loading, error };
 }

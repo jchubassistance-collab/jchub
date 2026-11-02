@@ -30,7 +30,7 @@
     "test:article-cover": "node --experimental-strip-types --test tests/article-cover.test.js",
     "test:reports": "node --experimental-strip-types --test tests/reports.test.js",
     "articles:export": "node --experimental-strip-types --env-file=.env scripts/export-articles.mjs",
-    "test:writer": "node --experimental-strip-types --test tests/writer-rules.test.js tests/blog-comments.test.js tests/markdown-format.test.js"
+    "test:writer": "node --experimental-strip-types --test tests/writer-rules.test.js tests/blog-comments.test.js tests/markdown-format.test.js tests/writer-performance.test.js"
   },
   "dependencies": {
     "@adobe/pdfservices-node-sdk": "^4.1.0",

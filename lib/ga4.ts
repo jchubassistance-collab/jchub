@@ -133,3 +133,35 @@ export async function getGa4ContentViews(paths: string[]) {
   const mapRows = (report: Report) => Object.fromEntries(rowsToObjects(report).map((row) => [String(row.pagePath), Number(row.screenPageViews || 0)]));
   return { configured: true, current: mapRows(current), previous: mapRows(previous) };
 }
+
+/**
+ * Readership of a writer's articles over the last `days` days (until yesterday, as GA4 has a
+ * delay) and the `days` before: views per day and per page, readers, reading time, devices,
+ * traffic channels and countries. `paths` are the article pages in both languages.
+ */
+export async function getGa4ArticleStats(paths: string[], days: number) {
+  const access = await getAccessToken();
+  if (!access || !paths.length) return { configured: Boolean(access) as boolean, daily: [], pages: [], previousPages: [], totals: null, devices: [], channels: [], countries: [] };
+  const filter = { filter: { fieldName: 'pagePath', inListFilter: { values: paths.slice(0, 1000), caseSensitive: true } } };
+  const start = `${days}daysAgo`;
+  const [daily, pages, previousPages, totals, devices, channels, countries] = await Promise.all([
+    runReport(access, ['date', 'pagePath'], ['screenPageViews'], 10000, start, 'yesterday', true, filter),
+    runReport(access, ['pagePath'], ['screenPageViews', 'activeUsers', 'userEngagementDuration'], 1000, start, 'yesterday', false, filter),
+    runReport(access, ['pagePath'], ['screenPageViews'], 1000, `${days * 2}daysAgo`, `${days + 1}daysAgo`, false, filter),
+    runReport(access, [], ['screenPageViews', 'activeUsers', 'userEngagementDuration'], 1, start, 'yesterday', false, filter),
+    runReport(access, ['deviceCategory'], ['screenPageViews'], 10, start, 'yesterday', false, filter),
+    runReport(access, ['sessionDefaultChannelGroup'], ['screenPageViews'], 10, start, 'yesterday', false, filter),
+    runReport(access, ['country'], ['screenPageViews'], 8, start, 'yesterday', false, filter),
+  ]);
+  const totalsRow = rowsToObjects(totals)[0];
+  return {
+    configured: true as boolean,
+    daily: rowsToObjects(daily).map((row) => ({ date: String(row.date), path: String(row.pagePath), views: Number(row.screenPageViews || 0) })),
+    pages: rowsToObjects(pages).map((row) => ({ path: String(row.pagePath), views: Number(row.screenPageViews || 0), readers: Number(row.activeUsers || 0), engagementSeconds: Number(row.userEngagementDuration || 0) })),
+    previousPages: rowsToObjects(previousPages).map((row) => ({ path: String(row.pagePath), views: Number(row.screenPageViews || 0) })),
+    totals: totalsRow ? { views: Number(totalsRow.screenPageViews || 0), readers: Number(totalsRow.activeUsers || 0), engagementSeconds: Number(totalsRow.userEngagementDuration || 0) } : { views: 0, readers: 0, engagementSeconds: 0 },
+    devices: rowsToObjects(devices).map((row) => ({ name: String(row.deviceCategory), views: Number(row.screenPageViews || 0) })),
+    channels: rowsToObjects(channels).map((row) => ({ name: String(row.sessionDefaultChannelGroup), views: Number(row.screenPageViews || 0) })),
+    countries: rowsToObjects(countries).map((row) => ({ name: String(row.country), views: Number(row.screenPageViews || 0) })),
+  };
+}

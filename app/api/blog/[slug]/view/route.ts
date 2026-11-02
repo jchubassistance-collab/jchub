@@ -4,6 +4,7 @@ import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { reportUserError } from '@/lib/user-error';
 import { enforceRateLimit } from '@/lib/rate-limit';
 import { withReport } from '@/lib/reports/server';
+import { requestLocale } from '@/i18n/request-locale';
 
 export const POST = withReport(async function POST(_request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const limited = await enforceRateLimit(_request, 'blog-view', 30, 60_000);
@@ -12,7 +13,12 @@ export const POST = withReport(async function POST(_request: NextRequest, { para
   if (!hasFirebaseAdminConfig()) return NextResponse.json({ views: null }, { status: 503 });
   try {
     const ref = getAdminDb().collection('blog_articles').doc(slug);
-    await ref.set({ slug, views: FieldValue.increment(1), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    // The day's count, per language, draws the curves of the writing space (/api/redaction/performance).
+    const day = new Date().toISOString().slice(0, 10);
+    await Promise.all([
+      ref.set({ slug, views: FieldValue.increment(1), updatedAt: FieldValue.serverTimestamp() }, { merge: true }),
+      ref.collection('days').doc(day).set({ date: day, views: FieldValue.increment(1), [requestLocale(_request)]: FieldValue.increment(1) }, { merge: true }),
+    ]);
     const snapshot = await ref.get();
     return NextResponse.json({ views: Number(snapshot.data()?.views || 0) }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
