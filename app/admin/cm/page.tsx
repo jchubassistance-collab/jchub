@@ -21,24 +21,23 @@ export default function CmPage() {
   const [tab, setTab] = useState<'dashboard'|'articles'|'tools'|'reports'|'compare'|'performance'|'kits'>('dashboard');
   const [reports, setReports] = useState<Report[]>(() => cachedJson<{ reports?: Report[] }>('/api/cm/reports')?.reports || []); const [catalog, setCatalog] = useState<CatalogItem[]>(() => cachedJson<{ content?: CatalogItem[] }>('/api/cm/catalog')?.content || []); const [kits, setKits] = useState<KitSummary[]>(() => cachedJson<{ kits?: KitSummary[] }>('/api/cm/kits')?.kits || []);
   const [reportDraft, setReportDraft] = useState<Omit<Report,'id'>>(blankReport);
-const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false); const [message, setMessage] = useState(''); const [realtime, setRealtime] = useState(false);
+const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false); const [message, setMessage] = useState(''); const [refreshedAt, setRefreshedAt] = useState<Date | null>(null);
   const [kitSelection, setKitSelection] = useState('');
   const refresh = useCallback(async () => {
     const failure = 'Impossible de charger les données CM. Vérifie ta session.';
     const [r,c,k] = await Promise.all([fetchJson<{ reports?: Report[] }>('/api/cm/reports',failure),fetchJson<{ content?: CatalogItem[] }>('/api/cm/catalog',failure),fetchJson<{ kits?: KitSummary[] }>('/api/cm/kits',failure)]);
-    setReports(r.reports || []); setCatalog(c.content || []); setKits(k.kits || []);
+    setReports(r.reports || []); setCatalog(c.content || []); setKits(k.kits || []); setRefreshedAt(new Date());
   },[]);
   useEffect(()=>{ refresh().catch((error)=>setMessage(error.message)).finally(()=>setLoading(false)); },[refresh]);
+  // Fresh data when the tab comes back into view, then every 5 minutes while it stays visible.
+  // A live connection (Server-Sent Events) used to hold a server function open all the time,
+  // which cost most of the site's compute.
   useEffect(()=>{
-    const stream=new EventSource('/api/cm/stream');
-    let refreshTimer:ReturnType<typeof setTimeout>|undefined;
-    const scheduleRefresh=()=>{if(refreshTimer)clearTimeout(refreshTimer);refreshTimer=setTimeout(()=>{refresh().catch((error)=>setMessage(error instanceof Error?error.message:'Synchronisation impossible.'));},180);};
-    const onOpen=()=>setRealtime(true); const onError=()=>setRealtime(false);
-    stream.addEventListener('open',onOpen); stream.addEventListener('error',onError);
-    stream.addEventListener('update',scheduleRefresh); stream.addEventListener('refresh',scheduleRefresh);
-    const onVisible=()=>{if(document.visibilityState==='visible')scheduleRefresh();};
+    const sync=()=>{refresh().catch((error)=>setMessage(error instanceof Error?error.message:'Synchronisation impossible.'));};
+    const timer=setInterval(()=>{if(document.visibilityState==='visible')sync();},5*60_000);
+    const onVisible=()=>{if(document.visibilityState==='visible')sync();};
     document.addEventListener('visibilitychange',onVisible);
-    return()=>{stream.close();if(refreshTimer)clearTimeout(refreshTimer);document.removeEventListener('visibilitychange',onVisible);};
+    return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',onVisible);};
   },[refresh]);
   useEffect(()=>{const sync=()=>{const value=window.location.hash.slice(1);if(['dashboard','articles','tools','reports','compare','performance','kits'].includes(value))setTab(value as typeof tab);};sync();window.addEventListener('hashchange',sync);return()=>window.removeEventListener('hashchange',sync);},[]);
   useEffect(()=>{if(window.location.hash!==`#${tab}`)window.history.replaceState(null,'',`${window.location.pathname}${window.location.search}#${tab}`);},[tab]);
@@ -50,7 +49,7 @@ const [loading, setLoading] = useState(true); const [saving, setSaving] = useSta
   return <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
     {!['articles','tools','dashboard','compare','performance','kits','reports'].includes(tab)&&<header className="overflow-hidden rounded-2xl bg-[#07142b] p-6 text-white sm:p-8"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[.2em] text-blue-300">JcHub · espace Community Manager</p><h1 className="mt-2 text-2xl font-black sm:text-3xl">Pilotage éditorial</h1><p className="mt-2 max-w-2xl text-sm text-slate-300">Organise les contenus et consigne les résultats réels d’Instagram et Facebook.</p></div><button onClick={()=>{setLoading(true);refresh().catch((error)=>setMessage(error.message)).finally(()=>setLoading(false));}} className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-3 py-2 text-sm hover:bg-white/10"><RefreshCw className={`h-4 w-4 ${loading?'animate-spin':''}`}/>Actualiser</button></div></header>}
     {!['articles','tools','dashboard','compare','performance','kits','reports'].includes(tab)&&<nav className="mb-5 flex flex-wrap gap-2" aria-label="Navigation CM">{([['articles','Articles',ClipboardList],['tools','Outils',ChartNoAxesCombined],['kits','Kits de publication',Sparkles],['reports','Rapports',ClipboardList],['compare','Comparatifs',ChartNoAxesCombined],['performance','Performances',ChartNoAxesCombined]] as const).map(([id,label,Icon])=><button key={id} onClick={()=>setTab(id)} className={`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold ${tab===id?'bg-blue-700 text-white':'border border-slate-200 bg-white text-slate-600 hover:border-blue-300'}`}><Icon className="h-4 w-4"/>{label}</button>)}</nav>}
-    <p aria-live="polite" className={`-mt-4 flex items-center justify-end gap-1.5 text-[10px] ${realtime?'text-emerald-700':'text-slate-400'}`}><span className={`h-1.5 w-1.5 rounded-full ${realtime?'bg-emerald-500':'bg-slate-300'}`}/>{realtime?'Synchronisé en temps réel':'Connexion temps réel en cours'}</p>
+    <p aria-live="polite" className="-mt-4 flex items-center justify-end gap-1.5 text-[10px] text-slate-400"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500"/>{refreshedAt?`Actualisé à ${refreshedAt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`:'Chargement…'}</p>
     {message&&<p role="status" className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">{message}</p>}
     {(tab==='articles'||tab==='tools')&&<CmCatalogDashboard items={catalog} kits={kits} kind={tab==='tools'?'Outil':'Article'} onKindChange={kind=>setTab(kind==='Outil'?'tools':'articles')} onPrepare={prepareKit}/>}
     {tab==='dashboard'&&<CmOverviewDashboard reports={reports} onNavigate={setTab}/>}
