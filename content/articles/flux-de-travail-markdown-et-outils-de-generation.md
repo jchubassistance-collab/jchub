@@ -11,7 +11,7 @@ tags:
   - Développement
   - technologie
 author: JcHub
-image: 'https://jchub.dev/api/article-cover?title=Du%20script%20automatis%C3%A9%20au%20rendu%20visuel%20%3A%20ma%C3%AEtriser%20le%20flux%20Markdown%20dans%20les%20projets%20modernes&category=Aper%C3%A7u%20Markdown'
+image: /blog/covers/flux-de-travail-markdown-et-outils-de-generation.jpg
 readTime: 5 min
 status: published
 publishedAt: '2026-10-16T09:11:00.568Z'

@@ -11,7 +11,7 @@ tags:
   - Développement
   - technologie
 author: JcHub
-image: "https://jchub.dev/api/article-cover?title=Agents%20Web%2C%20APIs%20et%20Encodage%20d'URL%20%3A%20%C3%89viter%20les%20Erreurs%20Silencieuses%20et%20le%20Gaspillage%20de%20Requ%C3%AAtes&category=Encodeur%20%2F%20D%C3%A9codeur%20URL"
+image: /blog/covers/agents-web-apis-encodage-url-erreurs-requetes.jpg
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-11-05T21:08:00.000Z'

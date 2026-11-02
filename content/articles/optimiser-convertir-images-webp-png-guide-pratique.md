@@ -11,7 +11,7 @@ tags:
   - Informatique
   - technologie
 author: JcHub
-image: 'https://jchub.dev/api/article-cover?title=Comment%20optimiser%20ses%20images%20WebP%20et%20PNG%20pour%20acc%C3%A9l%C3%A9rer%20un%20site%20web%20sans%20perte%20de%20qualit%C3%A9&category=Optimiseur%20et%20Convertisseur%20d%E2%80%99Images%20WebP%20%2F%20PNG'
+image: /blog/covers/optimiser-convertir-images-webp-png-guide-pratique.jpg
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-11-19T21:08:00.000Z'

@@ -12,7 +12,7 @@ keywords:
   - 2fa
   - sécurité compte
 author: Jessy Ngnambongo
-image: /blog/14-mot-de-passe-securise.svg
+image: /blog/covers/mot-de-passe-securise.jpg
 readTime: 5 min
 status: published
 publishedAt: '2026-10-10T07:03:03.196Z'
@@ -79,7 +79,7 @@ Le seul mot de passe que tu dois retenir par cœur : celui de Bitwarden. Il doit
 CorrectHorseBatteryStaple42!
 ```
 
-Ou utilise mon [générateur de mot de passe](https://jchub.io/outils/generateur-mot-de-passe) sur JcHub. Génère 24+ caractères, copie dans Bitwarden, oublie-le.
+Ou utilise mon [générateur de mot de passe](https://jchub.dev/fr/outils/generateur-mot-de-passe) sur JcHub. Génère 24+ caractères, copie dans Bitwarden, oublie-le.
 
 ### 3. **2FA partout où c'est possible**
 
@@ -97,7 +97,7 @@ La 2FA (Two-Factor Authentication) ajoute une couche de sécurité. Même si ton
 
 ### Outil en ligne (le plus rapide)
 
-Mon [Password Generator](https://jchub.io/outils/generateur-mot-de-passe) sur JcHub. Tu choisis :
+Mon [Password Generator](https://jchub.dev/fr/outils/generateur-mot-de-passe) sur JcHub. Tu choisis :
 - La longueur (16+ recommandé)
 - Si tu veux des majuscules
 - Si tu veux des chiffres
@@ -196,10 +196,10 @@ Si t'es dev, t'as des **clés API**, des **tokens JWT**, des **passwords de DB**
 - **Gestionnaire** : Bitwarden (gratuit, open source)
 - **2FA** : partout où c'est possible, app > SMS
 - **Pas de questions de sécurité** : génère des réponses random
-- **Générateur gratuit** : [jchub.io/outils/generateur-mot-de-passe](https://jchub.io/outils/generateur-mot-de-passe)
+- **Générateur gratuit** : [jchub.dev/fr/outils/generateur-mot-de-passe](https://jchub.dev/fr/outils/generateur-mot-de-passe)
 
 ---
 
-**Tu veux tester si tes mots de passe actuels sont robustes ?** Mon [Password Generator](https://jchub.io/outils/generateur-mot-de-passe) inclut un indicateur de force en temps réel.
+**Tu veux tester si tes mots de passe actuels sont robustes ?** Mon [Password Generator](https://jchub.dev/fr/outils/generateur-mot-de-passe) inclut un indicateur de force en temps réel.
 
-Y'a 14 outils dev gratuits sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Y'a 14 outils dev gratuits sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

@@ -11,7 +11,7 @@ tags:
   - Développement
   - technologie
 author: JcHub
-image: 'https://jchub.dev/api/article-cover?title=Au-del%C3%A0%20du%20code%20automatis%C3%A9%20%3A%20s%C3%A9curiser%20et%20inspecter%20les%20jetons%20JWT%20dans%20vos%20architectures%20modernes&category=D%C3%A9codeur%20JWT'
+image: /blog/covers/securiser-inspecter-jetons-jwt-architectures-modernes.jpg
 readTime: 5 min
 status: published
 publishedAt: '2026-09-24T13:15:40.525Z'

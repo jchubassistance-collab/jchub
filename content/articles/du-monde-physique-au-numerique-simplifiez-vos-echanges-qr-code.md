@@ -11,7 +11,7 @@ tags:
   - Informatique
   - technologie
 author: JcHub
-image: 'https://jchub.dev/api/article-cover?title=Du%20monde%20physique%20au%20num%C3%A9rique%20%3A%20simplifiez%20vos%20%C3%A9changes%20gr%C3%A2ce%20au%20QR%20Code&category=G%C3%A9n%C3%A9rateur%20de%20QR%20code'
+image: /blog/covers/du-monde-physique-au-numerique-simplifiez-vos-echanges-qr-code.jpg
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-11-12T21:08:00.000Z'

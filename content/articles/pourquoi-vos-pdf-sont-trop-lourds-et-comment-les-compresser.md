@@ -11,7 +11,7 @@ tags:
   - Informatique
   - technologie
 author: JcHub
-image: "https://jchub.dev/api/article-cover?title=Pourquoi%20vos%20PDF%20d%C3%A9passent%20les%20limites%20d'envoi%20et%20comment%20les%20all%C3%A9ger%20sans%20perte%20de%20lisibilit%C3%A9&category=Compresser%20un%20PDF%20gratuitement"
+image: /blog/covers/pourquoi-vos-pdf-sont-trop-lourds-et-comment-les-compresser.jpg
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-11-26T21:08:00.000Z'

@@ -11,7 +11,7 @@ tags:
   - Développement
   - technologie
 author: JcHub
-image: "https://example.com/api/article-cover?title=Agents%20web%20et%20micro-mod%C3%A8les%20%3A%20comment%20anticiper%20et%20ma%C3%AEtriser%20l'explosion%20de%20vos%20factures%20d'API&category=API%20Cost%20Calculator"
+image: /blog/covers/agents-web-micro-modeles-maitriser-couts-api.jpg
 readTime: 5 min
 status: published
 publishedAt: '2026-10-13T09:11:00.475Z'

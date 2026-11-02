@@ -12,7 +12,7 @@ keywords:
   - base64 css
   - base64 vs chiffrement
 author: Jessy Ngnambongo
-image: /blog/12-encoder-image-base64.svg
+image: /blog/covers/encoder-image-base64.jpg
 readTime: 4 min
 status: published
 publishedAt: '2026-10-14T09:10:59.928Z'
@@ -51,7 +51,7 @@ Historiquement, beaucoup de systèmes ne géraient que du texte (emails, URLs, J
 
 ### Outil en ligne
 
-Mon [Base64 Tool gratuit](https://jchub.io/outils/base64-encoder) sur JcHub. Tu colles ton texte, t'as l'encodage en 1 clic. Pareil dans l'autre sens (décoder).
+Mon [Base64 Tool gratuit](https://jchub.dev/fr/outils/base64-encoder) sur JcHub. Tu colles ton texte, t'as l'encodage en 1 clic. Pareil dans l'autre sens (décoder).
 
 ### En JavaScript
 
@@ -206,10 +206,10 @@ C'est comme dire "j'ai sécurisé mon mot de passe en l'écrivant à l'envers". 
 - **5 vrais usages** : data URIs CSS, MIME email, Basic Auth, JWT, stockage NoSQL
 - **+33% de taille** : pas pour les grosses images
 - **Si tu veux sécuriser** : AES, bcrypt, argon2
-- **Outil gratuit** : [jchub.io/outils/base64-encoder](https://jchub.io/outils/base64-encoder)
+- **Outil gratuit** : [jchub.dev/fr/outils/base64-encoder](https://jchub.dev/fr/outils/base64-encoder)
 
 ---
 
-**Tu débugges un JWT et t'as besoin de décoder son payload ?** Le payload d'un JWT est en Base64, donc utilise mon [JWT Decoder](https://jchub.io/outils/jwt-decoder) (gratuit).
+**Tu débugges un JWT et t'as besoin de décoder son payload ?** Le payload d'un JWT est en Base64, donc utilise mon [JWT Decoder](https://jchub.dev/fr/outils/decodeur-jwt) (gratuit).
 
-Y'a 14 outils dev gratuits sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Y'a 14 outils dev gratuits sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

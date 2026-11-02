@@ -11,7 +11,7 @@ tags:
   - Développement
   - technologie
 author: JcHub
-image: /blog/02-hash-generator.svg
+image: /blog/covers/cryptanalyse-et-hachage-outils-securite-web.jpg
 readTime: 5 min
 status: published
 publishedAt: '2026-09-14T08:00:54.226Z'

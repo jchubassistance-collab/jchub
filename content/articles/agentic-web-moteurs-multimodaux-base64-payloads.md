@@ -11,7 +11,7 @@ tags:
   - Développement
   - technologie
 author: JcHub
-image: "https://jchub.dev/api/article-cover?title=Agentic%20Web%20et%20Moteurs%20Multimodaux%20%3A%20Optimiser%20l'int%C3%A9gration%20des%20Payloads%20Binaires%20et%20Base64&category=Base64%20Encoder%20%2F%20Decoder"
+image: /blog/covers/agentic-web-moteurs-multimodaux-base64-payloads.jpg
 readTime: 5 min
 status: published
 publishedAt: '2026-10-11T09:11:02.181Z'

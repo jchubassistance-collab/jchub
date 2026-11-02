@@ -46,7 +46,7 @@ The cases where you need to "look inside" a JWT:
 
 ### Method 1: With an online tool (the fastest)
 
-1. Go to [https://jchub.io/outils/jwt-decoder](https://jchub.io/outils/jwt-decoder)
+1. Go to [https://jchub.dev/en/tools/jwt-decoder](https://jchub.dev/en/tools/jwt-decoder)
 2. Paste your token into the field
 3. The tool instantly shows you:
    - The **header** as formatted JSON
@@ -118,11 +118,11 @@ For sensitive data, use an **encrypted token** (JWE) instead, or keep it on the 
 
 Decoding a JWT isn't rocket science. It's just Base64 + JSON. But having a tool that shows you all of it nicely formatted, with the expiration indicator, saves you 10 minutes of debugging every time.
 
-👉 **Try it for free**: [https://jchub.io/outils/jwt-decoder](https://jchub.io/outils/jwt-decoder)
+👉 **Try it for free**: [https://jchub.dev/en/tools/jwt-decoder](https://jchub.dev/en/tools/jwt-decoder)
 
 **Copy your token, paste it, get your answer.** That's it.
 
 ---
 
-**Want more free dev tools?** JcHub offers 14 tools (JWT, hash, timestamp, API tester, regex, color, QR code, etc.). All free, all online, zero install. → [Discover all the tools](https://jchub.io/outils)
+**Want more free dev tools?** JcHub offers 14 tools (JWT, hash, timestamp, regex, color, QR code, etc.). All free, all online, zero install. → [Discover all the tools](https://jchub.dev/en/tools)
 

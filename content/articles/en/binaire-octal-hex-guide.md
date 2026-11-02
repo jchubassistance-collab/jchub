@@ -1,8 +1,8 @@
 ---
 slug: binary-octal-decimal-hexadecimal-guide
-title: 'Binary, octal, decimal, hexadecimal: the guide to never mix them up again'
+title: 'Binary, Octal, Decimal, Hexadecimal: The Guide to Never Confuse Them Again'
 description: "Still mixing up binary and hex? Here's a simple explanation with concrete examples (CSS colors, memory addresses, ASCII)."
-excerpt: 'Binary, octal, decimal, hexadecimal: the guide to never mix them up again. In my first computer science class, the teacher wrote 0b1010 on the board. I was lost...'
+excerpt: "Binary, Octal, Decimal, Hexadecimal: The Guide to Never Confuse Them Again My first computer science class, the teacher writes 0b1010 on the board. I'm lost. Another student whispers: 'That's 10 in binary'."
 keywords:
   - binary
   - hexadecimal
@@ -11,44 +11,44 @@ keywords:
   - binary number
   - ascii table
   - base 2 8 16
-sourceHash: 469715f85919b72af44b0ac9
-translatedAt: '2026-10-19T07:57:41.809Z'
+sourceHash: 919c996bb0c58091685aee57
+translatedAt: '2026-11-02T07:51:47.218Z'
 ---
-# Binary, octal, decimal, hexadecimal: the guide to never mix them up again
+# Binary, Octal, Decimal, Hexadecimal: The Guide to Never Confuse Them Again
 
-In my first computer science class, the teacher wrote `0b1010` on the board. I was lost. Another student whispered: "It's 10 in binary."
+My first computer science class, the teacher writes `0b1010` on the board. I'm lost. Another student whispers: "That's 10 in binary."
 
-10 in binary? But `1010` is 4 characters long, how does that make 10?!
+10 in binary? But `1010` is 10 characters, how does that equal 10?!
 
-It took me 6 months to really get it. Here's the explanation I wish I'd had.
+It took me 6 months to really understand. Here's the explanation I wish I had.
 
-## A base is just a counting convention
+## The Basics: It's Just a Counting Convention
 
-We all count in **base 10** (decimal) because we have 10 fingers. But a computer has 2 fingers (0 or 1). So it counts in **base 2** (binary).
+We all count in **base 10** (decimal) because we have 10 fingers. But the computer has 2 fingers (0 or 1). So it counts in **base 2** (binary).
 
-A "base" is just **how many different digits** you use to count:
+A "base" is just **how many different digits** you use for counting:
 
-| Base | Name | Digits used |
+| Base | Name | Digits Used |
 |---|---|---|
 | 2 | Binary | 0, 1 |
 | 8 | Octal | 0-7 |
 | 10 | Decimal | 0-9 |
 | 16 | Hexadecimal | 0-9, A-F |
 
-**The value** of a number stays the same. Only the **representation** changes.
+**The value** of a number is the same. It's just the **representation** that changes.
 
 ```
 Decimal:  10
-Binary:   1010
+Binary:  1010
 Octal:    12
-Hex:      A
+Hex:     A
 ```
 
 → All of these represent the **same quantity**: ten.
 
-## How to convert (the simple method)
+## How to Convert (The Simple Method)
 
-### Decimal → Binary (divide by 2)
+### Decimal → Binary (division by 2)
 
 ```
 10 in decimal:
@@ -60,7 +60,7 @@ Hex:      A
 → Read from bottom to top: 1010
 ```
 
-### Decimal → Hex (divide by 16)
+### Decimal → Hex (division by 16)
 
 ```
 255 in decimal:
@@ -70,9 +70,9 @@ Hex:      A
 → Read from bottom to top: FF
 ```
 
-### Binary → Hex (in groups of 4)
+### Binary → Hex (by groups of 4)
 
-This is the most useful conversion. Each group of 4 bits = 1 hex digit.
+This is the most useful conversion. Every group of 4 bits = 1 hex digit.
 
 ```
 1010 1111 (binary)
@@ -82,7 +82,7 @@ A     F    (hex)
 
 So `10101111` (binary) = `AF` (hex) = `175` (decimal).
 
-### Hex → Binary (the reverse)
+### Hex → Binary (reverse)
 
 ```
 A    F    (hex)
@@ -92,23 +92,23 @@ A    F    (hex)
 
 Easy, right?
 
-## Why hex is used so much in computing
+## Why Hexadecimal is So Popular in Computing
 
 **1 hex character = 4 bits = 1 nibble**
 
-So 2 hex characters = 8 bits = 1 byte. That's the perfect size to represent:
+So 2 hex characters = 8 bits = 1 byte (1 byte). This is the perfect size for representing:
 
-### 1. **CSS colors**
+### 1. **CSS Colors**
 
 ```css
-.pure-red   { color: #FF0000; }  /* R=FF, G=00, B=00 */
-.pure-green { color: #00FF00; }  /* R=00, G=FF, B=00 */
-.pure-blue  { color: #0000FF; }  /* R=00, G=00, B=FF */
+.red-pure { color: #FF0000; }  /* R=FF, G=00, B=00 */
+.green-pure  { color: #00FF00; }  /* R=00, G=FF, B=00 */
+.blue-pure  { color: #0000FF; }  /* R=00, G=00, B=FF */
 ```
 
 `#FF0000` = 3 bytes = 24 bits = 16,777,216 possible colors.
 
-### 2. **Memory addresses**
+### 2. **Memory Addresses**
 
 ```
 0x7ffeeb2bd000  (stack address)
@@ -116,7 +116,7 @@ So 2 hex characters = 8 bits = 1 byte. That's the perfect size to represent:
 0xDEADBEEF      (debug pattern)
 ```
 
-### 3. **ASCII characters**
+### 3. **ASCII Characters**
 
 ```
 'A' = 0x41 = 65 = 0b01000001
@@ -124,7 +124,7 @@ So 2 hex characters = 8 bits = 1 byte. That's the perfect size to represent:
 '0' = 0x30 = 48
 ```
 
-The ASCII table is super clean in hex. Each character fits in 2 digits.
+The ASCII table is super clean in hex. Each character takes up 2 digits.
 
 ### 4. **Hashes**
 
@@ -133,7 +133,7 @@ The ASCII table is super clean in hex. Each character fits in 2 digits.
 const hash = "a3f5b8c9d2e1...";  // 64 hex characters = 256 bits
 ```
 
-## The conversion table to know by heart
+## The Conversion Table to Memorize by Heart
 
 | Decimal | Binary | Hex |
 |---|---|---|
@@ -159,9 +159,9 @@ const hash = "a3f5b8c9d2e1...";  // 64 hex characters = 256 bits
 | 128 | 1000 0000 | 80 |
 | 255 | 1111 1111 | FF |
 
-Memorize at least 0-15. You can work out the rest.
+Memorize at least 0-15. The rest, you can figure out.
 
-## How to convert quickly
+## How to Convert Quickly
 
 ### In JavaScript
 
@@ -206,13 +206,13 @@ oct(8)          # '0o10'
 int("10", 8)    # 8
 ```
 
-### Online tool
+### Online Tool
 
-My [Number Base Converter](https://jchub-tools.com/number-base-converter) converts instantly across all 4 bases. Really handy to debug a bit shift.
+My [Number Base Converter](https://jchub-tools.com/number-base-converter) does instant conversion between all 4 bases. Very useful for debugging bit shifts.
 
-## The classic traps
+## Common Pitfalls
 
-### 1. **Mixing up binary and hex**
+### 1. **Confusing Binary and Hex**
 
 ```javascript
 parseInt("1010", 2)   // 10 (binary)
@@ -222,7 +222,7 @@ parseInt("1010", 16)  // 4112 (hex)
 ⚠️ Always specify the base in parseInt!
 ```
 
-### 2. **Forgetting the prefix**
+### 2. **Forgetting the Prefix**
 
 ```javascript
 // In JS, "0x" = hex, "0b" = binary, "0o" = octal
@@ -231,12 +231,12 @@ parseInt("1010", 16)  // 4112 (hex)
 0o10    // 8
 ```
 
-### 3. **Signed numbers**
+### 3. **Number Sign**
 
 An unsigned byte: 0 to 255.
 A signed byte: -128 to 127.
 
-That's what the **sign bit** (the leftmost bit) is about.
+This is the basis of the **sign bit** (the leftmost bit).
 
 ### 4. **Endianness**
 
@@ -244,7 +244,7 @@ That's what the **sign bit** (the leftmost bit) is about.
 - **Big-endian**: `0x12 0x34` (network)
 - **Little-endian**: `0x34 0x12` (x86, ARM)
 
-If you read raw bytes from a file or the network, this is crucial.
+If you're reading raw bytes from a file or network, this is crucial.
 
 ## TL;DR
 
@@ -253,11 +253,10 @@ If you read raw bytes from a file or the network, this is crucial.
 - **2 hex digits** = 8 bits = 1 byte
 - **Used for**: CSS colors, memory addresses, ASCII, hashes
 - **Quick conversion**: binary ↔ hex = groups of 4 bits
-- **Free tool**: [jchub.io/outils/number-base-converter](https://jchub.io/outils/number-base-converter)
+- **Free tool**: [jchub.dev/fr/outils/convertisseur-de-bases](https://jchub.dev/fr/outils/convertisseur-de-bases)
 
 ---
 
-**Debugging a binary payload and need a quick conversion?** My [Number Base Converter](https://jchub.io/outils/number-base-converter) does all 4 conversions in real time.
+**Debugging a binary payload and need quick conversion?** My [Number Base Converter](https://jchub.dev/fr/outils/convertisseur-de-bases) does all 4 conversions in real-time.
 
-There are 14 free dev tools on JcHub → [jchub.io/outils](https://jchub.io/outils)
-
+There are 14 free dev tools on JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

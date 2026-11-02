@@ -11,7 +11,7 @@ tags:
   - Développement
   - technologie
 author: JcHub
-image: "https://jchub.dev/api/article-cover?title=S%C3%A9curiser%20vos%20acc%C3%A8s%20%C3%A0%20l'%C3%A8re%20du%20Vibe%20Coding%20%3A%20Bonnes%20pratiques%20et%20g%C3%A9n%C3%A9ration%20de%20secrets&category=G%C3%A9n%C3%A9rateur%20de%20mot%20de%20passe%20s%C3%A9curis%C3%A9"
+image: /blog/covers/securiser-acces-vibe-coding-generation-secrets.jpg
 readTime: 5 min
 status: published
 publishedAt: '2026-10-11T09:11:04.381Z'

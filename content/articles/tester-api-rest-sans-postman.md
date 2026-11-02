@@ -13,7 +13,7 @@ keywords:
   - http request
   - postman vs insomnia
 author: Jessy Ngnambongo
-image: /blog/06-tester-api-rest-sans-postman.svg
+image: /blog/covers/tester-api-rest-sans-postman.jpg
 readTime: 6 min
 status: published
 publishedAt: '2026-09-12T21:53:01.970Z'
@@ -29,7 +29,7 @@ J'utilise Postman depuis 2017. Mais en 2024, j'ai décidé de l'arrêter. Pourqu
 - L'app Electron qui bouffe 1.5 GB de RAM
 - Des features premium cachées derrière un paywall
 
-J'ai cherché une alternative. J'en ai trouvé 3 qui valent le coup. Et j'en ai construit une aussi (on en parle plus bas).
+J'ai cherché une alternative. J'en ai trouvé 3 qui valent le coup, plus un outil que t'as déjà sur ta machine.
 
 ## Les 3 alternatives à Postman en 2026
 
@@ -48,7 +48,7 @@ J'ai cherché une alternative. J'en ai trouvé 3 qui valent le coup. Et j'en ai 
 - ✅ Open source
 - ✅ Self-hostable
 - ❌ UI un peu chargée
-- ❌ Pas de génération de code native
+- ✅ Génère le code de ta requête (cURL, fetch, axios, Python…)
 
 **Pour qui** : devs qui veulent du web, du gratuit, et de l'open source.
 
@@ -57,26 +57,25 @@ J'ai cherché une alternative. J'en ai trouvé 3 qui valent le coup. Et j'en ai 
 - ✅ Open source
 - ✅ Stocke les requêtes en fichiers `.bru` dans ton repo
 - ✅ Versionné avec Git (fini la perte de collections)
-- ❌ CLI-only au début, l'app desktop est jeune
+- ❌ App desktop à installer
 
 **Pour qui** : équipes qui veulent versionner leurs requêtes API avec le code.
 
-## Et mon outil : JcHub API Tester
+## Le bonus : curl, déjà installé
 
-J'ai construit un client HTTP 100% gratuit dans le navigateur. Pas d'install, pas de compte, pas de pub.
+Avant d'installer quoi que ce soit, regarde ton terminal. `curl` est livré avec macOS, Linux et Windows 10/11.
 
-**[JcHub API Tester](https://jchub.io/outils/api-tester)**
+```bash
+curl -i https://jsonplaceholder.typicode.com/todos/1
+```
 
-Pourquoi je l'utilise au quotidien :
+- ✅ Rien à installer, pas de compte
+- ✅ Pas de souci de CORS : la requête ne part pas d'un navigateur
+- ❌ Moins confortable pour les gros bodies JSON
 
-- **29 KB** vs 200 MB pour Postman
-- **Pas d'install** : ouvre l'onglet, c'est prêt
-- **Pas de compte** : tout reste dans le localStorage
-- **Génération de code** : cURL, fetch, axios, Python requests
-- **Historique** : 20 dernières requêtes
-- **Sauvegarde** : mes requêtes favorites restent
+**Pour qui** : les tests rapides et les scripts.
 
-**Limite connue** : CORS peut bloquer certaines requêtes depuis le navigateur. Pour bypasser, utilise une extension Chrome "Allow CORS" (à tes risques).
+**Limite connue des outils web** : CORS peut bloquer certaines requêtes envoyées depuis le navigateur. Hoppscotch propose une extension et un proxy pour contourner ça. Sinon, repasse par curl.
 
 ## Comment tester une API en 5 étapes
 
@@ -141,7 +140,7 @@ Tu reçois :
 Tu reçois un 401 sur ton endpoint protégé. Voici comment diagnostiquer :
 
 1. **Vérifie ton header** `Authorization` : est-ce que le token est bien là ?
-2. **Décode ton JWT** : est-ce qu'il est expiré ? → [JWT Decoder](https://jchub.io/outils/jwt-decoder)
+2. **Décode ton JWT** : est-ce qu'il est expiré ? → [JWT Decoder](https://jchub.dev/fr/outils/decodeur-jwt)
 3. **Vérifie l'algo** : `Bearer` ou `Basic` ? Le backend attend quoi ?
 4. **Teste avec curl** : `curl -H "Authorization: Bearer xxx" https://api.com/me`
 5. **Regarde les logs serveur** : souvent y'a plus d'info côté backend
@@ -149,7 +148,7 @@ Tu reçois un 401 sur ton endpoint protégé. Voici comment diagnostiquer :
 ## Le workflow que j'utilise au quotidien
 
 ```
-1. Teste en local avec mon API Tester
+1. Teste en local avec Hoppscotch (ou curl)
 2. Vérifie le status, le body, les headers
 3. Copie le code généré (fetch, axios, cURL)
 4. Colle dans mon code de prod
@@ -161,7 +160,7 @@ Tu reçois un 401 sur ton endpoint protégé. Voici comment diagnostiquer :
 
 ## La fonctionnalité qui change tout : la génération de code
 
-Tu fais une requête POST avec un body JSON, un header Authorization, et tu cliques sur "Code". L'outil te sort :
+Tu fais une requête POST avec un body JSON et un header Authorization. Hoppscotch, Insomnia et Bruno savent tous générer le code correspondant :
 
 ```javascript
 // fetch
@@ -198,14 +197,14 @@ Tu copies, tu colles dans ton projet, c'est prêt. Pas de guessing sur la syntax
 
 ## TL;DR
 
-- **3 alternatives à Postman** : Insomnia (natif), Hoppscotch (web), Bruno (CLI + files)
-- **Mon outil gratuit** : [jchub.io/outils/api-tester](https://jchub.io/outils/api-tester) (29 KB, dans le navigateur)
+- **3 alternatives à Postman** : Insomnia (natif), Hoppscotch (web), Bruno (requêtes en fichiers)
+- **Sans rien installer** : curl, directement dans ton terminal
 - **Codes HTTP** : 2xx = OK, 4xx = t'as merdé, 5xx = serveur a merdé
 - **Génération de code** : copy-paste direct dans ton projet
 - **Pour CORS** : génère le cURL et teste en terminal
 
 ---
 
-**Tu veux essayer ?** Va sur [JcHub API Tester](https://jchub.io/outils/api-tester), colle n'importe quelle URL, et regarde.
+**Tu reçois un 401 ?** Colle ton token dans mon [décodeur JWT](https://jchub.dev/fr/outils/decodeur-jwt) pour voir s'il a expiré.
 
-Y'a aussi 13 autres outils dev gratuits sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Y'a d'autres outils dev gratuits sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

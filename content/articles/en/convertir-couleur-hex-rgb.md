@@ -84,7 +84,7 @@ See how Tailwind builds its palettes? That's exactly it.
 
 ### Method 1: Online tool
 
-I have a [free Color Converter](https://jchub.io/outils/color-converter) on JcHub. Paste your HEX and you instantly get:
+I have a [free Color Converter](https://jchub.dev/en/tools/color-converter) on JcHub. Paste your HEX and you instantly get:
 - The RGB code
 - The HSL code
 - A visual preview of the color
@@ -179,12 +179,12 @@ If you code your design system in HSL, you can generate every variation automati
 - **RGB**: `rgb(R, G, B)` 0-255 (classic CSS)
 - **HSL**: `hsl(H, S%, L%)` (the best for variations)
 - Tailwind stores colors in HSL
-- Quick tool: [jchub.io/outils/color-converter](https://jchub.io/outils/color-converter)
+- Quick tool: [jchub.dev/en/tools/color-converter](https://jchub.dev/en/tools/color-converter)
 - Think about accessibility (WCAG contrast)
 
 ---
 
-**Working on a design system and need to generate palettes?** The [Color Converter](https://jchub.io/outils/color-converter) tool shows you every conversion + a live preview.
+**Working on a design system and need to generate palettes?** The [Color Converter](https://jchub.dev/en/tools/color-converter) tool shows you every conversion + a live preview.
 
-And if you have other frontend questions, I have 14 free dev tools on JcHub → [jchub.io/outils](https://jchub.io/outils)
+And if you have other frontend questions, I have 14 free dev tools on JcHub → [jchub.dev/en/tools](https://jchub.dev/en/tools)
 

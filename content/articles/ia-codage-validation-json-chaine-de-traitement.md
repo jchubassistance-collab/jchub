@@ -11,7 +11,7 @@ tags:
   - Développement
   - technologie
 author: JcHub
-image: /blog/07-json-formatter.svg
+image: /blog/covers/ia-codage-validation-json-chaine-de-traitement.jpg
 readTime: 5 min
 status: published
 publishedAt: '2026-09-13T20:13:06.881Z'

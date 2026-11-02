@@ -11,7 +11,7 @@ tags:
   - Développement
   - technologie
 author: JcHub
-image: "https://jchub.dev/api/article-cover?title=G%C3%A9n%C3%A9ration%20d'identifiants%20uniques%20dans%20les%20pipelines%20de%20rendu%20automatis%C3%A9s%20%3A%20Enjeux%20et%20bonnes%20pratiques&category=UUID%20Generator"
+image: /blog/covers/generation-identifiants-uniques-pipelines-rendu-automatiques.jpg
 readTime: 5 min
 status: published
 publishedAt: '2026-09-16T09:39:06.057Z'

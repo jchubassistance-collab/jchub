@@ -12,7 +12,7 @@ keywords:
   - regex javascript
   - regex phone
 author: Jessy Ngnambongo
-image: /blog/08-regex-email-5-patterns.svg
+image: /blog/covers/regex-email-5-patterns.jpg
 readTime: 5 min
 status: published
 publishedAt: '2026-09-16T07:15:23.869Z'
@@ -89,14 +89,14 @@ const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/;
 const urlRegexStrict = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/;
 ```
 
-✅ Accepte : `https://jchub.io`, `http://example.com/path?query=1#hash`
+✅ Accepte : `https://jchub.dev`, `http://example.com/path?query=1#hash`
 ❌ Rejette : `ftp://...`, `not a url`
 
 **Encore mieux** : utilise `new URL()` en JavaScript, c'est natif et plus safe.
 
 ```javascript
 try {
-  new URL("https://jchub.io");
+  new URL("https://jchub.dev");
   // C'est valide
 } catch {
   // Pas valide
@@ -150,7 +150,7 @@ Liste à jour : [github.com/disposable-email-domains](https://github.com/disposa
 
 ## Comment tester tes regex
 
-Mon outil gratuit : [Regex Tester](https://jchub.io/outils/regex-tester). Tu colles ta regex, ton texte de test, et il te dit en temps réel :
+Mon outil gratuit : [Regex Tester](https://jchub.dev/fr/outils/regex-tester). Tu colles ta regex, ton texte de test, et il te dit en temps réel :
 - Si ça match
 - Les groupes capturés
 - Les positions des matches
@@ -163,11 +163,11 @@ Très utile pour débugger une regex qui marche pas.
 - **5 patterns utiles** : email basique, email strict, téléphone, URL, mot de passe
 - **Normalise** : trim + lowercase
 - **Bloque les emails jetables** si besoin
-- **Teste avec** : [jchub.io/outils/regex-tester](https://jchub.io/outils/regex-tester)
+- **Teste avec** : [jchub.dev/fr/outils/regex-tester](https://jchub.dev/fr/outils/regex-tester)
 - **Préfère `new URL()`** à une regex pour les URLs
 
 ---
 
-**Tu codes un formulaire d'inscription et t'as besoin d'aide ?** Mon [Regex Tester](https://jchub.io/outils/regex-tester) te permet de tester tes patterns en temps réel.
+**Tu codes un formulaire d'inscription et t'as besoin d'aide ?** Mon [Regex Tester](https://jchub.dev/fr/outils/regex-tester) te permet de tester tes patterns en temps réel.
 
-Y'a 14 outils dev gratuits sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Y'a 14 outils dev gratuits sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

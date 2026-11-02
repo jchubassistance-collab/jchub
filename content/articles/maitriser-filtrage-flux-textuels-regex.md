@@ -11,7 +11,7 @@ tags:
   - Développement
   - technologie
 author: JcHub
-image: 'https://jchub.dev/api/article-cover?title=Ma%C3%AEtriser%20le%20filtrage%20de%20flux%20textuels%20%3A%20du%20pattern%20matching%20aux%20r%C3%A8gles%20de%20validation%20en%20production&category=Regex%20Tester%20visuel'
+image: /blog/covers/maitriser-filtrage-flux-textuels-regex.jpg
 readTime: 5 min
 status: published
 publishedAt: '2026-10-01T23:27:37.434Z'

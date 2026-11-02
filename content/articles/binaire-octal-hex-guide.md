@@ -13,7 +13,7 @@ keywords:
   - ascii table
   - base 2 8 16
 author: Jessy Ngnambongo
-image: /blog/13-binaire-octal-hex-guide.svg
+image: /blog/covers/binaire-octal-hex-guide.jpg
 readTime: 4 min
 status: published
 publishedAt: '2026-10-21T09:11:00.946Z'
@@ -259,10 +259,10 @@ Si tu lis des bytes bruts depuis un fichier ou un réseau, c'est crucial.
 - **2 chiffres hexa** = 8 bits = 1 byte
 - **Utilisé pour** : couleurs CSS, adresses mémoire, ASCII, hashs
 - **Conversion rapide** : binaire ↔ hexa = groupes de 4 bits
-- **Outil gratuit** : [jchub.io/outils/number-base-converter](https://jchub.io/outils/number-base-converter)
+- **Outil gratuit** : [jchub.dev/fr/outils/convertisseur-de-bases](https://jchub.dev/fr/outils/convertisseur-de-bases)
 
 ---
 
-**Tu débugges un payload binaire et t'as besoin de convertir rapidement ?** Mon [Number Base Converter](https://jchub.io/outils/number-base-converter) fait les 4 conversions en temps réel.
+**Tu débugges un payload binaire et t'as besoin de convertir rapidement ?** Mon [Number Base Converter](https://jchub.dev/fr/outils/convertisseur-de-bases) fait les 4 conversions en temps réel.
 
-Y'a 14 outils dev gratuits sur JcHub → [jchub.io/outils](https://jchub.io/outils)
+Y'a 14 outils dev gratuits sur JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)
