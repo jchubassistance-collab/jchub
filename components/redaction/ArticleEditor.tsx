@@ -4,59 +4,47 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { AlertCircle, ArrowLeft, Bold, Check, CircleDashed, Code, ExternalLink, Eye, Heading2, Heading3, Italic, Link2, List, ListOrdered, Loader2, Lock, Pencil, Quote, Send, Trash2, X } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Bold, Check, CircleDashed, Code, Columns2, ExternalLink, Eye, Heading2, Heading3, Heading4, Image as ImageIcon, Italic, Link2, List, ListOrdered, Loader2, Lock, Minus, Pencil, Quote, Redo2, Send, SquareCode, Trash2, Undo2, X } from 'lucide-react';
 import { articleUrl, canDelete, Card, CategoryField, deleteArticle, formatDay, Notice, StatusBadge } from '@/components/redaction/shared';
-import { publicSiteUrl, useWriter } from '@/components/redaction/WriterShell';
+import { publicSiteUrl, useWriter, WRITER_TIMEOUT_EVENT, type WriterTimeoutEvent } from '@/components/redaction/WriterShell';
 import { cachedJson, fetchJson, rememberJson } from '@/lib/admin-cache';
+import { formatEdit, type Edit, type Format } from '@/lib/markdown-format';
 import { parseKeywords, publicationChecks, readTime, slugify, wordCount, writingTips, WRITER_LIMITS, type WriterArticle } from '@/lib/writer-rules';
 
 type Form = { title: string; description: string; content: string; category: string; keywords: string; plannedFor: string; slug: string };
-type Format = 'h2' | 'h3' | 'bold' | 'italic' | 'list' | 'ordered' | 'quote' | 'code' | 'link';
 
 const AUTOSAVE_DELAY_MS = 2500;
 const field = 'w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500';
 
-/** Markdown syntax put around the selection, or before each selected line. */
-function applyFormat(value: string, start: number, end: number, kind: Format): { value: string; start: number; end: number } {
-  const selected = value.slice(start, end);
-  const wrap = (before: string, after: string, placeholder: string) => {
-    const text = selected || placeholder;
-    return { value: value.slice(0, start) + before + text + after + value.slice(end), start: start + before.length, end: start + before.length + text.length };
-  };
-  if (kind === 'bold') return wrap('**', '**', 'texte en gras');
-  if (kind === 'italic') return wrap('*', '*', 'texte en italique');
-  if (kind === 'code') return selected.includes('\n') ? wrap('```\n', '\n```', '') : wrap('`', '`', 'code');
-  if (kind === 'link') {
-    const text = selected || 'texte du lien';
-    const before = `${value.slice(0, start)}[${text}](`;
-    return { value: `${before}https://)${value.slice(end)}`, start: before.length, end: before.length + 'https://'.length };
-  }
-  const lineStart = value.lastIndexOf('\n', start - 1) + 1;
-  const lineEnd = value.indexOf('\n', end) === -1 ? value.length : value.indexOf('\n', end);
-  const lines = value.slice(lineStart, lineEnd).split('\n');
-  const prefixed = lines.map((line, index) => {
-    const bare = line.replace(/^(#{1,6}\s|[-*]\s|\d+\.\s|>\s)/, '');
-    const prefix = kind === 'h2' ? '## ' : kind === 'h3' ? '### ' : kind === 'list' ? '- ' : kind === 'ordered' ? `${index + 1}. ` : '> ';
-    return prefix + bare;
-  }).join('\n');
-  return { value: value.slice(0, lineStart) + prefixed + value.slice(lineEnd), start: lineStart, end: lineStart + prefixed.length };
-}
-
-const toolbar: { kind: Format; label: string; icon: typeof Bold }[] = [
-  { kind: 'h2', label: 'Sous-titre', icon: Heading2 },
-  { kind: 'h3', label: 'Sous-partie', icon: Heading3 },
-  { kind: 'bold', label: 'Gras', icon: Bold },
-  { kind: 'italic', label: 'Italique', icon: Italic },
-  { kind: 'list', label: 'Liste', icon: List },
-  { kind: 'ordered', label: 'Liste numérotée', icon: ListOrdered },
-  { kind: 'link', label: 'Lien', icon: Link2 },
-  { kind: 'quote', label: 'Citation', icon: Quote },
-  { kind: 'code', label: 'Code', icon: Code },
+type Tool = { kind: Format; label: string; icon: typeof Bold };
+const toolbar: Tool[][] = [
+  [
+    { kind: 'h2', label: 'Sous-titre (##)', icon: Heading2 },
+    { kind: 'h3', label: 'Sous-partie (###)', icon: Heading3 },
+    { kind: 'h4', label: 'Petit intertitre (####)', icon: Heading4 },
+  ],
+  [
+    { kind: 'bold', label: 'Gras (Ctrl+B)', icon: Bold },
+    { kind: 'italic', label: 'Italique (Ctrl+I)', icon: Italic },
+    { kind: 'code', label: 'Code dans la phrase', icon: Code },
+  ],
+  [
+    { kind: 'list', label: 'Liste à puces', icon: List },
+    { kind: 'ordered', label: 'Liste numérotée', icon: ListOrdered },
+    { kind: 'quote', label: 'Citation', icon: Quote },
+  ],
+  [
+    { kind: 'link', label: 'Lien (Ctrl+K)', icon: Link2 },
+    { kind: 'image', label: 'Image (adresse d’une image en ligne)', icon: ImageIcon },
+    { kind: 'codeblock', label: 'Bloc de code', icon: SquareCode },
+    { kind: 'rule', label: 'Séparateur', icon: Minus },
+  ],
 ];
 
 const blankForm = (plannedFor: string): Form => ({ title: '', description: '', content: '', category: 'Technologie', keywords: '', plannedFor, slug: '' });
 const formOf = (article: WriterArticle): Form => ({ title: article.title, description: article.description, content: article.content, category: article.category || 'Technologie', keywords: article.keywords.join(', '), plannedFor: article.plannedFor || '', slug: article.slug });
 const apiUrl = (id: string) => `/api/redaction/articles/${encodeURIComponent(id)}`;
+const unsavedKey = (id: string) => `jchub_writer_unsaved_${id}`;
 
 export function ArticleEditor({ id: initialId, initialPlannedFor = '' }: { id?: string; initialPlannedFor?: string }) {
   const router = useRouter();
@@ -73,7 +61,7 @@ export function ArticleEditor({ id: initialId, initialPlannedFor = '' }: { id?: 
   const [customSlug, setCustomSlug] = useState(cached?.customSlug || false);
   const [slugEditor, setSlugEditor] = useState<string | null>(null);
   const [views, setViews] = useState(cached?.views || 0);
-  const [tab, setTab] = useState<'write' | 'preview'>('write');
+  const [tab, setTab] = useState<'write' | 'preview' | 'split'>('write');
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(cached?.updatedAt || null);
   const [error, setError] = useState('');
@@ -86,6 +74,9 @@ export function ArticleEditor({ id: initialId, initialPlannedFor = '' }: { id?: 
   const [savedVersion, setSavedVersion] = useState(0);
   const savingRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  // Until the writer clicks in the text, a button adds its formatting at the end.
+  const touchedRef = useRef(false);
 
   const dirty = version !== savedVersion;
   const isPublished = status === 'published';
@@ -95,6 +86,9 @@ export function ArticleEditor({ id: initialId, initialPlannedFor = '' }: { id?: 
   const tips = writingTips(form);
   const words = wordCount(form.content);
   const shownSlug = publishedAt || customSlug || !dirty ? form.slug || slugify(form.title) : slugify(form.title);
+
+  // On a wide screen the text and its rendering sit side by side.
+  useEffect(() => { if (window.matchMedia('(min-width: 1280px)').matches) setTab('split'); }, []);
 
   useEffect(() => {
     if (!initialId) return;
@@ -192,19 +186,90 @@ export function ArticleEditor({ id: initialId, initialPlannedFor = '' }: { id?: 
     return () => window.removeEventListener('keydown', onKey);
   }, [dirty, readOnly, save]);
 
+  // Signed out for inactivity: a draft is saved; changes to a published article are kept in this
+  // tab (they wait for « Mettre à jour ») and come back when the writer opens the article again.
+  const leavingRef = useRef(false);
+  useEffect(() => {
+    const onTimeout = (event: Event) => {
+      leavingRef.current = true;
+      if (!dirty || readOnly) return;
+      if (isPublished) {
+        try { sessionStorage.setItem(unsavedKey(articleId), JSON.stringify(form)); } catch { /* Storage unavailable: nothing more to do. */ }
+      } else if (form.title.trim()) (event as WriterTimeoutEvent).detail.waitUntil(save());
+    };
+    window.addEventListener(WRITER_TIMEOUT_EVENT, onTimeout);
+    return () => window.removeEventListener(WRITER_TIMEOUT_EVENT, onTimeout);
+  }, [dirty, readOnly, isPublished, articleId, form, save]);
+
+  // Changes kept at the last sign-out come back once the article is loaded.
+  const [recovered, setRecovered] = useState(false);
+  useEffect(() => {
+    if (loading || !articleId) return;
+    let kept: string | null = null;
+    try { kept = sessionStorage.getItem(unsavedKey(articleId)); sessionStorage.removeItem(unsavedKey(articleId)); } catch { return; }
+    if (!kept) return;
+    try {
+      setForm({ ...blankForm(''), ...(JSON.parse(kept) as Partial<Form>) });
+      versionRef.current += 1; setVersion(versionRef.current); setRecovered(true);
+    } catch { /* A damaged copy is dropped. */ }
+  }, [loading, articleId]);
+
   useEffect(() => {
     if (!dirty) return;
-    const onBeforeUnload = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ''; };
+    const onBeforeUnload = (event: BeforeUnloadEvent) => { if (leavingRef.current) return; event.preventDefault(); event.returnValue = ''; };
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [dirty]);
 
+  /** Applies an edit where the writer is, without moving the page or the text under their eyes. */
+  const runEdit = (edit: Edit) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    const pageTop = window.scrollY;
+    const textTop = touchedRef.current ? textarea.scrollTop : textarea.scrollHeight;
+    textarea.focus({ preventScroll: true });
+    textarea.setSelectionRange(edit.from, edit.to);
+    // insertText keeps the change in the browser's history, so Ctrl+Z and « Annuler » undo it.
+    const inserted = document.execCommand('insertText', false, edit.text);
+    if (!inserted) update('content', textarea.value.slice(0, edit.from) + edit.text + textarea.value.slice(edit.to));
+    requestAnimationFrame(() => {
+      textarea.setSelectionRange(edit.selectStart, edit.selectEnd);
+      textarea.scrollTop = textTop;
+      window.scrollTo({ top: pageTop });
+    });
+    touchedRef.current = true;
+  };
+
   const format = (kind: Format) => {
     const textarea = textareaRef.current;
     if (!textarea) return;
-    const next = applyFormat(form.content, textarea.selectionStart, textarea.selectionEnd, kind);
-    update('content', next.value);
-    requestAnimationFrame(() => { textarea.focus(); textarea.setSelectionRange(next.start, next.end); });
+    const start = touchedRef.current ? textarea.selectionStart : textarea.value.length;
+    const end = touchedRef.current ? textarea.selectionEnd : textarea.value.length;
+    runEdit(formatEdit(textarea.value, start, end, kind));
+  };
+
+  const history = (command: 'undo' | 'redo') => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    const pageTop = window.scrollY;
+    textarea.focus({ preventScroll: true });
+    document.execCommand(command);
+    window.scrollTo({ top: pageTop });
+  };
+
+  const onEditorKey = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
+    const kind = ({ b: 'bold', i: 'italic', k: 'link' } as Record<string, Format>)[event.key.toLowerCase()];
+    if (kind) { event.preventDefault(); format(kind); }
+  };
+
+  // In the side-by-side view, the rendering follows the text as it scrolls.
+  const followScroll = () => {
+    const textarea = textareaRef.current;
+    const preview = previewRef.current;
+    if (!textarea || !preview || tab !== 'split') return;
+    const ratio = textarea.scrollTop / Math.max(1, textarea.scrollHeight - textarea.clientHeight);
+    preview.scrollTop = ratio * (preview.scrollHeight - preview.clientHeight);
   };
 
   const publish = async () => {
@@ -242,6 +307,7 @@ export function ArticleEditor({ id: initialId, initialPlannedFor = '' }: { id?: 
       </div>}
     </header>
 
+    {recovered && <Notice tone="info">Vos modifications non publiées, gardées lors de votre déconnexion automatique, ont été récupérées. Cliquez sur « Mettre à jour l’article » pour les publier.</Notice>}
     {readOnly && <Notice tone="info">Cet article est {status === 'archived' ? 'archivé' : 'programmé'} par l’administrateur : il n’est plus modifiable depuis votre espace.</Notice>}
     {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"><p className="flex items-start gap-2"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{error}</p>{missing.length > 0 && <ul className="ml-6 mt-2 list-disc space-y-0.5">{missing.map((item) => <li key={item}>{item}</li>)}</ul>}</div>}
     {justPublished && <Notice tone="success">{justPublished === 'first' ? 'Article publié ! ' : 'Modifications publiées. '}Le site sera à jour dans quelques minutes, le temps de la mise en ligne{justPublished === 'first' ? ', puis la version anglaise suivra' : ''}. <a href={articleUrl(form.slug)} target="_blank" rel="noreferrer" className="font-semibold underline">Voir l’article</a></Notice>}
@@ -273,25 +339,36 @@ export function ArticleEditor({ id: initialId, initialPlannedFor = '' }: { id?: 
           <div>
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200">
               <div role="tablist" className="flex">
-                {(['write', 'preview'] as const).map((value) => <button key={value} type="button" role="tab" aria-selected={tab === value} onClick={() => setTab(value)} className={`-mb-px inline-flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-sm font-semibold ${tab === value ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}>{value === 'write' ? <><Pencil className="h-4 w-4" />Écrire</> : <><Eye className="h-4 w-4" />Aperçu</>}</button>)}
+                {([['write', 'Écrire', Pencil], ['preview', 'Aperçu', Eye], ['split', 'Côte à côte', Columns2]] as const).map(([value, label, Icon]) => <button key={value} type="button" role="tab" aria-selected={tab === value} onClick={() => setTab(value)} className={`-mb-px items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm font-semibold sm:px-4 ${value === 'split' ? 'hidden xl:inline-flex' : 'inline-flex'} ${tab === value ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><Icon className="h-4 w-4" />{label}</button>)}
               </div>
-              {tab === 'write' && <div className="flex flex-wrap gap-0.5 pb-1" aria-label="Mise en forme">{toolbar.map(({ kind, label, icon: Icon }) => <button key={kind} type="button" title={label} aria-label={label} onClick={() => format(kind)} className="grid h-8 w-8 place-items-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900"><Icon className="h-4 w-4" /></button>)}</div>}
             </div>
-            {tab === 'write'
-              ? <textarea ref={textareaRef} aria-label="Contenu de l’article" value={form.content} onChange={(event) => update('content', event.target.value)} maxLength={WRITER_LIMITS.content} placeholder={'Introduction : le problème et ce que le lecteur va apprendre.\n\n## Premier sous-titre\n\nVotre texte…'} className="mt-3 min-h-[360px] w-full resize-y sm:min-h-[480px] rounded-lg border border-slate-200 bg-white p-4 text-[15px] leading-7 text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50" />
-              : <article className="mt-3 min-h-[360px] rounded-lg border border-slate-200 bg-white p-4 sm:min-h-[480px] sm:p-8">
-                {form.category && <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{form.category}</span>}
-                <h1 className="mt-3 text-2xl font-black leading-tight tracking-tight text-slate-950 sm:text-3xl">{form.title || 'Titre de l’article'}</h1>
-                {form.description && <p className="mt-3 text-lg leading-8 text-slate-600">{form.description}</p>}
-                <p className="mt-4 border-b border-slate-100 pb-5 text-sm text-slate-600">Par <strong className="text-slate-900">{name}</strong> · {readTime(form.content)} de lecture</p>
-                <div className="article-markdown article-markdown--light mt-6"><ReactMarkdown components={{ h1: ({ children }) => <h2>{children}</h2>, a: ({ href, title, children }) => <a href={href} title={title} target="_blank" rel="noreferrer">{children}</a> }}>{form.content.replace(/^\s*#\s+[^\n]*\n+/, '') || '*Le texte apparaîtra ici.*'}</ReactMarkdown></div>
-              </article>}
+            {tab !== 'preview' && <div className="mt-3 flex flex-wrap items-center gap-1 rounded-lg border border-slate-200 bg-slate-50/80 p-1" role="toolbar" aria-label="Mise en forme">
+              {/* onMouseDown keeps the cursor and the selection in the text. */}
+              {toolbar.map((group, index) => <div key={index} className="flex items-center gap-0.5 border-slate-200 pr-1 [&:not(:last-child)]:border-r">{group.map(({ kind, label, icon: Icon }) => <button key={kind} type="button" title={label} aria-label={label} onMouseDown={(event) => event.preventDefault()} onClick={() => format(kind)} className="grid h-8 w-8 place-items-center rounded-md text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-sm"><Icon className="h-4 w-4" /></button>)}</div>)}
+              <div className="ml-auto flex items-center gap-0.5">
+                <button type="button" title="Annuler (Ctrl+Z)" aria-label="Annuler" onMouseDown={(event) => event.preventDefault()} onClick={() => history('undo')} className="grid h-8 w-8 place-items-center rounded-md text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-sm"><Undo2 className="h-4 w-4" /></button>
+                <button type="button" title="Rétablir (Ctrl+Y)" aria-label="Rétablir" onMouseDown={(event) => event.preventDefault()} onClick={() => history('redo')} className="grid h-8 w-8 place-items-center rounded-md text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-sm"><Redo2 className="h-4 w-4" /></button>
+              </div>
+            </div>}
+            <div className={tab === 'split' ? 'mt-3 grid gap-4 xl:grid-cols-2' : 'mt-3'}>
+              {tab !== 'preview' && <textarea ref={textareaRef} aria-label="Contenu de l’article" value={form.content} onChange={(event) => update('content', event.target.value)} onKeyDown={onEditorKey} onFocus={() => { touchedRef.current = true; }} onScroll={followScroll} maxLength={WRITER_LIMITS.content} placeholder={'Introduction : le problème et ce que le lecteur va apprendre.\n\n## Premier sous-titre\n\nVotre texte…'} className={`w-full rounded-lg border border-slate-200 bg-white p-4 text-[15px] leading-7 text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 ${tab === 'split' ? 'h-[70vh] min-h-[480px] resize-none' : 'min-h-[360px] resize-y sm:min-h-[480px]'}`} />}
+              {tab !== 'write' && <div ref={previewRef} className={tab === 'split' ? 'h-[70vh] min-h-[480px] overflow-y-auto rounded-lg border border-slate-200' : ''}>
+                <article className={`min-h-[360px] bg-white p-4 sm:min-h-[480px] ${tab === 'split' ? 'sm:p-6' : 'rounded-lg border border-slate-200 sm:p-8'}`}>
+                  {form.category && <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{form.category}</span>}
+                  <h1 className="mt-3 text-2xl font-black leading-tight tracking-tight text-slate-950 sm:text-3xl">{form.title || 'Titre de l’article'}</h1>
+                  {form.description && <p className="mt-3 text-lg leading-8 text-slate-600">{form.description}</p>}
+                  <p className="mt-4 border-b border-slate-100 pb-5 text-sm text-slate-600">Par <strong className="text-slate-900">{name}</strong> · {readTime(form.content)} de lecture</p>
+                  <div className="article-markdown article-markdown--light mt-6"><ReactMarkdown components={{ h1: ({ children }) => <h2>{children}</h2>, a: ({ href, title, children }) => <a href={href} title={title} target="_blank" rel="noreferrer">{children}</a> }}>{form.content.replace(/^\s*#\s+[^\n]*\n+/, '') || '*Le texte apparaîtra ici.*'}</ReactMarkdown></div>
+                </article>
+              </div>}
+            </div>
             <p className="mt-2 flex flex-wrap justify-between gap-2 text-xs text-slate-500"><span>{words.toLocaleString('fr-FR')} mots · {readTime(form.content)} de lecture</span><Link href="/admin/redaction/ressources#markdown" className="text-blue-700 hover:underline">Aide à la mise en forme</Link></p>
           </div>
         </fieldset>
       </Card>
 
-      <div className="space-y-5">
+      {/* Stays in view while the writer scrolls through a long text. */}
+      <div className="space-y-5 lg:sticky lg:top-[92px] lg:max-h-[calc(100vh-108px)] lg:overflow-y-auto lg:pb-1">
         <Card className="p-5">
           <h2 className="text-sm font-bold text-[#0f1c3f]">{isPublished ? 'Article en ligne' : 'Avant de publier'}</h2>
           {isPublished && <p className="mt-2 text-sm text-slate-600">Publié le {formatDay(publishedAt)} · <strong className="font-semibold text-slate-800">{views.toLocaleString('fr-FR')}</strong> vue{views > 1 ? 's' : ''}</p>}

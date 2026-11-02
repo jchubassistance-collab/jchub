@@ -3,6 +3,7 @@ import 'server-only';
 import { revalidatePath, revalidateTag, unstable_cache } from 'next/cache';
 import { buildArticleFiles, isPublicArticleStatus, parseArticleFiles } from '@/lib/article-files';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
+import { reviewPending } from '@/lib/writer-rules';
 
 /**
  * Articles as Firestore holds them right now. The blog reads them on top of content/articles,
@@ -33,9 +34,11 @@ const readLiveArticles = unstable_cache(async (): Promise<LiveArticles> => {
     db.collection('articles').select('status').get(),
     db.collection('articles').where('status', 'in', ['published', 'scheduled']).get(),
   ]);
+  // A writer's article being reviewed at its first publication waits off the blog.
+  const reviewing = publics.docs.filter((document) => reviewPending(document.data())).map((document) => document.id);
   return {
-    records: publics.docs.flatMap((document) => { const record = toRecord(document.id, document.data()); return record ? [record] : []; }),
-    hidden: statuses.docs.filter((document) => !isPublicArticleStatus(document.data().status)).map((document) => document.id),
+    records: publics.docs.flatMap((document) => { const record = reviewing.includes(document.id) ? null : toRecord(document.id, document.data()); return record ? [record] : []; }),
+    hidden: [...reviewing, ...statuses.docs.filter((document) => !isPublicArticleStatus(document.data().status)).map((document) => document.id)],
   };
 }, ['live-articles'], { tags: [BLOG_TAG], revalidate: REFRESH_SECONDS });
 

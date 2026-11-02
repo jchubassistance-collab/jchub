@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { categoryKey, isValidWriterCategory, normalizeCategory, isWriterCategory, parseKeywords, publicationChecks, readTime, slugify, wordCount, writingTips, MIN_PUBLISHED_WORDS, WRITER_LIMITS } from '../lib/writer-rules.ts';
+import { categoryKey, isValidWriterCategory, normalizeCategory, onlyHeadingsChanged, reviewIssues, reviewPending, REVIEW_PENDING_MAX_MS, isWriterCategory, parseKeywords, publicationChecks, readTime, slugify, wordCount, writingTips, MIN_PUBLISHED_WORDS, WRITER_LIMITS } from '../lib/writer-rules.ts';
 
 const words = (count) => Array.from({ length: count }, (_, index) => `mot${index}`).join(' ');
 const ready = { title: 'Installer Windows 11 sur un ancien PC', description: 'Le pas-à-pas pour installer Windows 11 sur un PC que Microsoft juge trop ancien, sans perdre tes fichiers ni tes logiciels.', content: `## Avant de commencer\n\n${words(MIN_PUBLISHED_WORDS)}`, category: 'Technologie' };
@@ -66,4 +66,34 @@ test('une catégorie ajoutée est nettoyée et reconnue quelle que soit son écr
   assert.equal(categoryKey('reseau'), categoryKey('Réseau'));
   assert.equal(categoryKey('Base de données'), 'base-de-donnees');
   assert.equal(categoryKey(' !! '), '');
+});
+const lines = (...parts) => parts.join('\n');
+const fence = '```';
+
+test('un article qui respecte les règles ne passe pas par la relecture', () => {
+  const content = lines('Intro.', '', '## Première partie', '', words(300), '', '## Deuxième partie', '', words(300));
+  assert.deepEqual(reviewIssues({ title: 'Installer Windows 11 sur un ancien PC sans perdre ses fichiers', content, keywords: ['windows 11', 'ancien pc', 'installation'] }), []);
+});
+
+test('la relecture repère titre, sous-titres et mots-clés à corriger', () => {
+  const title = 'Installer Windows 11 sur un ancien PC sans perdre ses fichiers';
+  assert.deepEqual(reviewIssues({ title: 'Windows', content: lines('# Titre', '', words(900)), keywords: ['windows'] }), ['title-length', 'no-subtitles', 'main-heading', 'few-keywords']);
+  assert.ok(reviewIssues({ title, content: lines('## Une partie', '', words(1300)), keywords: ['a', 'b', 'c'] }).includes('few-subtitles'));
+  // Un # dans un bloc de code est un commentaire, pas un titre.
+  assert.ok(!reviewIssues({ title, content: lines('## Partie', '', `${fence}bash`, '# commentaire', fence), keywords: ['a', 'b', 'c'] }).includes('main-heading'));
+});
+
+test('seules les lignes de sous-titre peuvent changer', () => {
+  const original = lines('Intro.', '', '# Titre', '', 'Texte un.', '', 'Texte deux.');
+  assert.ok(onlyHeadingsChanged(original, lines('Intro.', '', '## Nouveau titre', '', 'Texte un.', '', '## Ajout', '', 'Texte deux.')));
+  assert.ok(!onlyHeadingsChanged(original, lines('Intro.', '', '## Titre', '', 'Texte un modifié.', '', 'Texte deux.')));
+  assert.ok(!onlyHeadingsChanged(lines(`${fence}bash`, '# a', fence), lines(`${fence}bash`, '# b', fence)));
+});
+
+test('un article en relecture reste caché au plus 10 minutes', () => {
+  const now = Date.parse('2026-11-02T10:00:00Z');
+  assert.ok(reviewPending({ aiReview: { status: 'pending', startedAt: '2026-11-02T09:58:00Z' } }, now));
+  assert.ok(!reviewPending({ aiReview: { status: 'pending', startedAt: new Date(now - REVIEW_PENDING_MAX_MS).toISOString() } }, now));
+  assert.ok(!reviewPending({ aiReview: { status: 'done' } }, now));
+  assert.ok(!reviewPending({}, now));
 });

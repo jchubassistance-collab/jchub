@@ -18,6 +18,13 @@ const navigation = [
 
 export const publicSiteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://jchub.dev').replace(/\/$/, '');
 
+/** Writers are signed out after this long without touching the page; reading and thinking count, so longer than the admin's 10 minutes. */
+const WRITER_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
+const WRITER_LAST_ACTIVITY_KEY = 'jchub_writer_last_activity';
+/** Sent before signing out for inactivity: the editor keeps the text being written (ArticleEditor). */
+export const WRITER_TIMEOUT_EVENT = 'jchub:writer-timeout';
+export type WriterTimeoutEvent = CustomEvent<{ waitUntil: (task: Promise<unknown>) => void }>;
+
 type WriterIdentity = { name: string; firstName: string; initials: string };
 const WriterContext = createContext<WriterIdentity>({ name: '', firstName: '', initials: '' });
 
@@ -33,6 +40,51 @@ export function WriterShell({ name, children }: { name: string; children: React.
   const identity = { name, firstName: words[0] || name, initials: words.slice(0, 2).map((word) => word[0]?.toUpperCase()).join('') || 'J' };
 
   useEffect(() => { setOpen(false); setMenuOpen(false); }, [pathname]);
+
+  // Signs the writer out after WRITER_IDLE_TIMEOUT_MS without activity, in every tab of the space.
+  useEffect(() => {
+    let lastActivity = Number(sessionStorage.getItem(WRITER_LAST_ACTIVITY_KEY)) || Date.now();
+    let timer: number;
+    let expired = false;
+
+    const expire = async () => {
+      if (expired) return;
+      expired = true;
+      sessionStorage.removeItem(WRITER_LAST_ACTIVITY_KEY);
+      const tasks: Promise<unknown>[] = [];
+      window.dispatchEvent(new CustomEvent(WRITER_TIMEOUT_EVENT, { detail: { waitUntil: (task: Promise<unknown>) => tasks.push(task) } }));
+      // The text being written is saved first, for 8 seconds at most.
+      await Promise.race([Promise.allSettled(tasks), new Promise((resolve) => setTimeout(resolve, 8000))]);
+      await Promise.allSettled([signOut(), fetch('/api/admin/session', { method: 'DELETE' })]);
+      window.location.replace('/admin/login?reason=timeout');
+    };
+    const check = () => {
+      const remaining = WRITER_IDLE_TIMEOUT_MS - (Date.now() - lastActivity);
+      if (remaining <= 0) { void expire(); return; }
+      window.clearTimeout(timer);
+      timer = window.setTimeout(check, remaining);
+    };
+    const record = () => {
+      if (Date.now() - lastActivity >= WRITER_IDLE_TIMEOUT_MS) { void expire(); return; }
+      lastActivity = Date.now();
+      sessionStorage.setItem(WRITER_LAST_ACTIVITY_KEY, String(lastActivity));
+      check();
+    };
+
+    sessionStorage.setItem(WRITER_LAST_ACTIVITY_KEY, String(lastActivity));
+    check();
+    const events: Array<keyof WindowEventMap> = ['pointerdown', 'pointermove', 'keydown', 'scroll', 'touchstart'];
+    events.forEach((name) => window.addEventListener(name, record, { passive: true }));
+    const onVisible = () => { if (document.visibilityState === 'visible') check(); };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', check);
+    return () => {
+      window.clearTimeout(timer);
+      events.forEach((name) => window.removeEventListener(name, record));
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', check);
+    };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -62,7 +114,7 @@ export function WriterShell({ name, children }: { name: string; children: React.
   const isActive = (href: string) => href === '/admin/redaction' ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 
   return <WriterContext.Provider value={identity}>
-    <div className="min-h-screen overflow-x-hidden bg-[#f4f7fb] text-slate-800 md:flex">
+    <div className="min-h-screen overflow-x-clip bg-[#f4f7fb] text-slate-800 md:flex">
       <aside className={`fixed inset-y-0 left-0 z-40 flex w-[256px] max-w-[calc(100vw-1rem)] flex-col bg-[#0f1c3f] text-white transition-transform md:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex h-[76px] shrink-0 items-center justify-between border-b border-white/10 px-6">
           <Link href="/admin/redaction" className="flex items-center gap-3 text-[26px] font-extrabold tracking-tight text-white"><img src="/jchub-icon-192.png" alt="" className="h-10 w-10 rounded-xl" />JcHub</Link>

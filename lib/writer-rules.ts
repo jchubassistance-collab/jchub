@@ -109,3 +109,55 @@ export function writingTips(article: { title: string; description: string; conte
   if (/^#\s/m.test(article.content)) tips.push('Le titre de l’article est déjà le titre principal : utilisez ## pour les sous-titres, pas #.');
   return tips;
 }
+
+/** Title length the review aims for: long enough to say the subject, short enough for Google. */
+export const REVIEW_TITLE_LENGTH = { min: 30, max: 70 } as const;
+export const REVIEW_MIN_KEYWORDS = 3;
+/** One ## subtitle at least every this many words. */
+export const REVIEW_WORDS_PER_SUBTITLE = 400;
+
+export type ReviewIssue = 'title-length' | 'no-subtitles' | 'few-subtitles' | 'main-heading' | 'long-subtitle' | 'few-keywords';
+
+/**
+ * What the review at publication fixes in the title, subtitles and keywords. An empty list means
+ * the article goes online as written.
+ */
+export function reviewIssues(article: { title: string; content: string; keywords: string[] }): ReviewIssue[] {
+  const issues: ReviewIssue[] = [];
+  const title = article.title.trim().length;
+  if (title < REVIEW_TITLE_LENGTH.min || title > REVIEW_TITLE_LENGTH.max) issues.push('title-length');
+  // A # inside a code block is a shell comment, not a heading.
+  const text = article.content.replace(/```[\s\S]*?```/g, '');
+  const subtitles = text.match(/^##\s.+$/gm) || [];
+  if (!subtitles.length) issues.push('no-subtitles');
+  else if (subtitles.length < Math.floor(wordCount(article.content) / REVIEW_WORDS_PER_SUBTITLE)) issues.push('few-subtitles');
+  if (/^#\s/m.test(text)) issues.push('main-heading');
+  if ((text.match(/^#{2,6}\s.+$/gm) || []).some((heading) => heading.replace(/^#+\s/, '').length > 90)) issues.push('long-subtitle');
+  if (article.keywords.length < REVIEW_MIN_KEYWORDS) issues.push('few-keywords');
+  return issues;
+}
+
+/** The text without its heading lines, spaces tidied: what the review must leave untouched. */
+function bodyWithoutHeadings(markdown: string): string {
+  let inCode = false;
+  return markdown.split('\n').filter((line) => {
+    if (line.trim().startsWith('```')) inCode = !inCode;
+    return inCode || !/^#{1,6}\s/.test(line.trim());
+  }).join(' ').replace(/\s+/g, ' ').trim();
+}
+
+/** True when `revised` only changes, adds or removes heading lines of `original`. */
+export function onlyHeadingsChanged(original: string, revised: string): boolean {
+  return bodyWithoutHeadings(original) === bodyWithoutHeadings(revised);
+}
+
+/** Past this, a review that never finished no longer hides the article. */
+export const REVIEW_PENDING_MAX_MS = 10 * 60_000;
+
+/** Whether the blog must still hide this article because its review is running. */
+export function reviewPending(data: Record<string, unknown>, now = Date.now()): boolean {
+  const review = data.aiReview as { status?: unknown; startedAt?: unknown } | undefined;
+  if (review?.status !== 'pending') return false;
+  const startedAt = Date.parse(String(review.startedAt || ''));
+  return Number.isFinite(startedAt) && now - startedAt < REVIEW_PENDING_MAX_MS;
+}

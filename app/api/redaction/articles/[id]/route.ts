@@ -8,6 +8,7 @@ import { addCoverPhoto } from '@/lib/article-photo';
 import { refreshArticle } from '@/lib/article-repository';
 import { hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { revalidateBlog } from '@/lib/live-articles';
+import { reviewWriterArticle } from '@/lib/writer-review';
 import { enforceRateLimit } from '@/lib/rate-limit';
 import { ownedArticle, slugTaken, toWriterArticle, uniqueSlug, viewsBySlug, writerError } from '@/lib/writer-articles';
 import { parseKeywords, publicationChecks, readTime, slugify, WRITER_EDITABLE_STATUSES, WRITER_LIMITS } from '@/lib/writer-rules';
@@ -65,6 +66,15 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       if (limited) return limited;
     }
 
+    // After the review at publication, the editor still holds what the writer typed: a save that
+    // sends those same values back keeps the reviewed title, subtitles and keywords.
+    const reviewed = (data.aiReview as { original?: { title?: string; content?: string; keywords?: string[] } } | undefined)?.original;
+    if (reviewed) {
+      if (input.title !== undefined && input.title === reviewed.title) delete input.title;
+      if (input.content !== undefined && input.content.trim() === String(reviewed.content || '').trim()) delete input.content;
+      if (input.keywords !== undefined && parseKeywords(input.keywords.join(',')).join(',') === (reviewed.keywords || []).join(',')) delete input.keywords;
+    }
+
     const update: Record<string, unknown> = { author: writer.name, updatedAt: FieldValue.serverTimestamp() };
     if (input.title !== undefined) update.title = input.title;
     if (input.description !== undefined) { update.description = input.description; update.excerpt = input.description; }
@@ -106,16 +116,23 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       update.status = 'published';
       update.readTime = readTime(String(next.content || ''));
       if (!data.publishedAt) update.publishedAt = FieldValue.serverTimestamp();
+      // Off the blog until the review of its title, subtitles and keywords ends (lib/writer-review.ts).
+      update.aiReview = { status: 'pending', startedAt: new Date().toISOString() };
     }
     await reference.update(update);
 
     if (wasPublished || publishing) {
-      // Online at once; the cover photo and the English version follow and refresh it again.
+      // An update is online at once; a first publication once reviewed. The cover photo and the
+      // English version follow, from the reviewed text, and refresh it again.
       revalidateBlog();
       after(async () => {
-        if (publishing) await addCoverPhoto(reference);
+        if (publishing) {
+          await reviewWriterArticle(reference);
+          revalidateBlog();
+          await addCoverPhoto(reference);
+        }
         await refreshArticle(id, { translate: true });
-        if (publishing) await notifyAdminOfWriterPublication({ title, description, slug, author: writer.name });
+        if (publishing) await notifyAdminOfWriterPublication({ title: String((await reference.get()).data()?.title || title), description, slug, author: writer.name });
       });
     }
     return NextResponse.json({ id, slug, status: publishing ? 'published' : status, savedAt: new Date().toISOString() });
