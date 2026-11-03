@@ -33,6 +33,7 @@ export const routing = defineRouting({
     '/contact': '/contact',
     '/kit-entrepreneur': { fr: '/kit-entrepreneur', en: '/business-kit' },
     '/mentions-legales': { fr: '/mentions-legales', en: '/legal-notice' },
+    '/newsletter/confirmation': '/newsletter/confirmation',
     '/outils': { fr: '/outils', en: '/tools' },
     '/outils/[slug]': { fr: '/outils/[slug]', en: '/tools/[slug]' },
     '/outils/categorie/[category]': { fr: '/outils/categorie/[category]', en: '/tools/category/[category]' },

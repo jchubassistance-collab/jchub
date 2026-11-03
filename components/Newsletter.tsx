@@ -10,13 +10,13 @@ import { LOCALE_HEADER } from '@/i18n/request-locale';
 const copy = bilingual({
   failed: 'Impossible de t’inscrire pour le moment.',
   generic: 'Une erreur est survenue.',
-  success: 'Merci, ton inscription est confirmée.',
+  success: 'Presque fini : ouvre l’e-mail que tu viens de recevoir pour confirmer ton inscription.',
   placeholder: 'ton@email.com',
   subscribe: 'S’inscrire',
 }, {
   failed: 'We can’t subscribe you right now.',
   generic: 'Something went wrong.',
-  success: 'Thanks, your subscription is confirmed.',
+  success: 'Almost done: open the email you just received to confirm your subscription.',
   placeholder: 'you@email.com',
   subscribe: 'Subscribe',
 });

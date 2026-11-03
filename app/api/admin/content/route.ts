@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
+import { viewsBySlug } from '@/lib/writer-articles';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,12 +12,12 @@ export async function GET(request: NextRequest) {
     await requireAdmin(request);
     if (!hasFirebaseAdminConfig()) return NextResponse.json({ error: 'Firebase indisponible.' }, { status: 503 });
     const db = getAdminDb();
-    const [articlesSnapshot, draftsSnapshot, viewsSnapshot] = await Promise.all([
+    const [articlesSnapshot, draftsSnapshot] = await Promise.all([
       db.collection('articles').get(),
       db.collection('agent_drafts').orderBy('createdAt', 'desc').get(),
-      db.collection('blog_articles').get(),
     ]);
-    const views = new Map(viewsSnapshot.docs.map((doc) => [doc.id, Number(doc.data().views || 0)]));
+    // Only the counters of these articles, not the whole blog_articles collection.
+    const views = await viewsBySlug(articlesSnapshot.docs.map((document) => String(document.data().slug || document.id)));
     const articles = articlesSnapshot.docs.map((document) => {
       const data = document.data();
       const slug = String(data.slug || document.id);

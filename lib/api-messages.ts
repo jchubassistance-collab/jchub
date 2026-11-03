@@ -21,8 +21,9 @@ const ENGLISH: Record<string, string> = {
   // Newsletter and contact
   'Le service newsletter est temporairement indisponible.': 'The newsletter service is temporarily unavailable.',
   'Adresse e-mail invalide.': 'Invalid email address.',
-  'Inscription enregistrée. La synchronisation newsletter sera retentée prochainement.': 'Subscription saved. The newsletter sync will be retried soon.',
   'Impossible de t’inscrire pour le moment.': 'We can’t subscribe you right now.',
+  'Ce lien a expiré ou a déjà servi. Inscris-toi à nouveau depuis le site.': 'This link has expired or was already used. Subscribe again from the site.',
+  'Impossible de confirmer ton inscription pour le moment. Réessaie dans quelques instants.': 'We can’t confirm your subscription right now. Try again in a moment.',
   'Le service de contact est temporairement indisponible.': 'The contact service is temporarily unavailable.',
   'Vérifie les champs du formulaire.': 'Check the form fields.',
   'Impossible d’envoyer ton message pour le moment.': 'We can’t send your message right now.',

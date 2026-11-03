@@ -67,13 +67,18 @@ function frontmatter(data: Record<string, unknown>, fields: readonly string[]): 
 
 const toLf = (text: string) => text.replace(/\r\n/g, '\n');
 
-/** gray-matter adds a line break after the body: the reader removes exactly that one. */
+/**
+ * The writer ends the body with one line break of its own (gray-matter only adds one when the
+ * body has none) and the reader removes exactly that one, so a body ending in a line break keeps it.
+ */
 function toMarkdown(content: string, data: Record<string, unknown>): string {
-  return matter.stringify(toLf(content), data);
+  return matter.stringify(`${toLf(content)}\n`, data);
 }
 
 function fromMarkdown(text: string): { data: Record<string, unknown>; content: string } {
-  const parsed = matter(toLf(text));
+  // With options gray-matter skips its cache, which would hand every reader of a same text one shared
+  // `data` object and keep every article text in memory for good.
+  const parsed = matter(toLf(text), {});
   return { data: parsed.data as Record<string, unknown>, content: parsed.content.replace(/\n$/, '') };
 }
 

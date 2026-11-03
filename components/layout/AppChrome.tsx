@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
@@ -110,7 +111,7 @@ function PageNavigationLoader({ label, text }: { label: string; text: string }) 
           <span className="jchub-loader__dot jchub-loader__dot--bottom" />
           <span className="jchub-loader__dot jchub-loader__dot--left" />
         </span>
-        <img src="/jchub-icon-192.png" alt="" width="192" height="192" className="jchub-loader__icon" />
+        <Image src="/jchub-icon-192.png" alt="" width={192} height={192} sizes="96px" loading="eager" className="jchub-loader__icon" />
       </div>
       <span className="sr-only">{text}</span>
     </div>

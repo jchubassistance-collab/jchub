@@ -58,7 +58,7 @@ async function run() {
   for (let index = 0; index < files.length; index += 1) {
     const file = files[index];
     const source = readFileSync(resolve(process.cwd(), 'content/blog', file), 'utf8');
-    const parsed = matter(source);
+    const parsed = matter(source, {});
     const data = parsed.data as Frontmatter;
     const slug = String(data.slug || file.replace(/\.md$/, ''));
     const ref = db.collection('articles').doc(slug);

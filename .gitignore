@@ -8,5 +8,10 @@ node_modules
 
 # Fichier de clés local, jamais versionné
 .api
+# Brouillons et sauvegardes personnels (déjà exclus de Vercel par .vercelignore)
+/security.txt
+/teste.html
+/tste.txt
+/backup-securite-*/
 # Le modèle de configuration (valeurs fictives) reste versionné
 !.env.exemple

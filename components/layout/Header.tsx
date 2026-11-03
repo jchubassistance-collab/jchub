@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useLocale } from 'next-intl';
 import { Briefcase, ChevronRight, Home, Info, Mail, Menu,Newspaper, Wrench, X } from 'lucide-react';
 import { useState } from 'react';
@@ -167,7 +168,7 @@ function MobileNavLink({ href, label, icon: Icon, pathname, onClick, index, open
 function MobileBrand() {
   return (
     <span className="inline-flex items-center gap-2.5">
-      <img src="/jchub-icon-192.png" alt="" aria-hidden="true" className="h-9 w-9 rounded-xl shadow-[0_4px_12px_rgba(15,23,42,.15)]" />
+      <Image src="/jchub-icon-192.png" alt="" aria-hidden="true" width={36} height={36} loading="eager" className="h-9 w-9 rounded-xl shadow-[0_4px_12px_rgba(15,23,42,.15)]" />
       <span className="text-2xl font-extrabold leading-none tracking-tight text-[#0369fb]">
         JcHub
       </span>

@@ -231,6 +231,7 @@ const API_INTENTS: Record<string, string | Record<string, string>> = {
   '/api/tools/upload': { POST: 'Envoi d’un fichier à traiter', DELETE: 'Suppression d’un fichier temporaire' },
   '/api/contact': 'Envoi du formulaire de contact',
   '/api/newsletter': 'Inscription à la newsletter',
+  '/api/newsletter/confirm': 'Confirmation d’une inscription à la newsletter',
   '/api/tool-assistant': { GET: 'Chargement des outils de l’assistant', POST: 'Question à l’assistant des outils' },
   '/api/nav-search': { POST: 'Enregistrement d’une recherche' },
   '/api/article-cover': 'Image de couverture d’un article',

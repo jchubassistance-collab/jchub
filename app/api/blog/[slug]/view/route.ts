@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
+import { getPublishedArticles } from '@/lib/blog';
 import { reportUserError } from '@/lib/user-error';
 import { enforceRateLimit } from '@/lib/rate-limit';
 import { withReport } from '@/lib/reports/server';
@@ -12,6 +13,11 @@ export const POST = withReport(async function POST(_request: NextRequest, { para
   const { slug } = await params;
   if (!hasFirebaseAdminConfig()) return NextResponse.json({ views: null }, { status: 503 });
   try {
+    // Only a published article's French slug gets a counter: any other value would add a stray
+    // document to blog_articles, which the admin pages read in full.
+    if (!/^[a-z0-9-]{1,160}$/.test(slug) || !(await getPublishedArticles('fr')).some((article) => article.slugs.fr === slug)) {
+      return NextResponse.json({ views: null }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    }
     const ref = getAdminDb().collection('blog_articles').doc(slug);
     // The day's count, per language, draws the curves of the writing space (/api/redaction/performance).
     const day = new Date().toISOString().slice(0, 10);

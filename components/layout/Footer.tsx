@@ -1,5 +1,6 @@
 ﻿'use client';
 
+import Image from 'next/image';
 import { useLocale } from 'next-intl';
 import { ArrowUpRight, Linkedin, Mail, MapPin, Sparkles } from 'lucide-react';
 import { OPEN_CONSENT_EVENT } from '@/components/AnalyticsConsent';
@@ -82,7 +83,7 @@ export function Footer() {
         <div className="relative isolate mx-auto max-w-sm overflow-hidden px-2 py-10 md:hidden">
           <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-10 -z-10 h-44 w-44 rounded-full bg-[#0369fb]/[0.07] blur-3xl" />
           <Link href="/" className="group inline-flex items-center gap-3 rounded-2xl border border-blue-100/80 bg-white/90 px-3 py-2 shadow-sm shadow-blue-900/5 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md" aria-label={t.homeLabel}>
-            <img src="/jchub-icon-192.png" alt="" className="h-9 w-9 rounded-lg transition-transform duration-300 group-hover:rotate-[-3deg] group-hover:scale-105" />
+            <Image src="/jchub-icon-192.png" alt="" width={36} height={36} className="h-9 w-9 rounded-lg transition-transform duration-300 group-hover:rotate-[-3deg] group-hover:scale-105" />
             <span className="text-lg font-extrabold tracking-tight text-[#0369fb]">JcHub</span>
           </Link>
           <div aria-hidden="true" className="mt-8 h-px w-full bg-gradient-to-r from-transparent via-blue-200 to-transparent" />
@@ -120,7 +121,7 @@ export function Footer() {
         <div className="hidden gap-10 py-12 md:grid md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:py-14">
           <div>
             <Link href="/" className="group inline-flex items-center" aria-label={t.homeLabel}>
-              <img src="/jchub-icon-192.png" alt="JcHub" className="h-10 w-auto transition duration-300 group-hover:scale-[1.04] md:hidden" />
+              <Image src="/jchub-icon-192.png" alt="JcHub" width={40} height={40} className="h-10 w-auto transition duration-300 group-hover:scale-[1.04] md:hidden" />
               <img src="/logo-blue.svg" alt="JcHub" className="hidden h-14 w-auto transition duration-300 group-hover:scale-[1.04] md:block" />
             </Link>
             <p className={`mt-5 max-w-sm text-sm leading-relaxed ${isLightPage ? 'text-slate-600' : 'text-slate-300'}`}>{t.about}</p>

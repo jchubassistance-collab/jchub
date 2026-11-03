@@ -3,6 +3,7 @@ import { getAdminDb } from '@/lib/firebase-admin';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getPublishedTools } from '@/lib/tools';
 import { getGa4Overview } from '@/lib/ga4';
+import { viewsBySlug as articleViews } from '@/lib/writer-articles';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,18 +13,20 @@ export async function GET(request: NextRequest) {
 
    const adminDb = getAdminDb();
 
-    const [users, articles, drafts, runs, publishedTools, articleViews, pendingMessages, analytics] = await Promise.all([
-      adminDb.collection('users').get(),
-      adminDb.collection('articles').get(),
-      adminDb.collection('agent_drafts').get(),
-      adminDb.collection('agent_runs').get(),
+    // Counts are computed by Firestore and lists are limited: the dashboard no longer downloads
+    // every user, run and view counter on each visit.
+    const [userCount, latestUsers, articles, drafts, runs, publishedTools, pendingMessages, analytics] = await Promise.all([
+      adminDb.collection('users').count().get(),
+      adminDb.collection('users').orderBy('createdAt', 'desc').limit(20).select('email', 'createdAt').get(),
+      adminDb.collection('articles').select('slug', 'title', 'status', 'publishedAt').get(),
+      adminDb.collection('agent_drafts').select('title', 'status', 'createdAt').get(),
+      adminDb.collection('agent_runs').orderBy('createdAt', 'desc').limit(1).get(),
       getPublishedTools(),
-      adminDb.collection('blog_articles').get(),
-      adminDb.collection('contact_messages').where('status', '==', 'new').get(),
+      adminDb.collection('contact_messages').where('status', '==', 'new').count().get(),
       getGa4Overview().catch(() => ({ configured: false as const })),
     ]);
 
-    const viewsBySlug = new Map(articleViews.docs.map((document) => [document.id, Number(document.data().views || 0)]));
+    const viewsBySlug = await articleViews(articles.docs.filter((article) => article.data().status === 'published').map((article) => String(article.data().slug || article.id)));
     const articleViewRows = articles.docs
       .filter((article) => article.data().status === 'published')
       .map((article) => ({
@@ -33,7 +36,7 @@ export async function GET(request: NextRequest) {
       }))
       .sort((first, second) => second.views - first.views);
 
-    const recentUsers = users.docs
+    const recentUsers = latestUsers.docs
       .map((user) => {
         const data = user.data();
         return {
@@ -95,11 +98,11 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
-      totalUsers: users.size,
+      totalUsers: userCount.data().count,
       totalArticles: articles.docs.filter((article) => article.data().status === 'published').length,
       totalDrafts: drafts.docs.filter((draft) => ['draft', 'approved'].includes(String(draft.data().status || 'draft'))).length,
       approvedDrafts: drafts.docs.filter((draft) => draft.data().status === 'approved').length,
-      pendingMessages: pendingMessages.size,
+      pendingMessages: pendingMessages.data().count,
       totalTools: publishedTools.length,
       totalArticleViews: articleViewRows.reduce((total, article) => total + article.views, 0),
       articleViews: articleViewRows.slice(0, 10),
