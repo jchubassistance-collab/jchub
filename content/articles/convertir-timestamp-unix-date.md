@@ -1,8 +1,12 @@
 ---
 slug: convertir-timestamp-unix-date
 title: 'Timestamp Unix : comment convertir 1704067200 en date lisible (et inversement)'
-description: "Tu reçois un nombre à 10 chiffres de ton backend et tu sais pas ce que c'est ? C'est un timestamp Unix. Voici comment le décoder en 30 secondes."
-excerpt: "Timestamp Unix : comment convertir 1704067200 en date lisible L'autre jour, je debug une API. Je reçois un payload JSON avec un champ \"createdat\": ..."
+description: >-
+  Tu reçois un nombre à 10 chiffres de ton backend et tu sais pas ce que c'est ?
+  C'est un timestamp Unix. Voici comment le décoder en 30 secondes.
+excerpt: >-
+  Timestamp Unix : comment convertir 1704067200 en date lisible L'autre jour, je
+  debug une API. Je reçois un payload JSON avec un champ "createdat": ...
 category: Développement
 keywords:
   - timestamp unix

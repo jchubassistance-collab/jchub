@@ -1,8 +1,12 @@
 ---
 slug: convert-pdf-to-editable-word-preserve-layout-tables
 title: 'Convert a PDF into an Editable Word Document: Preserving Layout and Tables'
-description: Understand how PDF-to-Word (DOCX) conversion works under the hood and learn how to quickly recover editable text and tables.
-excerpt: Understand how PDF-to-Word (DOCX) conversion works under the hood and learn how to quickly recover editable text and tables.
+description: >-
+  Understand how PDF-to-Word (DOCX) conversion works under the hood and learn
+  how to quickly recover editable text and tables.
+excerpt: >-
+  Understand how PDF-to-Word (DOCX) conversion works under the hood and learn
+  how to quickly recover editable text and tables.
 keywords:
   - computing
   - technology

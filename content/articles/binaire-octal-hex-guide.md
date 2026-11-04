@@ -1,8 +1,12 @@
 ---
 slug: binaire-octal-hex-guide
 title: 'Binaire, octal, décimal, hexadécimal : le guide pour ne plus rien confondre'
-description: "Tu mélanges encore binaire et hexa ? Voici l'explication simple avec des exemples concrets (couleurs CSS, addresses mémoire, ASCII)."
-excerpt: "Binaire, octal, décimal, hexadécimal : le guide pour ne plus rien confondre Mon premier cours d'info, le prof écrit 0b1010 au tableau. Je suis perd..."
+description: >-
+  Tu mélanges encore binaire et hexa ? Voici l'explication simple avec des
+  exemples concrets (couleurs CSS, addresses mémoire, ASCII).
+excerpt: >-
+  Binaire, octal, décimal, hexadécimal : le guide pour ne plus rien confondre
+  Mon premier cours d'info, le prof écrit 0b1010 au tableau. Je suis perd...
 category: Informatique
 keywords:
   - binaire

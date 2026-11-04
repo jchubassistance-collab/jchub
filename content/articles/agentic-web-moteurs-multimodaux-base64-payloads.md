@@ -1,8 +1,16 @@
 ---
 slug: agentic-web-moteurs-multimodaux-base64-payloads
-title: "Agentic Web et Moteurs Multimodaux : Optimiser l'intégration des Payloads Binaires et Base64"
-description: 'Analyse des tendances actuelles autour des agents web ultra-rapides et des modèles multimodaux embarqués, avec un guide pratique sur la gestion et le débogage de payloads Base64 pour vos APIs.'
-excerpt: 'Analyse des tendances actuelles autour des agents web ultra-rapides et des modèles multimodaux embarqués, avec un guide pratique sur la gestion et le débogage de payloads Base64 pour vos APIs.'
+title: >-
+  Agentic Web et Moteurs Multimodaux : Optimiser l'intégration des Payloads
+  Binaires et Base64
+description: >-
+  Analyse des tendances actuelles autour des agents web ultra-rapides et des
+  modèles multimodaux embarqués, avec un guide pratique sur la gestion et le
+  débogage de payloads Base64 pour vos APIs.
+excerpt: >-
+  Analyse des tendances actuelles autour des agents web ultra-rapides et des
+  modèles multimodaux embarqués, avec un guide pratique sur la gestion et le
+  débogage de payloads Base64 pour vos APIs.
 category: Développement
 keywords:
   - développement

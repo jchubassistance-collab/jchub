@@ -1,8 +1,14 @@
 ---
 slug: optimize-webp-png-images-speed-up-website
-title: How to optimize your WebP and PNG images to speed up a website without losing quality
-description: "Learn how to reduce the size of your WebP and PNG images to improve your website's loading speed, your SEO and the user experience."
-excerpt: "Learn how to reduce the size of your WebP and PNG images to improve your website's loading speed, your SEO and the user experience."
+title: >-
+  How to optimize your WebP and PNG images to speed up a website without losing
+  quality
+description: >-
+  Learn how to reduce the size of your WebP and PNG images to improve your
+  website's loading speed, your SEO and the user experience.
+excerpt: >-
+  Learn how to reduce the size of your WebP and PNG images to improve your
+  website's loading speed, your SEO and the user experience.
 keywords:
   - computer science
   - technology

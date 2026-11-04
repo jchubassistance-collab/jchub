@@ -1,8 +1,16 @@
 ---
 slug: high-frequency-log-time-metrics-inference-timestamps
-title: 'Analyzing high-frequency logs and time metrics: mastering timestamps in inference systems'
-description: "A technical look at timestamp challenges in fast inference architectures, and an introduction to JcHub's Timestamp Converter to inspect your distributed logs."
-excerpt: "A technical look at timestamp challenges in fast inference architectures, and an introduction to JcHub's Timestamp Converter to inspect your distributed logs."
+title: >-
+  Analyzing high-frequency logs and time metrics: mastering timestamps in
+  inference systems
+description: >-
+  A technical look at timestamp challenges in fast inference architectures, and
+  an introduction to JcHub's Timestamp Converter to inspect your distributed
+  logs.
+excerpt: >-
+  A technical look at timestamp challenges in fast inference architectures, and
+  an introduction to JcHub's Timestamp Converter to inspect your distributed
+  logs.
 keywords:
   - development
   - technology

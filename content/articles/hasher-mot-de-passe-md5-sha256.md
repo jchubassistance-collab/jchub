@@ -1,8 +1,12 @@
 ---
 slug: hasher-mot-de-passe-md5-sha256
 title: 'MD5 vs SHA-256 : lequel choisir pour hasher un mot de passe (le vrai avis)'
-description: "J'ai testé MD5, SHA-1, SHA-256 et SHA-512 sur mes propres projets. Voici celui que tu devrais utiliser (et pourquoi)."
-excerpt: "MD5 vs SHA256 : lequel choisir pour hasher un mot de passe Y'a 6 mois, j'ai débuggé un site qui stockait les mots de passe en MD5. En clair. Dans l..."
+description: >-
+  J'ai testé MD5, SHA-1, SHA-256 et SHA-512 sur mes propres projets. Voici celui
+  que tu devrais utiliser (et pourquoi).
+excerpt: >-
+  MD5 vs SHA256 : lequel choisir pour hasher un mot de passe Y'a 6 mois, j'ai
+  débuggé un site qui stockait les mots de passe en MD5. En clair. Dans l...
 category: Sécurité
 keywords:
   - md5 vs sha256

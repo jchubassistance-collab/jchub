@@ -1,8 +1,12 @@
 ---
 slug: email-regex-5-patterns
 title: 'Email regex: 5 patterns to know (and the traps to avoid)'
-description: "A regex to validate an email isn't as simple as /\\S+@\\S+\\.\\S+/. Here are 5 useful patterns, tested in production, with their limits."
-excerpt: 'Email regex: 5 patterns to know and the traps to avoid. 2 years ago, I used this as email validation in a project: A user wrote to me: "Your site...'
+description: >-
+  A regex to validate an email isn't as simple as /\S+@\S+\.\S+/. Here are 5
+  useful patterns, tested in production, with their limits.
+excerpt: >-
+  Email regex: 5 patterns to know and the traps to avoid. 2 years ago, I used
+  this as email validation in a project: A user wrote to me: "Your site...
 keywords:
   - email regex
   - regular expression

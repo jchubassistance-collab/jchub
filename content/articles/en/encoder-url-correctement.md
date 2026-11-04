@@ -1,8 +1,12 @@
 ---
 slug: encode-url-correctly
 title: How to encode a URL correctly (and not break your OAuth)
-description: "A space or an accent in a URL can break everything. Here's the difference between encodeURI and encodeURIComponent, and when to use which."
-excerpt: 'How to encode a URL correctly and not break your OAuth. Last month, a client called me in a panic: "Jessy, our Google login stopped working...'
+description: >-
+  A space or an accent in a URL can break everything. Here's the difference
+  between encodeURI and encodeURIComponent, and when to use which.
+excerpt: >-
+  How to encode a URL correctly and not break your OAuth. Last month, a client
+  called me in a panic: "Jessy, our Google login stopped working...
 keywords:
   - encode url
   - encodeURIComponent

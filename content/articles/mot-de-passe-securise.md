@@ -1,8 +1,12 @@
 ---
 slug: mot-de-passe-securise
 title: Comment créer un mot de passe vraiment sécurisé (et le retenir)
-description: 'Tous les conseils habituels sur les mots de passe sont nuls. Voici la vraie stratégie : générateur + gestionnaire + 2FA. Simple, efficace, applicable.'
-excerpt: 'Comment créer un mot de passe vraiment sécurisé et le retenir Le conseil classique : "Mets des majuscules, des chiffres, des symboles, et changele ...'
+description: >-
+  Tous les conseils habituels sur les mots de passe sont nuls. Voici la vraie
+  stratégie : générateur + gestionnaire + 2FA. Simple, efficace, applicable.
+excerpt: >-
+  Comment créer un mot de passe vraiment sécurisé et le retenir Le conseil
+  classique : "Mets des majuscules, des chiffres, des symboles, et changele ...
 category: Sécurité
 keywords:
   - mot de passe sécurisé

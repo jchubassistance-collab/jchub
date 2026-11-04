@@ -1,8 +1,16 @@
 ---
 slug: agentic-web-multimodal-engines-base64-payloads
-title: 'Agentic Web and Multimodal Engines: Optimizing the Integration of Binary and Base64 Payloads'
-description: 'An analysis of current trends around ultra-fast web agents and embedded multimodal models, with a practical guide to handling and debugging Base64 payloads for your APIs.'
-excerpt: 'An analysis of current trends around ultra-fast web agents and embedded multimodal models, with a practical guide to handling and debugging Base64 payloads for your APIs.'
+title: >-
+  Agentic Web and Multimodal Engines: Optimizing the Integration of Binary and
+  Base64 Payloads
+description: >-
+  An analysis of current trends around ultra-fast web agents and embedded
+  multimodal models, with a practical guide to handling and debugging Base64
+  payloads for your APIs.
+excerpt: >-
+  An analysis of current trends around ultra-fast web agents and embedded
+  multimodal models, with a practical guide to handling and debugging Base64
+  payloads for your APIs.
 keywords:
   - development
   - technology

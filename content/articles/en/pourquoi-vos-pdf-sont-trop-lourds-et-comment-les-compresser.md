@@ -1,8 +1,16 @@
 ---
 slug: why-your-pdfs-are-too-heavy-and-how-to-compress-them
-title: Why your PDFs exceed upload limits and how to make them lighter without losing readability
-description: Understand why PDF files balloon in size and discover concrete techniques to bring them under the 2 MB limit without degrading your administrative documents.
-excerpt: Understand why PDF files balloon in size and discover concrete techniques to bring them under the 2 MB limit without degrading your administrative documents.
+title: >-
+  Why your PDFs exceed upload limits and how to make them lighter without losing
+  readability
+description: >-
+  Understand why PDF files balloon in size and discover concrete techniques to
+  bring them under the 2 MB limit without degrading your administrative
+  documents.
+excerpt: >-
+  Understand why PDF files balloon in size and discover concrete techniques to
+  bring them under the 2 MB limit without degrading your administrative
+  documents.
 keywords:
   - computer science
   - technology

@@ -1,8 +1,13 @@
 ---
 slug: convertir-couleur-hex-rgb
 title: Comment convertir une couleur HEX en RGB et HSL (avec exemples CSS réels)
-description: "Tu reçois un #3B82F6 du designer et tu sais pas comment l'utiliser ? Voici la conversion HEX → RGB → HSL expliquée simplement, avec des exemples Tailwind/CSS."
-excerpt: "Comment convertir une couleur HEX en RGB et HSL avec exemples CSS réels Le designer m'envoie une maquette Figma. Je copie une couleur : 3B82F6. Coo..."
+description: >-
+  Tu reçois un #3B82F6 du designer et tu sais pas comment l'utiliser ? Voici la
+  conversion HEX → RGB → HSL expliquée simplement, avec des exemples
+  Tailwind/CSS.
+excerpt: >-
+  Comment convertir une couleur HEX en RGB et HSL avec exemples CSS réels Le
+  designer m'envoie une maquette Figma. Je copie une couleur : 3B82F6. Coo...
 category: Frontend
 keywords:
   - hex en rgb

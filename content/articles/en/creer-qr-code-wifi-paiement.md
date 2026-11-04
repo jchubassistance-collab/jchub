@@ -1,8 +1,14 @@
 ---
 slug: create-qr-code-wifi-vcard-mobile-payment
 title: 'QR Code: How to Create One for Your WiFi, vCard, or Mobile Payment'
-description: "QR codes aren't just for restaurant menus anymore. Here are 5 practical use cases for devs, with free generators."
-excerpt: 'QR Code: How to Create One for Your WiFi, vCard, or Mobile Payment QR codes are everywhere in 2026. But most devs only know they can hold a URL. In reality, a QR code can store anything: WiFi, contacts, payments, events, and more.'
+description: >-
+  QR codes aren't just for restaurant menus anymore. Here are 5 practical use
+  cases for devs, with free generators.
+excerpt: >-
+  QR Code: How to Create One for Your WiFi, vCard, or Mobile Payment QR codes
+  are everywhere in 2026. But most devs only know they can hold a URL. In
+  reality, a QR code can store anything: WiFi, contacts, payments, events, and
+  more.
 keywords:
   - qr code generator
   - qr code wifi

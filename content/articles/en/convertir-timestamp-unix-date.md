@@ -1,8 +1,12 @@
 ---
 slug: convert-unix-timestamp-to-date
 title: 'Unix Timestamp: How to Convert 1704067200 to a Readable Date (and Vice Versa)'
-description: "You receive a 10-digit number from your backend and don't know what it is? It's a Unix timestamp. Here's how to decode it in 30 seconds."
-excerpt: "Unix Timestamp: How to Convert 1704067200 to a Readable Date The other day, I was debugging an API. I received a JSON payload with a field 'created_at': ..."
+description: >-
+  You receive a 10-digit number from your backend and don't know what it is?
+  It's a Unix timestamp. Here's how to decode it in 30 seconds.
+excerpt: >-
+  Unix Timestamp: How to Convert 1704067200 to a Readable Date The other day, I
+  was debugging an API. I received a JSON payload with a field 'created_at': ...
 keywords:
   - unix timestamp
   - epoch time

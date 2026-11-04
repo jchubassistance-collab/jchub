@@ -1,8 +1,12 @@
 ---
 slug: uuid-v4-vs-v7-primary-keys
 title: 'UUID v4 vs UUID v7: which one to use for your primary keys in 2026'
-description: "You know UUID v4 by heart, but UUID v7 changes the game. Here's why modern databases are switching, with concrete examples."
-excerpt: 'UUID v4 vs UUID v7: which one to use for your primary keys in 2026. For years, I used auto-increment ids in all my tables. Simple...'
+description: >-
+  You know UUID v4 by heart, but UUID v7 changes the game. Here's why modern
+  databases are switching, with concrete examples.
+excerpt: >-
+  UUID v4 vs UUID v7: which one to use for your primary keys in 2026. For years,
+  I used auto-increment ids in all my tables. Simple...
 keywords:
   - uuid v4
   - uuid v7

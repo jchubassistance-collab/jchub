@@ -1,8 +1,14 @@
 ---
 slug: unique-identifiers-automated-rendering-pipelines
-title: 'Generating unique identifiers in automated rendering pipelines: challenges and best practices'
-description: "A look at state management and resource uniqueness in code-driven content generation workflows, and an introduction to JcHub's UUID generator."
-excerpt: "A look at state management and resource uniqueness in code-driven content generation workflows, and an introduction to JcHub's UUID generator."
+title: >-
+  Generating unique identifiers in automated rendering pipelines: challenges and
+  best practices
+description: >-
+  A look at state management and resource uniqueness in code-driven content
+  generation workflows, and an introduction to JcHub's UUID generator.
+excerpt: >-
+  A look at state management and resource uniqueness in code-driven content
+  generation workflows, and an introduction to JcHub's UUID generator.
 keywords:
   - development
   - technology

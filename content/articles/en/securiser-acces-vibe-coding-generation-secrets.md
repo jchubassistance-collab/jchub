@@ -1,8 +1,14 @@
 ---
 slug: secure-access-vibe-coding-secret-generation
-title: 'Securing your access in the age of vibe coding: best practices and secret generation'
-description: 'A look at the security risks of rapid prototyping, and best practices to generate and manage high-entropy secrets in your projects.'
-excerpt: 'A look at the security risks of rapid prototyping, and best practices to generate and manage high-entropy secrets in your projects.'
+title: >-
+  Securing your access in the age of vibe coding: best practices and secret
+  generation
+description: >-
+  A look at the security risks of rapid prototyping, and best practices to
+  generate and manage high-entropy secrets in your projects.
+excerpt: >-
+  A look at the security risks of rapid prototyping, and best practices to
+  generate and manage high-entropy secrets in your projects.
 keywords:
   - development
   - technology

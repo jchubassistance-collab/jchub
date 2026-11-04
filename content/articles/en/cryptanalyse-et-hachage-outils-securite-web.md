@@ -1,8 +1,14 @@
 ---
 slug: cryptanalysis-hashing-web-security-tools
-title: 'From cryptanalysis to digital fingerprints: why hashing remains the cornerstone of the modern web'
-description: "A look at recent cryptographic advances, from solving historical ciphers to Zero-Knowledge proofs, and an introduction to JcHub's Hash generator."
-excerpt: "A look at recent cryptographic advances, from solving historical ciphers to Zero-Knowledge proofs, and an introduction to JcHub's Hash generator."
+title: >-
+  From cryptanalysis to digital fingerprints: why hashing remains the
+  cornerstone of the modern web
+description: >-
+  A look at recent cryptographic advances, from solving historical ciphers to
+  Zero-Knowledge proofs, and an introduction to JcHub's Hash generator.
+excerpt: >-
+  A look at recent cryptographic advances, from solving historical ciphers to
+  Zero-Knowledge proofs, and an introduction to JcHub's Hash generator.
 keywords:
   - development
   - technology

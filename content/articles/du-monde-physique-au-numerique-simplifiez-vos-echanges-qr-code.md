@@ -1,8 +1,12 @@
 ---
 slug: du-monde-physique-au-numerique-simplifiez-vos-echanges-qr-code
 title: 'Du monde physique au numérique : simplifiez vos échanges grâce au QR Code'
-description: "Découvrez comment les QR codes facilitent le partage instantané d'informations, l'accès au WiFi et la promotion de vos projets sans friction."
-excerpt: "Découvrez comment les QR codes facilitent le partage instantané d'informations, l'accès au WiFi et la promotion de vos projets sans friction."
+description: >-
+  Découvrez comment les QR codes facilitent le partage instantané
+  d'informations, l'accès au WiFi et la promotion de vos projets sans friction.
+excerpt: >-
+  Découvrez comment les QR codes facilitent le partage instantané
+  d'informations, l'accès au WiFi et la promotion de vos projets sans friction.
 category: Technologie
 keywords:
   - informatique
@@ -11,7 +15,8 @@ tags:
   - Informatique
   - technologie
 author: JcHub
-image: /blog/covers/du-monde-physique-au-numerique-simplifiez-vos-echanges-qr-code.jpg
+image: >-
+  /blog/covers/du-monde-physique-au-numerique-simplifiez-vos-echanges-qr-code.jpg
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-11-12T21:08:00.000Z'

@@ -1,8 +1,12 @@
 ---
 slug: test-rest-api-without-postman
 title: 'How to test a REST API without Postman (free, in the browser)'
-description: "Fed up with Postman's 200 MB install and mandatory account? Here are 3 lightweight alternatives, including one that's 100% free and needs no install."
-excerpt: "How to test a REST API without Postman, free, in the browser. I've been using Postman since 2017. But in 2024, I decided to stop. Why..."
+description: >-
+  Fed up with Postman's 200 MB install and mandatory account? Here are 3
+  lightweight alternatives, including one that's 100% free and needs no install.
+excerpt: >-
+  How to test a REST API without Postman, free, in the browser. I've been using
+  Postman since 2017. But in 2024, I decided to stop. Why...
 keywords:
   - api tester
   - postman alternative

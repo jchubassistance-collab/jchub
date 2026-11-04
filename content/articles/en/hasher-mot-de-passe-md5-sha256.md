@@ -1,8 +1,12 @@
 ---
 slug: md5-vs-sha256-password-hashing
 title: 'MD5 vs SHA-256: which one to choose to hash a password (my honest take)'
-description: "I tested MD5, SHA-1, SHA-256 and SHA-512 on my own projects. Here's the one you should use (and why)."
-excerpt: 'MD5 vs SHA256: which one to choose to hash a password. 6 months ago, I debugged a site that stored passwords in MD5. In plain sight. In the...'
+description: >-
+  I tested MD5, SHA-1, SHA-256 and SHA-512 on my own projects. Here's the one
+  you should use (and why).
+excerpt: >-
+  MD5 vs SHA256: which one to choose to hash a password. 6 months ago, I
+  debugged a site that stored passwords in MD5. In plain sight. In the...
 keywords:
   - md5 vs sha256
   - hash password

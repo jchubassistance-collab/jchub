@@ -1,8 +1,13 @@
 ---
 slug: binary-octal-decimal-hexadecimal-guide
 title: 'Binary, Octal, Decimal, Hexadecimal: The Guide to Never Confuse Them Again'
-description: "Still mixing up binary and hex? Here's a simple explanation with concrete examples (CSS colors, memory addresses, ASCII)."
-excerpt: "Binary, Octal, Decimal, Hexadecimal: The Guide to Never Confuse Them Again My first computer science class, the teacher writes 0b1010 on the board. I'm lost. Another student whispers: 'That's 10 in binary'."
+description: >-
+  Still mixing up binary and hex? Here's a simple explanation with concrete
+  examples (CSS colors, memory addresses, ASCII).
+excerpt: >-
+  Binary, Octal, Decimal, Hexadecimal: The Guide to Never Confuse Them Again My
+  first computer science class, the teacher writes 0b1010 on the board. I'm
+  lost. Another student whispers: 'That's 10 in binary'.
 keywords:
   - binary
   - hexadecimal

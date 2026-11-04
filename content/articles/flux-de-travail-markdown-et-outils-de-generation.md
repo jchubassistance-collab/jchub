@@ -1,8 +1,14 @@
 ---
 slug: flux-de-travail-markdown-et-outils-de-generation
-title: 'Du script automatisé au rendu visuel : maîtriser le flux Markdown dans les projets modernes'
-description: "Analyse de la centralité du Markdown dans les architectures modernes de génération de contenu et d'outillage technique."
-excerpt: "Analyse de la centralité du Markdown dans les architectures modernes de génération de contenu et d'outillage technique."
+title: >-
+  Du script automatisé au rendu visuel : maîtriser le flux Markdown dans les
+  projets modernes
+description: >-
+  Analyse de la centralité du Markdown dans les architectures modernes de
+  génération de contenu et d'outillage technique.
+excerpt: >-
+  Analyse de la centralité du Markdown dans les architectures modernes de
+  génération de contenu et d'outillage technique.
 category: Développement
 keywords:
   - développement

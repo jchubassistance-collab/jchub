@@ -1,8 +1,12 @@
 ---
 slug: creer-qr-code-wifi-paiement
 title: 'QR Code : comment en créer un pour ton WiFi, vCard ou paiement mobile'
-description: "Le QR code c'est plus juste pour les menus de resto. Voici 5 usages pratiques pour les devs, avec des générateurs gratuits."
-excerpt: 'QR Code : comment en créer un pour ton WiFi, vCard ou paiement mobile Le QR code est partout en 2026. Mais la plupart des devs savent juste que ça ...'
+description: >-
+  Le QR code c'est plus juste pour les menus de resto. Voici 5 usages pratiques
+  pour les devs, avec des générateurs gratuits.
+excerpt: >-
+  QR Code : comment en créer un pour ton WiFi, vCard ou paiement mobile Le QR
+  code est partout en 2026. Mais la plupart des devs savent juste que ça ...
 category: Productivité
 keywords:
   - qr code generator

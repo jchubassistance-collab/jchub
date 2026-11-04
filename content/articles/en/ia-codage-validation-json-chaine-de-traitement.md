@@ -1,8 +1,14 @@
 ---
 slug: ai-codes-faster-who-cleans-the-data-json-validation
 title: 'AI writes code faster than you, but who cleans up the data?'
-description: A look at the rise of AI coding agents and the crucial importance of formatting and validating data structures like JSON in new development workflows.
-excerpt: A look at the rise of AI coding agents and the crucial importance of formatting and validating data structures like JSON in new development workflows.
+description: >-
+  A look at the rise of AI coding agents and the crucial importance of
+  formatting and validating data structures like JSON in new development
+  workflows.
+excerpt: >-
+  A look at the rise of AI coding agents and the crucial importance of
+  formatting and validating data structures like JSON in new development
+  workflows.
 keywords:
   - development
   - technology

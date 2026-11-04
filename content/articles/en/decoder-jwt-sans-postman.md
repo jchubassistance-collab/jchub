@@ -1,8 +1,12 @@
 ---
 slug: decode-jwt-without-postman
 title: How to decode a JWT (JSON Web Token) without Postman — 2026 Guide
-description: "Struggling to debug a JWT? Here's how to decode it in 30 seconds, without installing Postman, with a free online tool."
-excerpt: "How to decode a JWT JSON Web Token without Postman. Struggling to debug a JWT token that doesn't work in your API? Don't want to install Postman..."
+description: >-
+  Struggling to debug a JWT? Here's how to decode it in 30 seconds, without
+  installing Postman, with a free online tool.
+excerpt: >-
+  How to decode a JWT JSON Web Token without Postman. Struggling to debug a JWT
+  token that doesn't work in your API? Don't want to install Postman...
 keywords:
   - decode jwt
   - jwt decoder

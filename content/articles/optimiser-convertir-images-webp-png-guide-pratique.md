@@ -1,8 +1,16 @@
 ---
 slug: optimiser-convertir-images-webp-png-guide-pratique
-title: Comment optimiser ses images WebP et PNG pour accélérer un site web sans perte de qualité
-description: "Découvrez comment réduire la taille de vos images WebP et PNG pour améliorer la vitesse de chargement de votre site web, votre SEO et l'expérience utilisateur."
-excerpt: "Découvrez comment réduire la taille de vos images WebP et PNG pour améliorer la vitesse de chargement de votre site web, votre SEO et l'expérience utilisateur."
+title: >-
+  Comment optimiser ses images WebP et PNG pour accélérer un site web sans perte
+  de qualité
+description: >-
+  Découvrez comment réduire la taille de vos images WebP et PNG pour améliorer
+  la vitesse de chargement de votre site web, votre SEO et l'expérience
+  utilisateur.
+excerpt: >-
+  Découvrez comment réduire la taille de vos images WebP et PNG pour améliorer
+  la vitesse de chargement de votre site web, votre SEO et l'expérience
+  utilisateur.
 category: Technologie
 keywords:
   - informatique

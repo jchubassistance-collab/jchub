@@ -1,8 +1,12 @@
 ---
 slug: base64-is-not-encryption
-title: "Base64 is not encryption (and it's important to understand why)"
-description: "Encoding an image in Base64 doesn't make it secret. Here's when to use Base64, how it works, and why it's sometimes useful (and sometimes not)."
-excerpt: "Base64 is not encryption and it's important to understand why. The other day, a junior dev asked me: \"I put my admin password in Base64..."
+title: Base64 is not encryption (and it's important to understand why)
+description: >-
+  Encoding an image in Base64 doesn't make it secret. Here's when to use Base64,
+  how it works, and why it's sometimes useful (and sometimes not).
+excerpt: >-
+  Base64 is not encryption and it's important to understand why. The other day,
+  a junior dev asked me: "I put my admin password in Base64...
 keywords:
   - base64 encoder
   - base64 image

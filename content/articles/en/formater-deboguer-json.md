@@ -1,8 +1,12 @@
 ---
 slug: format-debug-minified-json
-title: "Minified JSON = 5,000 characters on one line? Here's how to format it"
-description: "Getting JSON on a single line and can't read anything? Here's how to format it, debug it and validate it in 10 seconds."
-excerpt: "Minified JSON = 5,000 characters on one line? Here's how to format it. 3 days ago, I was debugging an API. I opened the Chrome console and saw this..."
+title: 'Minified JSON = 5,000 characters on one line? Here''s how to format it'
+description: >-
+  Getting JSON on a single line and can't read anything? Here's how to format
+  it, debug it and validate it in 10 seconds.
+excerpt: >-
+  Minified JSON = 5,000 characters on one line? Here's how to format it. 3 days
+  ago, I was debugging an API. I opened the Chrome console and saw this...
 keywords:
   - json formatter
   - format json

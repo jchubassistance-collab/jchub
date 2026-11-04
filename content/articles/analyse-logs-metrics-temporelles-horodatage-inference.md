@@ -1,8 +1,16 @@
 ---
 slug: analyse-logs-metrics-temporelles-horodatage-inference
-title: "Analyse de logs et métriques temporelles à haute fréquence : maîtriser l'horodatage des systèmes d'inférence"
-description: "Analyse technique des enjeux d'horodatage dans les architectures d'inférence rapide et présentation du Convertisseur Timestamp de JcHub pour inspecter vos logs distribués."
-excerpt: "Analyse technique des enjeux d'horodatage dans les architectures d'inférence rapide et présentation du Convertisseur Timestamp de JcHub pour inspecter vos logs distribués."
+title: >-
+  Analyse de logs et métriques temporelles à haute fréquence : maîtriser
+  l'horodatage des systèmes d'inférence
+description: >-
+  Analyse technique des enjeux d'horodatage dans les architectures d'inférence
+  rapide et présentation du Convertisseur Timestamp de JcHub pour inspecter vos
+  logs distribués.
+excerpt: >-
+  Analyse technique des enjeux d'horodatage dans les architectures d'inférence
+  rapide et présentation du Convertisseur Timestamp de JcHub pour inspecter vos
+  logs distribués.
 category: Développement
 keywords:
   - développement

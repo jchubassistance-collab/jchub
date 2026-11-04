@@ -1,8 +1,12 @@
 ---
 slug: create-a-truly-secure-password
 title: How to create a truly secure password (and remember it)
-description: "All the usual password advice is useless. Here's the real strategy: generator + manager + 2FA. Simple, effective, actionable."
-excerpt: 'How to create a truly secure password and remember it. The classic advice: "Use capital letters, numbers, symbols, and change it...'
+description: >-
+  All the usual password advice is useless. Here's the real strategy: generator
+  + manager + 2FA. Simple, effective, actionable.
+excerpt: >-
+  How to create a truly secure password and remember it. The classic advice:
+  "Use capital letters, numbers, symbols, and change it...
 keywords:
   - secure password
   - password generator

@@ -1,8 +1,16 @@
 ---
 slug: cryptanalyse-et-hachage-outils-securite-web
-title: 'De la cryptanalyse aux empreintes numériques : pourquoi le hachage reste la pierre angulaire du web moderne'
-description: 'Exploration des avancées cryptographiques récentes, de la résolution de chiffres historiques aux preuves Zero-Knowledge, et présentation du Générateur de hash de JcHub.'
-excerpt: 'Exploration des avancées cryptographiques récentes, de la résolution de chiffres historiques aux preuves Zero-Knowledge, et présentation du Générateur de hash de JcHub.'
+title: >-
+  De la cryptanalyse aux empreintes numériques : pourquoi le hachage reste la
+  pierre angulaire du web moderne
+description: >-
+  Exploration des avancées cryptographiques récentes, de la résolution de
+  chiffres historiques aux preuves Zero-Knowledge, et présentation du Générateur
+  de hash de JcHub.
+excerpt: >-
+  Exploration des avancées cryptographiques récentes, de la résolution de
+  chiffres historiques aux preuves Zero-Knowledge, et présentation du Générateur
+  de hash de JcHub.
 category: Développement
 keywords:
   - développement

@@ -1,8 +1,12 @@
 ---
 slug: markdown-beginner-guide
 title: 'Markdown in 5 minutes: the survival guide for junior devs'
-description: "New to GitHub and don't understand the README syntax? Here's everything you need to know about Markdown in 5 minutes, with examples."
-excerpt: 'Markdown in 5 minutes: the survival guide for junior devs. On my first GitHub, I looked at a README. I saw #, **, []()... I understood nothing...'
+description: >-
+  New to GitHub and don't understand the README syntax? Here's everything you
+  need to know about Markdown in 5 minutes, with examples.
+excerpt: >-
+  Markdown in 5 minutes: the survival guide for junior devs. On my first GitHub,
+  I looked at a README. I saw #, **, []()... I understood nothing...
 keywords:
   - learn markdown
   - markdown syntax

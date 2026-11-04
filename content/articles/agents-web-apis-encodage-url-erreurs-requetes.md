@@ -1,8 +1,16 @@
 ---
 slug: agents-web-apis-encodage-url-erreurs-requetes
-title: "Agents Web, APIs et Encodage d'URL : Éviter les Erreurs Silencieuses et le Gaspillage de Requêtes"
-description: "Analyse des erreurs fréquentes lors de la construction d'URL pour les requêtes API et les agents automatisés, et comment utiliser un outil d'encodage pour fiabiliser vos flux HTTP."
-excerpt: "Analyse des erreurs fréquentes lors de la construction d'URL pour les requêtes API et les agents automatisés, et comment utiliser un outil d'encodage pour fiabiliser vos flux HTTP."
+title: >-
+  Agents Web, APIs et Encodage d'URL : Éviter les Erreurs Silencieuses et le
+  Gaspillage de Requêtes
+description: >-
+  Analyse des erreurs fréquentes lors de la construction d'URL pour les requêtes
+  API et les agents automatisés, et comment utiliser un outil d'encodage pour
+  fiabiliser vos flux HTTP.
+excerpt: >-
+  Analyse des erreurs fréquentes lors de la construction d'URL pour les requêtes
+  API et les agents automatisés, et comment utiliser un outil d'encodage pour
+  fiabiliser vos flux HTTP.
 category: Développement
 keywords:
   - développement

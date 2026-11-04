@@ -1,8 +1,16 @@
 ---
 slug: pourquoi-vos-pdf-sont-trop-lourds-et-comment-les-compresser
-title: "Pourquoi vos PDF dépassent les limites d'envoi et comment les alléger sans perte de lisibilité"
-description: "Comprendre les causes de l'explosion du poids des fichiers PDF et découvrir les techniques concrètes pour réduire leur taille sous le seuil des 2 Mo sans dégrader vos documents administratifs."
-excerpt: "Comprendre les causes de l'explosion du poids des fichiers PDF et découvrir les techniques concrètes pour réduire leur taille sous le seuil des 2 Mo sans dégrader vos documents administratifs."
+title: >-
+  Pourquoi vos PDF dépassent les limites d'envoi et comment les alléger sans
+  perte de lisibilité
+description: >-
+  Comprendre les causes de l'explosion du poids des fichiers PDF et découvrir
+  les techniques concrètes pour réduire leur taille sous le seuil des 2 Mo sans
+  dégrader vos documents administratifs.
+excerpt: >-
+  Comprendre les causes de l'explosion du poids des fichiers PDF et découvrir
+  les techniques concrètes pour réduire leur taille sous le seuil des 2 Mo sans
+  dégrader vos documents administratifs.
 category: Technologie
 keywords:
   - informatique

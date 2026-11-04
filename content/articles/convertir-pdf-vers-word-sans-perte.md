@@ -1,8 +1,16 @@
 ---
 slug: convertir-pdf-vers-word-sans-perte
-title: 'Convertir un PDF en document Word modifiable : préserver la mise en page et les tableaux'
-description: "Comprenez les mécanismes de conversion d'un fichier PDF vers un document Word DOCX et découvrez comment récupérer des textes et tableaux éditables rapidement."
-excerpt: "Comprenez les mécanismes de conversion d'un fichier PDF vers un document Word DOCX et découvrez comment récupérer des textes et tableaux éditables rapidement."
+title: >-
+  Convertir un PDF en document Word modifiable : préserver la mise en page et
+  les tableaux
+description: >-
+  Comprenez les mécanismes de conversion d'un fichier PDF vers un document Word
+  DOCX et découvrez comment récupérer des textes et tableaux éditables
+  rapidement.
+excerpt: >-
+  Comprenez les mécanismes de conversion d'un fichier PDF vers un document Word
+  DOCX et découvrez comment récupérer des textes et tableaux éditables
+  rapidement.
 category: Technologie
 keywords:
   - informatique
@@ -11,7 +19,8 @@ tags:
   - Informatique
   - technologie
 author: JcHub
-image: 'https://jchub.dev/api/article-cover?title=Convertir%20un%20PDF%20en%20document%20Word%20modifiable%20%3A%20pr%C3%A9server%20la%20mise%20en%20page%20et%20les%20tableaux&category=PDF%20vers%20Word'
+image: >-
+  https://jchub.dev/api/article-cover?title=Convertir%20un%20PDF%20en%20document%20Word%20modifiable%20%3A%20pr%C3%A9server%20la%20mise%20en%20page%20et%20les%20tableaux&category=PDF%20vers%20Word
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-12-03T21:08:00.000Z'
