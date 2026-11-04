@@ -76,7 +76,9 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
     safePathname === '/admin' ||
     safePathname.startsWith('/admin/') ||
     safePathname === '/compte' ||
-    safePathname.startsWith('/compte/');
+    safePathname.startsWith('/compte/') ||
+    // A page reached from an email: one action, no menu around it.
+    safePathname === '/newsletter/confirmation';
 
   // Public pages must render on the server: crawlers, link previews and slow phones see content before JS loads.
   if (isPrivateArea) {

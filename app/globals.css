@@ -2172,3 +2172,43 @@ body {
   outline-offset: 2px;
   border-radius: 4px;
 }
+/* Newsletter confirmation (components/NewsletterConfirmation.tsx): the envelope lands, the confetti drift. */
+.newsletter-envelope {
+  animation: newsletter-envelope-in .7s cubic-bezier(.2, .9, .3, 1.2) both;
+}
+
+.newsletter-confetto {
+  animation: newsletter-confetto-float 4s ease-in-out infinite;
+}
+
+@keyframes newsletter-envelope-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes newsletter-confetto-float {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(12deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .newsletter-envelope,
+  .newsletter-confetto {
+    animation: none;
+  }
+}
