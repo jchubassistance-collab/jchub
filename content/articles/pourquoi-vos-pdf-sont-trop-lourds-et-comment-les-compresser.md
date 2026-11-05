@@ -11,7 +11,7 @@ excerpt: >-
   Comprendre les causes de l'explosion du poids des fichiers PDF et découvrir
   les techniques concrètes pour réduire leur taille sous le seuil des 2 Mo sans
   dégrader vos documents administratifs.
-category: Technologie
+category: Outils & Astuces
 keywords:
   - informatique
   - technologie
@@ -23,7 +23,7 @@ image: /blog/covers/pourquoi-vos-pdf-sont-trop-lourds-et-comment-les-compresser.
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-11-26T21:08:00.000Z'
-updatedAt: '2026-10-17T08:06:04.448Z'
+updatedAt: '2026-11-04T14:18:02.734Z'
 ---
 Chaque jour, des milliers d'utilisateurs se heurtent au même message d'erreur : « Votre fichier dépasse la taille maximale autorisée de 2 Mo ». Que ce soit lors du dépôt d'un dossier de candidature sur une plateforme de recrutement, de la transmission de pièces justificatives sur un portail administratif public, ou simplement lors de l'envoi d'une facture par messagerie électronique, la gestion du poids des fichiers PDF reste un point de friction récurrent.
 

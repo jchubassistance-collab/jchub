@@ -11,7 +11,7 @@ excerpt: >-
   Comprenez les mécanismes de conversion d'un fichier PDF vers un document Word
   DOCX et découvrez comment récupérer des textes et tableaux éditables
   rapidement.
-category: Technologie
+category: Outils & Astuces
 keywords:
   - informatique
   - technologie
@@ -24,7 +24,7 @@ image: >-
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-12-03T21:08:00.000Z'
-updatedAt: '2026-10-19T08:01:48.297Z'
+updatedAt: '2026-11-04T14:18:00.721Z'
 ---
 # Convertir un PDF en document Word modifiable : préserver la mise en page et les tableaux
 

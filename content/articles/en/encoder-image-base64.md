@@ -1,12 +1,12 @@
 ---
 slug: base64-is-not-encryption
-title: Base64 is not encryption (and it's important to understand why)
+title: 'Base64: It''s Not Encryption (And Why That Matters)'
 description: >-
   Encoding an image in Base64 doesn't make it secret. Here's when to use Base64,
   how it works, and why it's sometimes useful (and sometimes not).
 excerpt: >-
-  Base64 is not encryption and it's important to understand why. The other day,
-  a junior dev asked me: "I put my admin password in Base64...
+  Base64: It's not encryption and why it matters The other day, a junior dev
+  asked me: "I put my admin password in Base...
 keywords:
   - base64 encoder
   - base64 image
@@ -14,24 +14,24 @@ keywords:
   - data uri
   - base64 css
   - base64 vs encryption
-sourceHash: 03d25091489c53de8b0efbf8
-translatedAt: '2026-10-19T07:57:56.104Z'
+sourceHash: 9732b5e49c083626deffa904
+translatedAt: '2026-11-05T07:52:07.118Z'
 ---
-# Base64 is not encryption (and it's important to understand why)
+# Base64: It's Not Encryption (And Why That Matters)
 
-The other day, a junior dev asked me: "I put my admin password in Base64 in the code, that's secure, right?"
+The other day, a junior dev asked me: "I put my admin password in Base64 in the code, so it's secure right?"
 
 **No.**
 
-Base64 is just an **encoding**, not **encryption**. It's the equivalent of writing your password in capital letters: anyone can turn it back into plain text.
+Base64 is just an **encoding**, not an **encryption**. It's the equivalent of writing your password in all caps: anyone can easily turn it back into plain text.
 
-But Base64 does have **real uses**. Here's when, why and how.
+However, Base64 does have **real use cases**. Here is when, why, and how to use it.
 
 ## What is Base64?
 
-Base64 is a way to represent **binary data** (images, files, bytes) as an **ASCII string** (letters, digits, +, /).
+Base64 is a way to represent **binary data** (images, files, bytes) as an **ASCII string** (letters, numbers, +, /).
 
-### A simple example
+### Simple Example
 
 The string "Hello" in Base64:
 
@@ -39,31 +39,31 @@ The string "Hello" in Base64:
 SGVsbG8=
 ```
 
-### Why it exists
+### Why It Exists
 
-Historically, many systems only handled text (emails, URLs, JSON). But sometimes you needed to send binary data (an image in an email, for example). Base64 lets you **convert binary data into text**.
+Historically, many systems only handled text (emails, URLs, JSON). But sometimes you need to send binary data (like an image in an email). Base64 lets you **convert binary into text**.
 
-**That's all.** No security, just conversion.
+**That's it.** No security, just conversion.
 
-## How to encode in Base64
+## How to Encode in Base64
 
-### Online tool
+### Online Tool
 
-My [free Base64 Tool](https://jchub.dev/en/tools/base64-encoder) on JcHub. Paste your text and get the encoding in 1 click. Same in the other direction (decoding).
+Try my free [Base64 Tool](https://jchub.dev/fr/outils/base64-encoder) on JcHub. Paste your text, and you get the encoding in 1 click. Works the other way around for decoding too.
 
 ### In JavaScript
 
 ```javascript
-// Encode
+// Encoder
 const original = "Hello World";
 const encoded = btoa(original);
 // "SGVsbG8gV29ybGQ="
 
-// Decode
+// Décoder
 const decoded = atob(encoded);
 // "Hello World"
 
-// For Unicode characters (accents, emojis)
+// Pour les caractères Unicode (accents, émojis)
 const text = "Héllo 🌍";
 const encodedUnicode = btoa(unescape(encodeURIComponent(text)));
 // "SGVsbG8g8J+MjQ=="
@@ -71,44 +71,44 @@ const decodedUnicode = decodeURIComponent(escape(atob(encodedUnicode)));
 // "Héllo 🌍"
 ```
 
-⚠️ `btoa` and `atob` only handle ASCII. For Unicode, you have to go through `encodeURIComponent` + `unescape`.
+⚠️ `btoa` and `atob` only handle ASCII. For Unicode, you need to use `encodeURIComponent` + `unescape`.
 
 ### In Python
 
 ```python
 import base64
 
-# Encode
+# Encoder
 text = "Hello World"
 encoded = base64.b64encode(text.encode()).decode()
 # "SGVsbG8gV29ybGQ="
 
-# Decode
+# Décoder
 decoded = base64.b64decode(encoded).decode()
 # "Hello World"
 ```
 
-### On the command line
+### Command Line
 
 ```bash
-# Encode
+# Encoder
 echo -n "Hello World" | base64
 # SGVsbG8gV29ybGQ=
 
-# Decode
+# Décoder
 echo "SGVsbG8gV29ybGQ=" | base64 -d
 # Hello World
 
-# Encode a file
+# Encoder un fichier
 base64 image.png > image.b64
 
-# Decode a file
+# Décoder un fichier
 base64 -d image.b64 > image-decoded.png
 ```
 
-## The real uses of Base64
+## Real Use Cases for Base64
 
-### 1. **Inline images in CSS (data URIs)**
+### 1. **Inline Images in CSS (Data URIs)**
 
 ```css
 .hero {
@@ -116,15 +116,15 @@ base64 -d image.b64 > image-decoded.png
 }
 ```
 
-**Advantage**: a single HTTP request instead of 2 (HTML + image).
-**Drawback**: the image is ~30% bigger in Base64.
+**Advantage**: 1 single HTTP request instead of 2 (HTML + image).
+**Disadvantage**: The image is ~30% larger in Base64.
 
-**When to use it**:
+**When to use**:
 - ✅ Small icons (under 10 KB)
 - ✅ Simple SVGs
 - ❌ Large images (size + 30% + no caching)
 
-### 2. **Email attachments (MIME)**
+### 2. **Email Attachments (MIME)**
 
 Emails only support text. To send an image, you encode it in Base64 and include it in the body.
 
@@ -141,9 +141,9 @@ iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAA
 Authorization: Basic amVhbjpkb3VibGV2ZHJvaXQ=
 ```
 
-The `amVhbjpkb3VibGV2ZHJvaXQ=` part is `jean:doubleverdroit` in Base64. It's just an encoding to pass special characters in the HTTP header.
+The `amVhbjpkb3VibGV2ZHJvaXQ=` string is just `jean:doubleverdroit` in Base64. It's simply an encoding used to pass special characters in the HTTP header.
 
-⚠️ **Once again**: it's NOT secure. The header is sent in plain text. You need HTTPS to encrypt it.
+⚠️ **Once again**: it is NOT secure. The header is sent in plain text. You need HTTPS to encrypt it.
 
 ### 4. **JWT (JSON Web Tokens)**
 
@@ -151,64 +151,63 @@ The `amVhbjpkb3VibGV2ZHJvaXQ=` part is `jean:doubleverdroit` in Base64. It's jus
 // Header
 {"alg":"HS256","typ":"JWT"}
 
-// Header in Base64
+// Header en Base64
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
 ```
 
-JWTs use Base64 to encode the header + payload (not the signature). That's why anyone can decode a JWT and read its content. The **signature** prevents modification, not reading.
+JWTs use Base64 to encode the header and payload (not the signature). That's why anyone can decode a JWT and read its contents. The **signature** prevents tampering, not reading.
 
-### 5. **Storing binary data in a NoSQL DB**
+### 5. **Storing Binary Data in a NoSQL DB**
 
-MongoDB stores BSON, not Base64. But you can store Base64 in a string if you have no choice.
+MongoDB stores BSON, not Base64. But you can store Base64 in a string if you have no other choice.
 
 ```javascript
 const user = {
   name: "Jean",
-  avatar: "data:image/png;base64,iVBORw0KGgo..."  // OK but suboptimal
+  avatar: "data:image/png;base64,iVBORw0KGgo..."  // OK mais suboptimal
 };
 ```
 
-**Better**: store the image URL (Cloudinary, S3, etc.).
+**Better**: Store the image URL instead (Cloudinary, S3, etc.).
 
-## The size: 33% bigger
+## Size: 33% Larger
 
-Base64 encodes 3 bytes into 4 characters. So **every 3 bytes become 4 chars** = 33% more.
-
-```
-PNG image: 100 KB
-Base64 image: 133 KB
-```
-
-For a 5 KB icon, that's 6.6 KB. For a 2 MB image, that's 2.6 MB. Not negligible.
-
-## Why it's not encryption
+Base64 encodes 3 bytes into 4 characters. Therefore, **every 3 bytes becomes 4 chars** = 33% larger.
 
 ```
-Original:  "Password123"
-Base64:    "UGFzc3dvcmQxMjM="
-Reverse:   "Password123"
+PNG Image: 100 KB
+Base64 Image: 133 KB
 ```
 
-Anyone can decode it. There's **no key**, **no secret**. It's just a deterministic transformation.
+For a 5 KB icon, that becomes 6.6 KB. For a 2 MB image, it becomes 2.6 MB. Not negligible.
 
-It's like saying "I secured my password by writing it backwards". Trivially reversible.
+## Why It's Not Encryption
+
+```
+Original :  "Password123"
+Base64 :    "UGFzc3dvcmQxMjM="
+Reverse:    "Password123"
+```
+
+Anyone can decode it. There is **no key**, **no secret**. It's just a deterministic transformation.
+
+It's like saying "I secured my password by writing it backwards." Trivially reversible.
 
 **To actually encrypt**, you need:
 - An **algorithm**: AES, ChaCha20, RSA
 - A **key**: known only to you
-- A **lib**: `bcrypt`, `argon2`, `crypto.subtle`
+- A **library**: `bcrypt`, `argon2`, `crypto.subtle`
 
 ## TL;DR
 
 - **Base64** = encoding, NOT encryption
-- **5 real uses**: CSS data URIs, MIME email, Basic Auth, JWT, NoSQL storage
-- **+33% size**: not for large images
-- **If you want security**: AES, bcrypt, argon2
-- **Free tool**: [jchub.dev/en/tools/base64-encoder](https://jchub.dev/en/tools/base64-encoder)
+- **5 real use cases**: CSS data URIs, email MIME, Basic Auth, JWTs, NoSQL storage
+- **+33% size**: not meant for large images
+- **If you want security**: use AES, bcrypt, argon2
+- **Free tool**: [jchub.dev/fr/outils/base64-encoder](https://jchub.dev/fr/outils/base64-encoder)
 
 ---
 
-**Debugging a JWT and need to decode its payload?** A JWT payload is in Base64, so use my [JWT Decoder](https://jchub.dev/en/tools/jwt-decoder) (free).
+**Debugging a JWT and need to decode its payload?** A JWT payload is in Base64, so feel free to use my free [JWT Decoder](https://jchub.dev/fr/outils/decodeur-jwt).
 
-There are 14 free dev tools on JcHub → [jchub.dev/en/tools](https://jchub.dev/en/tools)
-
+There are 14 free dev tools on JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)

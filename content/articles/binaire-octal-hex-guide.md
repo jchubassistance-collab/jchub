@@ -7,7 +7,7 @@ description: >-
 excerpt: >-
   Binaire, octal, décimal, hexadécimal : le guide pour ne plus rien confondre
   Mon premier cours d'info, le prof écrit 0b1010 au tableau. Je suis perd...
-category: Informatique
+category: Informatique de base
 keywords:
   - binaire
   - hexadécimal
@@ -22,7 +22,7 @@ readTime: 4 min
 status: published
 publishedAt: '2026-10-21T09:11:00.946Z'
 scheduledFor: '2026-10-20T22:05:20.235Z'
-updatedAt: '2026-10-21T09:11:00.946Z'
+updatedAt: '2026-11-04T14:17:59.334Z'
 ---
 # Binaire, octal, décimal, hexadécimal : le guide pour ne plus rien confondre
 

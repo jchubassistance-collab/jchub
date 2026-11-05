@@ -1,65 +1,65 @@
 ---
 slug: decode-jwt-without-postman
-title: How to decode a JWT (JSON Web Token) without Postman — 2026 Guide
+title: How to Decode a JWT (JSON Web Token) Without Postman — 2026 Guide
 description: >-
-  Struggling to debug a JWT? Here's how to decode it in 30 seconds, without
-  installing Postman, with a free online tool.
+  Struggling to debug a JWT? Here is how to decode it in 30 seconds, without
+  installing Postman, using a free online tool.
 excerpt: >-
-  How to decode a JWT JSON Web Token without Postman. Struggling to debug a JWT
-  token that doesn't work in your API? Don't want to install Postman...
+  How to decode a JWT (JSON Web Token) without Postman Struggling to debug a JWT
+  token that won't work in your API? Don't feel like installing P...
 keywords:
   - decode jwt
   - jwt decoder
   - json web token
   - debug token
-  - online jwt
+  - jwt online
   - base64 jwt
-sourceHash: f745d6a79bece55cf1bc64b1
-translatedAt: '2026-10-19T07:57:52.819Z'
+sourceHash: 2dca75fb9f1ae88c8397362d
+translatedAt: '2026-11-05T07:51:48.965Z'
 ---
-# How to decode a JWT (JSON Web Token) without Postman
+# How to Decode a JWT (JSON Web Token) Without Postman
 
-Struggling to debug a JWT token that doesn't work in your API? Don't want to install Postman just to see what's inside? Good news: you can do it in 30 seconds, in your browser, without installing anything. Here's how.
+Struggling to debug a JWT token that won't work in your API? Don't feel like installing Postman just to see what's inside? Good news: you can do it in 30 seconds, right in your browser, without installing anything. Here is how.
 
-## What exactly is a JWT?
+## What is a JWT anyway?
 
-A **JWT** (JSON Web Token) is an authentication token that your backend generates when a user signs in. It's a long string of characters that looks like this:
+A **JWT** (JSON Web Token) is an authentication token that your backend generates when a user logs in. It's a long string that looks like this:
 
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 ```
 
-What you don't see at first glance is that this token is actually **three parts separated by dots**:
+What you don't notice at first glance is that this token is actually **three parts separated by dots**:
 
-1. **Header** (before the 1st dot): the algorithm used (`HS256`, `RS256`...)
-2. **Payload** (between the 2 dots): the data (user_id, email, expiration...)
-3. **Signature** (after the 2nd dot): the proof of integrity
+1. **Header** (before the 1st dot): the algorithm used (`HS256`, `RS256`, etc.)
+2. **Payload** (between the 2 dots): the data (`user_id`, email, expiration, etc.)
+3. **Signature** (after the 2nd dot): the integrity proof
 
-These three parts are just **JSON encoded in Base64URL**. That's why they can be decoded.
+These three parts are simply **Base64URL-encoded JSON**. That's why we can decode them.
 
 ## Why you need to decode it
 
-The cases where you need to "look inside" a JWT:
+Situations where you need to "look inside" a JWT:
 
-- 🐛 **Debugging**: "Why isn't my auth working?"
-- 🔍 **Checking the expiration**: "When does my token expire?"
-- 👀 **Seeing the claims**: "Which fields is the backend sending me?"
-- 🛡️ **Auditing**: "Is there sensitive data I shouldn't be storing?"
+- 🐛 **Debug**: "Why isn't my auth working?"
+- 🔍 **Check expiration**: "When does my token expire?"
+- 👀 **View claims**: "What fields is the backend sending me?"
+- 🛡️ **Audit**: "Is there sensitive data I shouldn't be storing?"
 
 ## How to decode a JWT in 30 seconds
 
-### Method 1: With an online tool (the fastest)
+### Method 1: Using an online tool (the fastest way)
 
-1. Go to [https://jchub.dev/en/tools/jwt-decoder](https://jchub.dev/en/tools/jwt-decoder)
+1. Go to [https://jchub.dev/fr/outils/decodeur-jwt](https://jchub.dev/fr/outils/decodeur-jwt)
 2. Paste your token into the field
 3. The tool instantly shows you:
-   - The **header** as formatted JSON
+   - The **header** in formatted JSON
    - The **payload** with every claim detailed
-   - The **signature** (which can't be read, that's normal)
+   - The **signature** (which can't be read, and that's normal)
    - The status: valid or expired
 4. You can copy each part in one click
 
-**Advantage**: you see everything, and you even get an "expired" or "valid" indicator with the expiration date in plain text.
+**Benefit**: you see everything, and you even get an "expired" or "valid" indicator with the exact expiration date.
 
 ### Method 2: In the browser console
 
@@ -77,10 +77,10 @@ console.log('Payload:', decode(parts[1]));
 
 This method works, but it doesn't give you:
 - The expiration indicator
-- Nicely formatted JSON
+- Pretty JSON formatting
 - Automatic validation
 
-### Method 3: On the command line (for pros)
+### Method 3: From the command line (for pros)
 
 On macOS or Linux:
 
@@ -95,38 +95,37 @@ $token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($token.Split('.')[1]))
 ```
 
-## A concrete example: debugging a 401 error
+## Real-world example: debugging a 401 error
 
-Imagine: you're coding an API in Node.js, you send a JWT in the `Authorization` header, but you get a **401 Unauthorized** error.
+Imagine: you're building a Node.js API, you send a JWT in the `Authorization` header, but you get a **401 Unauthorized** error.
 
-Here's how to diagnose it:
+Here is how to diagnose it:
 
-1. **Get your token** (from localStorage, the network tab or the backend)
+1. **Grab your token** (from localStorage, the network tab, or the backend)
 2. **Paste it** into the JWT decoder
-3. **Look at the payload** — check:
+3. **Check the payload** — verify:
    - `exp` (expiration): if the date has passed → your token is dead, you need to request a new one
    - `sub` (subject): is it the expected user ID?
-   - `iss` (issuer): is it your backend's URL?
+   - `iss` (issuer): is it your backend URL?
    - `aud` (audience): is it your frontend?
-4. **Check the algorithm** in the header — if the backend expects `RS256` but you send `HS256`, it's not going to work
+4. **Check the algorithm** in the header — if the backend expects `RS256` but you're sending `HS256`, it won't work
 
-**In 90% of cases, it's the `exp` that has expired.** The decoder tells you at a glance.
+**In 90% of cases, the `exp` has simply expired.** The decoder will tell you at a glance.
 
-## What NOT to do with a JWT
+## What you should NOT do with a JWT
 
-⚠️ **Never put sensitive data** in the payload (password, card number, etc.). Why? Because anyone can decode it — it's not encrypted, just encoded. Base64 is like a `.zip` file without a password.
+⚠️ **Never put sensitive data** in the payload (passwords, credit card numbers, etc.). Why? Because anyone can decode it — it's not encrypted, just encoded. Base64 is like a `.zip` file without a password.
 
-For sensitive data, use an **encrypted token** (JWE) instead, or keep it on the server side.
+For sensitive data, use an **encrypted token** (JWE) or keep it on the server side.
 
 ## Conclusion
 
-Decoding a JWT isn't rocket science. It's just Base64 + JSON. But having a tool that shows you all of it nicely formatted, with the expiration indicator, saves you 10 minutes of debugging every time.
+Decoding a JWT isn't rocket science. It's just Base64 + JSON. But having a tool that shows you all of that nicely formatted, with an expiration indicator, saves you 10 minutes of debugging every single time.
 
-👉 **Try it for free**: [https://jchub.dev/en/tools/jwt-decoder](https://jchub.dev/en/tools/jwt-decoder)
+👉 **Try it for free**: [https://jchub.dev/fr/outils/decodeur-jwt](https://jchub.dev/fr/outils/decodeur-jwt)
 
-**Copy your token, paste it, get your answer.** That's it.
+**You copy your token, you paste, you get your answer.** That's it.
 
 ---
 
-**Want more free dev tools?** JcHub offers 14 tools (JWT, hash, timestamp, regex, color, QR code, etc.). All free, all online, zero install. → [Discover all the tools](https://jchub.dev/en/tools)
-
+**Want more free dev tools?** JcHub offers 14 tools (JWT, hash, timestamp, regex, color, QR code, etc.). All free, all online, zero install. → [Discover all tools](https://jchub.dev/fr/outils)

@@ -7,7 +7,7 @@ description: >-
 excerpt: >-
   Découvrez comment les QR codes facilitent le partage instantané
   d'informations, l'accès au WiFi et la promotion de vos projets sans friction.
-category: Technologie
+category: Outils & Astuces
 keywords:
   - informatique
   - technologie
@@ -20,7 +20,7 @@ image: >-
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-11-12T21:08:00.000Z'
-updatedAt: '2026-10-10T07:08:10.142Z'
+updatedAt: '2026-11-04T14:18:01.398Z'
 ---
 # Du monde physique au numérique : simplifiez vos échanges grâce au QR Code
 
