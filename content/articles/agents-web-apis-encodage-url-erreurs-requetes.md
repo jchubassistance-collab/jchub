@@ -21,9 +21,10 @@ tags:
 author: JcHub
 image: /blog/covers/agents-web-apis-encodage-url-erreurs-requetes.jpg
 readTime: 5 min
-status: scheduled
+status: published
+publishedAt: '2026-11-06T09:11:00.085Z'
 scheduledFor: '2026-11-05T21:08:00.000Z'
-updatedAt: '2026-10-04T21:08:34.605Z'
+updatedAt: '2026-11-06T09:11:00.085Z'
 ---
 # Agents Web, APIs et Encodage d'URL : Éviter les Erreurs Silencieuses et le Gaspillage de Requêtes
 
