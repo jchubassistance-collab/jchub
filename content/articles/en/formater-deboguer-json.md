@@ -1,31 +1,31 @@
 ---
 slug: format-debug-minified-json
-title: 'Minified JSON = 5,000 characters on one line? Here''s how to format it'
+title: Minified JSON = 5000 Characters on One Line? Here's How to Format It
 description: >-
-  Getting JSON on a single line and can't read anything? Here's how to format
-  it, debug it and validate it in 10 seconds.
+  Getting single-line minified JSON that's impossible to read? Here's how to
+  format, debug, and validate it in 10 seconds.
 excerpt: >-
-  Minified JSON = 5,000 characters on one line? Here's how to format it. 3 days
-  ago, I was debugging an API. I opened the Chrome console and saw this...
+  Minified JSON = 5000 characters on one line? Here's how to format it Three
+  days ago, I was debugging an API. I opened the Chrome console and saw this:...
 keywords:
   - json formatter
   - format json
   - json validator
   - json pretty print
-  - online json
+  - online json formatter
   - minified json
-sourceHash: b8911bcb38a297f2eb1b90cc
-translatedAt: '2026-10-19T07:58:02.240Z'
+sourceHash: bc130a434354dc96b572e312
+translatedAt: '2026-11-06T07:51:16.782Z'
 ---
-# Minified JSON = 5,000 characters on one line? Here's how to format it
+# Minified JSON = 5000 Characters on One Line? Here's How to Format It
 
-3 days ago, I was debugging an API. I opened the Chrome console and saw this:
+Three days ago, I was debugging an API. I opened the Chrome console and saw this:
 
 ```json
 {"id":12345,"name":"Jean Dupont","email":"jean@example.com","address":{"street":"123 Rue de la Paix","city":"Brazzaville","country":"CG","zip":""},"orders":[{"id":1,"total":99.99,"items":[{"productId":"abc","qty":2,"price":49.99}]},{"id":2,"total":149.50,"items":[{"productId":"def","qty":1,"price":149.50}]}],"preferences":{"theme":"dark","language":"fr","notifications":true,"newsletter":false}}
 ```
 
-5,000 characters on one line. My eyes hurt just reading it.
+5,000 characters on a single line. My eyes hurt just looking at it.
 
 10 seconds later, I had the readable version:
 
@@ -71,7 +71,7 @@ Here's how I do it.
 
 ### 1. **Chrome DevTools (already open)**
 
-In the Network tab → Preview, Chrome formats JSON automatically. But that doesn't work if you pasted the JSON into the console.
+In the Network tab → Preview, Chrome formats JSON automatically. But that doesn't work if you pasted the JSON straight into the console.
 
 In the console, just type:
 
@@ -112,15 +112,15 @@ curl -s https://api.github.com/users/jchub | jq '.name, .bio, .public_repos'
 # 42
 ```
 
-`jq` is the best CLI tool to manipulate JSON. Learn it, it'll save you hours.
+`jq` is the best CLI tool for manipulating JSON. Learn it—it'll save you hours.
 
 ### 4. **Online tool (for non-devs or when you're in a rush)**
 
-I have a [free JSON Formatter](https://jchub.dev/en/tools/json-formatter) on JcHub. Paste, click, and you get the formatted version. Bonus: it tells you whether your JSON is valid (parsing errors).
+I built a [free JSON Formatter](https://jchub.dev/fr/outils/json-formatter) on JcHub. Just paste, click, and get the formatted version. Bonus: it tells you if your JSON is valid (parsing errors).
 
 ## How to debug invalid JSON
 
-You paste your JSON into a parser and get:
+Paste your JSON into a parser, and you get:
 
 ```
 SyntaxError: Unexpected token } at position 245
@@ -148,11 +148,11 @@ Here are the 5 most common mistakes:
 
 ```json
 {
-  'name': 'Jean'  ← JSON wants double quotes, not single
+  'name': 'Jean'  ← JSON requires double quotes, not single
 }
 ```
 
-### 4. **JSON comment (impossible)**
+### 4. **JSON comments (not allowed)**
 
 ```json
 {
@@ -161,20 +161,20 @@ Here are the 5 most common mistakes:
 }
 ```
 
-If you need comments, use **JSON5** or **JSONC** (VS Code supports them).
+If you need comments, use **JSON5** or **JSONC** (VS Code supports both).
 
-### 5. **Forgotten escape character**
+### 5. **Unescaped quotes**
 
 ```json
 {
-  "message": "He said \"Hello\""  ← OK, correct escaping
+  "message": "He said \"Hello\""  ← OK, properly escaped
   "message": "He said "Hello""    ← ❌ broken
 }
 ```
 
 ## The trick nobody tells you: JSON Schema
 
-If you work with an API that returns complex JSON, **generate a JSON Schema**. It's a file that describes the expected structure.
+If you're working with an API that returns complex JSON, **generate a JSON Schema**. It's a file that describes the expected structure.
 
 ```json
 {
@@ -203,28 +203,27 @@ Tools to generate a schema from JSON:
 ## The workflow I use
 
 ```
-1. The API returns JSON → I copy it
-2. I paste it into my JSON Formatter
-3. I check that it's valid
-4. I copy the formatted version
-5. I paste it into VS Code to analyze it
-6. I code my parser/consumer
+1. API returns JSON → I copy it
+2. Paste into my JSON Formatter
+3. Verify that it's valid
+4. Copy the formatted version
+5. Paste it into VS Code to analyze
+6. Code my parser/consumer
 ```
 
-If the JSON comes up often, I generate a JSON Schema and use it to validate every response.
+If the JSON recurs often, I generate a JSON Schema and use it to validate every response.
 
 ## TL;DR
 
-- **Badly formatted JSON** = guaranteed sore eyes
+- **Unformatted JSON** = guaranteed eye strain
 - **VS Code**: Shift+Alt+F to format
 - **Chrome console**: `JSON.stringify(JSON.parse(data), null, 2)`
-- **jq** on the CLI for advanced filters
-- **Quick tool**: [jchub.dev/en/tools/json-formatter](https://jchub.dev/en/tools/json-formatter)
-- **5 common mistakes**: trailing comma, missing quotes, single quotes, comments, escaping
+- **jq** on the CLI for advanced filtering
+- **Quick tool**: [jchub.dev/fr/outils/json-formatter](https://jchub.dev/fr/outils/json-formatter)
+- **5 common errors**: trailing commas, missing quotes, single quotes, comments, unescaped characters
 
 ---
 
-**Working on an API that returns tokens?** My [JWT decoder](https://jchub.dev/en/tools/jwt-decoder) shows what they contain in one click. Combined with the JSON Formatter, you're all set.
+**Working on an API that returns tokens?** My [JWT decoder](https://jchub.dev/fr/outils/decodeur-jwt) shows you their contents in one click. Combined with the JSON Formatter, you're all set.
 
-There are 14 free dev tools on JcHub → [jchub.dev/en/tools](https://jchub.dev/en/tools)
-
+There are 14 free dev tools on JcHub → [jchub.dev/fr/outils](https://jchub.dev/fr/outils)
