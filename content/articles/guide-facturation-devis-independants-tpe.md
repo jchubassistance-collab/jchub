@@ -22,9 +22,10 @@ author: JcHub
 image: >-
   https://jchub.dev/api/article-cover?title=G%C3%A9rer+sa+facturation+et+ses+devis+en+toute+ind%C3%A9pendance+%3A+guide+pratique+pour+ind%C3%A9pendants+et+petites+entreprises&category=G%C3%A9n%C3%A9rateur+de+factures+et+de+devis&sig=apRNZXAOzm7bd4LPxX3vvq
 readTime: 5 min
-status: scheduled
+status: published
+publishedAt: '2026-11-07T09:11:00.617Z'
 scheduledFor: '2026-11-07T08:00:00.000Z'
-updatedAt: '2026-11-07T07:32:52.498Z'
+updatedAt: '2026-11-07T09:11:00.617Z'
 ---
 # Gérer sa facturation et ses devis en toute indépendance : guide pratique pour indépendants et petites entreprises
 
