@@ -1,6 +1,6 @@
 ---
 slug: decoder-jwt-sans-postman
-title: Comment décoder un JWT (JSON Web Token) sans Postman — Guide 2026
+title: Décoder un JWT (JSON Web Token) sans Postman en 2026
 description: >-
   Tu galères à débugger un JWT ? Voici comment le décoder en 30 secondes, sans
   installer Postman, avec un outil gratuit en ligne.

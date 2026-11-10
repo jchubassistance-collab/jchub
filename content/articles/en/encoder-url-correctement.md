@@ -14,7 +14,7 @@ keywords:
   - url encoding
   - oauth redirect uri
   - url space
-sourceHash: 6bf54b86ca775f71fab8a4f9
+sourceHash: 3a11f42c814f1b9e465550f6
 translatedAt: '2026-11-06T07:50:55.359Z'
 ---
 # How to Encode a URL Properly (and Not Break Your OAuth)

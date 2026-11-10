@@ -1,12 +1,9 @@
 ---
 slug: securiser-inspecter-jetons-jwt-architectures-modernes
-title: >-
-  Au-delà du code automatisé : sécuriser et inspecter les jetons JWT dans vos
-  architectures modernes
+title: Sécuriser et inspecter les jetons JWT de vos API
 description: >-
-  Avec l'essor des assistants CLI et de l'automatisation backend, l'inspection
-  des jetons d'accès reste une étape critique pour déboguer vos APIs REST.
-  Découvrez comment analyser vos JWT sans fuite de données.
+  Avec les assistants CLI et l'automatisation backend, inspecter les jetons
+  d'accès reste crucial pour déboguer vos API REST. Analysez vos JWT sans fuite.
 excerpt: >-
   Avec l'essor des assistants CLI et de l'automatisation backend, l'inspection
   des jetons d'accès reste une étape critique pour déboguer vos APIs REST.

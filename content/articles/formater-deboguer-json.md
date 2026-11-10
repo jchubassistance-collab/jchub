@@ -1,6 +1,6 @@
 ---
 slug: formater-deboguer-json
-title: JSON minifié = 5000 caractères sur une ligne ? Voici comment le formater
+title: JSON minifié sur une ligne ? Voici comment le formater
 description: >-
   Tu reçois du JSON sur une ligne et tu peux rien lire ? Voilà comment le
   formater, le débugger, et le valider en 10 secondes.

@@ -1,8 +1,6 @@
 ---
 slug: secure-access-vibe-coding-secret-generation
-title: >-
-  Securing your access in the age of vibe coding: best practices and secret
-  generation
+title: 'Vibe Coding: Securing Access and Generating Secrets'
 description: >-
   A look at the security risks of rapid prototyping, and best practices to
   generate and manage high-entropy secrets in your projects.
@@ -12,7 +10,7 @@ excerpt: >-
 keywords:
   - development
   - technology
-sourceHash: cffb1aa1e6434b222365bad9
+sourceHash: d6f9c1e34a93cad91610bc8d
 translatedAt: '2026-10-19T07:58:20.031Z'
 ---
 The software development ecosystem is changing fast. Between very rapid prototyping practices, the spread of locally run inference tools and the use of autonomous background agents, the pace of application creation has accelerated considerably. A developer can now design, test and deploy a working architecture in a few hours. However, this unprecedented speed comes with a recurring risk: neglecting the security of credentials and infrastructure secrets during the early phase of a project.

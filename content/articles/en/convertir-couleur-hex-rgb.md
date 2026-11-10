@@ -1,6 +1,6 @@
 ---
 slug: convert-hex-color-to-rgb-hsl
-title: How to Convert HEX to RGB and HSL (with Real CSS Examples)
+title: Convert HEX to RGB and HSL (with Real CSS Examples)
 description: >-
   Got a #3B82F6 from your designer and not sure what to do with it? Here's the
   HEX → RGB → HSL conversion explained simply, with Tailwind/CSS examples.
@@ -14,7 +14,7 @@ keywords:
   - rgb to hex
   - tailwind colors
   - color picker
-sourceHash: 6114f985e17120ac7d6d383b
+sourceHash: 53f0b9fbe818a26860611259
 translatedAt: '2026-11-05T07:51:39.457Z'
 ---
 # How to Convert HEX to RGB and HSL (with Real CSS Examples)

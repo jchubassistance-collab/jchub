@@ -14,7 +14,7 @@ keywords:
   - data uri
   - base64 css
   - base64 vs encryption
-sourceHash: 9732b5e49c083626deffa904
+sourceHash: 0a31e71e0e477cafbe7b916f
 translatedAt: '2026-11-05T07:52:07.118Z'
 ---
 # Base64: It's Not Encryption (And Why That Matters)

@@ -1,12 +1,9 @@
 ---
 slug: securiser-acces-vibe-coding-generation-secrets
-title: >-
-  Sécuriser vos accès à l'ère du Vibe Coding : Bonnes pratiques et génération de
-  secrets
+title: 'Vibe coding : sécuriser vos accès et générer vos secrets'
 description: >-
-  Analyse des risques de sécurité liés au prototypage rapide et présentation des
-  bonnes pratiques pour générer et gérer des secrets à haute entropie dans vos
-  projets.
+  Les risques de sécurité du prototypage rapide, et les bonnes pratiques pour
+  générer et gérer des secrets robustes dans vos projets.
 excerpt: >-
   Analyse des risques de sécurité liés au prototypage rapide et présentation des
   bonnes pratiques pour générer et gérer des secrets à haute entropie dans vos

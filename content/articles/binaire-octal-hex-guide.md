@@ -1,6 +1,6 @@
 ---
 slug: binaire-octal-hex-guide
-title: 'Binaire, octal, décimal, hexadécimal : le guide pour ne plus rien confondre'
+title: 'Binaire, octal, décimal, hexa : le guide sans confusion'
 description: >-
   Tu mélanges encore binaire et hexa ? Voici l'explication simple avec des
   exemples concrets (couleurs CSS, addresses mémoire, ASCII).

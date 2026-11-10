@@ -1,6 +1,6 @@
 ---
 slug: convert-unix-timestamp-to-date
-title: 'Unix Timestamp: How to Convert 1704067200 to a Readable Date (and Vice Versa)'
+title: 'Unix Timestamp: Convert 1704067200 to a Readable Date'
 description: >-
   You receive a 10-digit number from your backend and don't know what it is?
   It's a Unix timestamp. Here's how to decode it in 30 seconds.
@@ -14,7 +14,7 @@ keywords:
   - javascript date
   - unix timestamp
   - epoch converter
-sourceHash: 0c4dc8a91f637a140811600c
+sourceHash: 4345b4389151ada1cc92e7c3
 translatedAt: '2026-10-30T07:52:57.334Z'
 ---
 # Unix Timestamp: How to Convert 1704067200 to a Readable Date

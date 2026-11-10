@@ -1,10 +1,9 @@
 ---
 slug: web-agents-micro-models-control-api-costs
-title: 'Web agents and micro-models: how to anticipate and control exploding API bills'
+title: 'Web Agents: Keeping Exploding API Bills Under Control'
 description: >-
-  With the rise of high-frequency automated agents and lightweight decision
-  engines, API consumption is accelerating. Learn how to model your request
-  volumes and prevent infrastructure overruns.
+  Automated agents are multiplying API calls. Learn how to estimate your request
+  volumes and avoid surprises on your infrastructure bill.
 excerpt: >-
   With the rise of high-frequency automated agents and lightweight decision
   engines, API consumption is accelerating. Learn how to model your request
@@ -12,7 +11,7 @@ excerpt: >-
 keywords:
   - development
   - technology
-sourceHash: 9d0ff51d8ec06f2791c8f18f
+sourceHash: 15baf2ae1ec27ef8b74bda30
 translatedAt: '2026-10-19T07:57:38.497Z'
 ---
 ## The rise of autonomous requests and the end of predictable architectures

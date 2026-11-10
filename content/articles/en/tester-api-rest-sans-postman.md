@@ -1,10 +1,9 @@
 ---
 slug: test-rest-api-without-postman
-title: 'How to Test a REST API Without Postman (Free, In Your Browser)'
+title: 'Test a REST API Without Postman (Free, In Your Browser)'
 description: >-
-  Tired of Postman's 200 MB install size and mandatory account sign-in? Here are
-  3 lightweight alternatives, including one that's 100% free with zero
-  installation required.
+  Tired of Postman's 200 MB install and mandatory sign-in? Here are 3
+  lightweight alternatives, including one that's free and needs no installation.
 excerpt: >-
   How to test a REST API without Postman (free, in the browser) I've been using
   Postman since 2017. But in 2024, I decided to stop using it. Why?...
@@ -16,7 +15,7 @@ keywords:
   - test api
   - http request
   - postman vs insomnia
-sourceHash: 8866a73bad40ce7a0f41206e
+sourceHash: 0ef20ab80f3190e6ee460355
 translatedAt: '2026-11-07T07:52:18.831Z'
 ---
 # How to Test a REST API Without Postman (Free, In Your Browser)

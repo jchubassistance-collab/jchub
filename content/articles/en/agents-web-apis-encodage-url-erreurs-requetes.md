@@ -1,6 +1,6 @@
 ---
 slug: web-agents-apis-url-encoding-request-errors
-title: 'Web Agents, APIs and URL Encoding: Avoiding Silent Errors and Wasted Requests'
+title: 'URL Encoding: Avoiding Silent Errors in API Requests'
 description: >-
   An analysis of common mistakes when building URLs for API requests and
   automated agents, and how to use an encoding tool to make your HTTP flows
@@ -12,7 +12,7 @@ excerpt: >-
 keywords:
   - development
   - technology
-sourceHash: d0ba8d123c0618367be2a8cc
+sourceHash: 0e353dd36c29d44c49abe765
 translatedAt: '2026-10-19T07:57:36.779Z'
 ---
 # Web Agents, APIs and URL Encoding: Avoiding Silent Errors and Wasted Requests

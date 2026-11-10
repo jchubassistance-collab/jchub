@@ -1,6 +1,6 @@
 ---
 slug: create-a-truly-secure-password
-title: How to Create a Truly Secure Password (and Actually Remember It)
+title: How to Create a Secure Password You Can Remember
 description: >-
   All the usual password advice sucks. Here's the real strategy: generator +
   manager + 2FA. Simple, effective, actionable.
@@ -14,7 +14,7 @@ keywords:
   - bitwarden
   - 2fa
   - account security
-sourceHash: 8b8058a2c7994c7d28e1cec3
+sourceHash: 1330e5c237ad97378f5d4542
 translatedAt: '2026-11-07T07:51:03.929Z'
 ---
 # How to Create a Truly Secure Password (and Actually Remember It)

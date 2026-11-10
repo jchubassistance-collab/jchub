@@ -1,6 +1,6 @@
 ---
 slug: convertir-timestamp-unix-date
-title: 'Timestamp Unix : comment convertir 1704067200 en date lisible (et inversement)'
+title: 'Timestamp Unix : convertir 1704067200 en date lisible'
 description: >-
   Tu reçois un nombre à 10 chiffres de ton backend et tu sais pas ce que c'est ?
   C'est un timestamp Unix. Voici comment le décoder en 30 secondes.

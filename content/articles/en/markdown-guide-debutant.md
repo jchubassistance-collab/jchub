@@ -15,7 +15,7 @@ keywords:
   - markdown basics
   - github markdown
   - readme
-sourceHash: c2d0e456ed9c55b882ee695a
+sourceHash: 6a33fe6714d0abc2d6584ad2
 translatedAt: '2026-11-07T07:50:24.730Z'
 ---
 # Markdown in 5 Minutes: The Survival Guide for Junior Devs

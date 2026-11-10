@@ -1,12 +1,9 @@
 ---
 slug: agents-web-micro-modeles-maitriser-couts-api
-title: >-
-  Agents web et micro-modèles : comment anticiper et maîtriser l'explosion de
-  vos factures d'API
+title: 'Agents web : maîtriser l''explosion des coûts d''API'
 description: >-
-  Avec l'émergence des agents automatisés à haute fréquence et des moteurs de
-  décision légers, la consommation d'APIs s'accélère. Découvrez comment
-  modéliser vos volumes de requêtes et prévenir les surcoûts d'infrastructure.
+  Les agents automatisés multiplient les appels d'API. Voici comment estimer vos
+  volumes de requêtes et éviter les mauvaises surprises sur la facture.
 excerpt: >-
   Avec l'émergence des agents automatisés à haute fréquence et des moteurs de
   décision légers, la consommation d'APIs s'accélère. Découvrez comment

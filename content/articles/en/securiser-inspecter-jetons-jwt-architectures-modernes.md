@@ -1,12 +1,9 @@
 ---
 slug: secure-inspect-jwt-tokens-modern-architectures
-title: >-
-  Beyond automated code: securing and inspecting JWT tokens in your modern
-  architectures
+title: Securing and Inspecting JWT Tokens in Your APIs
 description: >-
-  With the rise of CLI assistants and backend automation, inspecting access
-  tokens remains a critical step when debugging your REST APIs. Learn how to
-  analyze your JWTs without leaking data.
+  With CLI assistants and backend automation, inspecting access tokens is key to
+  debugging your REST APIs. Learn how to analyze your JWTs without leaking data.
 excerpt: >-
   With the rise of CLI assistants and backend automation, inspecting access
   tokens remains a critical step when debugging your REST APIs. Learn how to
@@ -14,7 +11,7 @@ excerpt: >-
 keywords:
   - development
   - technology
-sourceHash: 48808701f151f567a363f47e
+sourceHash: ca0177f073d423830628a4c2
 translatedAt: '2026-10-19T07:58:21.739Z'
 ---
 # Beyond automated code: securing and inspecting JWT tokens in your modern architectures

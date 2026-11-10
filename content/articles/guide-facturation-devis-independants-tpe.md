@@ -1,12 +1,9 @@
 ---
 slug: guide-facturation-devis-independants-tpe
-title: >-
-  Gérer sa facturation et ses devis en toute indépendance : guide pratique pour
-  indépendants et petites entreprises
+title: 'Devis et factures : le guide des indépendants et TPE'
 description: >-
-  Découvrez les étapes clés pour rédiger des devis et factures conformes,
-  automatiser vos calculs de TVA et rationaliser votre gestion financière sans
-  vous surcharger.
+  Les étapes clés pour rédiger des devis et des factures conformes, calculer la
+  TVA automatiquement et gérer vos finances sans vous surcharger.
 excerpt: >-
   Découvrez les étapes clés pour rédiger des devis et factures conformes,
   automatiser vos calculs de TVA et rationaliser votre gestion financière sans
@@ -20,7 +17,7 @@ tags:
   - technologie
 author: JcHub
 image: >-
-  https://jchub.dev/api/article-cover?title=G%C3%A9rer+sa+facturation+et+ses+devis+en+toute+ind%C3%A9pendance+%3A+guide+pratique+pour+ind%C3%A9pendants+et+petites+entreprises&category=G%C3%A9n%C3%A9rateur+de+factures+et+de+devis&sig=apRNZXAOzm7bd4LPxX3vvq
+  https://jchub.dev/api/article-cover?title=Devis+et+factures+%3A+le+guide+des+ind%C3%A9pendants+et+TPE&category=G%C3%A9n%C3%A9rateur+de+factures+et+de+devis&sig=apRNZXAOzm7bd4LPxX3vvq
 readTime: 5 min
 status: published
 publishedAt: '2026-11-07T09:11:00.617Z'

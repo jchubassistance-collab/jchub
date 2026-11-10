@@ -1,6 +1,6 @@
 ---
 slug: uuid-base-donnees-v4-v7
-title: 'UUID v4 vs UUID v7 : lequel utiliser pour tes primary keys en 2026'
+title: 'UUID v4 ou v7 : lequel choisir pour tes clés primaires ?'
 description: >-
   Tu connais UUID v4 par cœur, mais UUID v7 change la donne. Voici pourquoi les
   bases de données modernes switchent, avec des exemples concrets.

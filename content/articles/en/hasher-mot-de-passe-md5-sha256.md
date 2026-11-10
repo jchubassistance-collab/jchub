@@ -1,6 +1,6 @@
 ---
 slug: md5-vs-sha256-password-hashing
-title: 'MD5 vs SHA-256: Which Should You Use to Hash Passwords? (The Honest Take)'
+title: 'MD5 vs SHA-256: Which One Should Hash Your Passwords?'
 description: >-
   I tested MD5, SHA-1, SHA-256, and SHA-512 on my own projects. Here is the one
   you should be using (and why).
@@ -14,7 +14,7 @@ keywords:
   - sha256
   - bcrypt
   - password security
-sourceHash: 9bd3e75cb9f23ef67a3855d7
+sourceHash: 2af54026624a9b72998b0db3
 translatedAt: '2026-11-06T07:51:32.443Z'
 ---
 # MD5 vs SHA-256: Which Should You Use to Hash Passwords?

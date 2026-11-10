@@ -1,6 +1,6 @@
 ---
 slug: encoder-image-base64
-title: 'Base64 : c''est pas du chiffrement (et c''est important à comprendre)'
+title: Base64 n'est pas du chiffrement (et c'est important)
 description: >-
   Encoder une image en Base64, c'est pas la rendre secrète. Voici quand utiliser
   Base64, comment ça marche, et pourquoi c'est parfois utile (parfois pas).

@@ -1,10 +1,10 @@
 ---
 slug: ia-codage-validation-json-chaine-de-traitement
-title: 'L''I.A. génère du code plus vite que vous, mais qui nettoie les données ?'
+title: 'L''IA code vite, mais qui valide vos données JSON ?'
 description: >-
-  Analyse de la montée en puissance des agents IA de codage et de l'importance
-  cruciale du formatage et de la validation des structures de données comme le
-  JSON dans les nouveaux workflows de développement.
+  Les agents IA écrivent du code toujours plus vite. Pourquoi formater et
+  valider vos données JSON devient essentiel dans ces nouveaux workflows de
+  développement.
 excerpt: >-
   Analyse de la montée en puissance des agents IA de codage et de l'importance
   cruciale du formatage et de la validation des structures de données comme le

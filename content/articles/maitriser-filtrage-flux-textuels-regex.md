@@ -1,12 +1,9 @@
 ---
 slug: maitriser-filtrage-flux-textuels-regex
-title: >-
-  Maîtriser le filtrage de flux textuels : du pattern matching aux règles de
-  validation en production
+title: Filtrer des flux de texte avec les regex en production
 description: >-
-  Analyse des techniques modernes de filtrage et d'extraction de données
-  textuelles à haute vitesse, avec des règles concrètes et l'utilisation de
-  regex pour nettoyer vos flux de production.
+  Les techniques modernes pour filtrer et extraire des données textuelles à
+  grande vitesse, avec des règles concrètes et des regex pour nettoyer vos flux.
 excerpt: >-
   Analyse des techniques modernes de filtrage et d'extraction de données
   textuelles à haute vitesse, avec des règles concrètes et l'utilisation de

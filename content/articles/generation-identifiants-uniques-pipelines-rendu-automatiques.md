@@ -1,12 +1,9 @@
 ---
 slug: generation-identifiants-uniques-pipelines-rendu-automatiques
-title: >-
-  Génération d'identifiants uniques dans les pipelines de rendu automatisés :
-  Enjeux et bonnes pratiques
+title: Identifiants uniques dans les pipelines automatisés
 description: >-
-  Analyse de la gestion d'état et de l'unicité des ressources dans les workflows
-  de génération de contenu par le code, et présentation du générateur d'UUID de
-  JcHub.
+  Comment garantir l'unicité des ressources dans les workflows qui génèrent du
+  contenu par le code, et créer vos UUID avec le générateur gratuit de JcHub.
 excerpt: >-
   Analyse de la gestion d'état et de l'unicité des ressources dans les workflows
   de génération de contenu par le code, et présentation du générateur d'UUID de

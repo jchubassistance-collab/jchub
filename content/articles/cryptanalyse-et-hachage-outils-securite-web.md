@@ -1,12 +1,10 @@
 ---
 slug: cryptanalyse-et-hachage-outils-securite-web
-title: >-
-  De la cryptanalyse aux empreintes numériques : pourquoi le hachage reste la
-  pierre angulaire du web moderne
+title: 'Cryptanalyse et hachage : le socle de la sécurité web'
 description: >-
-  Exploration des avancées cryptographiques récentes, de la résolution de
-  chiffres historiques aux preuves Zero-Knowledge, et présentation du Générateur
-  de hash de JcHub.
+  Des chiffres historiques aux preuves à divulgation nulle de connaissance : ce
+  que la cryptographie récente nous apprend, et pourquoi le hachage reste
+  essentiel.
 excerpt: >-
   Exploration des avancées cryptographiques récentes, de la résolution de
   chiffres historiques aux preuves Zero-Knowledge, et présentation du Générateur

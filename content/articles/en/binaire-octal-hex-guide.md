@@ -1,6 +1,6 @@
 ---
 slug: binary-octal-decimal-hexadecimal-guide
-title: 'Binary, Octal, Decimal, Hexadecimal: The Guide to Never Confuse Them Again'
+title: 'Binary, Octal, Decimal, Hex: The No-Confusion Guide'
 description: >-
   Still mixing up binary and hex? Here's a simple explanation with concrete
   examples (CSS colors, memory addresses, ASCII).
@@ -16,7 +16,7 @@ keywords:
   - binary number
   - ascii table
   - base 2 8 16
-sourceHash: 919c996bb0c58091685aee57
+sourceHash: d33ca2e2fbd18d8de55d84b4
 translatedAt: '2026-11-02T07:51:47.218Z'
 ---
 # Binary, Octal, Decimal, Hexadecimal: The Guide to Never Confuse Them Again

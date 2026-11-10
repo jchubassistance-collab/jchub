@@ -1,8 +1,6 @@
 ---
 slug: cryptanalysis-hashing-web-security-tools
-title: >-
-  From cryptanalysis to digital fingerprints: why hashing remains the
-  cornerstone of the modern web
+title: 'Cryptanalysis and Hashing: The Backbone of Web Security'
 description: >-
   A look at recent cryptographic advances, from solving historical ciphers to
   Zero-Knowledge proofs, and an introduction to JcHub's Hash generator.
@@ -12,7 +10,7 @@ excerpt: >-
 keywords:
   - development
   - technology
-sourceHash: 62797d570be8ef5bc4e9a4c6
+sourceHash: 60c8b7063271f729c92992cb
 translatedAt: '2026-10-19T07:57:51.097Z'
 ---
 Tech news from the last few days is a striking reminder of how much cryptographic concepts shape the present and the future of software development. On one side, artificial intelligence solved the Cyphral Distich, a 370-year-old ciphertext that had until now resisted the greatest specialists. On the other, platforms like Signal are preparing a privacy revolution by integrating zero-knowledge proofs (ZKP) to do away with phone numbers entirely at registration.

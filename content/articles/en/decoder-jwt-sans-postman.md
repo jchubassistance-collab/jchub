@@ -1,6 +1,6 @@
 ---
 slug: decode-jwt-without-postman
-title: How to Decode a JWT (JSON Web Token) Without Postman — 2026 Guide
+title: How to Decode a JWT Without Postman (2026 Guide)
 description: >-
   Struggling to debug a JWT? Here is how to decode it in 30 seconds, without
   installing Postman, using a free online tool.
@@ -14,7 +14,7 @@ keywords:
   - debug token
   - jwt online
   - base64 jwt
-sourceHash: 2dca75fb9f1ae88c8397362d
+sourceHash: e90851d7a7038e65e8414e92
 translatedAt: '2026-11-05T07:51:48.965Z'
 ---
 # How to Decode a JWT (JSON Web Token) Without Postman

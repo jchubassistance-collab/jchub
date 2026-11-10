@@ -1,6 +1,6 @@
 ---
 slug: regex-email-5-patterns
-title: 'Regex email : 5 patterns à connaître (et les pièges à éviter)'
+title: 'Regex email : 5 patterns à connaître (et leurs pièges)'
 description: >-
   La regex pour valider un email, c'est pas aussi simple que /\S+@\S+\.\S+/.
   Voici 5 patterns utiles, testés en prod, avec leurs limites.

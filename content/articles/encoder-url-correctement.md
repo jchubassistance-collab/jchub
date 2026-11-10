@@ -1,6 +1,6 @@
 ---
 slug: encoder-url-correctement
-title: Comment encoder une URL correctement (et ne pas casser ton OAuth)
+title: Encoder une URL correctement (sans casser ton OAuth)
 description: >-
   Un espace ou un accent dans une URL peut tout casser. Voici la différence
   entre encodeURI et encodeURIComponent, et quand utiliser lequel.

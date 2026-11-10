@@ -1,6 +1,6 @@
 ---
 slug: email-regex-5-patterns
-title: 'Email Regex: 5 Patterns You Should Know (and Pitfalls to Avoid)'
+title: 'Email Regex: 5 Patterns to Know (and Their Pitfalls)'
 description: >-
   Email validation regex isn't as simple as /\S+@\S+\.\S+/. Here are 5 useful
   patterns, tested in production, along with their limitations.
@@ -14,7 +14,7 @@ keywords:
   - email validation
   - javascript regex
   - phone regex
-sourceHash: c817fdd3110d471b1ee0c2e0
+sourceHash: 2244990a8373b1bca795fd61
 translatedAt: '2026-11-07T07:51:36.894Z'
 ---
 # Email Regex: 5 Patterns You Should Know (and Pitfalls to Avoid)

@@ -1,6 +1,6 @@
 ---
 slug: format-debug-minified-json
-title: Minified JSON = 5000 Characters on One Line? Here's How to Format It
+title: Minified JSON on One Line? Here's How to Format It
 description: >-
   Getting single-line minified JSON that's impossible to read? Here's how to
   format, debug, and validate it in 10 seconds.
@@ -14,7 +14,7 @@ keywords:
   - json pretty print
   - online json formatter
   - minified json
-sourceHash: bc130a434354dc96b572e312
+sourceHash: d9713a1518d9209154991698
 translatedAt: '2026-11-06T07:51:16.782Z'
 ---
 # Minified JSON = 5000 Characters on One Line? Here's How to Format It

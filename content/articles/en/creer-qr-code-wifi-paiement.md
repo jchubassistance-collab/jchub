@@ -1,6 +1,6 @@
 ---
 slug: create-qr-code-wifi-vcard-mobile-payment
-title: 'QR Code: How to Create One for Your WiFi, vCard, or Mobile Payment'
+title: 'How to Create a QR Code for WiFi, vCard or Payments'
 description: >-
   QR codes aren't just for restaurant menus anymore. Here are 5 practical use
   cases for devs, with free generators.
@@ -16,7 +16,7 @@ keywords:
   - qr code payment
   - cinetpay qr
   - mobile money qr
-sourceHash: 31799407fa099c6f5979b942
+sourceHash: 86216a670ec508b6e93f7f51
 translatedAt: '2026-10-31T07:53:18.371Z'
 ---
 # QR Code: How to Create One for Your WiFi, vCard, or Mobile Payment

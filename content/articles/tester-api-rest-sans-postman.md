@@ -1,6 +1,6 @@
 ---
 slug: tester-api-rest-sans-postman
-title: 'Comment tester une API REST sans Postman (gratuit, dans le navigateur)'
+title: 'Tester une API REST sans Postman (gratuit, en ligne)'
 description: >-
   Postman te saoule avec ses 200 MB d'installation et son compte obligatoire ?
   Voici 3 alternatives légères, dont une 100% gratuite et sans install.

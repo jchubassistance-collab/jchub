@@ -1,6 +1,6 @@
 ---
 slug: convertir-couleur-hex-rgb
-title: Comment convertir une couleur HEX en RGB et HSL (avec exemples CSS réels)
+title: Convertir une couleur HEX en RGB et HSL (exemples CSS)
 description: >-
   Tu reçois un #3B82F6 du designer et tu sais pas comment l'utiliser ? Voici la
   conversion HEX → RGB → HSL expliquée simplement, avec des exemples

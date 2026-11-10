@@ -1,6 +1,6 @@
 ---
 slug: markdown-guide-debutant
-title: 'Markdown en 5 minutes : le guide de survie pour devs juniors'
+title: 'Markdown en 5 minutes : le guide des devs juniors'
 description: >-
   T'es nouveau sur GitHub et tu comprends pas la syntaxe du README ? Voici tout
   ce qu'il faut savoir sur Markdown en 5 minutes, avec des exemples.

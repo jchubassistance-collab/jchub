@@ -1,8 +1,6 @@
 ---
 slug: managing-invoicing-quotes-practical-guide-freelancers-small-businesses
-title: >-
-  Managing Invoicing and Quotes Independently: A Practical Guide for Freelancers
-  and Small Businesses
+title: 'Quotes and Invoices: A Guide for Freelancers and SMBs'
 description: >-
   Discover the key steps to write compliant quotes and invoices, automate VAT
   calculations, and streamline your financial management without getting
@@ -14,7 +12,7 @@ excerpt: >-
 keywords:
   - development
   - technology
-sourceHash: 51c639cbcee5044c025f1073
+sourceHash: 06aa665440405475d5df2722
 translatedAt: '2026-11-07T07:33:18.443Z'
 ---
 # Managing Invoicing and Quotes Independently: A Practical Guide for Freelancers and Small Businesses
