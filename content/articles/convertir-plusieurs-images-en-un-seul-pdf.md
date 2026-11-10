@@ -18,9 +18,10 @@ author: Jessy Ngnambongo
 image: >-
   /api/article-cover?title=Convertir+plusieurs+images+en+un+seul+PDF+en+30+secondes&category=Outils+%26+Astuces
 readTime: 4 min
-status: scheduled
+status: published
+publishedAt: '2026-11-10T09:11:00.116Z'
 scheduledFor: '2026-11-10T07:00:00.000Z'
-updatedAt: '2026-11-04T14:17:49.354Z'
+updatedAt: '2026-11-10T09:11:00.116Z'
 ---
 On te demande « un seul fichier PDF » et tu as dix photos prises avec ton téléphone : une pièce d’identité recto verso, des relevés, des reçus, un devoir écrit à la main. Envoyer dix pièces jointes, c’est le meilleur moyen qu’une page se perde. La solution : les rassembler dans un seul PDF, une image par page, dans le bon ordre.
 
