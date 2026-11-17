@@ -18,6 +18,9 @@ export async function GET(request: NextRequest) {
     ]);
     // Only the counters of these articles, not the whole blog_articles collection.
     const views = await viewsBySlug(articlesSnapshot.docs.map((document) => String(document.data().slug || document.id)));
+    // A scheduled article is dated by when it goes live, the others by publication or last change.
+    const articleDate = (article: { status: string; scheduledFor: string | null; publishedAt: string | null; updatedAt: string | null }) =>
+      (article.status === 'scheduled' ? article.scheduledFor : null) || article.publishedAt || article.updatedAt || '';
     const articles = articlesSnapshot.docs.map((document) => {
       const data = document.data();
       const slug = String(data.slug || document.id);
@@ -32,9 +35,10 @@ export async function GET(request: NextRequest) {
         image: typeof data.image === 'string' ? data.image : '',
         views: views.get(slug) || 0,
         publishedAt: data.publishedAt?.toDate?.()?.toISOString() || null,
+        scheduledFor: data.scheduledFor?.toDate?.()?.toISOString() || null,
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
       };
-    }).sort((a, b) => (b.publishedAt || b.updatedAt || '').localeCompare(a.publishedAt || a.updatedAt || ''));
+    }).sort((a, b) => articleDate(b).localeCompare(articleDate(a)));
     const drafts = draftsSnapshot.docs.map((document) => {
       const data = document.data();
       return { id: document.id, title: String(data.title || 'Brouillon IA'), status: String(data.status || 'draft'), createdAt: data.createdAt?.toDate?.()?.toISOString() || null };

@@ -1,3 +1,4 @@
+import { revalidateTools } from '@/lib/tools-cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue, type DocumentReference } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
@@ -77,8 +78,11 @@ async function loadTool(id: string) {
   return { reference, data: snapshot.data() as Record<string, any> };
 }
 
-function setGeneration(reference: DocumentReference, generation: Generation, extra: Record<string, unknown> = {}) {
-  return reference.update({ generation: { ...generation, updatedAt: FieldValue.serverTimestamp() }, updatedAt: FieldValue.serverTimestamp(), ...extra });
+async function setGeneration(reference: DocumentReference, generation: Generation, extra: Record<string, unknown> = {}) {
+  const result = await reference.update({ generation: { ...generation, updatedAt: FieldValue.serverTimestamp() }, updatedAt: FieldValue.serverTimestamp(), ...extra });
+  // A merged generation can publish the tool or change its component: the catalog is read again.
+  revalidateTools();
+  return result;
 }
 
 /** Commits the component and the two registry entries on `branch`, on top of the latest base branch. */

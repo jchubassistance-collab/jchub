@@ -6,6 +6,7 @@ import { Briefcase, ChevronRight, Home, Info, Mail, Menu,Newspaper, Wrench, X } 
 import { useState } from 'react';
 import { ToolFinder } from '@/components/layout/ToolFinder';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { Link, usePathname } from '@/i18n/navigation';
 import { bilingual } from '@/i18n/copy';
 import type { StaticPathname } from '@/i18n/routing';
@@ -36,7 +37,7 @@ const copy = bilingual({
 
 /** Pages with the light header. `pathname` is the French internal address of the page. */
 export function isLightPage(pathname: string) {
-  return pathname === '/' || pathname === '/a-propos' || pathname === '/outils' || pathname.startsWith('/outils/') || pathname.startsWith('/tools/') || pathname === '/aide' || pathname === '/contact' || pathname === '/services' || pathname === '/kit-entrepreneur' || pathname === '/blog' || pathname.startsWith('/blog/') || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(pathname);
+  return pathname === '/' || pathname === '/a-propos' || pathname === '/outils' || pathname.startsWith('/outils/') || pathname.startsWith('/tools/') || pathname === '/aide' || pathname === '/contact' || pathname === '/services' || pathname === '/kit-entrepreneur' || pathname === '/ressources' || pathname.startsWith('/ressources/') || pathname === '/blog' || pathname.startsWith('/blog/') || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(pathname);
 }
 
 export function Header() {
@@ -77,6 +78,7 @@ export function Header() {
 
           <div className="hidden w-[19rem] items-center gap-3 xl:flex"><ToolFinder compact dark={!isHome}/></div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <div className="hidden md:block"><LanguageSwitcher light={isHome} /></div>
             <button
               onClick={() => setOpen((value) => !value)}

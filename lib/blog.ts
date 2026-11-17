@@ -3,7 +3,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { cache } from 'react';
 import { articleCoverPath } from '@/lib/article-cover';
-import { articlePathOnDisk, parseArticleFiles } from '@/lib/article-files';
+import { parseArticleFiles } from '@/lib/article-files';
 import { categoryLabel } from '@/lib/categories';
 import { getLiveArticles } from '@/lib/live-articles';
 import { readPhoto } from '@/lib/photos';
@@ -36,6 +36,8 @@ export type BlogArticle = {
   locale: Locale;
   /** Address slug of the article in each language, for hreflang links and the language switch. */
   slugs: Record<Locale, string>;
+  /** Former French slugs: their addresses redirect to the current one (see lib/slug-history.ts). */
+  previousSlugs: string[];
   /** False when the English version is not written yet and the French text is shown instead. */
   translated: boolean;
 };
@@ -151,6 +153,7 @@ function toArticle(data: Record<string, unknown>, locale: Locale): BlogArticle {
     tags: Array.from(new Set([category, ...keywords.slice(0, 3)])),
     locale,
     slugs,
+    previousSlugs: Array.isArray(data.previousSlugs) ? data.previousSlugs.map(String).filter((value) => value && value !== frenchSlug) : [],
     translated: locale === 'fr' || Boolean(english),
   };
 }
@@ -163,16 +166,19 @@ let articleRecords: Record<string, unknown>[] | null = null;
  */
 function readArticleRecords(): Record<string, unknown>[] {
   if (articleRecords && process.env.NODE_ENV === 'production') return articleRecords;
-  const directory = articlePathOnDisk();
+  // The folders are spelled out here, not taken from articlePathOnDisk(): the build only knows
+  // which files a function reads when the path is written in the same module, and otherwise
+  // copied a hundred unrelated project files into every function that lists the articles.
+  const directory = path.join(process.cwd(), 'content', 'articles');
   const records = fs.existsSync(directory)
     ? fs.readdirSync(directory)
       .filter((file) => file.endsWith('.md'))
       .sort()
       .map((file) => {
-        const englishFile = path.join(directory, 'en', file);
+        const englishFile = path.join(process.cwd(), 'content', 'articles', 'en', file);
         return parseArticleFiles(
           file.slice(0, -3),
-          fs.readFileSync(path.join(directory, file), 'utf8'),
+          fs.readFileSync(path.join(process.cwd(), 'content', 'articles', file), 'utf8'),
           fs.existsSync(englishFile) ? fs.readFileSync(englishFile, 'utf8') : null,
         );
       })
@@ -224,12 +230,14 @@ export async function getPublishedArticles(locale: Locale = 'fr'): Promise<BlogA
 
 /**
  * Finds a published article by the slug of its address in `locale`. In English the
- * French slug is accepted too, so the page can redirect it to the English address.
+ * French slug is accepted too, and in both languages a former slug of the article: the page
+ * then redirects to the current address, so links shared before a change keep working.
  */
 export const getPublishedArticleBySlug = cache(async (slug: string, locale: Locale = 'fr'): Promise<BlogArticle | null> => {
   const articles = (await getPublishedArticlesByLocale())[locale];
   return articles.find((article) => article.slug === slug)
     || (locale === 'en' ? articles.find((article) => article.slugs.fr === slug) : undefined)
+    || articles.find((article) => article.previousSlugs.includes(slug))
     || null;
 });
 

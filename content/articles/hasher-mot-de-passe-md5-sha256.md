@@ -1,8 +1,12 @@
 ---
 slug: hasher-mot-de-passe-md5-sha256
-title: 'MD5 vs SHA-256 : lequel choisir pour hasher un mot de passe (le vrai avis)'
-description: "J'ai testé MD5, SHA-1, SHA-256 et SHA-512 sur mes propres projets. Voici celui que tu devrais utiliser (et pourquoi)."
-excerpt: "MD5 vs SHA256 : lequel choisir pour hasher un mot de passe Y'a 6 mois, j'ai débuggé un site qui stockait les mots de passe en MD5. En clair. Dans l..."
+title: 'MD5 ou SHA-256 : lequel pour hasher un mot de passe ?'
+description: >-
+  J'ai testé MD5, SHA-1, SHA-256 et SHA-512 sur mes propres projets. Voici celui
+  que tu devrais utiliser (et pourquoi).
+excerpt: >-
+  MD5 vs SHA256 : lequel choisir pour hasher un mot de passe Y'a 6 mois, j'ai
+  débuggé un site qui stockait les mots de passe en MD5. En clair. Dans l...
 category: Sécurité
 keywords:
   - md5 vs sha256
@@ -13,15 +17,6 @@ keywords:
   - sécurité mot de passe
 author: Jessy Ngnambongo
 image: /blog/covers/hasher-mot-de-passe-md5-sha256.jpg
-photo:
-  id: "iar-afB0QQw"
-  url: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8bWF0cml4JTIwb2YlMjBiaW5hcnklMjBjb2RlfGVufDF8MHx8fDE3OTI5MjE4NDh8MA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8bWF0cml4JTIwb2YlMjBiaW5hcnklMjBjb2RlfGVufDF8MHx8fDE3OTI5MjE4NDh8MA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "Matrix movie still"
-  author: "Markus Spiske"
-  authorUrl: "https://unsplash.com/@markusspiske?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/matrix-movie-still-iar-afB0QQw?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/iar-afB0QQw/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8bWF0cml4JTIwb2YlMjBiaW5hcnklMjBjb2RlfGVufDF8MHx8fDE3OTI5MjE4NDh8MA"
 readTime: 5 min
 status: published
 publishedAt: '2026-08-25T22:05:20.235Z'

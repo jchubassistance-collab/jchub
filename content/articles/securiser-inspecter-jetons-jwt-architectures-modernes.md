@@ -1,8 +1,13 @@
 ---
 slug: securiser-inspecter-jetons-jwt-architectures-modernes
-title: 'Au-delà du code automatisé : sécuriser et inspecter les jetons JWT dans vos architectures modernes'
-description: "Avec l'essor des assistants CLI et de l'automatisation backend, l'inspection des jetons d'accès reste une étape critique pour déboguer vos APIs REST. Découvrez comment analyser vos JWT sans fuite de données."
-excerpt: "Avec l'essor des assistants CLI et de l'automatisation backend, l'inspection des jetons d'accès reste une étape critique pour déboguer vos APIs REST. Découvrez comment analyser vos JWT sans fuite de données."
+title: Sécuriser et inspecter les jetons JWT de vos API
+description: >-
+  Avec les assistants CLI et l'automatisation backend, inspecter les jetons
+  d'accès reste crucial pour déboguer vos API REST. Analysez vos JWT sans fuite.
+excerpt: >-
+  Avec l'essor des assistants CLI et de l'automatisation backend, l'inspection
+  des jetons d'accès reste une étape critique pour déboguer vos APIs REST.
+  Découvrez comment analyser vos JWT sans fuite de données.
 category: Développement
 keywords:
   - développement
@@ -12,15 +17,6 @@ tags:
   - technologie
 author: JcHub
 image: /blog/covers/securiser-inspecter-jetons-jwt-architectures-modernes.jpg
-photo:
-  id: "cvBBO4PzWPg"
-  url: "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZGVjb2RlZCUyMGp3dCUyMHRva2VuJTIwc3RyaW5nJTIwb24lMjBzY3JlZW58ZW58MXwwfHx8MTc5MjkyMTg4Nnww&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZGVjb2RlZCUyMGp3dCUyMHRva2VuJTIwc3RyaW5nJTIwb24lMjBzY3JlZW58ZW58MXwwfHx8MTc5MjkyMTg4Nnww&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "Lines of colorful JavaScript code displayed on a dark screen"
-  author: "Markus Spiske"
-  authorUrl: "https://unsplash.com/@markusspiske?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/javascript-code-on-dark-screen-cvBBO4PzWPg?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/cvBBO4PzWPg/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8ZGVjb2RlZCUyMGp3dCUyMHRva2VuJTIwc3RyaW5nJTIwb24lMjBzY3JlZW58ZW58MXwwfHx8MTc5MjkyMTg4Nnww"
 readTime: 5 min
 status: published
 publishedAt: '2026-09-24T13:15:40.525Z'

@@ -1,3 +1,4 @@
+import { setRequestLocale } from 'next-intl/server';
 import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import NextLink from 'next/link';
 import { Metadata } from 'next';
@@ -13,7 +14,8 @@ import { getPublicBaseUrl } from '@/lib/site-url';
 import { defaultSocialImage, languageAlternates } from '@/lib/seo';
 import { categorySlug } from '@/lib/categories';
 
-export const dynamic = 'force-dynamic';
+// Built once, then rebuilt at most hourly: tools appear on their publication date and visible days.
+export const revalidate = 3600;
 
 type Params = Promise<{ locale: string; slug: string }>;
 type Highlight = { icon: LucideIcon; title: string; desc: string };
@@ -75,6 +77,18 @@ function toolHighlights(component: string, locale: Locale): Highlight[] {
           { icon: Trash2, title: 'Supprimé après usage', desc: 'Effacé après conversion' },
         ];
   }
+  if (component === 'EmailSignatureGenerator') {
+    // The signature is built in the browser; only an imported photo or logo is sent, to be hosted.
+    return locale === 'en'
+      ? [
+          { icon: ShieldCheck, title: 'Built in your browser', desc: 'Your details stay on this device' },
+          { icon: Lock, title: 'Hosted image', desc: 'An uploaded photo or logo stays online for your e-mails' },
+        ]
+      : [
+          { icon: ShieldCheck, title: 'Créée dans ton navigateur', desc: 'Tes coordonnées restent sur cet appareil' },
+          { icon: Lock, title: 'Image hébergée', desc: 'Une photo ou un logo importé reste en ligne pour tes mails' },
+        ];
+  }
   const serverProcessing = isToolComponentName(component) ? SERVER_PROCESSED_TOOLS[component] : undefined;
   if (serverProcessing) return copy[locale].serverHighlights(serverProcessing.partner);
   return copy[locale].browserHighlights;
@@ -118,6 +132,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function ToolPage({ params }: { params: Params }) {
   const { locale, slug } = await params;
   if (!isLocale(locale)) notFound();
+  setRequestLocale(locale);
   const found = await getToolBySlug(slug, locale);
   if (!found) notFound();
   if (found.path) redirect(toolPath(found, locale));

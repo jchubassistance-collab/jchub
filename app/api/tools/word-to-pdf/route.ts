@@ -47,8 +47,11 @@ export const POST = withReport(async function POST(request: NextRequest) {
     const output = await convertWordWithAdobe(bytes);
 
     try {
+      // Counted in Turso since November 2026 (one SQL statement instead of a read and a write).
+      const { incrementCounter } = await import('@/lib/turso-store');
+      const counted = await incrementCounter('tool_uses:word_to_pdf');
       const { getAdminDb, hasFirebaseAdminConfig } = await import('@/lib/firebase-admin');
-      if (hasFirebaseAdminConfig()) {
+      if (counted === null && hasFirebaseAdminConfig()) {
         const db = getAdminDb();
         const now = new Date();
         const statsRef = db.collection('stats').doc('word_to_pdf');

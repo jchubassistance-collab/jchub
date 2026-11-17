@@ -1,3 +1,4 @@
+import { revalidateTools } from '@/lib/tools-cache';
 import { after, NextRequest, NextResponse } from 'next/server';
 import { ensureToolTranslation } from '@/lib/content-translation';
 import { reportUserError } from '@/lib/user-error';
@@ -6,6 +7,7 @@ import { requireAdmin } from '@/lib/admin-auth';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { tools as registeredTools } from '@/lib/tools';
 import { isToolComponentName } from '@/lib/tool-components';
+import { nextPreviousSlugs } from '@/lib/slug-history';
 
 export const runtime = 'nodejs';
 
@@ -47,6 +49,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const seoKeywords = body.seoKeywords === undefined ? (existingData.seo?.keywords || current.seo?.keywords || []) : String(body.seoKeywords).split(',').map((item) => item.trim()).filter(Boolean).slice(0, 20);
     const status = body.status || existingData.status || current.status || 'published';
     const path = String(existingData.path || current.path || '');
+    // The former address of the tool redirects to the new one (lib/slug-history.ts).
+    const previousSlugs = nextPreviousSlugs(existingData.previousSlugs, String(existingData.slug || id), nextSlug);
     await reference.set({
       slug: nextSlug,
       name,
@@ -58,11 +62,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       status,
       ...(path && path.startsWith('/outils/') ? { path: `/outils/${nextSlug}` } : path ? { path } : {}),
       seo: { title: seoTitle, description: seoDescription, keywords: seoKeywords },
+      ...(previousSlugs ? { previousSlugs } : {}),
       ...(publishAt === null ? { publishAt: FieldValue.delete() } : publishAt ? { publishAt } : {}),
       updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true });
     // A published tool gets (or refreshes) its English version for the English site.
     if (status === 'published') after(() => ensureToolTranslation(id).then(() => undefined, () => reportUserError()));
+    revalidateTools();
     return NextResponse.json({ id, slug: nextSlug, status });
   } catch (error) {
     const code = error instanceof Error ? error.message : 'INTERNAL_ERROR';

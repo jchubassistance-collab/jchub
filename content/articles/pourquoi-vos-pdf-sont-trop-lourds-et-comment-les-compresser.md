@@ -1,9 +1,17 @@
 ---
 slug: pourquoi-vos-pdf-sont-trop-lourds-et-comment-les-compresser
-title: "Pourquoi vos PDF dépassent les limites d'envoi et comment les alléger sans perte de lisibilité"
-description: "Comprendre les causes de l'explosion du poids des fichiers PDF et découvrir les techniques concrètes pour réduire leur taille sous le seuil des 2 Mo sans dégrader vos documents administratifs."
-excerpt: "Comprendre les causes de l'explosion du poids des fichiers PDF et découvrir les techniques concrètes pour réduire leur taille sous le seuil des 2 Mo sans dégrader vos documents administratifs."
-category: Technologie
+title: >-
+  Pourquoi vos PDF dépassent les limites d'envoi et comment les alléger sans
+  perte de lisibilité
+description: >-
+  Comprendre les causes de l'explosion du poids des fichiers PDF et découvrir
+  les techniques concrètes pour réduire leur taille sous le seuil des 2 Mo sans
+  dégrader vos documents administratifs.
+excerpt: >-
+  Comprendre les causes de l'explosion du poids des fichiers PDF et découvrir
+  les techniques concrètes pour réduire leur taille sous le seuil des 2 Mo sans
+  dégrader vos documents administratifs.
+category: Outils & Astuces
 keywords:
   - informatique
   - technologie
@@ -12,19 +20,10 @@ tags:
   - technologie
 author: JcHub
 image: /blog/covers/pourquoi-vos-pdf-sont-trop-lourds-et-comment-les-compresser.jpg
-photo:
-  id: "bCmonOgEIlw"
-  url: "https://images.unsplash.com/photo-1663124178703-d2d6a333e6c2?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8Y29tcHJlc3NlZCUyMGRvY3VtZW50JTIwZmlsZSUyMGljb258ZW58MXwwfHx8MTc5MjkyMTg3N3ww&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1663124178703-d2d6a333e6c2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8Y29tcHJlc3NlZCUyMGRvY3VtZW50JTIwZmlsZSUyMGljb258ZW58MXwwfHx8MTc5MjkyMTg3N3ww&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "icon"
-  author: "Rubaitul Azad"
-  authorUrl: "https://unsplash.com/@rubaitulazad?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/icon-bCmonOgEIlw?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/bCmonOgEIlw/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8Y29tcHJlc3NlZCUyMGRvY3VtZW50JTIwZmlsZSUyMGljb258ZW58MXwwfHx8MTc5MjkyMTg3N3ww"
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-11-26T21:08:00.000Z'
-updatedAt: '2026-10-17T08:06:04.448Z'
+updatedAt: '2026-11-04T14:18:02.734Z'
 ---
 Chaque jour, des milliers d'utilisateurs se heurtent au même message d'erreur : « Votre fichier dépasse la taille maximale autorisée de 2 Mo ». Que ce soit lors du dépôt d'un dossier de candidature sur une plateforme de recrutement, de la transmission de pièces justificatives sur un portail administratif public, ou simplement lors de l'envoi d'une facture par messagerie électronique, la gestion du poids des fichiers PDF reste un point de friction récurrent.
 

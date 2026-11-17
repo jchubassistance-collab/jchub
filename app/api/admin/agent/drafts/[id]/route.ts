@@ -47,7 +47,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         description: String(draft.description || ''),
         excerpt: String(draft.description || ''),
         content: String(draft.article || ''),
-        category: 'Technologie',
+        category: 'Outils & Astuces',
         keywords: ['informatique', 'technologie'],
         tags: ['Informatique', 'technologie'],
         author: 'JcHub',

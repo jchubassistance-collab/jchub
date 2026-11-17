@@ -1,3 +1,4 @@
+import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Building2, ChevronLeft, Facebook, Instagram, Mail, Scale } from 'lucide-react';
 import { pageMetadata } from '@/lib/seo';
@@ -70,6 +71,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function MentionsLegalesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+  setRequestLocale(locale);
   const t = copy[locale];
   return (
     <div className="template-home min-h-screen overflow-hidden bg-[#eff6ff] text-[#0f172a]">

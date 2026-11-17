@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { InsightsTracker } from '@/components/insights/InsightsTracker';
 import { usePathname as useInternalPathname } from '@/i18n/navigation';
 import { bilingual } from '@/i18n/copy';
 
@@ -71,10 +72,9 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
   }, [toolLoading]);
 
   const safePathname: string = internalPathname ?? '';
+  const isAdmin = isAdminHost || safePathname === '/admin' || safePathname.startsWith('/admin/');
   const isPrivateArea =
-    isAdminHost ||
-    safePathname === '/admin' ||
-    safePathname.startsWith('/admin/') ||
+    isAdmin ||
     safePathname === '/compte' ||
     safePathname.startsWith('/compte/') ||
     // A page reached from an email: one action, no menu around it.
@@ -82,7 +82,8 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
 
   // Public pages must render on the server: crawlers, link previews and slow phones see content before JS loads.
   if (isPrivateArea) {
-    return <><main className="min-h-screen">{children}</main>{toolLoading && <PageNavigationLoader label={t.loading} text={t.loadingText} />}</>;
+    // No full-page loader in the admin: its pages show their own content while they load.
+    return <><main className="min-h-screen">{children}</main>{toolLoading && !isAdmin && <PageNavigationLoader label={t.loading} text={t.loadingText} />}</>;
   }
 
   return (
@@ -90,6 +91,7 @@ export function AppChrome({ children, isAdminHost = false }: { children: React.R
       <Header />
       <main className="min-h-screen animate-page-in">{children}</main>
       <Footer />
+      <InsightsTracker />
       {toolLoading && <PageNavigationLoader label={t.loading} text={t.loadingText} />}
       <button
         type="button"

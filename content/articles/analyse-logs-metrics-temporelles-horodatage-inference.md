@@ -1,8 +1,13 @@
 ---
 slug: analyse-logs-metrics-temporelles-horodatage-inference
-title: "Analyse de logs et métriques temporelles à haute fréquence : maîtriser l'horodatage des systèmes d'inférence"
-description: "Analyse technique des enjeux d'horodatage dans les architectures d'inférence rapide et présentation du Convertisseur Timestamp de JcHub pour inspecter vos logs distribués."
-excerpt: "Analyse technique des enjeux d'horodatage dans les architectures d'inférence rapide et présentation du Convertisseur Timestamp de JcHub pour inspecter vos logs distribués."
+title: 'Logs à haute fréquence : maîtriser l''horodatage'
+description: >-
+  Les pièges de l'horodatage dans les systèmes d'inférence rapides, et comment
+  lire les timestamps de vos logs distribués avec le convertisseur JcHub.
+excerpt: >-
+  Analyse technique des enjeux d'horodatage dans les architectures d'inférence
+  rapide et présentation du Convertisseur Timestamp de JcHub pour inspecter vos
+  logs distribués.
 category: Développement
 keywords:
   - développement
@@ -12,19 +17,11 @@ tags:
   - technologie
 author: JcHub
 image: /blog/covers/analyse-logs-metrics-temporelles-horodatage-inference.jpg
-photo:
-  id: "VHmBX7FnXw0"
-  url: "https://images.unsplash.com/photo-1762163516269-3c143e04175c?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c2VydmVyJTIwcmFjayUyMGJsaW5raW5nJTIwbGlnaHRzfGVufDF8MHx8fDE3OTI5MjE4MDR8MA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1762163516269-3c143e04175c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c2VydmVyJTIwcmFjayUyMGJsaW5raW5nJTIwbGlnaHRzfGVufDF8MHx8fDE3OTI5MjE4MDR8MA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "Server rack with blinking green lights"
-  author: "Domaintechnik"
-  authorUrl: "https://unsplash.com/@fslfsl?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/server-rack-with-blinking-green-lights-VHmBX7FnXw0?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/VHmBX7FnXw0/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c2VydmVyJTIwcmFjayUyMGJsaW5raW5nJTIwbGlnaHRzfGVufDF8MHx8fDE3OTI5MjE4MDR8MA"
 readTime: 5 min
-status: scheduled
+status: published
+publishedAt: '2026-10-25T09:11:00.127Z'
 scheduledFor: '2026-10-25T08:15:00.000Z'
-updatedAt: '2026-10-04T08:14:26.276Z'
+updatedAt: '2026-10-25T09:11:00.127Z'
 ---
 ## L'accélération des boucles de décision et l'impératif de l'horodatage
 

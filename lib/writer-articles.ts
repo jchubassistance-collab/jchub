@@ -1,3 +1,4 @@
+import { articleViewTotals } from '@/lib/turso-store';
 import 'server-only';
 
 import { NextResponse, type NextRequest } from 'next/server';
@@ -70,6 +71,9 @@ export async function ownedArticle(uid: string, id: string) {
 export async function viewsBySlug(slugs: string[]): Promise<Map<string, number>> {
   const unique = Array.from(new Set(slugs.filter((slug) => isSafeArticleId(slug))));
   if (!unique.length) return new Map();
+  // Turso holds the counters since November 2026; Firestore is read only if Turso is unavailable.
+  const totals = await articleViewTotals(unique);
+  if (totals) return totals;
   const db = getAdminDb();
   const snapshots = await db.getAll(...unique.map((slug) => db.collection('blog_articles').doc(slug)));
   return new Map(snapshots.map((snapshot) => [snapshot.id, Number(snapshot.data()?.views || 0)]));

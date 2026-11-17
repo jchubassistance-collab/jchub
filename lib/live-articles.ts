@@ -13,7 +13,12 @@ import { reviewPending } from '@/lib/writer-rules';
  */
 
 const BLOG_TAG = 'blog-articles';
-const REFRESH_SECONDS = 300;
+/**
+ * Every change to an article calls revalidateBlog(), and scheduled articles go live by their date
+ * after the cache (lib/blog.ts): the copy can be kept an hour. It was 5 minutes, which re-read
+ * every article several hundred times a day (Firestore usage of October-November 2026).
+ */
+const REFRESH_SECONDS = 3600;
 
 export type LiveArticles = {
   /** Public articles, in the shape lib/blog.ts reads from the files. */
@@ -29,16 +34,15 @@ function toRecord(id: string, data: Record<string, unknown>): Record<string, unk
 }
 
 const readLiveArticles = unstable_cache(async (): Promise<LiveArticles> => {
-  const db = getAdminDb();
-  const [statuses, publics] = await Promise.all([
-    db.collection('articles').select('status').get(),
-    db.collection('articles').where('status', 'in', ['published', 'scheduled']).get(),
-  ]);
+  // One read of the collection gives both the public articles and the ids to hide: it used to
+  // take two queries, the second one reading every article again just for its status.
+  const all = await getAdminDb().collection('articles').get();
+  const publics = all.docs.filter((document) => isPublicArticleStatus(document.data().status));
   // A writer's article being reviewed at its first publication waits off the blog.
-  const reviewing = publics.docs.filter((document) => reviewPending(document.data())).map((document) => document.id);
+  const reviewing = publics.filter((document) => reviewPending(document.data())).map((document) => document.id);
   return {
-    records: publics.docs.flatMap((document) => { const record = reviewing.includes(document.id) ? null : toRecord(document.id, document.data()); return record ? [record] : []; }),
-    hidden: [...reviewing, ...statuses.docs.filter((document) => !isPublicArticleStatus(document.data().status)).map((document) => document.id)],
+    records: publics.flatMap((document) => { const record = reviewing.includes(document.id) ? null : toRecord(document.id, document.data()); return record ? [record] : []; }),
+    hidden: [...reviewing, ...all.docs.filter((document) => !isPublicArticleStatus(document.data().status)).map((document) => document.id)],
   };
 }, ['live-articles'], { tags: [BLOG_TAG], revalidate: REFRESH_SECONDS });
 

@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { ChevronRight, Search, Wrench, X } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import type { Tool } from '@/lib/tools';
 import { trackEvent } from '@/lib/analytics-client';
 import { bilingual } from '@/i18n/copy';
@@ -129,5 +130,22 @@ export function ToolsCatalog({ tools, initialQuery = '', showCategories = true }
 
       <LoadMore shown={shown} total={filteredTools.length} nextPage={Math.ceil(shown / STEP) + 1} counter={t.shown(shown, filteredTools.length)} label={t.more(Math.min(STEP, filteredTools.length - shown))} onMore={showMore} />
     </>
+  );
+}
+
+function CatalogWithAddressQuery(props: Omit<ToolsCatalogProps, 'initialQuery'>) {
+  return <ToolsCatalog {...props} initialQuery={useSearchParams()?.get('q') ?? ''} />;
+}
+
+/**
+ * The catalog of the tools page, which is built once: the search of the address (?q=, sent by
+ * the header's search) is read in the browser. Until then, and in the built HTML that search
+ * engines read, the whole catalog is shown.
+ */
+export function SearchableToolsCatalog(props: Omit<ToolsCatalogProps, 'initialQuery'>) {
+  return (
+    <Suspense fallback={<ToolsCatalog {...props} />}>
+      <CatalogWithAddressQuery {...props} />
+    </Suspense>
   );
 }

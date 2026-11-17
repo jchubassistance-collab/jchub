@@ -1,3 +1,4 @@
+import { cachedComments, revalidateComments } from '@/lib/comments-cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { z } from 'zod';
@@ -40,13 +41,7 @@ export const GET = withReport(async function GET(request: NextRequest) {
   if (!articleId.success) return NextResponse.json({ error: apiMessage(request, 'Article introuvable.') }, { status: 400 });
   if (!hasFirebaseAdminConfig()) return NextResponse.json({ comments: [] }, { headers: noStore });
   try {
-    const snapshot = await getAdminDb().collection('blog_comments').where('articleId', '==', articleId.data).limit(MAX_SHOWN).get();
-    const comments: BlogComment[] = snapshot.docs
-      .map((document) => {
-        const data = document.data();
-        return { id: document.id, name: String(data.name || ''), message: String(data.message || ''), createdAt: data.createdAt?.toDate?.()?.toISOString() || null };
-      })
-      .sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+    const comments: BlogComment[] = await cachedComments(articleId.data, MAX_SHOWN);
     return NextResponse.json({ comments }, { headers: noStore });
   } catch (error) {
     reportUserError(error, { request, details: { article: articleId.data } });
@@ -83,6 +78,7 @@ export const POST = withReport(async function POST(request: NextRequest) {
       createdAt: FieldValue.serverTimestamp(),
     });
     const comment: BlogComment = { id: reference.id, name, message, createdAt: new Date().toISOString() };
+    revalidateComments(article.id);
     return NextResponse.json({ comment }, { status: 201, headers: noStore });
   } catch (error) {
     reportUserError(error, { request, details: { article: parsed.data.articleId } });

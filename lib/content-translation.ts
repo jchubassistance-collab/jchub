@@ -1,3 +1,4 @@
+import { revalidateTools } from '@/lib/tools-cache';
 import 'server-only';
 
 import { createHash } from 'node:crypto';
@@ -142,6 +143,7 @@ export async function ensureToolTranslation(id: string): Promise<TranslationResu
   });
   // The English address stays the same once the tool is online.
   await reference.update({ 'translations.en': { ...translation, slug: existing?.slug || translation.slug, sourceHash: toolSourceHash(data), translatedAt: FieldValue.serverTimestamp() } });
+  revalidateTools();
   return 'translated';
 }
 

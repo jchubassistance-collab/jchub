@@ -1,12 +1,16 @@
 ---
 slug: mastering-text-stream-filtering-regex
-title: 'Mastering text stream filtering: from pattern matching to validation rules in production'
-description: 'A look at modern techniques to filter and extract text data at high speed, with concrete rules and regex usage to clean up your production streams.'
-excerpt: 'A look at modern techniques to filter and extract text data at high speed, with concrete rules and regex usage to clean up your production streams.'
+title: Filtering Text Streams with Regex in Production
+description: >-
+  A look at modern techniques to filter and extract text data at high speed,
+  with concrete rules and regex usage to clean up your production streams.
+excerpt: >-
+  A look at modern techniques to filter and extract text data at high speed,
+  with concrete rules and regex usage to clean up your production streams.
 keywords:
   - development
   - technology
-sourceHash: 3868592954e7d5b0265c1dcd
+sourceHash: 7e8cfc5705cfbb509e100034
 translatedAt: '2026-10-19T07:58:09.658Z'
 ---
 # Mastering text stream filtering: from pattern matching to validation rules in production

@@ -1,8 +1,14 @@
 ---
 slug: ia-codage-validation-json-chaine-de-traitement
-title: "L'I.A. génère du code plus vite que vous, mais qui nettoie les données ?"
-description: "Analyse de la montée en puissance des agents IA de codage et de l'importance cruciale du formatage et de la validation des structures de données comme le JSON dans les nouveaux workflows de développement."
-excerpt: "Analyse de la montée en puissance des agents IA de codage et de l'importance cruciale du formatage et de la validation des structures de données comme le JSON dans les nouveaux workflows de développement."
+title: 'L''IA code vite, mais qui valide vos données JSON ?'
+description: >-
+  Les agents IA écrivent du code toujours plus vite. Pourquoi formater et
+  valider vos données JSON devient essentiel dans ces nouveaux workflows de
+  développement.
+excerpt: >-
+  Analyse de la montée en puissance des agents IA de codage et de l'importance
+  cruciale du formatage et de la validation des structures de données comme le
+  JSON dans les nouveaux workflows de développement.
 category: Développement
 keywords:
   - développement
@@ -12,15 +18,6 @@ tags:
   - technologie
 author: JcHub
 image: /blog/covers/ia-codage-validation-json-chaine-de-traitement.jpg
-photo:
-  id: "4hbJ-eymZ1o"
-  url: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8anNvbiUyMGRhdGElMjBzdHJ1Y3R1cmUlMjBzY3JlZW58ZW58MXwwfHx8MTc5MjkyMTg1MHww&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8anNvbiUyMGRhdGElMjBzdHJ1Y3R1cmUlMjBzY3JlZW58ZW58MXwwfHx8MTc5MjkyMTg1MHww&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "lines of HTML codes"
-  author: "Florian Olivo"
-  authorUrl: "https://unsplash.com/@florianolv?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/lines-of-html-codes-4hbJ-eymZ1o?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/4hbJ-eymZ1o/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8anNvbiUyMGRhdGElMjBzdHJ1Y3R1cmUlMjBzY3JlZW58ZW58MXwwfHx8MTc5MjkyMTg1MHww"
 readTime: 5 min
 status: published
 publishedAt: '2026-09-13T20:13:06.881Z'

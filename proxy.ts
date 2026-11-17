@@ -3,7 +3,7 @@ import { NextRequest, NextResponse, type NextFetchEvent } from 'next/server';
 import createIntlMiddleware from 'next-intl/middleware';
 import { routing } from '@/i18n/routing';
 import { legacyFrenchPath } from '@/i18n/legacy-paths';
-import { REQUEST_ID_HEADER, startRequestReport, writeRequestReport } from '@/lib/reports/server';
+import { REQUEST_ID_HEADER, startRequestReport, writeRequestReport } from '@/lib/reports/proxy';
 
 const handleLocale = createIntlMiddleware(routing);
 
@@ -11,9 +11,22 @@ const ADMIN_HOST = (process.env.ADMIN_HOST || 'admin.jchub.dev').toLowerCase();
 const PUBLIC_HOST = (process.env.PUBLIC_HOST || 'jchub.dev').toLowerCase();
 const WWW_HOST = `www.${PUBLIC_HOST}`;
 
-function getContentSecurityPolicy(nonce: string) {
+const SCRIPT_HOSTS = 'https://www.googletagmanager.com https://www.google-analytics.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://static.cloudflareinsights.com https://tracker.metricool.com';
+
+/**
+ * The admin is rendered for every request and gets a nonce: only scripts carrying it (and those
+ * they load, 'strict-dynamic') run. Public pages are built once and served from the CDN, where
+ * no per-request nonce can be added: they allow inline scripts (Next.js's page data, the JSON-LD)
+ * and external scripts from the site and the listed hosts only.
+ */
+function getContentSecurityPolicy(nonce: string | null) {
   const developmentEval =
     process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : '';
+  // wasm-unsafe-eval only lets WebAssembly compile (pdf.js image decoders, the photo cut-out model), not eval().
+  // Hugging Face (connect-src) only serves that model's file, downloaded once by the browser.
+  const scripts = nonce
+    ? `'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval'${developmentEval} ${SCRIPT_HOSTS}`
+    : `'self' 'unsafe-inline' 'wasm-unsafe-eval'${developmentEval} ${SCRIPT_HOSTS}`;
 
   return [
     "default-src 'self'",
@@ -21,9 +34,8 @@ function getContentSecurityPolicy(nonce: string) {
     "object-src 'none'",
     "frame-ancestors 'none'",
     "form-action 'self'",
-    // wasm-unsafe-eval only lets WebAssembly compile (pdf.js image decoders), not eval().
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval'${developmentEval} https://www.googletagmanager.com https://www.google-analytics.com https://apis.google.com https://accounts.google.com https://static.cloudflareinsights.com https://tracker.metricool.com`,
-    "connect-src 'self' blob: https://vercel.com https://*.blob.vercel-storage.com https://*.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://api.cloudinary.com https://tracker.metricool.com https://cloudflareinsights.com",
+    `script-src ${scripts}`,
+    "connect-src 'self' blob: https://vercel.com https://*.blob.vercel-storage.com https://*.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://api.cloudinary.com https://tracker.metricool.com https://cloudflareinsights.com https://huggingface.co https://*.hf.co",
     "worker-src 'self'",
     "img-src 'self' data: blob: https:",
     "style-src 'self' 'unsafe-inline'",
@@ -69,12 +81,12 @@ function routeRequest(request: NextRequest, requestId: string) {
     || pathname.startsWith('/api/admin/');
 
   const requestHeaders = new Headers(request.headers);
-  const nonce = crypto.randomUUID();
+  // Next.js reads the nonce from the request's CSP while rendering an admin page.
+  const nonce = isAdminPath ? crypto.randomUUID() : null;
   const contentSecurityPolicy = getContentSecurityPolicy(nonce);
 
-  requestHeaders.set('x-nonce', nonce);
-  requestHeaders.set('x-is-admin-path', isAdminPath ? '1' : '0');
-  requestHeaders.set('Content-Security-Policy', contentSecurityPolicy);
+  if (nonce) requestHeaders.set('Content-Security-Policy', contentSecurityPolicy);
+  else requestHeaders.delete('Content-Security-Policy');
   // Only the proxy names the entry: a value sent by the visitor is dropped.
   if (requestId) requestHeaders.set(REQUEST_ID_HEADER, requestId);
   else requestHeaders.delete(REQUEST_ID_HEADER);
@@ -163,7 +175,9 @@ function routeRequest(request: NextRequest, requestId: string) {
 }
 
 export const config = {
+  // Static files (images, fonts, scripts…) skip the proxy: it runs, and is billed, for every
+  // request it matches. Probes such as /.env or /wp-login.php still go through it and its reports.
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|rss.xml).*)',
+    '/((?!_next/static|_next/image|_vercel|favicon.ico|robots.txt|sitemap.xml|rss.xml|.*\\.(?:png|jpe?g|gif|webp|avif|svg|ico|bmp|css|m?js|map|woff2?|ttf|otf|eot|webmanifest|mp3|mp4|webm|ogg|wasm|onnx|pdf|zip)$).*)',
   ],
 };

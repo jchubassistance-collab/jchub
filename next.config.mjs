@@ -16,6 +16,9 @@ try {
 const nextConfig = {
   experimental: {
     agentUpgrade: 'security',
+    // Two root layouts (app/[locale] and app/admin): the 404 of an unknown address is
+    // app/global-not-found.tsx.
+    globalNotFound: true,
   },
   allowedDevOrigins: ['127.0.0.1', ...(facebookOAuthHost ? [facebookOAuthHost] : [])],
   images: {
@@ -38,6 +41,10 @@ const nextConfig = {
   async redirects() {
     // Former paid-offer pages: keep any indexed links and backlinks useful.
     return [
+      // The home page, first address of most visits: redirected by Vercel's routing before the
+      // proxy, so no function runs (proxy.ts still covers the other unprefixed addresses).
+      // Limited to the public host: admin.jchub.dev/ is handled by proxy.ts.
+      { source: '/', has: [{ type: 'host', value: 'jchub\\.dev' }], destination: '/fr', permanent: true },
       { source: '/about', destination: '/fr/a-propos', permanent: true },
       { source: '/pricing', destination: '/fr/outils', permanent: true },
       { source: '/checkout', destination: '/fr/outils', permanent: true },

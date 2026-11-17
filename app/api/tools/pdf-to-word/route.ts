@@ -55,9 +55,12 @@ export const POST = withReport(async function POST(request: NextRequest) {
     }
 
     try {
+      // Counted in Turso since November 2026 (one SQL statement instead of a read and a write).
+      const { incrementCounter } = await import('@/lib/turso-store');
+      const counted = await incrementCounter('tool_uses:pdf_to_word');
       const { getAdminDb, hasFirebaseAdminConfig } = await import('@/lib/firebase-admin');
 
-      if (hasFirebaseAdminConfig()) {
+      if (counted === null && hasFirebaseAdminConfig()) {
         const db = getAdminDb();
         const now = new Date();
         const statsRef = db.collection('stats').doc('pdf_to_word');

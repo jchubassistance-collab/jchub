@@ -1,8 +1,13 @@
 ---
 slug: securiser-acces-vibe-coding-generation-secrets
-title: "Sécuriser vos accès à l'ère du Vibe Coding : Bonnes pratiques et génération de secrets"
-description: Analyse des risques de sécurité liés au prototypage rapide et présentation des bonnes pratiques pour générer et gérer des secrets à haute entropie dans vos projets.
-excerpt: Analyse des risques de sécurité liés au prototypage rapide et présentation des bonnes pratiques pour générer et gérer des secrets à haute entropie dans vos projets.
+title: 'Vibe coding : sécuriser vos accès et générer vos secrets'
+description: >-
+  Les risques de sécurité du prototypage rapide, et les bonnes pratiques pour
+  générer et gérer des secrets robustes dans vos projets.
+excerpt: >-
+  Analyse des risques de sécurité liés au prototypage rapide et présentation des
+  bonnes pratiques pour générer et gérer des secrets à haute entropie dans vos
+  projets.
 category: Développement
 keywords:
   - développement
@@ -12,15 +17,6 @@ tags:
   - technologie
 author: JcHub
 image: /blog/covers/securiser-acces-vibe-coding-generation-secrets.jpg
-photo:
-  id: "cvBBO4PzWPg"
-  url: "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8cmFuZG9tJTIwY2hhcmFjdGVyJTIwc3RyaW5nJTIwZ2VuZXJhdG9yfGVufDF8MHx8fDE3OTI5MjE4ODN8MA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8cmFuZG9tJTIwY2hhcmFjdGVyJTIwc3RyaW5nJTIwZ2VuZXJhdG9yfGVufDF8MHx8fDE3OTI5MjE4ODN8MA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "Lines of colorful JavaScript code displayed on a dark screen"
-  author: "Markus Spiske"
-  authorUrl: "https://unsplash.com/@markusspiske?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/javascript-code-on-dark-screen-cvBBO4PzWPg?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/cvBBO4PzWPg/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8cmFuZG9tJTIwY2hhcmFjdGVyJTIwc3RyaW5nJTIwZ2VuZXJhdG9yfGVufDF8MHx8fDE3OTI5MjE4ODN8MA"
 readTime: 5 min
 status: published
 publishedAt: '2026-10-11T09:11:04.381Z'

@@ -1,8 +1,13 @@
 ---
 slug: maitriser-filtrage-flux-textuels-regex
-title: 'Maîtriser le filtrage de flux textuels : du pattern matching aux règles de validation en production'
-description: "Analyse des techniques modernes de filtrage et d'extraction de données textuelles à haute vitesse, avec des règles concrètes et l'utilisation de regex pour nettoyer vos flux de production."
-excerpt: "Analyse des techniques modernes de filtrage et d'extraction de données textuelles à haute vitesse, avec des règles concrètes et l'utilisation de regex pour nettoyer vos flux de production."
+title: Filtrer des flux de texte avec les regex en production
+description: >-
+  Les techniques modernes pour filtrer et extraire des données textuelles à
+  grande vitesse, avec des règles concrètes et des regex pour nettoyer vos flux.
+excerpt: >-
+  Analyse des techniques modernes de filtrage et d'extraction de données
+  textuelles à haute vitesse, avec des règles concrètes et l'utilisation de
+  regex pour nettoyer vos flux de production.
 category: Développement
 keywords:
   - développement
@@ -12,15 +17,6 @@ tags:
   - technologie
 author: JcHub
 image: /blog/covers/maitriser-filtrage-flux-textuels-regex.jpg
-photo:
-  id: "ieic5Tq8YMk"
-  url: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8cmVnZXglMjBjb2RlJTIwb24lMjBzY3JlZW58ZW58MXwwfHx8MTc5MjkyMTg1Mnww&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8cmVnZXglMjBjb2RlJTIwb24lMjBzY3JlZW58ZW58MXwwfHx8MTc5MjkyMTg1Mnww&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "a computer screen with a bunch of code on it"
-  author: "Chris Ried"
-  authorUrl: "https://unsplash.com/@cdr6934?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/a-computer-screen-with-a-bunch-of-code-on-it-ieic5Tq8YMk?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/ieic5Tq8YMk/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8cmVnZXglMjBjb2RlJTIwb24lMjBzY3JlZW58ZW58MXwwfHx8MTc5MjkyMTg1Mnww"
 readTime: 5 min
 status: published
 publishedAt: '2026-10-01T23:27:37.434Z'

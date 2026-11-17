@@ -4,8 +4,8 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { reportUserError } from '@/lib/user-error';
 import { enforceRateLimit } from '@/lib/rate-limit';
-import { newsletterListId } from '@/lib/brevo';
-import { confirmationTokenHash, isConfirmationToken, requiredEnvironment, sendBrevoEmail } from '@/lib/newsletter';
+import { addNewsletterContact } from '@/lib/brevo';
+import { confirmationTokenHash, isConfirmationToken, sendBrevoEmail } from '@/lib/newsletter';
 import { isLocale } from '@/i18n/routing';
 import { withReport } from '@/lib/reports/server';
 
@@ -43,25 +43,11 @@ export const POST = withReport(async function POST(request: NextRequest) {
 
     const email = String(data.email || subscriber.id);
     const locale = isLocale(data.locale) ? data.locale : 'fr';
-    // English subscribers join the English list when it exists, the French one otherwise.
-    const listId = newsletterListId(locale) ?? newsletterListId('fr');
-    if (listId === null) throw new Error('BREVO_LIST_ID invalide');
-
-    const brevoResponse = await fetch('https://api.brevo.com/v3/contacts', {
-      method: 'POST',
-      headers: {
-        accept: 'application/json',
-        'api-key': requiredEnvironment('BREVO_API_KEY'),
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({ email, listIds: [listId], updateEnabled: true }),
-      cache: 'no-store',
-    });
-    if (!brevoResponse.ok) {
+    const added = await addNewsletterContact(email, locale);
+    if (!added.ok) {
       // The token is kept: the visitor can press the button again once Brevo answers.
-      const brevoError = await brevoResponse.text();
-      reportUserError(new Error(`Brevo a refusé l’inscription (${brevoResponse.status}) : ${brevoError.slice(0, 300)}`), { request, status: brevoResponse.status, details: { fournisseur: 'Brevo', liste: listId } });
-      await subscriber.ref.update({ brevoStatus: 'failed', brevoError: `Brevo ${brevoResponse.status}`, updatedAt: FieldValue.serverTimestamp() });
+      reportUserError(new Error(`Brevo a refusé l’inscription (${added.status}) : ${added.error}`), { request, status: added.status, details: { fournisseur: 'Brevo', liste: added.listId } });
+      await subscriber.ref.update({ brevoStatus: 'failed', brevoError: `Brevo ${added.status}`, updatedAt: FieldValue.serverTimestamp() });
       return NextResponse.json({ error: apiMessage(request, 'Impossible de confirmer ton inscription pour le moment. Réessaie dans quelques instants.') }, { status: 502 });
     }
 

@@ -38,6 +38,8 @@ export const routing = defineRouting({
     '/outils/[slug]': { fr: '/outils/[slug]', en: '/tools/[slug]' },
     '/outils/categorie/[category]': { fr: '/outils/categorie/[category]', en: '/tools/category/[category]' },
     '/outils/apercu/[component]': { fr: '/outils/apercu/[component]', en: '/tools/preview/[component]' },
+    '/ressources': { fr: '/ressources', en: '/resources' },
+    '/ressources/[slug]': { fr: '/ressources/[slug]', en: '/resources/[slug]' },
     '/services': '/services',
     '/suppression-donnees': { fr: '/suppression-donnees', en: '/data-deletion' },
     '/tools/api-cost-calculator': '/tools/api-cost-calculator',

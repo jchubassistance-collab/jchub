@@ -1,6 +1,7 @@
+import { setRequestLocale } from 'next-intl/server';
 import NextLink from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowRight, Briefcase, Check, FolderOpen, Gift, Palette, Receipt, Store, Sparkles } from 'lucide-react';
+import { ArrowRight, Briefcase, Check, FileText, FolderOpen, Gift, Palette, Receipt, Store, Sparkles } from 'lucide-react';
 import { getPublishedTools, localizeTool, toolPath, type Tool } from '@/lib/tools';
 import { pageMetadata } from '@/lib/seo';
 import { Link } from '@/i18n/navigation';
@@ -66,6 +67,9 @@ const copy = bilingual({
     { title: 'Recruter ou postuler', text: 'Un CV clair, prêt à imprimer ou à envoyer.' },
   ],
   use: 'Utiliser',
+  resourcesTitle: 'Les modèles pour tes projets web',
+  resourcesText: 'Cahier des charges, contrat de création de site (droit OHADA) et checklist de lancement : gratuits, en Word ou en PDF.',
+  resourcesButton: 'Voir les ressources',
   ctaEyebrow: 'Besoin de plus qu’un outil ?',
   ctaTitle: 'Je crée ton site sur mesure.',
   ctaText: 'Site vitrine, réservation en ligne, outil de gestion : un site qui travaille pour ton activité.',
@@ -110,6 +114,9 @@ const copy = bilingual({
     { title: 'Hire or apply', text: 'A clear resume, ready to print or send.' },
   ],
   use: 'Use',
+  resourcesTitle: 'Templates for your web projects',
+  resourcesText: 'Requirements document, website contract (OHADA law) and launch checklist: free, as Word or PDF files.',
+  resourcesButton: 'See the resources',
   ctaEyebrow: 'Need more than a tool?',
   ctaTitle: 'I build your custom website.',
   ctaText: 'Showcase site, online booking, management tool: a website that works for your business.',
@@ -122,12 +129,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({ locale, title: copy[locale].metaTitle, description: copy[locale].metaDescription, href: '/kit-entrepreneur' });
 }
 
-// Tools go live on their publication date: the kit fills up without a new deployment.
-export const dynamic = 'force-dynamic';
+// Built once, then rebuilt at most hourly: tools appear on their publication date and visible days.
+export const revalidate = 3600;
 
 export default async function BusinessKitPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+  setRequestLocale(locale);
   const t = copy[locale];
   const published = new Map((await getPublishedTools()).map((tool) => [tool.slug, tool]));
   const needs = NEEDS
@@ -207,6 +215,14 @@ export default async function BusinessKitPage({ params }: { params: Promise<{ lo
               </div>
             ))}
           </div>
+        </section>
+
+        <section className="flex flex-col gap-6 rounded-[1.5rem] bg-white p-7 shadow-[0_2px_10px_rgba(15,23,42,.05)] sm:flex-row sm:items-center sm:justify-between sm:p-9">
+          <div className="flex items-start gap-4">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#eff6ff] text-blue-700"><FileText className="h-5 w-5" /></span>
+            <div><h2 className="text-xl font-bold" style={{ fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif' }}>{t.resourcesTitle}</h2><p className="mt-1 max-w-xl text-sm leading-6 text-slate-600">{t.resourcesText}</p></div>
+          </div>
+          <Link href="/ressources" className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#93c5fd] px-6 py-3 text-sm font-bold text-[#0f172a] transition hover:bg-[#60a5fa]">{t.resourcesButton} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></Link>
         </section>
 
         <section className="relative overflow-hidden rounded-[1.75rem] bg-[#0f172a] px-7 py-10 text-white shadow-[0_24px_55px_rgba(15,23,42,.18)] sm:px-10 sm:py-14 lg:px-14">

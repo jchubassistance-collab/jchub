@@ -1,3 +1,4 @@
+import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { ArrowRight, Check, ChevronDown, Code2, FileText, Gift, Globe, Handshake, LayoutDashboard, Mail, MessageCircle, Rocket, Sparkles, Wrench, Workflow } from 'lucide-react';
 import { getPublishedTools } from '@/lib/tools';
@@ -160,12 +161,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({ locale, title: copy[locale].metaTitle, description: copy[locale].metaDescription, href: '/services' });
 }
 
-// The tool count follows the catalog: tools go live on their publication date.
-export const dynamic = 'force-dynamic';
+// Built once, then rebuilt at most hourly: tools appear on their publication date and visible days.
+export const revalidate = 3600;
 
 export default async function ServicesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+  setRequestLocale(locale);
   const t = copy[locale];
   const publishedTools = await getPublishedTools();
   const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t.whatsappMessage)}`;

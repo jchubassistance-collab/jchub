@@ -17,6 +17,25 @@ const CATEGORY_LABELS_EN: Record<string, string> = {
   Produit: 'Product',
   Numérique: 'Digital',
   Réseau: 'Networking',
+  Actus: 'News',
+  'Réseau & Télécom': 'Networking & Telecom',
+  'IA & Automatisation': 'AI & Automation',
+  'Informatique de base': 'Computer basics',
+  'Outils & Astuces': 'Tools & Tips',
+  Entrepreneuriat: 'Entrepreneurship',
+};
+
+/** The blog's sections, in the order they are presented (see lib/writer-rules.ts). */
+export const BLOG_CATEGORIES = ['Actus', 'Réseau & Télécom', 'Développement', 'IA & Automatisation', 'Informatique de base', 'Outils & Astuces', 'Entrepreneuriat'] as const;
+
+/**
+ * Former categories merged into a section of November 2026. Their pages redirect to the new one,
+ * so links already shared or indexed keep working.
+ */
+export const MERGED_CATEGORIES: Record<string, string> = {
+  Réseau: 'Réseau & Télécom',
+  Informatique: 'Informatique de base',
+  Technologie: 'Outils & Astuces',
 };
 
 export function categoryLabel(category: string, locale: Locale): string {

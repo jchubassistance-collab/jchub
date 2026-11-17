@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart3, Bot, ChevronDown, ClipboardList, FileText, Home, LineChart, LogOut, Menu, Settings, Users, Wrench, X, Send, Inbox, Bell, Search, ExternalLink, Sparkles, ScrollText } from 'lucide-react';
+import { BarChart3, Bot, ChevronDown, ClipboardList, FileText, Home, LineChart, LogOut, Menu, Settings, Users, Wrench, X, Send, Inbox, Bell, Search, ExternalLink, Sparkles, ScrollText, FolderDown, Activity, History, DatabaseBackup } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { signOut } from '@/lib/firebase-auth';
 import { prefetchPage } from '@/lib/admin-cache';
@@ -16,11 +16,15 @@ const navigation = [
   { href: '/admin/cm-access', label: 'Accès CM', icon: Users },
   { href: '/admin/content', label: 'Contenu', icon: FileText },
   { href: '/admin/analytics', label: 'Analytics', icon: LineChart },
+  { href: '/admin/insights', label: 'Control Center', icon: Activity },
   { href: '/admin/tools', label: 'Outils', icon: Wrench },
+  { href: '/admin/resources', label: 'Ressources', icon: FolderDown },
   { href: '/admin/agent', label: 'Agent éditorial', icon: Bot },
   { href: '/admin/cm', label: 'Espace CM', icon: BarChart3 },
   { href: '/admin/inbox', label: 'Messages & newsletter', icon: Inbox },
   { href: '/admin/reports', label: 'Rapports', icon: ScrollText },
+  { href: '/admin/journal', label: 'Journal d’activité', icon: History },
+  { href: '/admin/sauvegardes', label: 'Sauvegardes', icon: DatabaseBackup },
   { href: '/admin/settings', label: 'Paramètres', icon: Settings },
 ];
 

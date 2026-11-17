@@ -1,9 +1,13 @@
 ---
 slug: binaire-octal-hex-guide
-title: 'Binaire, octal, décimal, hexadécimal : le guide pour ne plus rien confondre'
-description: "Tu mélanges encore binaire et hexa ? Voici l'explication simple avec des exemples concrets (couleurs CSS, addresses mémoire, ASCII)."
-excerpt: "Binaire, octal, décimal, hexadécimal : le guide pour ne plus rien confondre Mon premier cours d'info, le prof écrit 0b1010 au tableau. Je suis perd..."
-category: Informatique
+title: 'Binaire, octal, décimal, hexa : le guide sans confusion'
+description: >-
+  Tu mélanges encore binaire et hexa ? Voici l'explication simple avec des
+  exemples concrets (couleurs CSS, addresses mémoire, ASCII).
+excerpt: >-
+  Binaire, octal, décimal, hexadécimal : le guide pour ne plus rien confondre
+  Mon premier cours d'info, le prof écrit 0b1010 au tableau. Je suis perd...
+category: Informatique de base
 keywords:
   - binaire
   - hexadécimal
@@ -14,19 +18,11 @@ keywords:
   - base 2 8 16
 author: Jessy Ngnambongo
 image: /blog/covers/binaire-octal-hex-guide.jpg
-photo:
-  id: "iar-afB0QQw"
-  url: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMGRpZ2l0cyUyMHNjcmVlbnxlbnwxfDB8fHwxNzkyOTIxODA4fDA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMGRpZ2l0cyUyMHNjcmVlbnxlbnwxfDB8fHwxNzkyOTIxODA4fDA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "Matrix movie still"
-  author: "Markus Spiske"
-  authorUrl: "https://unsplash.com/@markusspiske?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/matrix-movie-still-iar-afB0QQw?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/iar-afB0QQw/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMGRpZ2l0cyUyMHNjcmVlbnxlbnwxfDB8fHwxNzkyOTIxODA4fDA"
 readTime: 4 min
-status: scheduled
+status: published
+publishedAt: '2026-10-21T09:11:00.946Z'
 scheduledFor: '2026-10-20T22:05:20.235Z'
-updatedAt: '2026-08-25T22:05:36.078Z'
+updatedAt: '2026-11-04T14:17:59.334Z'
 ---
 # Binaire, octal, décimal, hexadécimal : le guide pour ne plus rien confondre
 

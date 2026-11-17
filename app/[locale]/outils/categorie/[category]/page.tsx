@@ -1,5 +1,5 @@
+import { setRequestLocale } from 'next-intl/server';
 import { notFound, permanentRedirect } from 'next/navigation';
-import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import { ArrowRight, ChevronRight, Lightbulb, Wrench } from 'lucide-react';
 import { ToolsCatalog } from '@/components/tools/ToolsCatalog';
@@ -13,8 +13,8 @@ import { getPathname, Link } from '@/i18n/navigation';
 import { bilingual } from '@/i18n/copy';
 import { isLocale, type Locale } from '@/i18n/routing';
 
-// The list depends on the tools visible today.
-export const dynamic = 'force-dynamic';
+// Built once, then rebuilt at most hourly: tools appear on their publication date and visible days.
+export const revalidate = 3600;
 
 type Params = Promise<{ locale: string; category: string }>;
 type CategoryText = { title: string; intro: string };
@@ -91,9 +91,15 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return pageMetadata({ locale, title: text.title, description: text.intro, href: '/outils', paths });
 }
 
+// No page is built ahead: each one is built at its first visit, then served from the cache.
+export function generateStaticParams() {
+  return [];
+}
+
 export default async function ToolCategoryPage({ params }: { params: Params }) {
   const { locale, category: slug } = await params;
   if (!isLocale(locale)) notFound();
+  setRequestLocale(locale);
   const { category, tools } = await findCategory(slug, locale);
   if (!category) notFound();
   const t = copy[locale];
@@ -106,7 +112,6 @@ export default async function ToolCategoryPage({ params }: { params: Params }) {
 
   const baseUrl = getPublicBaseUrl();
   const pageUrl = `${baseUrl}${toolCategoryPath(category, locale)}`;
-  const nonce = (await headers()).get('x-nonce') || undefined;
   const structuredData = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -134,7 +139,7 @@ export default async function ToolCategoryPage({ params }: { params: Params }) {
 
   return (
     <div className="template-home min-h-screen bg-[#eff6ff] text-[#0f172a]">
-      <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }} />
       <section className="relative overflow-hidden border-b border-blue-100/80 bg-[radial-gradient(circle_at_12%_15%,rgba(147,197,253,.45),transparent_32%),radial-gradient(circle_at_88%_85%,rgba(191,219,254,.6),transparent_34%),#eff6ff]">
         <div
           aria-hidden="true"

@@ -1,8 +1,12 @@
 ---
 slug: creer-qr-code-wifi-paiement
-title: 'QR Code : comment en créer un pour ton WiFi, vCard ou paiement mobile'
-description: "Le QR code c'est plus juste pour les menus de resto. Voici 5 usages pratiques pour les devs, avec des générateurs gratuits."
-excerpt: 'QR Code : comment en créer un pour ton WiFi, vCard ou paiement mobile Le QR code est partout en 2026. Mais la plupart des devs savent juste que ça ...'
+title: 'Créer un QR code pour ton WiFi, ta vCard ou un paiement'
+description: >-
+  Le QR code c'est plus juste pour les menus de resto. Voici 5 usages pratiques
+  pour les devs, avec des générateurs gratuits.
+excerpt: >-
+  QR Code : comment en créer un pour ton WiFi, vCard ou paiement mobile Le QR
+  code est partout en 2026. Mais la plupart des devs savent juste que ça ...
 category: Productivité
 keywords:
   - qr code generator
@@ -13,15 +17,6 @@ keywords:
   - mobile money qr
 author: Jessy Ngnambongo
 image: /blog/covers/creer-qr-code-wifi-paiement.jpg
-photo:
-  id: "Q6uqw_Hjye8"
-  url: "https://images.unsplash.com/photo-1595079676339-1534801ad6cf?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c21hcnRwaG9uZSUyMHNjYW5uaW5nJTIwcGF5bWVudCUyMHFyJTIwY29kZXxlbnwxfDB8fHwxNzkyOTIxODIwfDA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1595079676339-1534801ad6cf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c21hcnRwaG9uZSUyMHNjYW5uaW5nJTIwcGF5bWVudCUyMHFyJTIwY29kZXxlbnwxfDB8fHwxNzkyOTIxODIwfDA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "black android smartphone displaying qr code"
-  author: "Markus Winkler"
-  authorUrl: "https://unsplash.com/@markuswinkler?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/black-android-smartphone-displaying-qr-code-Q6uqw_Hjye8?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/Q6uqw_Hjye8/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c21hcnRwaG9uZSUyMHNjYW5uaW5nJTIwcGF5bWVudCUyMHFyJTIwY29kZXxlbnwxfDB8fHwxNzkyOTIxODIwfDA"
 readTime: 4 min
 status: published
 publishedAt: '2026-10-01T09:11:00.267Z'

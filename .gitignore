@@ -15,3 +15,11 @@ node_modules
 /backup-securite-*/
 # Le modèle de configuration (valeurs fictives) reste versionné
 !.env.exemple
+
+# Local Control Center database (lib/insights/db.ts)
+/.data
+
+# Playwright (npm run test:e2e)
+/test-results/
+/playwright-report/
+/playwright/.cache/

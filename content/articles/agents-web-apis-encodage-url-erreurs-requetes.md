@@ -1,8 +1,13 @@
 ---
 slug: agents-web-apis-encodage-url-erreurs-requetes
-title: "Agents Web, APIs et Encodage d'URL : Éviter les Erreurs Silencieuses et le Gaspillage de Requêtes"
-description: "Analyse des erreurs fréquentes lors de la construction d'URL pour les requêtes API et les agents automatisés, et comment utiliser un outil d'encodage pour fiabiliser vos flux HTTP."
-excerpt: "Analyse des erreurs fréquentes lors de la construction d'URL pour les requêtes API et les agents automatisés, et comment utiliser un outil d'encodage pour fiabiliser vos flux HTTP."
+title: 'Encodage d''URL : éviter les erreurs silencieuses des API'
+description: >-
+  Les erreurs d'encodage d'URL les plus fréquentes dans les requêtes API et les
+  agents automatisés, et comment les éviter pour fiabiliser vos appels HTTP.
+excerpt: >-
+  Analyse des erreurs fréquentes lors de la construction d'URL pour les requêtes
+  API et les agents automatisés, et comment utiliser un outil d'encodage pour
+  fiabiliser vos flux HTTP.
 category: Développement
 keywords:
   - développement
@@ -12,19 +17,11 @@ tags:
   - technologie
 author: JcHub
 image: /blog/covers/agents-web-apis-encodage-url-erreurs-requetes.jpg
-photo:
-  id: "6y5iySR_UXc"
-  url: "https://images.unsplash.com/photo-1579458342405-52d7d969e0d4?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YnJva2VuJTIwdXJsJTIwbGluayUyMGNoYWlufGVufDF8MHx8fDE3OTI5MjE3OTZ8MA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1579458342405-52d7d969e0d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YnJva2VuJTIwdXJsJTIwbGluayUyMGNoYWlufGVufDF8MHx8fDE3OTI5MjE3OTZ8MA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "grey metal chain in close up photography"
-  author: "Aida B"
-  authorUrl: "https://unsplash.com/@aidamarie_photography?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/grey-metal-chain-in-close-up-photography-6y5iySR_UXc?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/6y5iySR_UXc/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YnJva2VuJTIwdXJsJTIwbGluayUyMGNoYWlufGVufDF8MHx8fDE3OTI5MjE3OTZ8MA"
 readTime: 5 min
-status: scheduled
+status: published
+publishedAt: '2026-11-06T09:11:00.085Z'
 scheduledFor: '2026-11-05T21:08:00.000Z'
-updatedAt: '2026-10-04T21:08:34.605Z'
+updatedAt: '2026-11-06T09:11:00.085Z'
 ---
 # Agents Web, APIs et Encodage d'URL : Éviter les Erreurs Silencieuses et le Gaspillage de Requêtes
 

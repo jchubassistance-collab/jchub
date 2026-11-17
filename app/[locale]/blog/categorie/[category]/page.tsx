@@ -1,12 +1,12 @@
+import { setRequestLocale } from 'next-intl/server';
 import { notFound, permanentRedirect } from 'next/navigation';
-import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import { ArrowRight, BookOpen, ChevronRight, Sparkles, Tag } from 'lucide-react';
 import { BlogCatalog } from '@/components/blog/BlogCatalog';
 import { CategoryLinks } from '@/components/CategoryLinks';
 import { Newsletter } from '@/components/Newsletter';
 import { getPublishedArticles, type BlogArticle } from '@/lib/blog';
-import { categoryFromSlug, categoryLabel, categorySlug, countByCategory } from '@/lib/categories';
+import { categoryFromSlug, categoryLabel, categorySlug, countByCategory, MERGED_CATEGORIES } from '@/lib/categories';
 import { blogCategoryPath } from '@/lib/category-paths';
 import { pageMetadata, type LocalizedPaths } from '@/lib/seo';
 import { getPublicBaseUrl } from '@/lib/site-url';
@@ -26,6 +26,12 @@ const copy = bilingual({
     Informatique: { title: 'Articles d’informatique', intro: 'Les bases qui servent tous les jours : systèmes de numération, formats de données et notions clés expliquées simplement.' },
     'Base de données': { title: 'Articles sur les bases de données', intro: 'Identifiants, clés primaires et modélisation : des conseils pour concevoir des bases de données solides.' },
     Productivité: { title: 'Articles sur la productivité', intro: 'Des astuces et des outils pour gagner du temps sur les tâches répétitives et mieux organiser ton travail.' },
+    Actus: { title: 'Actus tech', intro: 'Des faits courts et sourcés : ce qui s’est passé, d’où vient l’information et pourquoi ça compte pour toi.' },
+    'Réseau & Télécom': { title: 'Articles réseau et télécom', intro: 'Modèle OSI, 4G, 5G, fibre et réseaux mobiles : comment les données voyagent de ton téléphone jusqu’à Internet, expliqué simplement.' },
+    'IA & Automatisation': { title: 'Articles sur l’IA et l’automatisation', intro: 'Des usages concrets de l’IA pour les développeurs et les petites équipes : gagner du temps sans perdre le contrôle.' },
+    'Informatique de base': { title: 'Les bases de l’informatique', intro: 'Binaire, hexadécimal, formats de données : les notions qui servent tous les jours, expliquées simplement avec des exemples.' },
+    'Outils & Astuces': { title: 'Outils et astuces', intro: 'Des tutoriels pas à pas avec les outils gratuits de JcHub : PDF, images, QR codes et petites tâches du quotidien.' },
+    Entrepreneuriat: { title: 'Articles pour entrepreneurs', intro: 'Lancer et faire tourner ton activité avec des outils gratuits : site, factures, visuels et bonnes pratiques, sans gros budget.' },
   } as Record<string, CategoryText>,
   fallback: (label: string): CategoryText => ({ title: `Articles : ${label}`, intro: `Tous les articles JcHub sur le thème « ${label} » : guides pratiques, retours d’expérience et conseils.` }),
   eyebrow: 'Catégorie du blog',
@@ -48,6 +54,12 @@ const copy = bilingual({
     Informatique: { title: 'Computer science articles', intro: 'The basics you use every day: number systems, data formats and key concepts explained simply.' },
     'Base de données': { title: 'Articles about databases', intro: 'IDs, primary keys and data modeling: advice to design solid databases.' },
     Productivité: { title: 'Articles about productivity', intro: 'Tips and tools to save time on repetitive tasks and organize your work better.' },
+    Actus: { title: 'Tech news', intro: 'Short, sourced facts: what happened, where the information comes from and why it matters to you.' },
+    'Réseau & Télécom': { title: 'Networking and telecom articles', intro: 'OSI model, 4G, 5G, fiber and mobile networks: how data travels from your phone to the Internet, explained simply.' },
+    'IA & Automatisation': { title: 'Articles about AI and automation', intro: 'Concrete uses of AI for developers and small teams: save time without losing control.' },
+    'Informatique de base': { title: 'Computer basics', intro: 'Binary, hexadecimal, data formats: the notions you use every day, explained simply with examples.' },
+    'Outils & Astuces': { title: 'Tools and tips', intro: 'Step-by-step tutorials with JcHub’s free tools: PDFs, images, QR codes and small everyday tasks.' },
+    Entrepreneuriat: { title: 'Articles for entrepreneurs', intro: 'Launch and run your business with free tools: website, invoices, visuals and good practices, without a big budget.' },
   },
   fallback: (label: string): CategoryText => ({ title: `Articles: ${label}`, intro: `All JcHub articles about ${label}: practical guides, lessons learned and tips.` }),
   eyebrow: 'Blog category',
@@ -76,6 +88,10 @@ async function findCategory(slug: string, locale: Locale): Promise<{ category: s
   // The address of the other language moves to the right one, like the articles.
   const other = categoryFromSlug(slug, locale === 'fr' ? 'en' : 'fr', categories);
   if (other) permanentRedirect(blogCategoryPath(other, locale));
+  // A category merged into a section in November 2026 leads to that section.
+  for (const [former, current] of Object.entries(MERGED_CATEGORIES)) {
+    if ((['fr', 'en'] as const).some((language) => categorySlug(former, language) === slug)) permanentRedirect(blogCategoryPath(current, locale));
+  }
   return { category: null, articles };
 }
 
@@ -89,9 +105,15 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return pageMetadata({ locale, title: text.title, description: text.intro, href: '/blog', paths });
 }
 
+// No page is built ahead: each one is built at its first visit, then served from the cache.
+export function generateStaticParams() {
+  return [];
+}
+
 export default async function BlogCategoryPage({ params }: { params: Params }) {
   const { locale, category: slug } = await params;
   if (!isLocale(locale)) notFound();
+  setRequestLocale(locale);
   const { category, articles } = await findCategory(slug, locale);
   if (!category) notFound();
   const t = copy[locale];
@@ -102,7 +124,6 @@ export default async function BlogCategoryPage({ params }: { params: Params }) {
 
   const baseUrl = getPublicBaseUrl();
   const pageUrl = `${baseUrl}${blogCategoryPath(category, locale)}`;
-  const nonce = (await headers()).get('x-nonce') || undefined;
   const structuredData = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -135,7 +156,7 @@ export default async function BlogCategoryPage({ params }: { params: Params }) {
 
   return (
     <div className="template-home min-h-screen overflow-hidden bg-[#eff6ff] text-[#0f172a]">
-      <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }} />
       <section className="relative overflow-hidden border-b border-blue-100/80 bg-[radial-gradient(circle_at_12%_15%,rgba(147,197,253,.45),transparent_32%),radial-gradient(circle_at_88%_85%,rgba(191,219,254,.6),transparent_34%),#eff6ff]">
         <div
           aria-hidden="true"

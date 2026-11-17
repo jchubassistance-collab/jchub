@@ -56,8 +56,9 @@ test('les conseils signalent un # de trop et l’absence de sous-titres', () => 
   assert.ok(tips.some((tip) => tip.includes('pas #')));
 });
 
-test('Réseau fait partie des catégories de départ', () => {
-  assert.ok(isWriterCategory('Réseau'));
+test('les rubriques du blog font partie des catégories de départ', () => {
+  for (const category of ['Actus', 'Réseau & Télécom', 'IA & Automatisation', 'Informatique de base', 'Outils & Astuces', 'Entrepreneuriat']) assert.ok(isWriterCategory(category), category);
+  assert.ok(!isWriterCategory('Technologie'), 'fusionnée dans Outils & Astuces');
 });
 
 test('une catégorie ajoutée est nettoyée et reconnue quelle que soit son écriture', () => {

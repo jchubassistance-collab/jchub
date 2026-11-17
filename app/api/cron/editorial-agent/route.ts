@@ -25,7 +25,7 @@ export const GET = withReport(async function GET(request: NextRequest) {
   if (!lock) return NextResponse.json({ started: false, skipped: true, reason: 'already_started', date: dateKey });
 
   try {
-    const run = await start(runEditorialAgent);
+    const run = await start(runEditorialAgent, [dateKey]);
     await lockReference.update({ status: 'running', runId: run.runId, updatedAt: new Date() });
     return NextResponse.json({ started: true, runId: run.runId, date: dateKey }, { status: 202 });
   } catch (error) {

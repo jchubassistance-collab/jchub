@@ -5,6 +5,7 @@ import { useLocale } from 'next-intl';
 import { Facebook, Instagram, Linkedin, Mail, MessageCircle, MapPin, Phone, Send, Sparkles, ArrowRight, Check, Clock } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { bilingual } from '@/i18n/copy';
+import { trackEvent } from '@/lib/analytics-client';
 import { LOCALE_HEADER } from '@/i18n/request-locale';
 
 const contactMethods = [
@@ -165,6 +166,8 @@ export default function ContactPage() {
         throw new Error(result.error || t.sendFailed);
       }
       if (result.warning) setError(result.warning);
+      // Counted by the Control Center (Conversions): a "project" subject is a service request.
+      trackEvent('contact_submit', { subject: form.subject });
       setSent(true);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : t.sendFailed);

@@ -7,13 +7,17 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { reportUserError } from '@/lib/user-error';
 import { clientIpFromHeaders } from '@/lib/client-ip';
+import { consumeLimit } from '@/lib/turso-store';
 
 /** The visitor's IP, which a request sent straight to Vercel cannot choose (see lib/client-ip.ts). */
 function getTrustedClientIp(request: NextRequest) {
   return clientIpFromHeaders(request.headers) || (process.env.NODE_ENV !== 'production' ? 'local-development' : '');
 }
 
-/** Distributed Firestore fixed-window limiter. It stores only a one-way IP hash. */
+/**
+ * Distributed fixed-window limiter. It stores only a one-way IP hash. Counted in Turso (one SQL
+ * statement); the former Firestore transaction remains as a fallback if Turso is unavailable.
+ */
 export async function enforceRateLimit(
   request: NextRequest,
   key: string,
@@ -22,6 +26,15 @@ export async function enforceRateLimit(
 ): Promise<NextResponse | null> {
   const ip = getTrustedClientIp(request);
   if (!ip) return NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 });
+  const id = createHash('sha256').update(`${key}:${ip}`).digest('hex');
+  const counted = await consumeLimit(`rate:${id}`, limit, windowMs);
+  if (counted) {
+    if (counted.allowed) return null;
+    return NextResponse.json({ error: apiMessage(request, 'Trop de demandes. Réessaie dans quelques instants.') }, {
+      status: 429,
+      headers: { 'Retry-After': String(Math.max(1, Math.ceil((counted.resetAt - Date.now()) / 1000))) },
+    });
+  }
   if (!hasFirebaseAdminConfig()) {
     return process.env.NODE_ENV === 'production'
       ? NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 })
@@ -29,7 +42,6 @@ export async function enforceRateLimit(
   }
 
   try {
-    const id = createHash('sha256').update(`${key}:${ip}`).digest('hex');
     const ref = getAdminDb().collection('_rateLimits').doc(id);
     const now = Date.now();
     const allowed = await getAdminDb().runTransaction(async (tx) => {
@@ -60,6 +72,19 @@ export async function enforceRateLimit(
 export async function enforceDailyToolAssistantQuota(request: NextRequest): Promise<NextResponse | null> {
   const ip = getTrustedClientIp(request);
   if (!ip) return NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 });
+  const now = new Date();
+  const day = now.toISOString().slice(0, 10);
+  const id = createHash('sha256').update(`tool-assistant:${day}:${ip}`).digest('hex');
+  const tomorrowAt = new Date(`${day}T00:00:00.000Z`).getTime() + 86400_000;
+  // The key holds the day: a window of two days never resets within it.
+  const counted = await consumeLimit(`ai-quota:${id}`, 5, 2 * 86400_000);
+  if (counted) {
+    if (counted.allowed) return null;
+    return NextResponse.json({ error: apiMessage(request, 'Tu as utilisé tes 5 recherches assistées du jour. Reviens demain 🙂') }, {
+      status: 429,
+      headers: { 'Retry-After': String(Math.max(1, Math.ceil((tomorrowAt - now.getTime()) / 1000))) },
+    });
+  }
   if (!hasFirebaseAdminConfig()) {
     return process.env.NODE_ENV === 'production'
       ? NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 })
@@ -67,9 +92,6 @@ export async function enforceDailyToolAssistantQuota(request: NextRequest): Prom
   }
 
   try {
-    const now = new Date();
-    const day = now.toISOString().slice(0, 10);
-    const id = createHash('sha256').update(`tool-assistant:${day}:${ip}`).digest('hex');
     const ref = getAdminDb().collection('_dailyAiQuotas').doc(id);
     const allowed = await getAdminDb().runTransaction(async (tx) => {
       const snapshot = await tx.get(ref);
@@ -99,6 +121,20 @@ export async function enforceDailyConversionQuota(
   const ip = getTrustedClientIp(request);
 
   if (!ip) return NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 });
+  {
+    const now = new Date();
+    const day = now.toISOString().slice(0, 10);
+    const hash = createHash('sha256').update(`daily-conversion:${tool}:${ip}`).digest('hex');
+    const counted = await consumeLimit(`conversion-quota:${day}:${hash}`, 5, 2 * 86400_000);
+    if (counted) {
+      if (counted.allowed) return null;
+      const nextDay = new Date(`${day}T00:00:00.000Z`).getTime() + 86400_000;
+      return NextResponse.json(
+        { error: apiMessage(request, 'Limite atteinte : 5 conversions par outil et par jour. Réessaie demain.') },
+        { status: 429, headers: { 'Retry-After': String(Math.max(1, Math.ceil((nextDay - now.getTime()) / 1000))) } },
+      );
+    }
+  }
   if (!hasFirebaseAdminConfig()) {
     return process.env.NODE_ENV === 'production'
       ? NextResponse.json({ error: apiMessage(request, 'Service temporairement indisponible.') }, { status: 503 })

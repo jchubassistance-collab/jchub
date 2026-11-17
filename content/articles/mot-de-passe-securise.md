@@ -1,8 +1,12 @@
 ---
 slug: mot-de-passe-securise
-title: Comment créer un mot de passe vraiment sécurisé (et le retenir)
-description: 'Tous les conseils habituels sur les mots de passe sont nuls. Voici la vraie stratégie : générateur + gestionnaire + 2FA. Simple, efficace, applicable.'
-excerpt: 'Comment créer un mot de passe vraiment sécurisé et le retenir Le conseil classique : "Mets des majuscules, des chiffres, des symboles, et changele ...'
+title: Créer un mot de passe vraiment sécurisé (et le retenir)
+description: >-
+  Tous les conseils habituels sur les mots de passe sont nuls. Voici la vraie
+  stratégie : générateur + gestionnaire + 2FA. Simple, efficace, applicable.
+excerpt: >-
+  Comment créer un mot de passe vraiment sécurisé et le retenir Le conseil
+  classique : "Mets des majuscules, des chiffres, des symboles, et changele ...
 category: Sécurité
 keywords:
   - mot de passe sécurisé
@@ -13,15 +17,6 @@ keywords:
   - sécurité compte
 author: Jessy Ngnambongo
 image: /blog/covers/mot-de-passe-securise.jpg
-photo:
-  id: "2_rlRMukZO4"
-  url: "https://images.unsplash.com/photo-1762330472502-83efbe1d4478?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8cGFzc3dvcmQlMjBtYW5hZ2VyJTIwYXBwJTIwaW50ZXJmYWNlfGVufDF8MHx8fDE3OTI5MjE4NzF8MA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1762330472502-83efbe1d4478?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8cGFzc3dvcmQlMjBtYW5hZ2VyJTIwYXBwJTIwaW50ZXJmYWNlfGVufDF8MHx8fDE3OTI5MjE4NzF8MA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "Facebook login screen with username and password fields"
-  author: "Zulfugar Karimov"
-  authorUrl: "https://unsplash.com/@zulfugarkarimov?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/facebook-login-screen-with-username-and-password-fields-2_rlRMukZO4?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/2_rlRMukZO4/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8cGFzc3dvcmQlMjBtYW5hZ2VyJTIwYXBwJTIwaW50ZXJmYWNlfGVufDF8MHx8fDE3OTI5MjE4NzF8MA"
 readTime: 5 min
 status: published
 publishedAt: '2026-10-10T07:03:03.196Z'

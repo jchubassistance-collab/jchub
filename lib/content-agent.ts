@@ -111,7 +111,8 @@ function parseDraft(text: string, sources: TrendCandidate[], catalog: CatalogIte
     throw new Error('La réponse IA contient des informations de promotion qui ne correspondent pas au catalogue.');
   }
   const wordCount = parsed.article.trim().split(/\s+/).length;
-  if (wordCount < 700 || wordCount > 1000) {
+  // Asked for 700 to 1,000 words; a little less or more is fine, the admin rereads every draft.
+  if (wordCount < 600 || wordCount > 1400) {
     throw new Error(`L’article généré contient ${wordCount} mots; la longueur attendue est de 700 à 1000 mots.`);
   }
   if (!Array.isArray(parsed.recommendations) || parsed.recommendations.some((item) =>
@@ -139,7 +140,12 @@ function parseDraft(text: string, sources: TrendCandidate[], catalog: CatalogIte
   };
 }
 
-async function generateWithGemini(prompt: string, model = process.env.GEMINI_MODEL?.trim() || 'gemini-2.5-flash', timeoutMs = 45_000): Promise<string> {
+/** Gemini answers 503 or 429 when a model is overloaded: worth another try, or another model. */
+class GeminiBusyError extends Error {}
+/** The model no longer exists for this key (404): skipped until the server restarts. */
+const retiredGeminiModels = new Set<string>();
+
+async function generateWithGemini(prompt: string, model = process.env.GEMINI_MODEL?.trim() || 'gemini-3.5-flash', timeoutMs = 45_000): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new Error('GEMINI_API_KEY est manquante.');
   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
@@ -150,10 +156,57 @@ async function generateWithGemini(prompt: string, model = process.env.GEMINI_MOD
     signal: AbortSignal.timeout(timeoutMs),
   });
   const data = await response.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>; error?: { message?: string } };
+  if (response.status === 404) retiredGeminiModels.add(model);
+  if (response.status === 503 || response.status === 429) throw new GeminiBusyError(data.error?.message || `Gemini ${model} est surchargé.`);
   if (!response.ok) throw new Error(data.error?.message || `Gemini a répondu ${response.status}.`);
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
   if (!text) throw new Error('Gemini n’a renvoyé aucun contenu.');
   return text;
+}
+
+/**
+ * Models tried in turn for long texts: GEMINI_MODEL, then GEMINI_FALLBACK_MODELS (comma
+ * separated), then models known to answer. An overloaded model gets a second try after a pause;
+ * a model that no longer exists is skipped.
+ */
+function geminiModels(): string[] {
+  const fallbacks = process.env.GEMINI_FALLBACK_MODELS?.split(',') ?? ['gemini-3.5-flash', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite'];
+  return Array.from(new Set([process.env.GEMINI_MODEL, ...fallbacks].map((model) => model?.trim()).filter((model): model is string => Boolean(model))))
+    .filter((model) => !retiredGeminiModels.has(model));
+}
+
+const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function generateWithGeminiModels(prompt: string): Promise<string> {
+  let lastError: unknown = new Error('Aucun modèle Gemini disponible.');
+  for (const model of geminiModels()) {
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      try {
+        return await generateWithGemini(prompt, model, 90_000);
+      } catch (error) {
+        lastError = error;
+        const busy = error instanceof GeminiBusyError || (error instanceof Error && error.name === 'TimeoutError');
+        if (!busy || attempt === 2) break;
+        await pause(4_000);
+      }
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error('Aucun modèle Gemini disponible.');
+}
+
+/**
+ * A provider whose account has no credit left is set aside for a while instead of being called,
+ * and failing, on every generation.
+ */
+const SUSPENDED_MS = 6 * 3600_000;
+const suspendedProviders = new Map<AiProvider, number>();
+const OUT_OF_CREDIT = /no credits|insufficient[_ ]quota|exceeded your current quota|billing|payment required|credit balance/i;
+
+function isSuspended(provider: AiProvider): boolean {
+  const until = suspendedProviders.get(provider) ?? 0;
+  if (until > Date.now()) return true;
+  suspendedProviders.delete(provider);
+  return false;
 }
 
 async function generateWithOllama(prompt: string): Promise<string> {
@@ -172,7 +225,7 @@ async function generateWithOllama(prompt: string): Promise<string> {
   return data.response;
 }
 
-async function generateWithCompatibleProvider(provider: 'openai' | 'openrouter' | 'deepseek', prompt: string, maxTokens = 3000): Promise<string> {
+async function generateWithCompatibleProvider(provider: 'openai' | 'openrouter' | 'deepseek', prompt: string, maxTokens = 8000): Promise<string> {
   const configuration = {
     openai: {
       apiKey: process.env.OPENAI_API_KEY?.trim(),
@@ -209,8 +262,8 @@ async function generateWithCompatibleProvider(provider: 'openai' | 'openrouter' 
       model: configuration.model,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.4,
-      // Bound provider cost and avoid OpenRouter's much larger implicit default.
-      // 3,000 tokens is sufficient for the CM kit and planning assist; social copies ask for more.
+      // Bounds the cost and avoids OpenRouter's much larger implicit default. 8,000 tokens leave room
+      // for a 1,000-word article in JSON, plus the reasoning that free models count in it.
       ...(provider === 'openrouter' ? { max_tokens: maxTokens } : {}),
       response_format: { type: 'json_object' },
     }),
@@ -236,14 +289,14 @@ async function generateWithCompatibleProvider(provider: 'openai' | 'openrouter' 
 
 async function generateWithProvider(provider: AiProvider, prompt: string): Promise<string> {
   if (provider === 'ollama') return generateWithOllama(prompt);
-  if (provider === 'gemini') return generateWithGemini(prompt);
+  if (provider === 'gemini') return generateWithGeminiModels(prompt);
   return generateWithCompatibleProvider(provider, prompt);
 }
 
 // Textes courts (kits du CM, recherches de photo) : modèles Gemini légers, qui répondent en quelques secondes
-// quand le modèle principal est saturé. 3.1 garde mieux les accents que 3.5, qui reste en secours.
+// quand le modèle principal est saturé. 3.5 lite répond le plus souvent ; 3.1, souvent saturé, reste en dernier secours.
 // Chacun est essayé à son tour; GEMINI_QUICK_MODEL passe en premier.
-const QUICK_GEMINI_MODELS = ['gemini-3.1-flash-lite', 'gemini-3.5-flash-lite'];
+const QUICK_GEMINI_MODELS = ['gemini-3.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.1-flash-lite'];
 
 export async function generateQuickText(prompt: string): Promise<{ text: string; provider: AiProvider }> {
   const models = Array.from(new Set([process.env.GEMINI_QUICK_MODEL?.trim(), ...QUICK_GEMINI_MODELS].filter((model): model is string => Boolean(model))));
@@ -267,10 +320,12 @@ export async function generateConfiguredText(prompt: string): Promise<{ text: st
   let lastError: unknown;
   const candidates = [provider, ...getFallbackProviders().filter((fallback) => fallback !== provider)];
   for (const candidate of candidates) {
+    if (isSuspended(candidate)) continue;
     try {
       return { text: await generateWithProvider(candidate, prompt), provider: candidate };
     } catch (error) {
       lastError = error;
+      if (error instanceof Error && OUT_OF_CREDIT.test(error.message)) suspendedProviders.set(candidate, Date.now() + SUSPENDED_MS);
       // Says which provider failed, so a wrong key or an exhausted quota shows in the logs.
       if (candidate !== candidates[candidates.length - 1]) reportUserError(error, { action: `Génération IA via ${candidate}, essai du fournisseur suivant` });
     }
@@ -302,22 +357,21 @@ export async function generateEditorialDraft(candidates: TrendCandidate[], catal
   if (!catalog.length) throw new Error('Le catalogue JcHub est vide.');
   const prompt = buildPrompt(candidates, catalog, await getRecentlyPromoted());
   const provider = getProvider();
-  try {
-    const response = await generateWithProvider(provider, prompt);
-    return { ...parseDraft(response, candidates, catalog), provider };
-  } catch (error) {
-    let lastError = error;
-    for (const fallback of getFallbackProviders().filter((candidate) => candidate !== provider)) {
-      reportUserError();
-      try {
-        const response = await generateWithProvider(fallback, prompt);
-        return { ...parseDraft(response, candidates, catalog), provider: fallback };
-      } catch (fallbackError) {
-        lastError = fallbackError;
-      }
+  const providers = [provider, ...getFallbackProviders().filter((candidate) => candidate !== provider)].filter((candidate) => !isSuspended(candidate));
+  const failures: string[] = [];
+  for (const candidate of providers) {
+    try {
+      const response = await generateWithProvider(candidate, prompt);
+      return { ...parseDraft(response, candidates, catalog), provider: candidate };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (OUT_OF_CREDIT.test(message)) suspendedProviders.set(candidate, Date.now() + SUSPENDED_MS);
+      failures.push(`${candidate} : ${message.slice(0, 160)}`);
+      reportUserError(error, { action: `Brouillon éditorial via ${candidate}` });
     }
-    throw lastError;
   }
+  // Every provider is named, so the admin knows which key or quota to look at.
+  throw new Error(`Aucun fournisseur IA n’a produit le brouillon. ${failures.join(' | ') || 'Tous les fournisseurs sont suspendus.'}`);
 }
 
 export async function saveEditorialDraft(draft: EditorialDraft) {

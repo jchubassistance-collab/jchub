@@ -1,8 +1,13 @@
 ---
 slug: agentic-web-moteurs-multimodaux-base64-payloads
-title: "Agentic Web et Moteurs Multimodaux : Optimiser l'intégration des Payloads Binaires et Base64"
-description: 'Analyse des tendances actuelles autour des agents web ultra-rapides et des modèles multimodaux embarqués, avec un guide pratique sur la gestion et le débogage de payloads Base64 pour vos APIs.'
-excerpt: 'Analyse des tendances actuelles autour des agents web ultra-rapides et des modèles multimodaux embarqués, avec un guide pratique sur la gestion et le débogage de payloads Base64 pour vos APIs.'
+title: 'Agentic Web et IA multimodale : bien gérer le Base64'
+description: >-
+  Agents web rapides et modèles multimodaux : ce qui change pour vos API, avec
+  un guide pratique pour gérer et déboguer vos payloads Base64.
+excerpt: >-
+  Analyse des tendances actuelles autour des agents web ultra-rapides et des
+  modèles multimodaux embarqués, avec un guide pratique sur la gestion et le
+  débogage de payloads Base64 pour vos APIs.
 category: Développement
 keywords:
   - développement
@@ -12,15 +17,6 @@ tags:
   - technologie
 author: JcHub
 image: /blog/covers/agentic-web-moteurs-multimodaux-base64-payloads.jpg
-photo:
-  id: "iar-afB0QQw"
-  url: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMGRhdGElMjBzdHJlYW18ZW58MXwwfHx8MTc5MjkyMTc5NHww&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMGRhdGElMjBzdHJlYW18ZW58MXwwfHx8MTc5MjkyMTc5NHww&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "Matrix movie still"
-  author: "Markus Spiske"
-  authorUrl: "https://unsplash.com/@markusspiske?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/matrix-movie-still-iar-afB0QQw?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/iar-afB0QQw/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8YmluYXJ5JTIwY29kZSUyMGRhdGElMjBzdHJlYW18ZW58MXwwfHx8MTc5MjkyMTc5NHww"
 readTime: 5 min
 status: published
 publishedAt: '2026-10-11T09:11:02.181Z'

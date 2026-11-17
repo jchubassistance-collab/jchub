@@ -3,9 +3,20 @@
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, ArrowRight } from 'lucide-react';
+import QRCode from 'qrcode';
 import { getCurrentIdToken, resetPassword, signInWithEmail } from '@/lib/firebase-auth';
 
 const ADMIN_LAST_ACTIVITY_KEY = 'jchub_admin_last_activity';
+
+type SessionResponse = {
+  error?: string;
+  role?: string;
+  mfa?: 'setup' | 'setup-retry' | 'required' | 'locked';
+  secret?: string;
+  otpauthUri?: string;
+  recoveryCodes?: string[];
+  remainingRecoveryCodes?: number;
+};
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -16,25 +27,83 @@ export default function AdminLoginPage() {
   const [resetMode, setResetMode] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
+  // Double authentification : le jeton Firebase est gardé le temps de saisir le code.
+  const [step, setStep] = useState<'credentials' | 'code' | 'setup' | 'recovery'>('credentials');
+  const [idToken, setIdToken] = useState('');
+  const [code, setCode] = useState('');
+  const [setup, setSetup] = useState<{ secret: string; qr: string } | null>(null);
+  const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
+  const [nextPath, setNextPath] = useState('/admin');
+  const [notice, setNotice] = useState('');
+
+  const openSession = async (token: string, secondFactor?: string) => {
+    const response = await fetch('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(secondFactor ? { idToken: token, code: secondFactor } : { idToken: token }) });
+    const responseText = await response.text();
+    let data: SessionResponse = {};
+    try { data = JSON.parse(responseText) as SessionResponse; }
+    catch { throw new Error('Le serveur admin a renvoyé une réponse invalide. Réessaie dans quelques instants.'); }
+
+    if (data.mfa === 'setup' && data.secret && data.otpauthUri) {
+      const qr = await QRCode.toDataURL(data.otpauthUri, { margin: 1, width: 200 });
+      setSetup({ secret: data.secret, qr });
+      setStep('setup');
+      return;
+    }
+    if (data.mfa === 'required' || data.mfa === 'setup-retry') {
+      setStep(data.mfa === 'required' ? 'code' : 'setup');
+      if (data.error) throw new Error(data.error);
+      return;
+    }
+    if (!response.ok) throw new Error(data.error || 'Accès administrateur refusé.');
+
+    sessionStorage.setItem(ADMIN_LAST_ACTIVITY_KEY, String(Date.now()));
+    const destination = data.role === 'cm' ? '/admin/cm' : data.role === 'writer' ? '/admin/redaction' : '/admin';
+    if (data.recoveryCodes?.length) {
+      // Les codes de secours ne sont montrés qu'une fois : on attend que l'admin les ait notés.
+      setRecoveryCodes(data.recoveryCodes);
+      setNextPath(destination);
+      setStep('recovery');
+      return;
+    }
+    if (typeof data.remainingRecoveryCodes === 'number') {
+      setNotice(`Code de secours utilisé. Il en reste ${data.remainingRecoveryCodes}.`);
+      window.setTimeout(() => router.replace(destination), 2500);
+      return;
+    }
+    router.replace(destination);
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setError('');
     try {
       await signInWithEmail(email.trim().toLowerCase(), password);
-      const idToken = await getCurrentIdToken();
-      const response = await fetch('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idToken }) });
-      const responseText = await response.text();
-      let data: { error?: string } = {};
-      try { data = JSON.parse(responseText) as { error?: string }; }
-      catch { throw new Error('Le serveur admin a renvoyé une réponse invalide. Réessaie dans quelques instants.'); }
-      if (!response.ok) throw new Error(data.error || 'Accès administrateur refusé.');
-      sessionStorage.setItem(ADMIN_LAST_ACTIVITY_KEY, String(Date.now()));
-      const role = (data as { role?: string }).role;
-      router.replace(role === 'cm' ? '/admin/cm' : role === 'writer' ? '/admin/redaction' : '/admin');
+      const token = await getCurrentIdToken();
+      if (!token) throw new Error('Authentification impossible.');
+      setIdToken(token);
+      setPassword('');
+      await openSession(token);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Authentification impossible.');
     } finally { setLoading(false); }
+  };
+
+  const handleCode = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      await openSession(idToken, code);
+      setCode('');
+    } catch (cause) {
+      setCode('');
+      setError(cause instanceof Error ? cause.message : 'Code refusé.');
+    } finally { setLoading(false); }
+  };
+
+  const backToCredentials = () => {
+    setStep('credentials'); setIdToken(''); setCode(''); setSetup(null); setError(''); setNotice('');
   };
 
   const handleResetPassword = async (event: FormEvent<HTMLFormElement>) => {
@@ -70,8 +139,40 @@ export default function AdminLoginPage() {
         <div aria-hidden="true" className="h-px w-full bg-gradient-to-r from-transparent via-sky-100/50 to-transparent sm:hidden" />
 
         <section className="w-full sm:pl-0.5">
-          <h1 className="mb-4 text-[20px] font-medium text-white">{resetMode ? 'Reset Password' : 'Sign In'}</h1>
-          {resetMode ? (
+          <h1 className="mb-4 text-[20px] font-medium text-white">
+            {step === 'code' ? 'Code de vérification' : step === 'setup' ? 'Activer la double authentification' : step === 'recovery' ? 'Codes de secours' : resetMode ? 'Reset Password' : 'Sign In'}
+          </h1>
+          {step === 'recovery' ? (
+            <div className="space-y-3">
+              <p className="text-sm leading-6 text-sky-100/85">Note ces codes dans un endroit sûr (gestionnaire de mots de passe). Chacun remplace une fois le code de l’appli si tu perds ton téléphone. Ils ne seront plus affichés.</p>
+              <ul className="grid grid-cols-2 gap-1.5 rounded bg-white p-3 font-mono text-sm text-slate-800">
+                {recoveryCodes.map((value) => <li key={value}>{value}</li>)}
+              </ul>
+              <div className="flex items-center justify-between pt-1">
+                <button type="button" onClick={() => { void navigator.clipboard?.writeText(recoveryCodes.join('\n')).then(() => setNotice('Codes copiés.'), () => setNotice('Copie impossible : recopie-les à la main.')); }} className="text-sm italic text-white/70 transition hover:text-white">Copier les codes</button>
+                <button type="button" onClick={() => router.replace(nextPath)} className="group inline-flex items-center gap-1.5 text-[20px] font-medium text-white transition hover:text-sky-100">J’ai noté<ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" /></button>
+              </div>
+              {notice && <p className="text-sm text-emerald-100">{notice}</p>}
+            </div>
+          ) : step === 'code' || step === 'setup' ? (
+            <form className="space-y-3" onSubmit={handleCode}>
+              {step === 'setup' && setup ? (
+                <>
+                  <p className="text-sm leading-6 text-sky-100/85">Scanne ce QR code avec une appli d’authentification (Google Authenticator, Microsoft Authenticator, Authy…), puis saisis le code à 6 chiffres qu’elle affiche.</p>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- QR code généré dans le navigateur (data URL). */}
+                  <img src={setup.qr} alt="QR code à scanner avec l’appli d’authentification" width={200} height={200} className="rounded bg-white p-2" />
+                  <p className="text-xs leading-5 text-sky-100/70">Sans QR code, saisis cette clé dans l’appli :<br /><span className="select-all break-all font-mono text-white">{setup.secret.match(/.{1,4}/g)?.join(' ')}</span></p>
+                </>
+              ) : (
+                <p className="text-sm leading-6 text-sky-100/85">Saisis le code à 6 chiffres de ton appli d’authentification, ou un code de secours.</p>
+              )}
+              <label className="sr-only" htmlFor="admin-code">Code</label>
+              <input id="admin-code" required autoFocus inputMode={step === 'setup' ? 'numeric' : 'text'} autoComplete="one-time-code" maxLength={20} value={code} onChange={(event) => setCode(event.target.value)} className="h-11 w-full border border-white/15 bg-white px-3.5 font-mono text-base tracking-[.3em] text-slate-700 outline-none placeholder:tracking-normal placeholder:text-slate-400 transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200/40" placeholder={step === 'setup' ? '123456' : '123456 ou ABCD-EFGH'} />
+              {error && <ErrorMessage text={error} />}
+              {notice && <p className="text-sm text-emerald-100">{notice}</p>}
+              <div className="flex items-center justify-between pt-1"><button type="button" onClick={backToCredentials} className="text-sm italic text-white/70 transition hover:text-white">Retour</button><button type="submit" disabled={loading || !code.trim()} className="group inline-flex items-center gap-1.5 text-[20px] font-medium text-white transition hover:text-sky-100 disabled:opacity-60"><span>{loading ? 'Vérification…' : 'Valider'}</span><ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" /></button></div>
+            </form>
+          ) : resetMode ? (
             <form className="space-y-3" onSubmit={handleResetPassword}>
               <label className="sr-only" htmlFor="admin-email-reset">Email</label>
               <input id="admin-email-reset" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="h-11 w-full border border-white/15 bg-white px-3.5 text-base text-slate-700 outline-none placeholder:text-slate-400 transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200/40" placeholder="Email" />

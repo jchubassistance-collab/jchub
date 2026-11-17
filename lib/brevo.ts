@@ -16,6 +16,25 @@ export function newsletterListId(locale: Locale): number | null {
   return Number.isInteger(listId) && listId > 0 ? listId : null;
 }
 
+/**
+ * Adds a confirmed address to the newsletter list of its language (the French one when English
+ * has none). Only call it once the owner of the address has proved it by opening a link.
+ */
+export async function addNewsletterContact(email: string, locale: Locale): Promise<{ ok: true } | { ok: false; status: number; error: string; listId: number }> {
+  const listId = newsletterListId(locale) ?? newsletterListId('fr');
+  if (listId === null) throw new Error('BREVO_LIST_ID invalide');
+  const apiKey = process.env.BREVO_API_KEY?.trim();
+  if (!apiKey) throw new Error('Variable BREVO_API_KEY manquante');
+  const response = await fetch('https://api.brevo.com/v3/contacts', {
+    method: 'POST',
+    headers: { accept: 'application/json', 'api-key': apiKey, 'content-type': 'application/json' },
+    body: JSON.stringify({ email, listIds: [listId], updateEnabled: true }),
+    cache: 'no-store',
+  });
+  if (response.ok) return { ok: true };
+  return { ok: false, status: response.status, error: (await response.text()).slice(0, 300), listId };
+}
+
 const EMAIL_TEXTS: Record<Locale, { newTool: string; newArticle: string; discoverTool: string; readArticle: string; footer: string }> = {
   fr: { newTool: 'Nouvel outil', newArticle: 'Nouvel article', discoverTool: 'Découvrir l’outil', readArticle: 'Lire l’article', footer: 'JcHub · Des outils et ressources numériques utiles.' },
   en: { newTool: 'New tool', newArticle: 'New article', discoverTool: 'Discover the tool', readArticle: 'Read the article', footer: 'JcHub · Useful digital tools and resources.' },

@@ -174,6 +174,8 @@ export function shouldTrackRequest(input: { pathname: string; method: string; ge
   const { pathname, method } = input;
   if (method === 'OPTIONS') return false;
   if (isReportsPath(pathname)) return false;
+  // The Control Center's own collection: one entry per beacon would double the reports for nothing.
+  if (pathname === '/api/track') return false;
   if (pathname.startsWith('/_next/') || pathname.startsWith('/__nextjs')) return false;
   if (ASSET_EXTENSION.test(pathname) && !isSuspiciousPath(pathname)) return false;
   const purpose = `${input.get('sec-purpose') || ''} ${input.get('purpose') || ''}`;
@@ -240,6 +242,7 @@ const API_INTENTS: Record<string, string | Record<string, string>> = {
 
 const CRON_LABELS: Record<string, string> = {
   'editorial-agent': 'agent éditorial de la semaine',
+  backup: 'sauvegarde quotidienne des données',
   'translate-content': 'traduction des contenus',
   'publish-scheduled': 'publication des contenus programmés',
   'publish-tool-devto': 'publication d’un outil sur DEV',
@@ -252,7 +255,7 @@ const CRON_LABELS: Record<string, string> = {
 };
 
 const ADMIN_SECTIONS: Record<string, string> = {
-  '': 'tableau de bord', inbox: 'boîte de réception', analytics: 'acquisition', content: 'contenus', tools: 'outils',
+  '': 'tableau de bord', backups: 'sauvegardes', activity: 'journal d’activité', sauvegardes: 'sauvegardes', journal: 'journal d’activité', inbox: 'boîte de réception', analytics: 'acquisition', content: 'contenus', tools: 'outils',
   users: 'utilisateurs', settings: 'réglages', social: 'réseaux sociaux', agent: 'agent éditorial', cm: 'espace CM',
   'cm-access': 'accès CM', 'cm-accounts': 'comptes CM', login: 'connexion', register: 'inscription', guides: 'guides',
   stats: 'statistiques', reports: 'rapports', catalog: 'catalogue', editorial: 'calendrier éditorial',

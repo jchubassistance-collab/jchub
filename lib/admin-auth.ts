@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import { getAdminAuth, getAdminDb } from '@/lib/firebase-admin';
 import { reportOutcome } from '@/lib/reports/server';
+import { logRequestActivity } from '@/lib/activity-log';
 
 export const ADMIN_SESSION_COOKIE = 'jchub_admin_session';
 
@@ -54,6 +55,7 @@ export async function requireAdmin(request: NextRequest) {
 
   // The site reports name the account behind each admin action.
   reportOutcome(request, { user: decodedToken.email || decodedToken.uid });
+  logRequestActivity(request, { uid: decodedToken.uid, email: decodedToken.email, role: 'admin' });
   return decodedToken;
 }
 
@@ -74,6 +76,7 @@ export async function requireCmActor(request: NextRequest) {
     || (await getAdminDb().collection('users').doc(decodedToken.uid).get()).data()?.role === 'admin';
   if (isAdmin || role === 'cm') {
     reportOutcome(request, { user: decodedToken.email || decodedToken.uid });
+    logRequestActivity(request, { uid: decodedToken.uid, email: decodedToken.email, role: isAdmin ? 'admin' : 'cm' });
     return { token: decodedToken, isAdmin };
   }
   throw new Error('FORBIDDEN');
@@ -121,5 +124,6 @@ export async function requireWriter(request: NextRequest): Promise<Writer> {
   const writer = writerFromToken(decodedToken);
   if (!writer) throw new Error('FORBIDDEN');
   reportOutcome(request, { user: writer.email || writer.uid });
+  logRequestActivity(request, { uid: writer.uid, email: writer.email, role: 'writer' });
   return writer;
 }

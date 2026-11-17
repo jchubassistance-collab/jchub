@@ -8,15 +8,16 @@ import type { CSSProperties } from 'react';
 import { photoDataUri } from '@/lib/photos';
 
 // Polices et logo lus une seule fois, à la première image (voir la doc Next « Using Node.js runtime with local assets »).
-const asset = (path: string) => readFile(join(process.cwd(), path));
+// Chaque chemin est écrit en entier : passé par une variable, il faisait embarquer tout le
+// projet (sources, public/…) dans chaque fonction qui dessine une carte.
 type CardFont = { name: string; data: Buffer; weight: 400 | 600 | 800; style: 'normal' };
 let assets: Promise<{ fonts: CardFont[]; logoSrc: string }> | null = null;
 function loadAssets() {
   assets ??= Promise.all([
-    asset('assets/fonts/inter-latin-400-normal.woff'),
-    asset('assets/fonts/inter-latin-600-normal.woff'),
-    asset('assets/fonts/inter-latin-800-normal.woff'),
-    asset('public/jchub-icon-192.png'),
+    readFile(join(process.cwd(), 'assets', 'fonts', 'inter-latin-400-normal.woff')),
+    readFile(join(process.cwd(), 'assets', 'fonts', 'inter-latin-600-normal.woff')),
+    readFile(join(process.cwd(), 'assets', 'fonts', 'inter-latin-800-normal.woff')),
+    readFile(join(process.cwd(), 'public', 'jchub-icon-192.png')),
   ]).then(([interRegular, interSemiBold, interExtraBold, logo]) => ({
     logoSrc: `data:image/png;base64,${logo.toString('base64')}`,
     fonts: [

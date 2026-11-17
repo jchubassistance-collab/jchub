@@ -6,7 +6,8 @@
  */
 
 /** Categories every writer starts with: each one has its English label in lib/categories.ts. Writers add others (writer_categories). */
-export const WRITER_CATEGORIES = ['Développement', 'Technologie', 'Informatique', 'Réseau', 'Sécurité', 'Productivité', 'Frontend', 'Base de données', 'Design', 'Numérique'] as const;
+/** The blog's sections first (lib/categories.ts BLOG_CATEGORIES), then the themes kept from before. */
+export const WRITER_CATEGORIES = ['Actus', 'Réseau & Télécom', 'Développement', 'IA & Automatisation', 'Informatique de base', 'Outils & Astuces', 'Entrepreneuriat', 'Sécurité', 'Productivité', 'Frontend', 'Base de données', 'Design'] as const;
 export type WriterCategory = (typeof WRITER_CATEGORIES)[number];
 
 export const WRITER_LIMITS = { title: 140, description: 500, content: 100_000, category: 50, keyword: 40, keywords: 8, slug: 90 } as const;

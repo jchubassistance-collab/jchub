@@ -1,3 +1,4 @@
+import { recordSearchTerm, searchTermTotals } from '@/lib/turso-store';
 import { createHash } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -31,6 +32,9 @@ const indexes: Partial<Record<Locale, { expires: number; index: Promise<SearchIn
 async function searchedTerms(): Promise<SearchIndex['terms']> {
   if (!hasFirebaseAdminConfig()) return [];
   const since = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+  // Turso holds the searched terms since November 2026; Firestore only as a fallback.
+  const fromTurso = await searchTermTotals(since);
+  if (fromTurso) return fromTurso;
   const snapshot = await getAdminDb().collection('nav_search_terms').where('date', '>=', since).get();
   const totals = new Map<string, number>();
   for (const doc of snapshot.docs) { const data = doc.data(); const term = String(data.term || ''); if (term) totals.set(term, (totals.get(term) || 0) + Number(data.count || 0)); }
@@ -114,6 +118,7 @@ export const POST = withReport(async function POST(request: NextRequest) {
   if (term.length < 2 || term.length > 80 || /[\w.+-]+@[\w.-]+\.[a-z]{2,}/i.test(rawTerm) || /\d{7,}/.test(rawTerm)) return NextResponse.json({ ok: false }, { status: 400 });
   try {
     const date = new Date().toISOString().slice(0, 10);
+    if (await recordSearchTerm(term, date)) return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
     const id = `${date}_${createHash('sha256').update(term).digest('hex').slice(0, 24)}`;
     await getAdminDb().collection('nav_search_terms').doc(id).set({ date, term, count: FieldValue.increment(1) }, { merge: true });
     return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });

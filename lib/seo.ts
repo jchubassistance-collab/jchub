@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getPathname } from '@/i18n/navigation';
 import { OG_LOCALE } from '@/i18n/copy';
 import { routing, type Locale } from '@/i18n/routing';
+import { getPublicBaseUrl } from '@/lib/site-url';
 
 type Href = Parameters<typeof getPathname>[0]['href'];
 
@@ -11,6 +12,23 @@ export const DEFAULT_SOCIAL_IMAGE = {
   width: 1200,
   height: 630,
   alt: 'JcHub — outils pratiques et gratuits pour développeurs',
+};
+
+/** Shared by the two root layouts (public site and admin). */
+export const SITE_METADATA: Metadata = {
+  metadataBase: new URL(getPublicBaseUrl()),
+  authors: [{ name: 'Jessy Ngnambongo' }],
+  creator: 'Jessy Ngnambongo',
+  publisher: 'Jessy Ngnambongo',
+  verification: { google: 'CHtgc4pbKQbkrHEYgwyHs--a3JugPZMg3WTy87vcJm0' },
+  icons: {
+    icon: [
+      { url: '/jchub-icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/jchub-icon-512.png', type: 'image/png', sizes: '512x512' },
+    ],
+    shortcut: '/jchub-icon-192.png',
+    apple: '/jchub-icon-192.png',
+  },
 };
 
 export function defaultSocialImage(locale: Locale) {

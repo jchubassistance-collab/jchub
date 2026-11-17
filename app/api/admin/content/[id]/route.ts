@@ -7,6 +7,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { revalidateBlog } from '@/lib/live-articles';
+import { nextPreviousSlugs } from '@/lib/slug-history';
 
 export const runtime = 'nodejs';
 
@@ -46,6 +47,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       const existing = await getAdminDb().collection('articles').where('slug', '==', slug).get();
       if (existing.docs.some((doc) => doc.id !== id)) return NextResponse.json({ error: 'Ce slug est déjà utilisé.' }, { status: 409 });
       update.slug = slug;
+      // The former address of an article already online redirects to the new one.
+      const current = String(snapshot.data()?.slug || id);
+      const previousSlugs = snapshot.data()?.publishedAt || isPublicArticleStatus(snapshot.data()?.status) ? nextPreviousSlugs(snapshot.data()?.previousSlugs, current, slug) : null;
+      if (previousSlugs) update.previousSlugs = previousSlugs;
     }
     const publishing = body.status === 'published' && snapshot.data()?.status !== 'published';
     if (body.status !== undefined) {

@@ -1,10 +1,6 @@
-import { getLocale } from 'next-intl/server';
-import { NotFoundContent, notFoundMetadata } from '@/components/NotFoundContent';
+import { LocaleNotFoundClient } from '@/components/LocaleNotFoundClient';
 
-export async function generateMetadata() {
-  return notFoundMetadata(await getLocale());
-}
-
-export default async function LocaleNotFound() {
-  return <NotFoundContent locale={await getLocale()} />;
+// No getLocale() here: it reads the headers and turns the 404 of a static page into a 500.
+export default function LocaleNotFound() {
+  return <LocaleNotFoundClient />;
 }

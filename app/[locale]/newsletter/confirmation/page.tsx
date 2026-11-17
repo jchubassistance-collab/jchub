@@ -1,3 +1,4 @@
+import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { NewsletterConfirmation } from '@/components/NewsletterConfirmation';
@@ -27,6 +28,7 @@ export default async function NewsletterConfirmationPage({ params, searchParams 
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+  setRequestLocale(locale);
   const { token } = await searchParams;
   return <NewsletterConfirmation token={typeof token === 'string' ? token : ''} />;
 }

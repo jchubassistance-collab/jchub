@@ -1,8 +1,12 @@
 ---
 slug: from-physical-to-digital-simplify-sharing-with-qr-codes
 title: 'From the physical world to digital: simplify your exchanges with QR codes'
-description: 'Find out how QR codes make it easy to share information instantly, give WiFi access and promote your projects without friction.'
-excerpt: 'Find out how QR codes make it easy to share information instantly, give WiFi access and promote your projects without friction.'
+description: >-
+  Find out how QR codes make it easy to share information instantly, give WiFi
+  access and promote your projects without friction.
+excerpt: >-
+  Find out how QR codes make it easy to share information instantly, give WiFi
+  access and promote your projects without friction.
 keywords:
   - computer science
   - technology

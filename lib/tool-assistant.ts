@@ -1,3 +1,4 @@
+import { holdSlot, reserveSlot } from '@/lib/turso-store';
 import 'server-only';
 
 import { FieldValue } from 'firebase-admin/firestore';
@@ -46,6 +47,10 @@ const mistralPacing = () => getAdminDb().collection('_aiProviderPacing').doc('mi
  */
 async function reserveMistralSlot(): Promise<number | null> {
   if (!process.env.MISTRAL_API_KEY?.trim()) return null;
+  // Turso first (one SQL statement); the Firestore transaction remains as a fallback.
+  const reserved = await reserveSlot('mistral', MISTRAL_SPACING_MS, MAX_QUEUE_WAIT_MS);
+  if (reserved === 'full') return null;
+  if (reserved !== null) return reserved;
   if (!hasFirebaseAdminConfig()) return 0;
   try {
     return await getAdminDb().runTransaction(async (tx) => {
@@ -62,9 +67,10 @@ async function reserveMistralSlot(): Promise<number | null> {
 
 /** After a Mistral 429, sends every visitor straight to OpenRouter until Mistral accepts calls again. */
 async function pauseMistral(retryAfter: string | null) {
-  if (!hasFirebaseAdminConfig()) return;
   const seconds = Number(retryAfter);
   const pauseMs = Number.isFinite(seconds) && seconds > 0 ? Math.min(seconds * 1000, 3_600_000) : 60_000;
+  if (await holdSlot('mistral', Date.now() + pauseMs)) return;
+  if (!hasFirebaseAdminConfig()) return;
   try {
     await getAdminDb().runTransaction(async (tx) => {
       const nextAt = Math.max(Date.now() + pauseMs, Number((await tx.get(mistralPacing())).data()?.nextAt || 0));

@@ -26,6 +26,7 @@ export const TOOL_COMPONENTS = [
   'UrlEncoder',
   'PdfMergeSplit',
   'LogoStudio',
+  'EmailSignatureGenerator',
   // @generated-tools: components created from the admin are inserted above this line.
 ] as const;
 

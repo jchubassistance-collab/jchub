@@ -1,3 +1,4 @@
+import { revalidateComments } from '@/lib/comments-cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAdmin } from '@/lib/admin-auth';
@@ -52,6 +53,7 @@ export async function DELETE(request: NextRequest) {
     const parsed = deleteSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) return NextResponse.json({ error: 'Commentaire invalide.' }, { status: 400 });
     await getAdminDb().collection('blog_comments').doc(parsed.data.commentId).delete();
+    revalidateComments();
     return NextResponse.json({ success: true });
   } catch (error) { return errorResponse(error); }
 }

@@ -1,7 +1,8 @@
+import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { ArrowRight, Check, Grid2X2, Lightbulb, ShieldCheck, Sparkles, Wrench, Zap } from 'lucide-react';
 import { getPublishedTools, localizeTool, toolPath } from '@/lib/tools';
-import { ToolsCatalog } from '@/components/tools/ToolsCatalog';
+import { SearchableToolsCatalog } from '@/components/tools/ToolsCatalog';
 import { CategoryLinks } from '@/components/CategoryLinks';
 import { categoryLabel, categorySlug, countByCategory } from '@/lib/categories';
 import { pageMetadata } from '@/lib/seo';
@@ -87,14 +88,17 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({ locale, title: copy[locale].metaTitle, description: copy[locale].metaDescription, href: '/outils' });
 }
 
-export default async function ToolsPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ q?: string }> }) {
+// Built once, then rebuilt at most hourly: tools appear on their publication date and visible days.
+export const revalidate = 3600;
+
+export default async function ToolsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+  setRequestLocale(locale);
   const t = copy[locale];
   const publishedTools = await getPublishedTools();
   const tools = publishedTools.map((tool) => ({ ...localizeTool(tool, locale), href: toolPath(tool, locale) }));
   const categories = countByCategory(publishedTools.map((tool) => tool.category));
-  const { q = '' } = await searchParams;
 
   return (
     <div className="template-home template-tools-page overflow-hidden bg-[#eff6ff] text-[#0f172a]" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
@@ -139,7 +143,7 @@ export default async function ToolsPage({ params, searchParams }: { params: Prom
         <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-3"><Badge>{t.library}</Badge><h2 className="text-3xl font-extrabold leading-tight sm:text-4xl" style={{ fontFamily: 'Poppins, Inter, ui-sans-serif, system-ui, sans-serif' }}>{t.libraryTitle}</h2><p className="max-w-xl text-sm leading-6 text-slate-600">{t.libraryText}</p></div>
         </div>
-        <ToolsCatalog tools={tools} initialQuery={q} />
+        <SearchableToolsCatalog tools={tools} />
       </section>
 
       <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8 lg:px-10 lg:pb-20">

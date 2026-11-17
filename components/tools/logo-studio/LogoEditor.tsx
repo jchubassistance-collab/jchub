@@ -914,11 +914,11 @@ export function LogoEditor({ active, onAddToPack, ref }: { active: boolean; onAd
   </div>;
 }
 
-function Section({ children }: { children: ReactNode }) {
+export function Section({ children }: { children: ReactNode }) {
   return <div className="space-y-3 rounded-xl border border-slate-200 p-3.5">{children}</div>;
 }
 
-function Slider({ label, value, min, max, step = 1, display, onChange }: {
+export function Slider({ label, value, min, max, step = 1, display, onChange }: {
   label: string;
   value: number;
   min: number;
@@ -937,7 +937,7 @@ function Slider({ label, value, min, max, step = 1, display, onChange }: {
   </div>;
 }
 
-function Switch({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
+export function Switch({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
   return <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)} className="flex w-full items-center justify-between gap-3 text-left text-sm font-semibold text-slate-800">
     <span>{label}</span>
     <span aria-hidden="true" className={`relative h-6 w-11 shrink-0 rounded-full transition ${checked ? 'bg-blue-600' : 'bg-slate-300'}`}>
@@ -946,7 +946,7 @@ function Switch({ label, checked, onChange }: { label: string; checked: boolean;
   </button>;
 }
 
-function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+export function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   const id = useId();
   return <div className="flex items-center justify-between gap-3">
     <label htmlFor={id} className="text-sm font-medium text-slate-700">{label}</label>
@@ -985,20 +985,20 @@ function NumberField({ label, value, min, max, suffix, onChange }: { label: stri
 }
 
 /** `label` names the button for screen readers and tooltips; `text`, shorter, is what wide screens show. */
-function ToolButton({ icon: Icon, label, text = label, title, onClick, disabled }: { icon: LucideIcon; label: string; text?: string; title?: string; onClick: () => void; disabled?: boolean }) {
+export function ToolButton({ icon: Icon, label, text = label, title, onClick, disabled }: { icon: LucideIcon; label: string; text?: string; title?: string; onClick: () => void; disabled?: boolean }) {
   return <button type="button" onClick={onClick} disabled={disabled} aria-label={label} title={title ?? label} className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40">
     <Icon className="h-4 w-4" aria-hidden="true" />
     <span className="hidden xl:inline">{text}</span>
   </button>;
 }
 
-function IconButton({ icon: Icon, label, pressed, onClick, children }: { icon: LucideIcon; label: string; pressed?: boolean; onClick: () => void; children: ReactNode }) {
+export function IconButton({ icon: Icon, label, pressed, onClick, children }: { icon: LucideIcon; label: string; pressed?: boolean; onClick: () => void; children: ReactNode }) {
   return <button type="button" onClick={onClick} aria-label={label} aria-pressed={pressed} title={label} className={`inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border px-3 text-sm font-semibold transition ${pressed ? 'border-blue-500 bg-blue-50 text-blue-800' : 'border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'}`}>
     <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
     <span className="truncate">{children}</span>
   </button>;
 }
 
-function ChipButton({ onClick, pressed, children }: { onClick: () => void; pressed?: boolean; children: ReactNode }) {
+export function ChipButton({ onClick, pressed, children }: { onClick: () => void; pressed?: boolean; children: ReactNode }) {
   return <button type="button" onClick={onClick} aria-pressed={pressed} className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${pressed ? 'border-blue-500 bg-blue-50 text-blue-800' : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-900'}`}>{children}</button>;
 }

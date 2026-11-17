@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Script from 'next/script';
 import { useLocale } from 'next-intl';
+import { trackInsight } from '@/lib/insights/client';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { Link } from '@/i18n/navigation';
 import { bilingual } from '@/i18n/copy';
@@ -49,7 +50,7 @@ function clearAnalyticsCookies() {
 }
 
 /** Audience trackers (GA4, Metricool) load only after an explicit opt-in. */
-export function AnalyticsConsent({ nonce }: { nonce?: string }) {
+export function AnalyticsConsent() {
   const t = copy[useLocale()];
   const [choice, setChoice] = useState<Choice | null>(null);
   const [bannerOpen, setBannerOpen] = useState(false);
@@ -64,6 +65,8 @@ export function AnalyticsConsent({ nonce }: { nonce?: string }) {
   }, []);
 
   const decide = (value: Choice) => {
+    // The choice itself is counted anonymously, without cookie (Control Center › Conversions).
+    trackInsight({ type: 'consent', name: value });
     try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ value, at: Date.now() })); } catch { /* Choice applies to this visit only. */ }
     setBannerOpen(false);
     if (value === 'denied' && choice === 'granted') {
@@ -79,10 +82,9 @@ export function AnalyticsConsent({ nonce }: { nonce?: string }) {
     <>
       {choice === 'granted' && (
         <>
-          <GoogleAnalytics nonce={nonce} />
+          <GoogleAnalytics />
           <Script
             src="https://tracker.metricool.com/resources/be.js"
-            nonce={nonce}
             strategy="lazyOnload"
             onLoad={() => (window as typeof window & { beTracker?: { t: (options: { hash: string }) => void } }).beTracker?.t({ hash: 'cf3c77b7b68bec375b5ba0a7a2f6716' })}
           />

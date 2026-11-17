@@ -5,28 +5,20 @@
  * writes run after it (after / waitUntil), each has a time limit and failures are only logged.
  */
 import { after, type NextRequest } from 'next/server';
-import { clientIpFromHeaders, isCloudflareIp } from '@/lib/client-ip';
 import {
-  buildRequestEntry, compactEntry, describeCause, describeIntent, errorEmail, errorFingerprint, errorReport,
-  isReportId, newReportId, redactPath, reportIdTime, requestKind, requestPath, routePattern, sanitizeContext, shouldEmailError,
-  shouldTrackRequest, toolPageSlug, truncate, visitorLocation, type StoredError, type StoredFingerprint, type StoredRequest,
+  compactEntry, describeCause, describeIntent, errorEmail, errorFingerprint, errorReport, newReportId,
+  redactPath, reportIdTime, requestKind, requestPath, routePattern, sanitizeContext, shouldEmailError,
+  truncate, type StoredError, type StoredFingerprint, type StoredRequest,
 } from '@/lib/reports/core';
-import { hasReportsDatabase, increment, rtdbGet, rtdbUpdate } from '@/lib/reports/rtdb';
+import { increment, rtdbGet, rtdbUpdate } from '@/lib/reports/rtdb';
+import { reportsEnabled, reportsEnvironment as environment, requestIdOf, requestVisitor } from '@/lib/reports/proxy';
 import type { UserErrorContext } from '@/lib/user-error';
 
-export const REQUEST_ID_HEADER = 'x-request-id';
+// The proxy's part lives in lib/reports/proxy.ts, kept light; the routes keep importing it from here.
+export { REQUEST_ID_HEADER, reportsEnabled, requestIdOf, requestVisitor, startRequestReport, writeRequestReport } from '@/lib/reports/proxy';
 
 type HeaderReader = { get(name: string): string | null };
 type Outcome = { status?: number; summary?: string; user?: string };
-
-function environment(): string {
-  return process.env.VERCEL_ENV || process.env.NODE_ENV || 'development';
-}
-
-/** Reports are written when the database is configured, never while `next build` prerenders pages. */
-export function reportsEnabled(): boolean {
-  return process.env.NEXT_PHASE !== 'phase-production-build' && hasReportsDatabase();
-}
 
 function warn(message: string, error: unknown) {
   console.warn(message, error instanceof Error ? error.message : error);
@@ -40,71 +32,6 @@ function schedule(task: () => Promise<unknown>) {
   } catch {
     // Outside a request (a script, a background task): run it now.
     void run();
-  }
-}
-
-/** Id of the entry the proxy opened for this request, or '' (request not logged). */
-export function requestIdOf(request: { headers: HeaderReader }): string {
-  const id = request.headers.get(REQUEST_ID_HEADER) || '';
-  return isReportId(id, 'r') ? id : '';
-}
-
-function visitor(headers: HeaderReader) {
-  const peer = headers.get('x-real-ip')?.trim() || '';
-  const viaCloudflare = Boolean(peer && isCloudflareIp(peer));
-  return { ip: clientIpFromHeaders(headers), viaCloudflare, ...visitorLocation(headers, viaCloudflare) };
-}
-
-async function toolName(pathname: string): Promise<string | undefined> {
-  const page = toolPageSlug(pathname);
-  if (!page) return undefined;
-  try {
-    const { tools } = await import('@/lib/tools');
-    const tool = tools.find((item) => (page.locale === 'en' ? (item.translations?.en?.slug || item.slug) : item.slug) === page.slug);
-    return tool?.name;
-  } catch {
-    return undefined;
-  }
-}
-
-// ---------------------------------------------------------------------------------------------
-// Proxy
-
-/** Proxy: the id of a new entry for this request, or '' when it is not logged. */
-export function startRequestReport(request: NextRequest): string {
-  if (!reportsEnabled()) return '';
-  const tracked = shouldTrackRequest({ pathname: request.nextUrl.pathname, method: request.method, get: (name) => request.headers.get(name) });
-  return tracked ? newReportId('r') : '';
-}
-
-/** Proxy, after the response: writes the entry (who, from where, what they wanted). */
-export async function writeRequestReport(request: NextRequest, response: Response, id: string): Promise<void> {
-  try {
-    const { search } = request.nextUrl;
-    const pathname = redactPath(request.nextUrl.pathname);
-    const location = visitor(request.headers);
-    const entry: StoredRequest = buildRequestEntry({
-      time: reportIdTime(id),
-      method: request.method,
-      pathname,
-      search,
-      host: request.headers.get('x-forwarded-host') || request.headers.get('host') || request.nextUrl.host,
-      headers: request.headers,
-      ip: location.ip,
-      viaCloudflare: location.viaCloudflare,
-      toolName: await toolName(pathname),
-      env: environment(),
-    });
-    // A response made by the proxy itself (a redirect) is final; next() and rewrites go on to the route.
-    if (!response.headers.has('x-middleware-next') && !response.headers.has('x-middleware-rewrite')) {
-      const target = response.headers.get('location');
-      entry.st = response.status;
-      entry.ms = Math.max(0, Date.now() - entry.t);
-      entry.rs = target ? `Redirigé vers ${truncate(target.replace(/^https?:\/\/[^/]+/, ''), 150)}` : `Réponse ${response.status} du proxy`;
-    }
-    await rtdbUpdate(requestPath(id), entry, 4000);
-  } catch (error) {
-    warn('Requête non journalisée.', error);
   }
 }
 
@@ -192,6 +119,11 @@ export function withReport<Args extends unknown[]>(handler: (request: NextReques
           if (typeof body?.error === 'string') summary = body.error;
         }
         await writeOutcome(request, id, { ...outcome, status: outcome.status ?? status, summary: summary || fallback });
+        // API calls also feed the Control Center: tools' processing time, routes' latency and errors.
+        if (new URL(request.url).pathname.startsWith('/api/')) {
+          const { recordApiCall } = await import('@/lib/insights/server-events');
+          await recordApiCall(request, outcome.status ?? status, Date.now() - reportIdTime(id), summary || fallback);
+        }
       });
     }
   };
@@ -231,7 +163,7 @@ export async function recordError(cause: unknown, context: ErrorRecordContext = 
     const env = environment();
     const where = context.route || path;
     const fingerprint = errorFingerprint(`${env === 'production' ? '' : `${env}:`}${where}`, `${described.name} ${described.message}`);
-    const location = headers ? visitor(headers) : null;
+    const location = headers ? requestVisitor(headers) : null;
     const userAgent = headers?.get('user-agent') || '';
     const status = context.status ?? described.status ?? (context.source === 'non gérée' ? 500 : undefined);
     const user = context.request ? actors.get(context.request) : undefined;

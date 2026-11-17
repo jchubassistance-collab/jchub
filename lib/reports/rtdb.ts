@@ -37,7 +37,9 @@ function base64Url(bytes: Uint8Array | string): string {
 }
 
 async function signedAssertion(clientEmail: string, privateKey: string): Promise<string> {
-  const pem = privateKey.replace(/-----(BEGIN|END) PRIVATE KEY-----/g, '').replace(/\s+/g, '');
+  // Only the base64 body is kept, whatever the way the key was saved (quotes, literal "\n",
+  // spaces): one stray character made atob() fail and stopped every report on 2026-11-04.
+  const pem = privateKey.replace(/\\n/g, '').replace(/-----(BEGIN|END) PRIVATE KEY-----/g, '').replace(/[^A-Za-z0-9+/=]/g, '');
   const der = Uint8Array.from(atob(pem), (character) => character.charCodeAt(0));
   const key = await crypto.subtle.importKey('pkcs8', der, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
   const now = Math.floor(Date.now() / 1000);

@@ -59,7 +59,7 @@ const PAGE_DATA: [prefix: string, urls: string[]][] = [
 
 export function prefetchPage(href: string) {
   const path = href.split('#')[0];
-  const urls = path === '/admin' ? ['/api/admin/stats'] : PAGE_DATA.find(([prefix]) => path === prefix || path.startsWith(`${prefix}/`))?.[1] || [];
+  const urls = path === '/admin' ? ['/api/admin/dashboard?days=28&lang=all'] : PAGE_DATA.find(([prefix]) => path === prefix || path.startsWith(`${prefix}/`))?.[1] || [];
   // A page opened again refreshes its own data: only what this tab never received is started early.
   urls.filter((url) => !cache.has(url) && !pending.has(url)).forEach((url) => { fetchJson(url).catch(() => undefined); });
 }

@@ -1,3 +1,4 @@
+import { cacheGet, cacheSet } from '@/lib/turso-store';
 import { createHash } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -129,7 +130,10 @@ export const POST = withReport(async function POST(request: NextRequest) {
     // English answers get their own keys; French keys keep their earlier form so cached answers stay valid.
     const cacheId = createHash('sha256').update(`${ASSISTANT_PROMPT_VERSION}:${locale === 'en' ? 'en:' : ''}${fingerprint}:${cacheQuery}`).digest('hex');
     const db = hasFirebaseAdminConfig() ? getAdminDb() : null;
-    if (db) {
+    // Cached answers live in Turso; Firestore is read only when Turso is unavailable.
+    const tursoCached = await cacheGet<ToolAssistantAnswer>(`tool-assistant:${cacheId}`);
+    if (tursoCached) return NextResponse.json({ ...present(tursoCached, catalog), source: 'cache' }, { headers: { 'Cache-Control': 'private, no-store' } });
+    if (db && tursoCached === null) {
       try {
         const cached = await db.collection('_toolAssistantCache').doc(cacheId).get();
         const expiresAt = cached.data()?.expiresAt?.toDate?.();
@@ -143,6 +147,8 @@ export const POST = withReport(async function POST(request: NextRequest) {
     if (limited) return keywordMatch.tools.length ? catalogAnswer(keywordMatch.tools as (Tool & { href: string })[], false, locale) : limited;
     const answer = present(await recommendToolsWithAi(query, catalog, locale), catalog);
     if (!answer.suggestions.length) answer.message = answer.message || t.noTool;
+    const toCache = { message: answer.message, suggestions: answer.suggestions.map(({ slug, reason }) => ({ slug, reason })) };
+    if (await cacheSet(`tool-assistant:${cacheId}`, toCache, 7 * 86400_000)) return NextResponse.json({ ...answer, source: 'ai' }, { headers: { 'Cache-Control': 'private, no-store' } });
     if (db) {
       try {
         await db.collection('_toolAssistantCache').doc(cacheId).set({ answer: { message: answer.message, suggestions: answer.suggestions.map(({ slug, reason }) => ({ slug, reason })) }, expiresAt: new Date(Date.now() + 7 * 86400_000), createdAt: FieldValue.serverTimestamp() });

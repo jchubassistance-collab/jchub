@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { getPublishedArticlesByLocale } from '@/lib/blog';
 import { getPublishedTools, toolPath } from '@/lib/tools';
 import { getPublicBaseUrl } from '@/lib/site-url';
+import { getPublishedResources } from '@/lib/resource-store';
 import { localizedPaths, type LocalizedPaths } from '@/lib/seo';
 import { countByCategory } from '@/lib/categories';
 import { blogCategoryPath, toolCategoryPath } from '@/lib/category-paths';
@@ -20,7 +21,7 @@ type Entry = MetadataRoute.Sitemap[number];
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getPublicBaseUrl();
   // The articles come from content/articles, in both languages.
-  const [{ fr: articles, en: englishArticles }, tools] = await Promise.all([getPublishedArticlesByLocale(), getPublishedTools()]);
+  const [{ fr: articles, en: englishArticles }, tools, resources] = await Promise.all([getPublishedArticlesByLocale(), getPublishedTools(), getPublishedResources()]);
   const publicPages: { href: StaticPathname; changeFrequency: Entry['changeFrequency']; priority: number }[] = [
     { href: '/', changeFrequency: 'weekly', priority: 1 },
     { href: '/blog', changeFrequency: 'daily', priority: 0.8 },
@@ -28,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { href: '/outils', changeFrequency: 'weekly', priority: 0.9 },
     { href: '/services', changeFrequency: 'monthly', priority: 0.7 },
     { href: '/kit-entrepreneur', changeFrequency: 'weekly', priority: 0.7 },
+    { href: '/ressources', changeFrequency: 'monthly', priority: 0.7 },
     { href: '/aide', changeFrequency: 'monthly', priority: 0.6 },
     { href: '/contact', changeFrequency: 'monthly', priority: 0.5 },
     { href: '/cgu', changeFrequency: 'yearly', priority: 0.2 },
@@ -63,6 +65,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...tools.filter((tool) => tool.slug.trim()).flatMap((tool) => bothLanguages(
       { fr: toolPath(tool, 'fr'), en: toolPath(tool, 'en') },
       { changeFrequency: 'monthly', priority: 0.7 },
+    )),
+    ...resources.flatMap((resource) => bothLanguages(
+      {
+        fr: getPathname({ locale: 'fr', href: { pathname: '/ressources/[slug]', params: { slug: resource.fr.slug } } }),
+        en: getPathname({ locale: 'en', href: { pathname: '/ressources/[slug]', params: { slug: resource.en.slug } } }),
+      },
+      { lastModified: resource.updated, changeFrequency: 'monthly', priority: 0.6 },
     )),
     ...countByCategory(tools.map((tool) => tool.category)).flatMap(({ category }) => bothLanguages(
       { fr: toolCategoryPath(category, 'fr'), en: toolCategoryPath(category, 'en') },

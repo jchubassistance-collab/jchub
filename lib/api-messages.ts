@@ -9,6 +9,10 @@ const ENGLISH: Record<string, string> = {
   // lib/rate-limit.ts
   'Service temporairement indisponible.': 'Service temporarily unavailable.',
   'Trop de demandes. Réessaie dans quelques instants.': 'Too many requests. Try again in a moment.',
+  // app/api/tools/email-signature-image/route.ts
+  'L’image est trop lourde (1 Mo au maximum).': 'The image is too large (1 MB at most).',
+  'Image invalide.': 'Invalid image.',
+  'Impossible d’enregistrer l’image pour le moment. Colle plutôt l’adresse d’une image déjà en ligne.': 'The image could not be saved right now. Paste the address of an image that is already online instead.',
   'Tu as utilisé tes 5 recherches assistées du jour. Reviens demain 🙂': 'You have used your 5 assisted searches for today. Come back tomorrow 🙂',
   'Limite atteinte : 5 conversions par outil et par jour. Réessaie demain.': 'Limit reached: 5 conversions per tool per day. Try again tomorrow.',
   // lib/temporary-conversion-blobs.ts
@@ -75,6 +79,11 @@ const ENGLISH: Record<string, string> = {
   'Le fichier reçu ne semble pas être un document DOCX valide.': 'The file received does not seem to be a valid DOCX document.',
   'La conversion Word vers PDF est momentanément indisponible.': 'Word to PDF conversion is temporarily unavailable.',
   'Erreur pendant la conversion du document Word en PDF.': 'Error during the Word to PDF conversion.',
+  // app/api/resources
+  'Ressource introuvable.': 'Resource not found.',
+  'Impossible d’envoyer le lien pour le moment.': 'We can’t send the link right now.',
+  'Ce lien a expiré. Demande un nouveau lien depuis la page de la ressource.': 'This link has expired. Ask for a new one from the resource page.',
+  'Impossible de préparer le fichier pour le moment.': 'We can’t prepare the file right now.',
 };
 
 /** `french` in the language of the page that called the API route. */

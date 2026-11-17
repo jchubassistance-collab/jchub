@@ -1,3 +1,4 @@
+import { articleDailyViews } from '@/lib/turso-store';
 import { NextRequest, NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { requireWriter } from '@/lib/admin-auth';
@@ -31,6 +32,19 @@ async function commentsOf(ids: string[]) {
 
 /** Views per day and language counted by the blog (blog_articles/{slug}/days), from `since`. */
 async function siteDailyViews(articles: { id: string; slug: string }[], since: string) {
+  // Turso first (one query for every article); the Firestore subcollections only as a fallback.
+  const rows = await articleDailyViews(articles.map(({ slug }) => slug), since);
+  if (rows) {
+    const idOf = new Map(articles.map(({ id, slug }) => [slug, id]));
+    const days = new Map<string, { id: string; date: string; en: number; fr: number }>();
+    for (const row of rows) {
+      const key = `${row.slug}:${row.day}`;
+      const entry = days.get(key) ?? { id: idOf.get(row.slug) ?? row.slug, date: row.day, en: 0, fr: 0 };
+      if (row.lang === 'en') entry.en += row.views; else entry.fr += row.views;
+      days.set(key, entry);
+    }
+    return Array.from(days.values());
+  }
   const db = getAdminDb();
   const snapshots = await Promise.all(articles.map(({ slug }) => db.collection('blog_articles').doc(slug).collection('days').where('date', '>=', since).get()));
   return snapshots.flatMap((snapshot, index) => snapshot.docs.map((document) => {

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { AlertCircle, ArrowLeft, Bold, Check, CircleDashed, Code, Columns2, ExternalLink, Eye, Heading2, Heading3, Heading4, Image as ImageIcon, Italic, Link2, List, ListOrdered, Loader2, Lock, Minus, Pencil, Quote, Redo2, Send, SquareCode, Trash2, Undo2, X } from 'lucide-react';
 import { articleUrl, canDelete, Card, CategoryField, deleteArticle, formatDay, Notice, StatusBadge } from '@/components/redaction/shared';
 import { publicSiteUrl, useWriter, WRITER_TIMEOUT_EVENT, type WriterTimeoutEvent } from '@/components/redaction/WriterShell';
@@ -41,8 +42,8 @@ const toolbar: Tool[][] = [
   ],
 ];
 
-const blankForm = (plannedFor: string): Form => ({ title: '', description: '', content: '', category: 'Technologie', keywords: '', plannedFor, slug: '' });
-const formOf = (article: WriterArticle): Form => ({ title: article.title, description: article.description, content: article.content, category: article.category || 'Technologie', keywords: article.keywords.join(', '), plannedFor: article.plannedFor || '', slug: article.slug });
+const blankForm = (plannedFor: string): Form => ({ title: '', description: '', content: '', category: 'Développement', keywords: '', plannedFor, slug: '' });
+const formOf = (article: WriterArticle): Form => ({ title: article.title, description: article.description, content: article.content, category: article.category || 'Développement', keywords: article.keywords.join(', '), plannedFor: article.plannedFor || '', slug: article.slug });
 const apiUrl = (id: string) => `/api/redaction/articles/${encodeURIComponent(id)}`;
 const unsavedKey = (id: string) => `jchub_writer_unsaved_${id}`;
 
@@ -358,7 +359,7 @@ export function ArticleEditor({ id: initialId, initialPlannedFor = '' }: { id?: 
                   <h1 className="mt-3 text-2xl font-black leading-tight tracking-tight text-slate-950 sm:text-3xl">{form.title || 'Titre de l’article'}</h1>
                   {form.description && <p className="mt-3 text-lg leading-8 text-slate-600">{form.description}</p>}
                   <p className="mt-4 border-b border-slate-100 pb-5 text-sm text-slate-600">Par <strong className="text-slate-900">{name}</strong> · {readTime(form.content)} de lecture</p>
-                  <div className="article-markdown article-markdown--light mt-6"><ReactMarkdown components={{ h1: ({ children }) => <h2>{children}</h2>, a: ({ href, title, children }) => <a href={href} title={title} target="_blank" rel="noreferrer">{children}</a> }}>{form.content.replace(/^\s*#\s+[^\n]*\n+/, '') || '*Le texte apparaîtra ici.*'}</ReactMarkdown></div>
+                  <div className="article-markdown article-markdown--light mt-6"><ReactMarkdown remarkPlugins={[remarkGfm]} components={{ h1: ({ children }) => <h2>{children}</h2>, a: ({ href, title, children }) => <a href={href} title={title} target="_blank" rel="noreferrer">{children}</a> }}>{form.content.replace(/^\s*#\s+[^\n]*\n+/, '') || '*Le texte apparaîtra ici.*'}</ReactMarkdown></div>
                 </article>
               </div>}
             </div>

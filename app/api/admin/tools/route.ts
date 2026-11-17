@@ -1,3 +1,4 @@
+import { revalidateTools } from '@/lib/tools-cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/admin-auth';
@@ -109,6 +110,7 @@ export async function POST(request: NextRequest) {
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       });
+      revalidateTools();
       return NextResponse.json({ id: toolReference.id, slug, status: 'draft' }, { status: 201 });
     }
 
@@ -116,6 +118,7 @@ export async function POST(request: NextRequest) {
     const name = parsed.data.name || 'Nouvel outil';
     // No default component: the admin picks an existing one or generates a new one with AI.
     await getAdminDb().collection('tools').doc(slug).set({ slug, name, description: '', category: 'Développement', icon: '🛠️', tags: [], component: '', status: 'draft', seo: { title: name, description: '', keywords: [] }, createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
+    revalidateTools();
     return NextResponse.json({ slug }, { status: 201 });
   } catch (error) {
     const code = error instanceof Error ? error.message : 'INTERNAL_ERROR';

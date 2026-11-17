@@ -59,7 +59,7 @@ test('les outils intégrés ont une adresse anglaise unique', () => {
 
 test('chaque catégorie a une adresse propre dans chaque langue, et on la retrouve à partir de cette adresse', async () => {
   const { categoryFromSlug, categorySlug, countByCategory } = await import('../lib/categories.ts');
-  const categories = ['Développement', 'Design', 'Document', 'Productivité', 'Sécurité', 'Texte', 'Encodage', 'Autre', 'Informatique', 'Frontend', 'Technologie', 'Base de données', 'Produit', 'Numérique'];
+  const categories = ['Développement', 'Design', 'Document', 'Productivité', 'Sécurité', 'Texte', 'Encodage', 'Autre', 'Informatique', 'Frontend', 'Technologie', 'Base de données', 'Produit', 'Numérique', 'Actus', 'Réseau & Télécom', 'IA & Automatisation', 'Informatique de base', 'Outils & Astuces', 'Entrepreneuriat'];
   for (const locale of ['fr', 'en']) {
     const slugs = categories.map((category) => categorySlug(category, locale));
     assert.equal(new Set(slugs).size, categories.length, `deux catégories partagent une adresse en ${locale}`);
@@ -68,6 +68,8 @@ test('chaque catégorie a une adresse propre dans chaque langue, et on la retrou
   }
   assert.equal(categorySlug('Base de données', 'fr'), 'base-de-donnees');
   assert.equal(categorySlug('Sécurité', 'en'), 'security');
+  assert.equal(categorySlug('Réseau & Télécom', 'fr'), 'reseau-telecom');
+  assert.equal(categorySlug('IA & Automatisation', 'en'), 'ai-automation');
   assert.deepEqual(countByCategory(['Design', 'Document', 'Design']), [{ category: 'Design', count: 2 }, { category: 'Document', count: 1 }]);
 });
 

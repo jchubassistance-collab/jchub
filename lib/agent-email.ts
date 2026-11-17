@@ -98,3 +98,35 @@ export async function notifyAdminOfWriterPublication(article: { title: string; d
     `${article.author} vient de publier un article depuis l’espace rédaction.\n\n${article.title}\n\n${article.description}\n\nIl sera en ligne dans quelques minutes, le temps du déploiement : ${siteUrl()}/fr/blog/${encodeURIComponent(article.slug)}\n\nPour le modifier ou le retirer (Déplacer en brouillon ou Archiver) : ${siteUrl()}/admin/content`,
   );
 }
+
+/** Sent after the weekly research of the resource agent: the drafts wait for the admin. */
+export async function notifyAdminOfResourceDrafts(drafts: { title: string; reason: string }[], failures: string[]): Promise<EmailResult> {
+  const config = adminEmailConfig();
+  if (!config) {
+    reportUserError();
+    return { ok: false, reason: 'Configuration Brevo ou adresse de notification manquante.' };
+  }
+  const list = drafts.map((draft) => `- ${draft.title}\n  Pourquoi : ${draft.reason}`).join('\n\n');
+  const problems = failures.length ? `\n\nÀ savoir :\n${failures.map((failure) => `- ${failure}`).join('\n')}` : '';
+  const subject = drafts.length
+    ? `JcHub — ${drafts.length} ressource${drafts.length > 1 ? 's' : ''} à relire`
+    : 'JcHub — la recherche de ressources n’a rien produit cette semaine';
+  const body = drafts.length
+    ? `L’agent a cherché ce que les gens demandent et a rédigé ${drafts.length} ressource${drafts.length > 1 ? 's' : ''} en brouillon, en français et en anglais :\n\n${list}${problems}\n\nRien n’est publié. Relis, corrige si besoin, puis publie : ${siteUrl()}/admin/resources`
+    : `Aucun brouillon n’a pu être créé.${problems}\n\nTu peux relancer la recherche depuis ${siteUrl()}/admin/resources`;
+  return sendAdminEmail(config, subject, body);
+}
+
+/** Sent when a weekly agent could not finish: says why, instead of failing silently. */
+export async function notifyAdminOfAgentFailure(agent: string, reason: string, retryPath: string): Promise<EmailResult> {
+  const config = adminEmailConfig();
+  if (!config) {
+    reportUserError();
+    return { ok: false, reason: 'Configuration Brevo ou adresse de notification manquante.' };
+  }
+  return sendAdminEmail(
+    config,
+    `JcHub — ${agent} n’a rien produit cette semaine`,
+    `${agent} n’a pas pu terminer.\n\nRaison : ${reason.slice(0, 1500)}\n\nSi tous les fournisseurs IA échouent, vérifie leurs clés et leurs crédits (Gemini, OpenRouter, OpenAI), puis relance depuis ${siteUrl()}${retryPath}`,
+  );
+}

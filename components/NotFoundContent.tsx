@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ArrowRight, Home, Wrench } from 'lucide-react';
-import { Link } from '@/i18n/navigation';
+import NextLink from 'next/link';
+import { getPathname } from '@/i18n/navigation';
 import { bilingual } from '@/i18n/copy';
 import type { Locale } from '@/i18n/routing';
 
@@ -48,23 +49,23 @@ export function NotFoundContent({ locale }: { locale: Locale }) {
         <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-600 sm:text-base sm:leading-7">{t.text}</p>
 
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link href="/" locale={locale} className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-[0_8px_20px_rgba(37,99,235,.2)] transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_12px_24px_rgba(37,99,235,.26)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+          <NextLink href={getPathname({ locale, href: '/' })} className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-[0_8px_20px_rgba(37,99,235,.2)] transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_12px_24px_rgba(37,99,235,.26)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
             <Home className="h-4 w-4" aria-hidden="true" />
             {t.home}
-          </Link>
-          <Link href="/outils" locale={locale} className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-blue-200 bg-white px-6 py-3 text-sm font-bold text-[#17324d] transition hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+          </NextLink>
+          <NextLink href={getPathname({ locale, href: '/outils' })} className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-blue-200 bg-white px-6 py-3 text-sm font-bold text-[#17324d] transition hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
             <Wrench className="h-4 w-4 text-blue-700" aria-hidden="true" />
             {t.tools}
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-          </Link>
+          </NextLink>
         </div>
 
         <nav aria-label={t.title} className="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-sm font-semibold text-slate-500">
-          <Link href="/outils" locale={locale} className="transition hover:text-blue-700">{t.toolsLink}</Link>
+          <NextLink href={getPathname({ locale, href: '/outils' })} className="transition hover:text-blue-700">{t.toolsLink}</NextLink>
           <span aria-hidden="true" className="h-1 w-1 rounded-full bg-blue-300" />
-          <Link href="/a-propos" locale={locale} className="transition hover:text-blue-700">{t.about}</Link>
+          <NextLink href={getPathname({ locale, href: '/a-propos' })} className="transition hover:text-blue-700">{t.about}</NextLink>
           <span aria-hidden="true" className="h-1 w-1 rounded-full bg-blue-300" />
-          <Link href="/contact" locale={locale} className="transition hover:text-blue-700">{t.contact}</Link>
+          <NextLink href={getPathname({ locale, href: '/contact' })} className="transition hover:text-blue-700">{t.contact}</NextLink>
         </nav>
       </div>
     </section>

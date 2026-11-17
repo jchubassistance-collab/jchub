@@ -1,9 +1,13 @@
 ---
 slug: du-monde-physique-au-numerique-simplifiez-vos-echanges-qr-code
 title: 'Du monde physique au numérique : simplifiez vos échanges grâce au QR Code'
-description: "Découvrez comment les QR codes facilitent le partage instantané d'informations, l'accès au WiFi et la promotion de vos projets sans friction."
-excerpt: "Découvrez comment les QR codes facilitent le partage instantané d'informations, l'accès au WiFi et la promotion de vos projets sans friction."
-category: Technologie
+description: >-
+  Découvrez comment les QR codes facilitent le partage instantané
+  d'informations, l'accès au WiFi et la promotion de vos projets sans friction.
+excerpt: >-
+  Découvrez comment les QR codes facilitent le partage instantané
+  d'informations, l'accès au WiFi et la promotion de vos projets sans friction.
+category: Outils & Astuces
 keywords:
   - informatique
   - technologie
@@ -11,20 +15,12 @@ tags:
   - Informatique
   - technologie
 author: JcHub
-image: /blog/covers/du-monde-physique-au-numerique-simplifiez-vos-echanges-qr-code.jpg
-photo:
-  id: "Q6uqw_Hjye8"
-  url: "https://images.unsplash.com/photo-1595079676339-1534801ad6cf?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c21hcnRwaG9uZSUyMHNjYW5uaW5nJTIwcXIlMjBjb2RlfGVufDF8MHx8fDE3OTI5MjE4MjZ8MA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1595079676339-1534801ad6cf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c21hcnRwaG9uZSUyMHNjYW5uaW5nJTIwcXIlMjBjb2RlfGVufDF8MHx8fDE3OTI5MjE4MjZ8MA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "black android smartphone displaying qr code"
-  author: "Markus Winkler"
-  authorUrl: "https://unsplash.com/@markuswinkler?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/black-android-smartphone-displaying-qr-code-Q6uqw_Hjye8?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/Q6uqw_Hjye8/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c21hcnRwaG9uZSUyMHNjYW5uaW5nJTIwcXIlMjBjb2RlfGVufDF8MHx8fDE3OTI5MjE4MjZ8MA"
+image: >-
+  /blog/covers/du-monde-physique-au-numerique-simplifiez-vos-echanges-qr-code.jpg
 readTime: 5 min
 status: scheduled
 scheduledFor: '2026-11-12T21:08:00.000Z'
-updatedAt: '2026-10-10T07:08:10.142Z'
+updatedAt: '2026-11-04T14:18:01.398Z'
 ---
 # Du monde physique au numérique : simplifiez vos échanges grâce au QR Code
 

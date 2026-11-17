@@ -24,7 +24,7 @@ export default function WriterCalendarPage() {
   const { articles, loaded, error, reload } = useWriterArticles();
   const today = dayKey(new Date());
   const [month, setMonth] = useState(() => { const now = new Date(); return new Date(now.getFullYear(), now.getMonth(), 1); });
-  const [idea, setIdea] = useState({ title: '', category: 'Technologie', plannedFor: today });
+  const [idea, setIdea] = useState({ title: '', category: 'Développement', plannedFor: today });
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ tone: 'error' | 'success'; text: string } | null>(null);
   const titleRef = useRef<HTMLInputElement>(null);

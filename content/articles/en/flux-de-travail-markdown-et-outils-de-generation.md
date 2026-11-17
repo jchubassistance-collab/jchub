@@ -1,12 +1,16 @@
 ---
 slug: markdown-workflow-generation-tools
-title: 'From automated scripts to visual rendering: mastering the Markdown workflow in modern projects'
-description: A look at the central role of Markdown in modern content generation architectures and technical tooling.
-excerpt: A look at the central role of Markdown in modern content generation architectures and technical tooling.
+title: Mastering the Markdown Workflow in Modern Projects
+description: >-
+  A look at the central role of Markdown in modern content generation
+  architectures and technical tooling.
+excerpt: >-
+  A look at the central role of Markdown in modern content generation
+  architectures and technical tooling.
 keywords:
   - development
   - technology
-sourceHash: 32a894ed450778199a803ce9
+sourceHash: 7fc3297d171011ec2547b4bc
 translatedAt: '2026-10-19T07:58:00.516Z'
 ---
 # From automated scripts to visual rendering: mastering the Markdown workflow in modern projects

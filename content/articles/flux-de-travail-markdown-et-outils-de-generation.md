@@ -1,8 +1,12 @@
 ---
 slug: flux-de-travail-markdown-et-outils-de-generation
-title: 'Du script automatisé au rendu visuel : maîtriser le flux Markdown dans les projets modernes'
-description: "Analyse de la centralité du Markdown dans les architectures modernes de génération de contenu et d'outillage technique."
-excerpt: "Analyse de la centralité du Markdown dans les architectures modernes de génération de contenu et d'outillage technique."
+title: Maîtriser le flux Markdown dans les projets modernes
+description: >-
+  Analyse de la centralité du Markdown dans les architectures modernes de
+  génération de contenu et d'outillage technique.
+excerpt: >-
+  Analyse de la centralité du Markdown dans les architectures modernes de
+  génération de contenu et d'outillage technique.
 category: Développement
 keywords:
   - développement
@@ -12,15 +16,6 @@ tags:
   - technologie
 author: JcHub
 image: /blog/covers/flux-de-travail-markdown-et-outils-de-generation.jpg
-photo:
-  id: "ieic5Tq8YMk"
-  url: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8bWFya2Rvd24lMjBjb2RlJTIwb24lMjBtb25pdG9yfGVufDF8MHx8fDE3OTI5MjE4Mzl8MA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8bWFya2Rvd24lMjBjb2RlJTIwb24lMjBtb25pdG9yfGVufDF8MHx8fDE3OTI5MjE4Mzl8MA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "a computer screen with a bunch of code on it"
-  author: "Chris Ried"
-  authorUrl: "https://unsplash.com/@cdr6934?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/a-computer-screen-with-a-bunch-of-code-on-it-ieic5Tq8YMk?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/ieic5Tq8YMk/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8bWFya2Rvd24lMjBjb2RlJTIwb24lMjBtb25pdG9yfGVufDF8MHx8fDE3OTI5MjE4Mzl8MA"
 readTime: 5 min
 status: published
 publishedAt: '2026-10-16T09:11:00.568Z'

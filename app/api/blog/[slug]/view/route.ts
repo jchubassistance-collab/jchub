@@ -1,3 +1,4 @@
+import { recordArticleView } from '@/lib/turso-store';
 import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
@@ -18,6 +19,11 @@ export const POST = withReport(async function POST(_request: NextRequest, { para
     if (!/^[a-z0-9-]{1,160}$/.test(slug) || !(await getPublishedArticles('fr')).some((article) => article.slugs.fr === slug)) {
       return NextResponse.json({ views: null }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     }
+    // Counted in Turso since November 2026 (lib/turso-store.ts): no Firestore read or write.
+    const lang = requestLocale(_request) === 'en' ? 'en' : 'fr';
+    const total = await recordArticleView(slug, lang);
+    if (total !== null) return NextResponse.json({ views: total }, { headers: { 'Cache-Control': 'no-store' } });
+    // Fallback while Turso is unavailable: the former Firestore counters.
     const ref = getAdminDb().collection('blog_articles').doc(slug);
     // The day's count, per language, draws the curves of the writing space (/api/redaction/performance).
     const day = new Date().toISOString().slice(0, 10);

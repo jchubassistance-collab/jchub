@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { bilingual } from '@/i18n/copy';
 import { isLocale } from '@/i18n/routing';
@@ -16,6 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return { title: t.title, description: t.description, robots: { index: false, follow: false } };
 }
 
+// The page reads its code from the address (useSearchParams): the static shell waits for it.
 export default function AuthActionLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <Suspense>{children}</Suspense>;
 }

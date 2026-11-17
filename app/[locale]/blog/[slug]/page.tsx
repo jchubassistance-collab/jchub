@@ -1,6 +1,8 @@
+import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 import { ArrowLeft, Calendar, Clock, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { BlogInteractions } from '@/components/blog/BlogInteractions';
 import { ArticleComments } from '@/components/blog/ArticleComments';
@@ -118,6 +120,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function ArticlePage({ params }: { params: Params }) {
   const { locale, slug } = await params;
   if (!isLocale(locale)) notFound();
+  setRequestLocale(locale);
   const article = await getPublishedArticleBySlug(slug, locale);
   if (!article) notFound();
   // A French slug opened in English moves to the English address.
@@ -165,7 +168,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,760px)_260px] lg:px-8 lg:py-16">
         <article className="min-w-0 rounded-[28px] border border-blue-100 bg-white px-5 py-8 shadow-[0_18px_50px_rgba(37,99,235,.08)] sm:px-10 sm:py-12 sm:px-10 sm:py-12">
           {!article.translated && <p className="mb-6 rounded-xl bg-blue-50 px-4 py-3 text-sm text-slate-600">{t.untranslated}</p>}
-          <div className="article-markdown article-markdown--light" lang={article.translated ? undefined : 'fr'}><ReactMarkdown components={{ h1: ({ children }) => <h2>{children}</h2>, a: ({ href, title, children }) => <a href={resolveLink(href)} title={title}>{children}</a> }}>{body}</ReactMarkdown></div>
+          <div className="article-markdown article-markdown--light" lang={article.translated ? undefined : 'fr'}><ReactMarkdown remarkPlugins={[remarkGfm]} components={{ h1: ({ children }) => <h2>{children}</h2>, a: ({ href, title, children }) => <a href={resolveLink(href)} title={title}>{children}</a> }}>{body}</ReactMarkdown></div>
           <div className="mt-10 flex flex-wrap gap-2 border-t border-blue-100 pt-6">
             {article.tags.map((tag) => (
               <span key={tag} className="rounded-md bg-blue-50 px-3 py-1.5 text-xs font-semibold text-slate-600">#{tag}</span>

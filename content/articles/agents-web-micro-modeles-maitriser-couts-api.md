@@ -1,8 +1,13 @@
 ---
 slug: agents-web-micro-modeles-maitriser-couts-api
-title: "Agents web et micro-modèles : comment anticiper et maîtriser l'explosion de vos factures d'API"
-description: "Avec l'émergence des agents automatisés à haute fréquence et des moteurs de décision légers, la consommation d'APIs s'accélère. Découvrez comment modéliser vos volumes de requêtes et prévenir les surcoûts d'infrastructure."
-excerpt: "Avec l'émergence des agents automatisés à haute fréquence et des moteurs de décision légers, la consommation d'APIs s'accélère. Découvrez comment modéliser vos volumes de requêtes et prévenir les surcoûts d'infrastructure."
+title: 'Agents web : maîtriser l''explosion des coûts d''API'
+description: >-
+  Les agents automatisés multiplient les appels d'API. Voici comment estimer vos
+  volumes de requêtes et éviter les mauvaises surprises sur la facture.
+excerpt: >-
+  Avec l'émergence des agents automatisés à haute fréquence et des moteurs de
+  décision légers, la consommation d'APIs s'accélère. Découvrez comment
+  modéliser vos volumes de requêtes et prévenir les surcoûts d'infrastructure.
 category: Développement
 keywords:
   - développement
@@ -12,15 +17,6 @@ tags:
   - technologie
 author: JcHub
 image: /blog/covers/agents-web-micro-modeles-maitriser-couts-api.jpg
-photo:
-  id: "OnI_TNcIv9U"
-  url: "https://images.unsplash.com/photo-1680992046626-418f7e910589?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c2VydmVyJTIwcmFjayUyMGdsb3dpbmclMjBsaWdodHN8ZW58MXwwfHx8MTc5MjkyMTgwMHww&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1680992046626-418f7e910589?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c2VydmVyJTIwcmFjayUyMGdsb3dpbmclMjBsaWdodHN8ZW58MXwwfHx8MTc5MjkyMTgwMHww&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "a rack of electronic equipment in a dark room"
-  author: "Tyler"
-  authorUrl: "https://unsplash.com/@tylergm?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/a-rack-of-electronic-equipment-in-a-dark-room-OnI_TNcIv9U?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/OnI_TNcIv9U/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8c2VydmVyJTIwcmFjayUyMGdsb3dpbmclMjBsaWdodHN8ZW58MXwwfHx8MTc5MjkyMTgwMHww"
 readTime: 5 min
 status: published
 publishedAt: '2026-10-13T09:11:00.475Z'

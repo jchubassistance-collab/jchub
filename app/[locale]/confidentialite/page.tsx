@@ -1,3 +1,4 @@
+import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { ChevronLeft, Facebook, Instagram, Lock, Mail, ShieldCheck } from 'lucide-react';
 import { pageMetadata } from '@/lib/seo';
@@ -25,8 +26,10 @@ const copy = bilingual({
     ['Contact', 'nom, email, sujet et message envoyés via le formulaire'],
     ['Commentaires', 'nom et commentaire que tu publies sous un article : ils sont visibles par tous les lecteurs'],
     ['Newsletter', 'adresse email si tu t’inscris, et la date à laquelle tu as confirmé ton inscription depuis le lien reçu par email'],
+    ['Ressources', 'adresse email si tu demandes un modèle à télécharger, le modèle demandé, les dates de demande et de téléchargement, et ton choix pour la newsletter'],
     ['Fichiers', 'documents et images que tu soumets aux outils de conversion (voir la section 4)'],
     ['Recherche d’outils', 'le texte que tu tapes dans la recherche assistée'],
+    ['Mesure d’audience JcHub', 'pages vues, outils utilisés (taille des fichiers, résultat obtenu ou erreur), défilement et temps de lecture des articles, clics vers d’autres sites, performances techniques de la page, choix sur les cookies, pays, ville et type d’appareil. Sans cookie et sans rien enregistrer sur ton appareil : ton adresse IP n’est pas conservée, elle sert seulement à calculer un identifiant anonyme qui change chaque jour, ce qui empêche de te suivre d’un jour à l’autre'],
     ['Technique', 'adresse IP et localisation approximative qui s’en déduit (pays, région, ville), navigateur et appareil, langue, pages visitées et actions effectuées sur le site avec leur résultat (journal d’activité, voir la section 7)'],
   ] as Labeled[],
   s2Title: '2. Pourquoi on collecte ces données',
@@ -83,7 +86,7 @@ const copy = bilingual({
   onFacebook: 'JcHub sur Facebook',
   onInstagram: 'JcHub sur Instagram',
   s7Title: '7. Conservation des données',
-  s7Text: 'On conserve tes données tant que ton compte est actif. Après suppression, elles sont effacées sous 30 jours (sauf obligations légales contraires). Les fichiers soumis aux outils de conversion sont effacés au plus tard sous 24 heures (voir la section 4). Pour classer les mots-clés de la recherche du menu, le terme saisi est normalisé puis compté au maximum une fois par session de navigation et par jour, sans identifiant de visiteur, sur une fenêtre statistique de 30 jours. Les adresses e-mail et les recherches contenant de longues suites de chiffres ne sont pas enregistrées. Les réponses assistées sont gardées 7 jours pour être resservies. Les commentaires des articles restent en ligne tant que l’article l’est ; écris-nous via le formulaire de contact pour faire supprimer le tien. Le journal d’activité (adresse IP, localisation approximative, navigateur, page ou action demandée et résultat) sert à la sécurité et au diagnostic des erreurs : seul l’administrateur y a accès, et ses entrées sont supprimées automatiquement après 30 jours, 90 jours pour celles qui concernent une erreur.',
+  s7Text: 'On conserve tes données tant que ton compte est actif. Après suppression, elles sont effacées sous 30 jours (sauf obligations légales contraires). Les fichiers soumis aux outils de conversion sont effacés au plus tard sous 24 heures (voir la section 4). Pour classer les mots-clés de la recherche du menu, le terme saisi est normalisé puis compté au maximum une fois par session de navigation et par jour, sans identifiant de visiteur, sur une fenêtre statistique de 30 jours. Les adresses e-mail et les recherches contenant de longues suites de chiffres ne sont pas enregistrées. Les réponses assistées sont gardées 7 jours pour être resservies. Les commentaires des articles restent en ligne tant que l’article l’est ; écris-nous via le formulaire de contact pour faire supprimer le tien. Les demandes de modèles (adresse e-mail, modèle demandé, dates) sont supprimées automatiquement après 12 mois. Les données de la mesure d’audience JcHub, anonymes, sont supprimées après 13 mois. Le journal d’activité (adresse IP, localisation approximative, navigateur, page ou action demandée et résultat) sert à la sécurité et au diagnostic des erreurs : seul l’administrateur y a accès, et ses entrées sont supprimées automatiquement après 30 jours, 90 jours pour celles qui concernent une erreur.',
   s8Title: '8. Sécurité',
   s8Text: 'Tes données sont stockées sur des serveurs sécurisés (Firebase, Vercel, Cloudinary) avec chiffrement en transit et au repos. L’accès est protégé par Firebase Auth.',
   s9Title: '9. Modifications',
@@ -106,8 +109,10 @@ const copy = bilingual({
     ['Contact', 'name, email, subject and message sent through the form'],
     ['Comments', 'the name and comment you post under an article: they are visible to all readers'],
     ['Newsletter', 'email address if you subscribe, and the date you confirmed your subscription from the link sent by email'],
+    ['Resources', 'email address if you request a template to download, the template requested, the request and download dates, and your newsletter choice'],
     ['Files', 'documents and images you submit to the conversion tools (see section 4)'],
     ['Tool search', 'the text you type in the assisted search'],
+    ['JcHub audience measurement', 'pages viewed, tools used (file size, result obtained or error), scrolling and reading time of articles, clicks to other sites, technical performance of the page, cookie choices, country, city and device type. No cookie and nothing stored on your device: your IP address is not kept, it is only used to compute an anonymous identifier that changes every day, which prevents following you from one day to the next'],
     ['Technical', 'IP address and the approximate location derived from it (country, region, city), browser and device, language, pages visited and actions taken on the site with their outcome (activity log, see section 7)'],
   ],
   s2Title: '2. Why we collect this data',
@@ -164,7 +169,7 @@ const copy = bilingual({
   onFacebook: 'JcHub on Facebook',
   onInstagram: 'JcHub on Instagram',
   s7Title: '7. Data retention',
-  s7Text: 'We keep your data as long as your account is active. After deletion, it is erased within 30 days (unless legal obligations require otherwise). Files submitted to the conversion tools are erased within 24 hours at the latest (see section 4). To rank keywords in the navigation search, each normalized search term is counted at most once per browsing session and per day, without a visitor identifier, over a 30-day statistics window. Email addresses and searches containing long digit sequences are not recorded. Assisted answers are kept for 7 days so they can be served again. Article comments stay online as long as the article does; write to us through the contact form to have yours removed. The activity log (IP address, approximate location, browser, requested page or action and outcome) is used for security and error diagnosis: only the administrator can access it, and its entries are deleted automatically after 30 days, 90 days for those about an error.',
+  s7Text: 'We keep your data as long as your account is active. After deletion, it is erased within 30 days (unless legal obligations require otherwise). Files submitted to the conversion tools are erased within 24 hours at the latest (see section 4). To rank keywords in the navigation search, each normalized search term is counted at most once per browsing session and per day, without a visitor identifier, over a 30-day statistics window. Email addresses and searches containing long digit sequences are not recorded. Assisted answers are kept for 7 days so they can be served again. Article comments stay online as long as the article does; write to us through the contact form to have yours removed. Template requests (email address, template requested, dates) are deleted automatically after 12 months. The anonymous data of the JcHub audience measurement is deleted after 13 months. The activity log (IP address, approximate location, browser, requested page or action and outcome) is used for security and error diagnosis: only the administrator can access it, and its entries are deleted automatically after 30 days, 90 days for those about an error.',
   s8Title: '8. Security',
   s8Text: 'Your data is stored on secure servers (Firebase, Vercel, Cloudinary) with encryption in transit and at rest. Access is protected by Firebase Auth.',
   s9Title: '9. Changes',
@@ -180,6 +185,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function ConfidentialitePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+  setRequestLocale(locale);
   const t = copy[locale];
   return (
     <div className="template-home min-h-screen overflow-hidden bg-[#eff6ff] text-[#0f172a]">

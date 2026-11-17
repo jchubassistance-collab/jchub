@@ -11,3 +11,9 @@
 /tste.txt
 /backup-securite-*/
 /tests/
+
+/.data
+
+/test-results/
+/playwright-report/
+/tests/e2e/

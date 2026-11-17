@@ -17,7 +17,7 @@ function getCredentials() {
   return { email, privateKey, propertyId };
 }
 
-async function getAccessToken() {
+export async function getAccessToken() {
   const credentials = getCredentials();
   if (!credentials) return null;
   const header = base64Url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
@@ -41,7 +41,7 @@ async function getAccessToken() {
   return { token: data.access_token, propertyId: credentials.propertyId };
 }
 
-async function runReport(access: { token: string; propertyId: string }, dimensions: string[], metrics: string[], limit = 10, startDate = '28daysAgo', endDate = 'yesterday', chronological = false, dimensionFilter?: unknown): Promise<Report> {
+export async function runReport(access: { token: string; propertyId: string }, dimensions: string[], metrics: string[], limit = 10, startDate = '28daysAgo', endDate = 'yesterday', chronological = false, dimensionFilter?: unknown): Promise<Report> {
   const response = await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${access.propertyId}:runReport`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${access.token}`, 'Content-Type': 'application/json' },
@@ -53,7 +53,7 @@ async function runReport(access: { token: string; propertyId: string }, dimensio
   return data;
 }
 
-function rowsToObjects(report: Report) {
+export function rowsToObjects(report: Report) {
   const dimensions = (report.dimensionHeaders || []).map((header) => header.name || 'dimension');
   const metrics = (report.metricHeaders || []).map((header) => header.name || 'metric');
   return (report.rows || []).map((row) => Object.fromEntries([
@@ -163,5 +163,58 @@ export async function getGa4ArticleStats(paths: string[], days: number) {
     devices: rowsToObjects(devices).map((row) => ({ name: String(row.deviceCategory), views: Number(row.screenPageViews || 0) })),
     channels: rowsToObjects(channels).map((row) => ({ name: String(row.sessionDefaultChannelGroup), views: Number(row.screenPageViews || 0) })),
     countries: rowsToObjects(countries).map((row) => ({ name: String(row.country), views: Number(row.screenPageViews || 0) })),
+  };
+}
+
+export type DashboardLang = 'all' | 'fr' | 'en';
+
+/**
+ * Everything the admin dashboard shows from Google Analytics, for the last `days` days and the
+ * same length just before (to compare), optionally limited to the French or English pages.
+ */
+export async function getGa4Dashboard(days: number, lang: DashboardLang = 'all') {
+  const access = await getAccessToken();
+  if (!access) return { configured: false as const };
+  const current = [`${days}daysAgo`, 'yesterday'] as const;
+  const previous = [`${days * 2}daysAgo`, `${days + 1}daysAgo`] as const;
+  const langFilter = lang === 'all' ? undefined : { filter: { fieldName: 'pagePath', stringFilter: { matchType: 'BEGINS_WITH', value: `/${lang}/`, caseSensitive: true } } };
+  const blogFilter = { filter: { fieldName: 'pagePath', stringFilter: { matchType: 'FULL_REGEXP', value: lang === 'all' ? '^/((fr|en)/)?blog(/.*)?$' : `^/${lang}/blog(/.*)?$`, caseSensitive: true } } };
+  const totals = ['activeUsers', 'screenPageViews', 'sessions', 'newUsers', 'bounceRate', 'averageSessionDuration', 'conversions'];
+  const [now, before, daily, dailyBefore, monthly, heat, channels, countries, devices, pages] = await Promise.all([
+    runReport(access, [], totals, 1, ...current, false, langFilter),
+    runReport(access, [], totals, 1, ...previous, false, langFilter),
+    runReport(access, ['date'], ['activeUsers', 'screenPageViews'], 400, ...current, true, langFilter),
+    runReport(access, ['date'], ['activeUsers', 'screenPageViews'], 400, ...previous, true, langFilter),
+    runReport(access, ['yearMonth'], ['screenPageViews'], 13, '365daysAgo', 'yesterday', true, blogFilter),
+    runReport(access, ['dayOfWeek', 'hour'], ['screenPageViews'], 200, ...current, false, langFilter),
+    runReport(access, ['sessionDefaultChannelGroup'], ['sessions'], 10, ...current, false, langFilter),
+    runReport(access, ['countryId', 'country'], ['activeUsers'], 250, ...current, false, langFilter),
+    runReport(access, ['deviceCategory'], ['activeUsers'], 5, ...current, false, langFilter),
+    runReport(access, ['pagePath'], ['screenPageViews'], 500, ...current, false, langFilter),
+  ]);
+  const summary = (report: Report) => {
+    const row = rowsToObjects(report)[0] || {};
+    return {
+      visitors: Number(row.activeUsers || 0),
+      pageViews: Number(row.screenPageViews || 0),
+      sessions: Number(row.sessions || 0),
+      newUsers: Number(row.newUsers || 0),
+      bounceRate: Number((Number(row.bounceRate || 0) * 100).toFixed(1)),
+      averageSessionDuration: Math.round(Number(row.averageSessionDuration || 0)),
+      conversions: Number(row.conversions || 0),
+    };
+  };
+  return {
+    configured: true as const,
+    current: summary(now),
+    previous: summary(before),
+    daily: rowsToObjects(daily).map((row) => ({ date: String(row.date), visitors: Number(row.activeUsers), pageViews: Number(row.screenPageViews) })),
+    dailyPrevious: rowsToObjects(dailyBefore).map((row) => ({ date: String(row.date), visitors: Number(row.activeUsers), pageViews: Number(row.screenPageViews) })),
+    blogMonthly: rowsToObjects(monthly).map((row) => ({ month: String(row.yearMonth), views: Number(row.screenPageViews) })),
+    heatmap: rowsToObjects(heat).map((row) => ({ day: Number(row.dayOfWeek), hour: Number(row.hour), views: Number(row.screenPageViews) })),
+    channels: rowsToObjects(channels).map((row) => ({ channel: String(row.sessionDefaultChannelGroup), sessions: Number(row.sessions) })),
+    countries: rowsToObjects(countries).map((row) => ({ code: String(row.countryId), name: String(row.country), visitors: Number(row.activeUsers) })).filter((row) => /^[A-Z]{2}$/.test(row.code)),
+    devices: rowsToObjects(devices).map((row) => ({ device: String(row.deviceCategory), visitors: Number(row.activeUsers) })),
+    pages: rowsToObjects(pages).map((row) => ({ path: String(row.pagePath), views: Number(row.screenPageViews) })),
   };
 }

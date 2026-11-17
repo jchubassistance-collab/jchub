@@ -22,6 +22,10 @@
       "schedule": "0 9 * * *"
     },
     {
+      "path": "/api/cron/resource-agent",
+      "schedule": "0 7 * * 1"
+    },
+    {
       "path": "/api/cron/cm-weekly-insights",
       "schedule": "0 8 * * 1"
     },
@@ -32,6 +36,14 @@
     {
       "path": "/api/cron/cleanup-reports",
       "schedule": "30 2 * * *"
+    },
+    {
+      "path": "/api/cron/backup",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/insights-daily",
+      "schedule": "0 6 * * *"
     }
   ]
 }

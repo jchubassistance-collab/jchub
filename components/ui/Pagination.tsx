@@ -1,7 +1,6 @@
 'use client';
 
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState, type MouseEvent } from 'react';
 import { ADMIN_PAGE_SIZES, pageFromParam, pageWindow } from '@/lib/pagination';
 
@@ -10,10 +9,15 @@ const PAGE_SIZE_KEY = 'jchub-admin-page-size';
 /**
  * The page of a list, kept in the address (?page=3). The history entry is replaced, not added:
  * Back leaves the list instead of going through every page seen, and comes back to the same page.
+ * The public lists are built once (static pages), so the address is read in the browser after
+ * the first render, not with useSearchParams: the built page shows page 1.
  */
 export function usePageParam(): [number, (page: number) => void] {
-  const searchParams = useSearchParams();
-  const [page, setPageState] = useState(() => pageFromParam(searchParams?.get('page')));
+  const [page, setPageState] = useState(1);
+  useEffect(() => {
+    const fromAddress = pageFromParam(new URLSearchParams(window.location.search).get('page'));
+    if (fromAddress > 1) setPageState(fromAddress);
+  }, []);
   const setPage = useCallback((next: number) => {
     const value = Math.max(1, Math.floor(next));
     setPageState(value);
@@ -53,8 +57,12 @@ export function LoadMore({ shown, total, nextPage, counter, label, onMore }: {
   label: string;
   onMore: () => void;
 }) {
-  const searchParams = useSearchParams();
-  const params = new URLSearchParams(searchParams?.toString());
+  // The other parameters of the address (a search, for instance) are kept, once known in the browser.
+  const [search, setSearch] = useState('');
+  useEffect(() => {
+    setSearch(window.location.search);
+  }, []);
+  const params = new URLSearchParams(search);
   params.set('page', String(nextPage));
   const click = (event: MouseEvent<HTMLAnchorElement>) => {
     // Ctrl or middle click still opens the next page in a new tab.

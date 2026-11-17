@@ -1,3 +1,4 @@
+import { setRequestLocale } from 'next-intl/server';
 import Image from 'next/image';
 import NextLink from 'next/link';
 import { notFound } from 'next/navigation';
@@ -167,11 +168,15 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({ locale, title: copy[locale].metaTitle, description: copy[locale].metaDescription, href: '/', absoluteTitle: true });
 }
 
-export const dynamic = 'force-dynamic';
+// Built once, then rebuilt at most hourly: tools appear on their publication date and visible days.
+export const revalidate = 3600;
+// Only /fr and /en: any other first segment (/wp-login.php) is a 404, without rendering the page.
+export const dynamicParams = false;
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+  setRequestLocale(locale);
   const t = copy[locale];
   const featuredTools = tools.filter((tool) => tool.status !== 'draft' && isToolVisibleToday(tool)).slice(0, 3);
   const recentArticles = (await getPublishedArticles(locale))

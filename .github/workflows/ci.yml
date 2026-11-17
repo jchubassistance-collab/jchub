@@ -1,12 +1,17 @@
-# Lint and unit tests on every Pull Request, including tools generated from the admin.
-# Type checking happens in the Vercel preview build, which must succeed before the
-# admin can approve a generated tool.
+# Types, lint and unit tests on every push and Pull Request, including tools generated from
+# the admin (their Vercel preview build must also succeed before the admin approves them).
+# Nothing is deployed from here: production is deployed with `vercel --prod`.
 name: CI
 
 on:
-  pull_request:
   push:
-    branches: [main]
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -14,12 +19,23 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+
       - run: npm ci
-      - run: npm run lint
-      - run: npm test
+
+      # Route types (.next/types) are needed by tsc, without building the site.
+      - name: Types
+        run: npm run -s typecheck
+
+      - name: Lint
+        run: npm run -s lint
+
+      - name: Unit tests
+        run: npm test

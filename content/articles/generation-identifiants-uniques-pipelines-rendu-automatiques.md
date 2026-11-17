@@ -1,8 +1,13 @@
 ---
 slug: generation-identifiants-uniques-pipelines-rendu-automatiques
-title: "Génération d'identifiants uniques dans les pipelines de rendu automatisés : Enjeux et bonnes pratiques"
-description: "Analyse de la gestion d'état et de l'unicité des ressources dans les workflows de génération de contenu par le code, et présentation du générateur d'UUID de JcHub."
-excerpt: "Analyse de la gestion d'état et de l'unicité des ressources dans les workflows de génération de contenu par le code, et présentation du générateur d'UUID de JcHub."
+title: Identifiants uniques dans les pipelines automatisés
+description: >-
+  Comment garantir l'unicité des ressources dans les workflows qui génèrent du
+  contenu par le code, et créer vos UUID avec le générateur gratuit de JcHub.
+excerpt: >-
+  Analyse de la gestion d'état et de l'unicité des ressources dans les workflows
+  de génération de contenu par le code, et présentation du générateur d'UUID de
+  JcHub.
 category: Développement
 keywords:
   - développement
@@ -12,15 +17,6 @@ tags:
   - technologie
 author: JcHub
 image: /blog/covers/generation-identifiants-uniques-pipelines-rendu-automatiques.jpg
-photo:
-  id: "cvBBO4PzWPg"
-  url: "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8dW5pcXVlJTIwY29kZSUyMHN0cmluZyUyMHRlcm1pbmFsfGVufDF8MHx8fDE3OTI5MjE4NDd8MA&ixlib=rb-4.1.0"
-  thumb: "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8dW5pcXVlJTIwY29kZSUyMHN0cmluZyUyMHRlcm1pbmFsfGVufDF8MHx8fDE3OTI5MjE4NDd8MA&ixlib=rb-4.1.0&q=80&w=400"
-  alt: "Lines of colorful JavaScript code displayed on a dark screen"
-  author: "Markus Spiske"
-  authorUrl: "https://unsplash.com/@markusspiske?utm_source=jchub&utm_medium=referral"
-  pageUrl: "https://unsplash.com/photos/javascript-code-on-dark-screen-cvBBO4PzWPg?utm_source=jchub&utm_medium=referral"
-  downloadLocation: "https://api.unsplash.com/photos/cvBBO4PzWPg/download?ixid=M3wxMTEyNzE2fDB8MXxzZWFyY2h8MXx8dW5pcXVlJTIwY29kZSUyMHN0cmluZyUyMHRlcm1pbmFsfGVufDF8MHx8fDE3OTI5MjE4NDd8MA"
 readTime: 5 min
 status: published
 publishedAt: '2026-09-16T09:39:06.057Z'

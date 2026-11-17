@@ -1,0 +1,495 @@
+/*
+ * Dark theme of the public site, applied when <html data-theme="dark"> (see lib/theme.ts).
+ *
+ * Tailwind 4 utilities read their colour from variables (bg-slate-50 → var(--color-slate-50)):
+ * the palette is redefined below, which repaints backgrounds, text, borders and hover states at
+ * once. Colours written as hex in components ([#0f172a]) or in globals.css are mapped one by one.
+ * Inside .keep-light (an e-mail preview, a document page), the light colours are kept.
+ */
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --dark-page: #0a1322;
+  --dark-surface: #111d31;
+  --dark-surface-2: #16243b;
+  --dark-border: rgba(148, 163, 184, 0.18);
+  --dark-text: #eef2f7;
+  --dark-muted: #aab7c9;
+}
+
+html[data-theme="dark"] body {
+  background-color: var(--dark-page);
+}
+
+/* Generated from node_modules/tailwindcss/theme.css: pale shades become dark tints, dark text shades become light. */
+html[data-theme="dark"] {
+  --color-slate-50: #0e1a2d;
+  --color-slate-100: #15243a;
+  --color-slate-200: #22324c;
+  --color-slate-300: #34476a;
+  --color-slate-400: #71839d;
+  --color-slate-500: #97a6bb;
+  --color-slate-600: #aab7c9;
+  --color-slate-700: #c7d1de;
+  --color-slate-800: #dee5ee;
+  --color-slate-900: #eef2f7;
+  --color-slate-950: #f8fafc;
+  --color-gray-50: #0e1a2d;
+  --color-gray-100: #15243a;
+  --color-gray-200: #22324c;
+  --color-gray-300: #34476a;
+  --color-gray-400: #71839d;
+  --color-gray-500: #97a6bb;
+  --color-gray-600: #aab7c9;
+  --color-gray-700: #c7d1de;
+  --color-gray-800: #dee5ee;
+  --color-gray-900: #eef2f7;
+  --color-gray-950: #f8fafc;
+  --color-zinc-50: #0e1a2d;
+  --color-zinc-100: #15243a;
+  --color-zinc-200: #22324c;
+  --color-zinc-300: #34476a;
+  --color-zinc-400: #71839d;
+  --color-zinc-500: #97a6bb;
+  --color-zinc-600: #aab7c9;
+  --color-zinc-700: #c7d1de;
+  --color-zinc-800: #dee5ee;
+  --color-zinc-900: #eef2f7;
+  --color-zinc-950: #f8fafc;
+  --color-neutral-50: #0e1a2d;
+  --color-neutral-100: #15243a;
+  --color-neutral-200: #22324c;
+  --color-neutral-300: #34476a;
+  --color-neutral-400: #71839d;
+  --color-neutral-500: #97a6bb;
+  --color-neutral-600: #aab7c9;
+  --color-neutral-700: #c7d1de;
+  --color-neutral-800: #dee5ee;
+  --color-neutral-900: #eef2f7;
+  --color-neutral-950: #f8fafc;
+  --color-stone-50: #0e1a2d;
+  --color-stone-100: #15243a;
+  --color-stone-200: #22324c;
+  --color-stone-300: #34476a;
+  --color-stone-400: #71839d;
+  --color-stone-500: #97a6bb;
+  --color-stone-600: #aab7c9;
+  --color-stone-700: #c7d1de;
+  --color-stone-800: #dee5ee;
+  --color-stone-900: #eef2f7;
+  --color-stone-950: #f8fafc;
+  --color-red-50: color-mix(in oklab, oklch(63.7% 0.237 25.331) 13%, #0b1424);
+  --color-red-100: color-mix(in oklab, oklch(63.7% 0.237 25.331) 20%, #0b1424);
+  --color-red-200: color-mix(in oklab, oklch(63.7% 0.237 25.331) 34%, #0b1424);
+  --color-red-300: color-mix(in oklab, oklch(63.7% 0.237 25.331) 55%, #0b1424);
+  --color-red-700: oklch(80.8% 0.114 19.571);
+  --color-red-800: oklch(88.5% 0.062 18.334);
+  --color-red-900: oklch(93.6% 0.032 17.717);
+  --color-red-950: oklch(97.1% 0.013 17.38);
+  --color-orange-50: color-mix(in oklab, oklch(70.5% 0.213 47.604) 13%, #0b1424);
+  --color-orange-100: color-mix(in oklab, oklch(70.5% 0.213 47.604) 20%, #0b1424);
+  --color-orange-200: color-mix(in oklab, oklch(70.5% 0.213 47.604) 34%, #0b1424);
+  --color-orange-300: color-mix(in oklab, oklch(70.5% 0.213 47.604) 55%, #0b1424);
+  --color-orange-700: oklch(83.7% 0.128 66.29);
+  --color-orange-800: oklch(90.1% 0.076 70.697);
+  --color-orange-900: oklch(95.4% 0.038 75.164);
+  --color-orange-950: oklch(98% 0.016 73.684);
+  --color-amber-50: color-mix(in oklab, oklch(76.9% 0.188 70.08) 13%, #0b1424);
+  --color-amber-100: color-mix(in oklab, oklch(76.9% 0.188 70.08) 20%, #0b1424);
+  --color-amber-200: color-mix(in oklab, oklch(76.9% 0.188 70.08) 34%, #0b1424);
+  --color-amber-300: color-mix(in oklab, oklch(76.9% 0.188 70.08) 55%, #0b1424);
+  --color-amber-700: oklch(87.9% 0.169 91.605);
+  --color-amber-800: oklch(92.4% 0.12 95.746);
+  --color-amber-900: oklch(96.2% 0.059 95.617);
+  --color-amber-950: oklch(98.7% 0.022 95.277);
+  --color-yellow-50: color-mix(in oklab, oklch(79.5% 0.184 86.047) 13%, #0b1424);
+  --color-yellow-100: color-mix(in oklab, oklch(79.5% 0.184 86.047) 20%, #0b1424);
+  --color-yellow-200: color-mix(in oklab, oklch(79.5% 0.184 86.047) 34%, #0b1424);
+  --color-yellow-300: color-mix(in oklab, oklch(79.5% 0.184 86.047) 55%, #0b1424);
+  --color-yellow-700: oklch(90.5% 0.182 98.111);
+  --color-yellow-800: oklch(94.5% 0.129 101.54);
+  --color-yellow-900: oklch(97.3% 0.071 103.193);
+  --color-yellow-950: oklch(98.7% 0.026 102.212);
+  --color-lime-50: color-mix(in oklab, oklch(76.8% 0.233 130.85) 13%, #0b1424);
+  --color-lime-100: color-mix(in oklab, oklch(76.8% 0.233 130.85) 20%, #0b1424);
+  --color-lime-200: color-mix(in oklab, oklch(76.8% 0.233 130.85) 34%, #0b1424);
+  --color-lime-300: color-mix(in oklab, oklch(76.8% 0.233 130.85) 55%, #0b1424);
+  --color-lime-700: oklch(89.7% 0.196 126.665);
+  --color-lime-800: oklch(93.8% 0.127 124.321);
+  --color-lime-900: oklch(96.7% 0.067 122.328);
+  --color-lime-950: oklch(98.6% 0.031 120.757);
+  --color-green-50: color-mix(in oklab, oklch(72.3% 0.219 149.579) 13%, #0b1424);
+  --color-green-100: color-mix(in oklab, oklch(72.3% 0.219 149.579) 20%, #0b1424);
+  --color-green-200: color-mix(in oklab, oklch(72.3% 0.219 149.579) 34%, #0b1424);
+  --color-green-300: color-mix(in oklab, oklch(72.3% 0.219 149.579) 55%, #0b1424);
+  --color-green-700: oklch(87.1% 0.15 154.449);
+  --color-green-800: oklch(92.5% 0.084 155.995);
+  --color-green-900: oklch(96.2% 0.044 156.743);
+  --color-green-950: oklch(98.2% 0.018 155.826);
+  --color-emerald-50: color-mix(in oklab, oklch(69.6% 0.17 162.48) 13%, #0b1424);
+  --color-emerald-100: color-mix(in oklab, oklch(69.6% 0.17 162.48) 20%, #0b1424);
+  --color-emerald-200: color-mix(in oklab, oklch(69.6% 0.17 162.48) 34%, #0b1424);
+  --color-emerald-300: color-mix(in oklab, oklch(69.6% 0.17 162.48) 55%, #0b1424);
+  --color-emerald-700: oklch(84.5% 0.143 164.978);
+  --color-emerald-800: oklch(90.5% 0.093 164.15);
+  --color-emerald-900: oklch(95% 0.052 163.051);
+  --color-emerald-950: oklch(97.9% 0.021 166.113);
+  --color-teal-50: color-mix(in oklab, oklch(70.4% 0.14 182.503) 13%, #0b1424);
+  --color-teal-100: color-mix(in oklab, oklch(70.4% 0.14 182.503) 20%, #0b1424);
+  --color-teal-200: color-mix(in oklab, oklch(70.4% 0.14 182.503) 34%, #0b1424);
+  --color-teal-300: color-mix(in oklab, oklch(70.4% 0.14 182.503) 55%, #0b1424);
+  --color-teal-700: oklch(85.5% 0.138 181.071);
+  --color-teal-800: oklch(91% 0.096 180.426);
+  --color-teal-900: oklch(95.3% 0.051 180.801);
+  --color-teal-950: oklch(98.4% 0.014 180.72);
+  --color-cyan-50: color-mix(in oklab, oklch(71.5% 0.143 215.221) 13%, #0b1424);
+  --color-cyan-100: color-mix(in oklab, oklch(71.5% 0.143 215.221) 20%, #0b1424);
+  --color-cyan-200: color-mix(in oklab, oklch(71.5% 0.143 215.221) 34%, #0b1424);
+  --color-cyan-300: color-mix(in oklab, oklch(71.5% 0.143 215.221) 55%, #0b1424);
+  --color-cyan-700: oklch(86.5% 0.127 207.078);
+  --color-cyan-800: oklch(91.7% 0.08 205.041);
+  --color-cyan-900: oklch(95.6% 0.045 203.388);
+  --color-cyan-950: oklch(98.4% 0.019 200.873);
+  --color-sky-50: color-mix(in oklab, oklch(68.5% 0.169 237.323) 13%, #0b1424);
+  --color-sky-100: color-mix(in oklab, oklch(68.5% 0.169 237.323) 20%, #0b1424);
+  --color-sky-200: color-mix(in oklab, oklch(68.5% 0.169 237.323) 34%, #0b1424);
+  --color-sky-300: color-mix(in oklab, oklch(68.5% 0.169 237.323) 55%, #0b1424);
+  --color-sky-700: oklch(82.8% 0.111 230.318);
+  --color-sky-800: oklch(90.1% 0.058 230.902);
+  --color-sky-900: oklch(95.1% 0.026 236.824);
+  --color-sky-950: oklch(97.7% 0.013 236.62);
+  --color-blue-50: color-mix(in oklab, oklch(62.3% 0.214 259.815) 13%, #0b1424);
+  --color-blue-100: color-mix(in oklab, oklch(62.3% 0.214 259.815) 20%, #0b1424);
+  --color-blue-200: color-mix(in oklab, oklch(62.3% 0.214 259.815) 34%, #0b1424);
+  --color-blue-300: color-mix(in oklab, oklch(62.3% 0.214 259.815) 55%, #0b1424);
+  --color-blue-700: oklch(80.9% 0.105 251.813);
+  --color-blue-800: oklch(88.2% 0.059 254.128);
+  --color-blue-900: oklch(93.2% 0.032 255.585);
+  --color-blue-950: oklch(97% 0.014 254.604);
+  --color-indigo-50: color-mix(in oklab, oklch(58.5% 0.233 277.117) 13%, #0b1424);
+  --color-indigo-100: color-mix(in oklab, oklch(58.5% 0.233 277.117) 20%, #0b1424);
+  --color-indigo-200: color-mix(in oklab, oklch(58.5% 0.233 277.117) 34%, #0b1424);
+  --color-indigo-300: color-mix(in oklab, oklch(58.5% 0.233 277.117) 55%, #0b1424);
+  --color-indigo-700: oklch(78.5% 0.115 274.713);
+  --color-indigo-800: oklch(87% 0.065 274.039);
+  --color-indigo-900: oklch(93% 0.034 272.788);
+  --color-indigo-950: oklch(96.2% 0.018 272.314);
+  --color-violet-50: color-mix(in oklab, oklch(60.6% 0.25 292.717) 13%, #0b1424);
+  --color-violet-100: color-mix(in oklab, oklch(60.6% 0.25 292.717) 20%, #0b1424);
+  --color-violet-200: color-mix(in oklab, oklch(60.6% 0.25 292.717) 34%, #0b1424);
+  --color-violet-300: color-mix(in oklab, oklch(60.6% 0.25 292.717) 55%, #0b1424);
+  --color-violet-700: oklch(81.1% 0.111 293.571);
+  --color-violet-800: oklch(89.4% 0.057 293.283);
+  --color-violet-900: oklch(94.3% 0.029 294.588);
+  --color-violet-950: oklch(96.9% 0.016 293.756);
+  --color-purple-50: color-mix(in oklab, oklch(62.7% 0.265 303.9) 13%, #0b1424);
+  --color-purple-100: color-mix(in oklab, oklch(62.7% 0.265 303.9) 20%, #0b1424);
+  --color-purple-200: color-mix(in oklab, oklch(62.7% 0.265 303.9) 34%, #0b1424);
+  --color-purple-300: color-mix(in oklab, oklch(62.7% 0.265 303.9) 55%, #0b1424);
+  --color-purple-700: oklch(82.7% 0.119 306.383);
+  --color-purple-800: oklch(90.2% 0.063 306.703);
+  --color-purple-900: oklch(94.6% 0.033 307.174);
+  --color-purple-950: oklch(97.7% 0.014 308.299);
+  --color-fuchsia-50: color-mix(in oklab, oklch(66.7% 0.295 322.15) 13%, #0b1424);
+  --color-fuchsia-100: color-mix(in oklab, oklch(66.7% 0.295 322.15) 20%, #0b1424);
+  --color-fuchsia-200: color-mix(in oklab, oklch(66.7% 0.295 322.15) 34%, #0b1424);
+  --color-fuchsia-300: color-mix(in oklab, oklch(66.7% 0.295 322.15) 55%, #0b1424);
+  --color-fuchsia-700: oklch(83.3% 0.145 321.434);
+  --color-fuchsia-800: oklch(90.3% 0.076 319.62);
+  --color-fuchsia-900: oklch(95.2% 0.037 318.852);
+  --color-fuchsia-950: oklch(97.7% 0.017 320.058);
+  --color-pink-50: color-mix(in oklab, oklch(65.6% 0.241 354.308) 13%, #0b1424);
+  --color-pink-100: color-mix(in oklab, oklch(65.6% 0.241 354.308) 20%, #0b1424);
+  --color-pink-200: color-mix(in oklab, oklch(65.6% 0.241 354.308) 34%, #0b1424);
+  --color-pink-300: color-mix(in oklab, oklch(65.6% 0.241 354.308) 55%, #0b1424);
+  --color-pink-700: oklch(82.3% 0.12 346.018);
+  --color-pink-800: oklch(89.9% 0.061 343.231);
+  --color-pink-900: oklch(94.8% 0.028 342.258);
+  --color-pink-950: oklch(97.1% 0.014 343.198);
+  --color-rose-50: color-mix(in oklab, oklch(64.5% 0.246 16.439) 13%, #0b1424);
+  --color-rose-100: color-mix(in oklab, oklch(64.5% 0.246 16.439) 20%, #0b1424);
+  --color-rose-200: color-mix(in oklab, oklch(64.5% 0.246 16.439) 34%, #0b1424);
+  --color-rose-300: color-mix(in oklab, oklch(64.5% 0.246 16.439) 55%, #0b1424);
+  --color-rose-700: oklch(81% 0.117 11.638);
+  --color-rose-800: oklch(89.2% 0.058 10.001);
+  --color-rose-900: oklch(94.1% 0.03 12.58);
+  --color-rose-950: oklch(96.9% 0.015 12.422);
+}
+
+/*
+ * Class overrides, in Tailwind's utilities layer with the specificity of a single class: a hover
+ * or focus utility (hover:bg-blue-50) written on the same element still wins, as in light mode.
+ */
+@layer utilities {
+  /* White surfaces: cards, panels, inputs. */
+  :where(html[data-theme="dark"]) .bg-white,
+  :where(html[data-theme="dark"]) .hover\:bg-white:hover,
+  :where(html[data-theme="dark"]) [class~="bg-white/95"],
+  :where(html[data-theme="dark"]) [class~="bg-white/90"],
+  :where(html[data-theme="dark"]) [class~="bg-white/85"] {
+    background-color: var(--dark-surface);
+  }
+
+  :where(html[data-theme="dark"]) [class~="bg-white/80"],
+  :where(html[data-theme="dark"]) [class~="bg-white/75"],
+  :where(html[data-theme="dark"]) [class~="bg-white/70"],
+  :where(html[data-theme="dark"]) [class~="bg-white/60"] {
+    background-color: rgba(17, 29, 49, 0.82);
+  }
+
+  :where(html[data-theme="dark"]) .from-white { --tw-gradient-from: var(--dark-surface); }
+  :where(html[data-theme="dark"]) .via-white { --tw-gradient-via: var(--dark-surface); }
+  :where(html[data-theme="dark"]) .to-white { --tw-gradient-to: var(--dark-surface); }
+
+  :where(html[data-theme="dark"]) .border-white,
+  :where(html[data-theme="dark"]) [class~="border-white/70"],
+  :where(html[data-theme="dark"]) [class~="border-white/50"] {
+    border-color: var(--dark-border);
+  }
+
+  /* Pale page backgrounds written in hex. */
+  :where(html[data-theme="dark"]) [class~="bg-[#eff6ff]"],
+  :where(html[data-theme="dark"]) [class~="bg-[#eff6ff]/90"],
+  :where(html[data-theme="dark"]) [class~="bg-[#f8fbff]"],
+  :where(html[data-theme="dark"]) [class~="bg-[#f5f9ff]"],
+  :where(html[data-theme="dark"]) [class~="bg-[#f8fafc]"],
+  :where(html[data-theme="dark"]) [class~="bg-[#f7f8fc]"],
+  :where(html[data-theme="dark"]) [class~="bg-[#f7f8fb]"],
+  :where(html[data-theme="dark"]) [class~="bg-[#f4f7fb]"],
+  :where(html[data-theme="dark"]) [class~="bg-[#f4f6fb]"],
+  :where(html[data-theme="dark"]) [class~="bg-[#f5f7f5]"],
+  :where(html[data-theme="dark"]) [class~="bg-[#f2f6ff]"],
+  :where(html[data-theme="dark"]) [class~="bg-[#eaf0ff]"] {
+    background-color: var(--dark-page);
+  }
+
+  :where(html[data-theme="dark"]) [class~="from-[#e8efff]"],
+  :where(html[data-theme="dark"]) [class~="from-[#d9e5ff]"],
+  :where(html[data-theme="dark"]) [class~="from-[#dbeafe]"] { --tw-gradient-from: #13264a; }
+  :where(html[data-theme="dark"]) [class~="via-[#e5f4fa]"] { --tw-gradient-via: #12283d; }
+  :where(html[data-theme="dark"]) [class~="to-[#c9d8fb]"],
+  :where(html[data-theme="dark"]) [class~="to-[#bfdbfe]"] { --tw-gradient-to: #1a3263; }
+
+  /* Dark text written in hex. */
+  :where(html[data-theme="dark"]) [class~="text-[#0f172a]"],
+  :where(html[data-theme="dark"]) [class~="text-[#0f1c3f]"],
+  :where(html[data-theme="dark"]) [class~="text-[#102b57]"],
+  :where(html[data-theme="dark"]) [class~="text-[#102a43]"],
+  :where(html[data-theme="dark"]) [class~="text-[#17324d]"],
+  :where(html[data-theme="dark"]) [class~="text-[#30343b]"] {
+    color: var(--dark-text);
+  }
+
+  /* Light-blue buttons keep their dark text. */
+  :where(html[data-theme="dark"]) [class~="bg-[#93c5fd]"][class~="text-[#0f172a]"],
+  :where(html[data-theme="dark"]) [class~="bg-[#9ccbff]"][class~="text-[#0f172a]"],
+  :where(html[data-theme="dark"]) [class~="bg-[#bfdbfe]"][class~="text-[#0f172a]"] {
+    color: #0f172a;
+  }
+
+  :where(html[data-theme="dark"]) [class~="text-[#0369fb]"],
+  :where(html[data-theme="dark"]) [class~="text-[#2457c5]"],
+  :where(html[data-theme="dark"]) [class~="text-[#2859c5]"],
+  :where(html[data-theme="dark"]) [class~="text-[#101caf]"] {
+    color: #7fb0ff;
+  }
+
+  /* Dark buttons (bg-slate-900 + white text) become the site's blue: a near-white button would hide its white text. */
+  :where(html[data-theme="dark"]) .bg-slate-900,
+  :where(html[data-theme="dark"]) .bg-slate-950,
+  :where(html[data-theme="dark"]) .bg-gray-900,
+  :where(html[data-theme="dark"]) [class~="bg-[#0f172a]"] {
+    background-color: #2563eb;
+  }
+
+  :where(html[data-theme="dark"]) .bg-slate-800,
+  :where(html[data-theme="dark"]) .bg-slate-700,
+  :where(html[data-theme="dark"]) .hover\:bg-slate-800:hover,
+  :where(html[data-theme="dark"]) .hover\:bg-slate-700:hover,
+  :where(html[data-theme="dark"]) .hover\:bg-slate-900:hover,
+  :where(html[data-theme="dark"]) .hover\:bg-slate-950:hover {
+    background-color: #1d4ed8;
+  }
+
+  :where(html[data-theme="dark"]) .border-slate-900,
+  :where(html[data-theme="dark"]) .border-slate-950 {
+    border-color: #2563eb;
+  }
+
+  /* Overlays behind menus and dialogs stay dark. */
+  :where(html[data-theme="dark"]) [class*="bg-slate-950/"],
+  :where(html[data-theme="dark"]) [class*="bg-slate-900/"] {
+    background-color: rgba(0, 0, 0, 0.55);
+  }
+
+  :where(html[data-theme="dark"]) input::placeholder,
+  :where(html[data-theme="dark"]) textarea::placeholder {
+    color: #71839d;
+  }
+
+  /* Strong backgrounds keep their real colour, so the white text on them stays readable. */
+  :where(html[data-theme="dark"]) .bg-red-700, :where(html[data-theme="dark"]) .hover\:bg-red-700:hover { background-color: oklch(50.5% 0.213 27.518); }
+  :where(html[data-theme="dark"]) .bg-red-800, :where(html[data-theme="dark"]) .hover\:bg-red-800:hover { background-color: oklch(44.4% 0.177 26.899); }
+  :where(html[data-theme="dark"]) .bg-red-900, :where(html[data-theme="dark"]) .hover\:bg-red-900:hover { background-color: oklch(39.6% 0.141 25.723); }
+  :where(html[data-theme="dark"]) .bg-red-950, :where(html[data-theme="dark"]) .hover\:bg-red-950:hover { background-color: oklch(25.8% 0.092 26.042); }
+  :where(html[data-theme="dark"]) .bg-orange-700, :where(html[data-theme="dark"]) .hover\:bg-orange-700:hover { background-color: oklch(55.3% 0.195 38.402); }
+  :where(html[data-theme="dark"]) .bg-orange-800, :where(html[data-theme="dark"]) .hover\:bg-orange-800:hover { background-color: oklch(47% 0.157 37.304); }
+  :where(html[data-theme="dark"]) .bg-orange-900, :where(html[data-theme="dark"]) .hover\:bg-orange-900:hover { background-color: oklch(40.8% 0.123 38.172); }
+  :where(html[data-theme="dark"]) .bg-orange-950, :where(html[data-theme="dark"]) .hover\:bg-orange-950:hover { background-color: oklch(26.6% 0.079 36.259); }
+  :where(html[data-theme="dark"]) .bg-amber-700, :where(html[data-theme="dark"]) .hover\:bg-amber-700:hover { background-color: oklch(55.5% 0.163 48.998); }
+  :where(html[data-theme="dark"]) .bg-amber-800, :where(html[data-theme="dark"]) .hover\:bg-amber-800:hover { background-color: oklch(47.3% 0.137 46.201); }
+  :where(html[data-theme="dark"]) .bg-amber-900, :where(html[data-theme="dark"]) .hover\:bg-amber-900:hover { background-color: oklch(41.4% 0.112 45.904); }
+  :where(html[data-theme="dark"]) .bg-amber-950, :where(html[data-theme="dark"]) .hover\:bg-amber-950:hover { background-color: oklch(27.9% 0.077 45.635); }
+  :where(html[data-theme="dark"]) .bg-yellow-700, :where(html[data-theme="dark"]) .hover\:bg-yellow-700:hover { background-color: oklch(55.4% 0.135 66.442); }
+  :where(html[data-theme="dark"]) .bg-yellow-800, :where(html[data-theme="dark"]) .hover\:bg-yellow-800:hover { background-color: oklch(47.6% 0.114 61.907); }
+  :where(html[data-theme="dark"]) .bg-yellow-900, :where(html[data-theme="dark"]) .hover\:bg-yellow-900:hover { background-color: oklch(42.1% 0.095 57.708); }
+  :where(html[data-theme="dark"]) .bg-yellow-950, :where(html[data-theme="dark"]) .hover\:bg-yellow-950:hover { background-color: oklch(28.6% 0.066 53.813); }
+  :where(html[data-theme="dark"]) .bg-lime-700, :where(html[data-theme="dark"]) .hover\:bg-lime-700:hover { background-color: oklch(53.2% 0.157 131.589); }
+  :where(html[data-theme="dark"]) .bg-lime-800, :where(html[data-theme="dark"]) .hover\:bg-lime-800:hover { background-color: oklch(45.3% 0.124 130.933); }
+  :where(html[data-theme="dark"]) .bg-lime-900, :where(html[data-theme="dark"]) .hover\:bg-lime-900:hover { background-color: oklch(40.5% 0.101 131.063); }
+  :where(html[data-theme="dark"]) .bg-lime-950, :where(html[data-theme="dark"]) .hover\:bg-lime-950:hover { background-color: oklch(27.4% 0.072 132.109); }
+  :where(html[data-theme="dark"]) .bg-green-700, :where(html[data-theme="dark"]) .hover\:bg-green-700:hover { background-color: oklch(52.7% 0.154 150.069); }
+  :where(html[data-theme="dark"]) .bg-green-800, :where(html[data-theme="dark"]) .hover\:bg-green-800:hover { background-color: oklch(44.8% 0.119 151.328); }
+  :where(html[data-theme="dark"]) .bg-green-900, :where(html[data-theme="dark"]) .hover\:bg-green-900:hover { background-color: oklch(39.3% 0.095 152.535); }
+  :where(html[data-theme="dark"]) .bg-green-950, :where(html[data-theme="dark"]) .hover\:bg-green-950:hover { background-color: oklch(26.6% 0.065 152.934); }
+  :where(html[data-theme="dark"]) .bg-emerald-700, :where(html[data-theme="dark"]) .hover\:bg-emerald-700:hover { background-color: oklch(50.8% 0.118 165.612); }
+  :where(html[data-theme="dark"]) .bg-emerald-800, :where(html[data-theme="dark"]) .hover\:bg-emerald-800:hover { background-color: oklch(43.2% 0.095 166.913); }
+  :where(html[data-theme="dark"]) .bg-emerald-900, :where(html[data-theme="dark"]) .hover\:bg-emerald-900:hover { background-color: oklch(37.8% 0.077 168.94); }
+  :where(html[data-theme="dark"]) .bg-emerald-950, :where(html[data-theme="dark"]) .hover\:bg-emerald-950:hover { background-color: oklch(26.2% 0.051 172.552); }
+  :where(html[data-theme="dark"]) .bg-teal-700, :where(html[data-theme="dark"]) .hover\:bg-teal-700:hover { background-color: oklch(51.1% 0.096 186.391); }
+  :where(html[data-theme="dark"]) .bg-teal-800, :where(html[data-theme="dark"]) .hover\:bg-teal-800:hover { background-color: oklch(43.7% 0.078 188.216); }
+  :where(html[data-theme="dark"]) .bg-teal-900, :where(html[data-theme="dark"]) .hover\:bg-teal-900:hover { background-color: oklch(38.6% 0.063 188.416); }
+  :where(html[data-theme="dark"]) .bg-teal-950, :where(html[data-theme="dark"]) .hover\:bg-teal-950:hover { background-color: oklch(27.7% 0.046 192.524); }
+  :where(html[data-theme="dark"]) .bg-cyan-700, :where(html[data-theme="dark"]) .hover\:bg-cyan-700:hover { background-color: oklch(52% 0.105 223.128); }
+  :where(html[data-theme="dark"]) .bg-cyan-800, :where(html[data-theme="dark"]) .hover\:bg-cyan-800:hover { background-color: oklch(45% 0.085 224.283); }
+  :where(html[data-theme="dark"]) .bg-cyan-900, :where(html[data-theme="dark"]) .hover\:bg-cyan-900:hover { background-color: oklch(39.8% 0.07 227.392); }
+  :where(html[data-theme="dark"]) .bg-cyan-950, :where(html[data-theme="dark"]) .hover\:bg-cyan-950:hover { background-color: oklch(30.2% 0.056 229.695); }
+  :where(html[data-theme="dark"]) .bg-sky-700, :where(html[data-theme="dark"]) .hover\:bg-sky-700:hover { background-color: oklch(50% 0.134 242.749); }
+  :where(html[data-theme="dark"]) .bg-sky-800, :where(html[data-theme="dark"]) .hover\:bg-sky-800:hover { background-color: oklch(44.3% 0.11 240.79); }
+  :where(html[data-theme="dark"]) .bg-sky-900, :where(html[data-theme="dark"]) .hover\:bg-sky-900:hover { background-color: oklch(39.1% 0.09 240.876); }
+  :where(html[data-theme="dark"]) .bg-sky-950, :where(html[data-theme="dark"]) .hover\:bg-sky-950:hover { background-color: oklch(29.3% 0.066 243.157); }
+  :where(html[data-theme="dark"]) .bg-blue-700, :where(html[data-theme="dark"]) .hover\:bg-blue-700:hover { background-color: oklch(48.8% 0.243 264.376); }
+  :where(html[data-theme="dark"]) .bg-blue-800, :where(html[data-theme="dark"]) .hover\:bg-blue-800:hover { background-color: oklch(42.4% 0.199 265.638); }
+  :where(html[data-theme="dark"]) .bg-blue-900, :where(html[data-theme="dark"]) .hover\:bg-blue-900:hover { background-color: oklch(37.9% 0.146 265.522); }
+  :where(html[data-theme="dark"]) .bg-blue-950, :where(html[data-theme="dark"]) .hover\:bg-blue-950:hover { background-color: oklch(28.2% 0.091 267.935); }
+  :where(html[data-theme="dark"]) .bg-indigo-700, :where(html[data-theme="dark"]) .hover\:bg-indigo-700:hover { background-color: oklch(45.7% 0.24 277.023); }
+  :where(html[data-theme="dark"]) .bg-indigo-800, :where(html[data-theme="dark"]) .hover\:bg-indigo-800:hover { background-color: oklch(39.8% 0.195 277.366); }
+  :where(html[data-theme="dark"]) .bg-indigo-900, :where(html[data-theme="dark"]) .hover\:bg-indigo-900:hover { background-color: oklch(35.9% 0.144 278.697); }
+  :where(html[data-theme="dark"]) .bg-indigo-950, :where(html[data-theme="dark"]) .hover\:bg-indigo-950:hover { background-color: oklch(25.7% 0.09 281.288); }
+  :where(html[data-theme="dark"]) .bg-violet-700, :where(html[data-theme="dark"]) .hover\:bg-violet-700:hover { background-color: oklch(49.1% 0.27 292.581); }
+  :where(html[data-theme="dark"]) .bg-violet-800, :where(html[data-theme="dark"]) .hover\:bg-violet-800:hover { background-color: oklch(43.2% 0.232 292.759); }
+  :where(html[data-theme="dark"]) .bg-violet-900, :where(html[data-theme="dark"]) .hover\:bg-violet-900:hover { background-color: oklch(38% 0.189 293.745); }
+  :where(html[data-theme="dark"]) .bg-violet-950, :where(html[data-theme="dark"]) .hover\:bg-violet-950:hover { background-color: oklch(28.3% 0.141 291.089); }
+  :where(html[data-theme="dark"]) .bg-purple-700, :where(html[data-theme="dark"]) .hover\:bg-purple-700:hover { background-color: oklch(49.6% 0.265 301.924); }
+  :where(html[data-theme="dark"]) .bg-purple-800, :where(html[data-theme="dark"]) .hover\:bg-purple-800:hover { background-color: oklch(43.8% 0.218 303.724); }
+  :where(html[data-theme="dark"]) .bg-purple-900, :where(html[data-theme="dark"]) .hover\:bg-purple-900:hover { background-color: oklch(38.1% 0.176 304.987); }
+  :where(html[data-theme="dark"]) .bg-purple-950, :where(html[data-theme="dark"]) .hover\:bg-purple-950:hover { background-color: oklch(29.1% 0.149 302.717); }
+  :where(html[data-theme="dark"]) .bg-fuchsia-700, :where(html[data-theme="dark"]) .hover\:bg-fuchsia-700:hover { background-color: oklch(51.8% 0.253 323.949); }
+  :where(html[data-theme="dark"]) .bg-fuchsia-800, :where(html[data-theme="dark"]) .hover\:bg-fuchsia-800:hover { background-color: oklch(45.2% 0.211 324.591); }
+  :where(html[data-theme="dark"]) .bg-fuchsia-900, :where(html[data-theme="dark"]) .hover\:bg-fuchsia-900:hover { background-color: oklch(40.1% 0.17 325.612); }
+  :where(html[data-theme="dark"]) .bg-fuchsia-950, :where(html[data-theme="dark"]) .hover\:bg-fuchsia-950:hover { background-color: oklch(29.3% 0.136 325.661); }
+  :where(html[data-theme="dark"]) .bg-pink-700, :where(html[data-theme="dark"]) .hover\:bg-pink-700:hover { background-color: oklch(52.5% 0.223 3.958); }
+  :where(html[data-theme="dark"]) .bg-pink-800, :where(html[data-theme="dark"]) .hover\:bg-pink-800:hover { background-color: oklch(45.9% 0.187 3.815); }
+  :where(html[data-theme="dark"]) .bg-pink-900, :where(html[data-theme="dark"]) .hover\:bg-pink-900:hover { background-color: oklch(40.8% 0.153 2.432); }
+  :where(html[data-theme="dark"]) .bg-pink-950, :where(html[data-theme="dark"]) .hover\:bg-pink-950:hover { background-color: oklch(28.4% 0.109 3.907); }
+  :where(html[data-theme="dark"]) .bg-rose-700, :where(html[data-theme="dark"]) .hover\:bg-rose-700:hover { background-color: oklch(51.4% 0.222 16.935); }
+  :where(html[data-theme="dark"]) .bg-rose-800, :where(html[data-theme="dark"]) .hover\:bg-rose-800:hover { background-color: oklch(45.5% 0.188 13.697); }
+  :where(html[data-theme="dark"]) .bg-rose-900, :where(html[data-theme="dark"]) .hover\:bg-rose-900:hover { background-color: oklch(41% 0.159 10.272); }
+  :where(html[data-theme="dark"]) .bg-rose-950, :where(html[data-theme="dark"]) .hover\:bg-rose-950:hover { background-color: oklch(27.1% 0.105 12.094); }
+}
+
+/* Tool pages: .tool-workspace repaints the old dark tool classes in light; repaint them dark again. */
+html[data-theme="dark"] .tool-workspace {
+  color: var(--dark-muted);
+}
+
+html[data-theme="dark"] .tool-workspace [class*="bg-[#071526]"],
+html[data-theme="dark"] .tool-workspace [class*="bg-[#0b1830]"],
+html[data-theme="dark"] .tool-workspace [class*="bg-[#0c1d31]"],
+html[data-theme="dark"] .tool-workspace [class*="bg-[#0f2140]"] {
+  background-color: var(--dark-surface) !important;
+}
+
+html[data-theme="dark"] .tool-workspace [class*="border-[#9ccbff]"] {
+  border-color: var(--dark-border) !important;
+}
+
+html[data-theme="dark"] .tool-workspace :not(button)[class~="text-white"],
+html[data-theme="dark"] .tool-workspace :not(button)[class~="text-[#dfeeff]"],
+html[data-theme="dark"] .tool-workspace :not(button)[class~="text-slate-100"],
+html[data-theme="dark"] .tool-workspace :not(button)[class~="text-slate-200"],
+html[data-theme="dark"] .tool-workspace :not(button)[class~="text-slate-300"] {
+  color: var(--dark-muted) !important;
+}
+
+html[data-theme="dark"] .tool-workspace :not(button)[class~="text-slate-400"] {
+  color: #97a6bb !important;
+}
+
+html[data-theme="dark"] .tool-workspace input:not([type="hidden"]):not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] .tool-workspace textarea,
+html[data-theme="dark"] .tool-workspace select {
+  border-color: #34476a !important;
+  background-color: #0e1a2d !important;
+  color: var(--dark-text) !important;
+}
+
+/* Kept light on purpose: previews of what will be printed or e-mailed. */
+html[data-theme="dark"] .keep-light {
+  color-scheme: light;
+  --color-slate-50: oklch(98.4% 0.003 247.858);
+  --color-slate-100: oklch(96.8% 0.007 247.896);
+  --color-slate-200: oklch(92.9% 0.013 255.508);
+  --color-slate-300: oklch(86.9% 0.022 252.894);
+  --color-slate-400: oklch(70.4% 0.04 256.788);
+  --color-slate-500: oklch(55.4% 0.046 257.417);
+  --color-slate-600: oklch(44.6% 0.043 257.281);
+  --color-slate-700: oklch(37.2% 0.044 257.287);
+  --color-slate-800: oklch(27.9% 0.041 260.031);
+  --color-slate-900: oklch(20.8% 0.042 265.755);
+}
+
+html[data-theme="dark"] .keep-light.bg-white,
+html[data-theme="dark"] .keep-light .bg-white {
+  background-color: #ffffff;
+}
+
+/* Articles: .article-markdown was drawn for a dark page; its --light variant goes back to those colours. */
+html[data-theme="dark"] .article-markdown--light { color: #e2e8f0; }
+html[data-theme="dark"] .article-markdown--light h2,
+html[data-theme="dark"] .article-markdown--light h3,
+html[data-theme="dark"] .article-markdown--light h4,
+html[data-theme="dark"] .article-markdown--light strong,
+html[data-theme="dark"] .article-markdown--light th { color: #f8fafc; }
+html[data-theme="dark"] .article-markdown--light p,
+html[data-theme="dark"] .article-markdown--light ul,
+html[data-theme="dark"] .article-markdown--light ol,
+html[data-theme="dark"] .article-markdown--light blockquote { color: #cbd5e1; }
+html[data-theme="dark"] .article-markdown--light a { color: #7fb0ff; }
+html[data-theme="dark"] .article-markdown--light li::marker { color: #60a5fa; }
+html[data-theme="dark"] .article-markdown--light blockquote { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+html[data-theme="dark"] .article-markdown--light :not(pre) > code { background: rgba(96, 165, 250, 0.14); color: #bfdbfe; }
+html[data-theme="dark"] .article-markdown--light h2,
+html[data-theme="dark"] .article-markdown--light hr,
+html[data-theme="dark"] .article-markdown--light td,
+html[data-theme="dark"] .article-markdown--light th { border-color: rgba(148, 163, 184, 0.22); }
+html[data-theme="dark"] .article-markdown--light th { background: rgba(148, 163, 184, 0.08); }
+
+/* Loading screens: dark too, so a dark page does not flash white while the next one loads. */
+html[data-theme="dark"] .loading-screen,
+html[data-theme="dark"] .tool-navigation-loader {
+  background: var(--dark-page);
+}
+
+html[data-theme="dark"] .jchub-loader__icon {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] .jchub-loader__dot {
+  background: #6d63ff;
+  box-shadow: 0 2px 10px rgba(109, 99, 255, 0.45);
+}
+
+html[data-theme="dark"] .loading-ring {
+  border-color: rgba(96, 165, 250, 0.4);
+}
