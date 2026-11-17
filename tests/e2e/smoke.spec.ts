@@ -80,3 +80,32 @@ for (const path of ['/fr/une-page-qui-n-existe-pas', '/fr/outils/un-outil-qui-n-
     expect(response.status()).toBe(404);
   });
 }
+
+test('the VAT calculator goes from net to gross with the country rate', async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.goto('/fr/outils/calculateur-tva');
+  await dismissConsent(page);
+  await expect(async () => {
+    await page.getByLabel('Pays').selectOption('CM');
+    await page.getByLabel('Montant HT').fill('100000');
+    await expect(page.getByText(/119\s250\s*FCFA/).first()).toBeVisible({ timeout: 1_000 });
+  }).toPass({ timeout: 15_000 });
+  await expect(page.getByText('cent dix-neuf mille deux cent cinquante francs CFA')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('the receipt generator shows the amount in words and its preview', async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.goto('/fr/outils/generateur-recu-paiement');
+  await dismissConsent(page);
+  await expect(page.getByText(/soixante-quinze mille francs CFA/)).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole('button', { name: 'Télécharger le PDF' })).toBeEnabled({ timeout: 15_000 });
+  expect(errors).toEqual([]);
+});
+
+test('the invoice writes its total in words', async ({ page }) => {
+  await page.goto('/fr/outils/generateur-facture');
+  await dismissConsent(page);
+  // The sample: 520 000 FCFA before tax at 18.9 % (Congo).
+  await expect(page.getByText(/six cent dix-huit mille deux cent quatre-vingts francs CFA/)).toBeVisible({ timeout: 15_000 });
+});

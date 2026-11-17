@@ -35,6 +35,8 @@ const tools: Record<ToolComponentName, ComponentType> = {
   PdfMergeSplit: dynamic(() => import('@/components/tools/PdfMergeSplit').then((m) => m.PdfMergeSplit)),
   LogoStudio: dynamic(() => import('@/components/tools/logo-studio/LogoStudio').then((m) => m.LogoStudio)),
   EmailSignatureGenerator: dynamic(() => import('@/components/tools/EmailSignatureGenerator').then((m) => m.EmailSignatureGenerator)),
+  VatCalculator: dynamic(() => import('@/components/tools/VatCalculator').then((m) => m.VatCalculator)),
+  ReceiptGenerator: dynamic(() => import('@/components/tools/ReceiptGenerator').then((m) => m.ReceiptGenerator)),
   // @generated-tools: components created from the admin are inserted above this line.
 };
 

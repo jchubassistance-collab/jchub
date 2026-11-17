@@ -1,6 +1,7 @@
 /** Invoice and quote generator: the data typed in the form, amounts and totals. Layout: invoice-layout.ts. */
 
-export type InvoiceParty = { name: string; address: string; email: string; phone: string; taxId: string };
+/** `registry`: trade register number (RCCM in OHADA countries, SIRET, company number…). */
+export type InvoiceParty = { name: string; address: string; email: string; phone: string; taxId: string; registry: string };
 export type InvoiceItem = { description: string; quantity: string; unitPrice: string; vatRate: string };
 
 export type InvoiceData = {
@@ -11,6 +12,10 @@ export type InvoiceData = {
   dueDate: string;
   currency: string;
   vat: boolean;
+  /** Country whose standard VAT rate prefills the lines (lib/vat-rates.ts), or '' for none. */
+  country: string;
+  /** Writes the total in words under the totals, as usual in French-speaking Africa. */
+  inWords: boolean;
   seller: InvoiceParty;
   client: InvoiceParty;
   items: InvoiceItem[];
@@ -24,15 +29,17 @@ export type InvoiceData = {
 
 export type InvoiceLabels = {
   invoice: string; quote: string; number: string; date: string; due: string; validUntil: string;
-  billedTo: string; quoteFor: string; taxId: string; description: string; quantity: string;
+  billedTo: string; quoteFor: string; taxId: string; registry: string; description: string; quantity: string;
   unitPrice: string; vat: string; amount: string; subtotal: string; vatRate: (rate: string) => string;
   total: string; terms: string; payment: string;
+  /** Sentence before the amount in words, e.g. "Arrêtée la présente facture à la somme de". */
+  inWords: (kind: InvoiceData['kind']) => string;
 };
 
-export const CURRENCIES = ['EUR', 'XAF', 'XOF', 'USD', 'CAD', 'CHF', 'GBP', 'MAD', 'CDF'] as const;
+export const CURRENCIES = ['EUR', 'XAF', 'XOF', 'USD', 'CAD', 'CHF', 'GBP', 'MAD', 'CDF', 'GNF', 'MGA'] as const;
 export const INVOICE_ACCENTS = ['#1d4ed8', '#0f766e', '#6d28d9', '#9f1239', '#c2410c', '#1e293b'] as const;
 
-const EMPTY_PARTY: InvoiceParty = { name: '', address: '', email: '', phone: '', taxId: '' };
+export const EMPTY_PARTY: InvoiceParty = { name: '', address: '', email: '', phone: '', taxId: '', registry: '' };
 export const EMPTY_ITEM: InvoiceItem = { description: '', quantity: '1', unitPrice: '', vatRate: '20' };
 
 /** A date input value `days` after `from`. */
@@ -44,7 +51,7 @@ export function isoDate(from: Date, days = 0): string {
 export function emptyInvoice(today = new Date()): InvoiceData {
   return {
     kind: 'invoice', number: `${today.getFullYear()}-001`, issueDate: isoDate(today), dueDate: isoDate(today, 30),
-    currency: 'EUR', vat: true, seller: { ...EMPTY_PARTY }, client: { ...EMPTY_PARTY }, items: [{ ...EMPTY_ITEM }],
+    currency: 'EUR', vat: true, country: '', inWords: false, seller: { ...EMPTY_PARTY }, client: { ...EMPTY_PARTY }, items: [{ ...EMPTY_ITEM }],
     terms: '', payment: '', accent: INVOICE_ACCENTS[0], logo: '', logoRatio: 1,
   };
 }
@@ -109,4 +116,16 @@ export function formatNumber(value: number, locale: string): string {
 export function formatDate(iso: string, locale: string): string {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return '';
   return new Intl.DateTimeFormat(intlLocale(locale), { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`));
+}
+
+/** A saved draft completed with the fields added since it was saved (registry, country…). */
+export function completeInvoice(draft: Partial<InvoiceData>, today = new Date()): InvoiceData {
+  const base = emptyInvoice(today);
+  return {
+    ...base,
+    ...draft,
+    seller: { ...EMPTY_PARTY, ...draft.seller },
+    client: { ...EMPTY_PARTY, ...draft.client },
+    items: Array.isArray(draft.items) && draft.items.length ? draft.items.map((item) => ({ ...EMPTY_ITEM, ...item })) : base.items,
+  };
 }

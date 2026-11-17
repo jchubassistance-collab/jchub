@@ -25,7 +25,7 @@
     "test:articles": "node --experimental-strip-types --test tests/article-files.test.js tests/slug-history.test.js",
     "test:pdf-pages": "node --experimental-strip-types --test tests/pdf-pages.test.js",
     "test:images-to-pdf": "node --experimental-strip-types --test tests/images-to-pdf.test.js",
-    "test:documents": "node --experimental-strip-types --test tests/document-generators.test.js tests/email-signature.test.js",
+    "test:documents": "node --experimental-strip-types --test tests/document-generators.test.js tests/email-signature.test.js tests/africa-tools.test.js",
     "test:client-ip": "node --experimental-strip-types --test tests/client-ip.test.js",
     "test:logo-studio": "node --experimental-strip-types --test tests/logo-editor.test.js tests/icon-pack.test.js tests/photo-editor.test.js",
     "test:download-name": "node --experimental-strip-types --test tests/download-name.test.js",

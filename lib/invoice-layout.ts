@@ -1,5 +1,6 @@
 /** Layout of an invoice or a quote on A4 pages. */
 import { A4, Column, PagedDocument, PT, pdfText, type Measure, type Page, type TextStyle } from '@/lib/document-painter';
+import { amountInWords } from '@/lib/amount-words';
 import { computeTotals, formatDate, formatMoney, formatNumber, type InvoiceData, type InvoiceLabels } from '@/lib/invoice';
 
 const DARK = '#0f172a';
@@ -31,6 +32,7 @@ export function layoutInvoice(data: InvoiceData, labels: InvoiceLabels, locale: 
   seller.text(data.seller.address, small);
   seller.text([data.seller.email, data.seller.phone].map((item) => item.trim()).filter(Boolean).join('  ·  '), small);
   if (data.seller.taxId.trim()) seller.text(`${labels.taxId} ${data.seller.taxId.trim()}`, small);
+  if (data.seller.registry?.trim()) seller.text(`${labels.registry} ${data.seller.registry.trim()}`, small);
 
   const heading = new Column(document, measure, right - 80, 80, column.top, column.bottom);
   heading.text((data.kind === 'quote' ? labels.quote : labels.invoice).toUpperCase(), { size: 22, bold: true, color: data.accent, align: 'right', lineHeight: 1.2 });
@@ -52,6 +54,7 @@ export function layoutInvoice(data: InvoiceData, labels: InvoiceLabels, locale: 
     [data.client.address, small],
     [[data.client.email, data.client.phone].map((item) => item.trim()).filter(Boolean).join('  ·  '), small],
     [data.client.taxId.trim() ? `${labels.taxId} ${data.client.taxId.trim()}` : '', small],
+    [data.client.registry?.trim() ? `${labels.registry} ${data.client.registry.trim()}` : '', small],
   ];
   const panelHeight = clientLines.reduce((sum, [text, style]) => sum + client.lines(text, style).length * client.lineHeight(style), 0) + 8;
   column.add({ kind: 'rect', x: panelX, y: column.y, width: 88, height: panelHeight, color: PANEL });
@@ -121,6 +124,15 @@ export function layoutInvoice(data: InvoiceData, labels: InvoiceLabels, locale: 
   column.add({ kind: 'text', x: totalsLeft + 3, y: column.y + 6.6, text: pdfText(labels.total), size: 10.5, bold: true, color: '#ffffff' });
   column.add({ kind: 'text', x: right - 3, y: column.y + 6.6, text: money(totals.total), size: 10.5, bold: true, color: '#ffffff', align: 'right' });
   column.gap(14);
+
+  // "Arrêtée la présente facture à la somme de cinq cent trente et un mille francs CFA."
+  if (data.inWords && totals.total > 0) {
+    const words = amountInWords(totals.total, data.currency, locale);
+    const sentence = `${labels.inWords(data.kind)} ${words} (${formatMoney(totals.total, data.currency, locale)}).`;
+    column.ensure(12);
+    column.text(sentence, { size: 9, bold: true, color: DARK, lineHeight: 1.45 });
+    column.gap(6);
+  }
 
   for (const [label, text] of [[labels.terms, data.terms], [labels.payment, data.payment]] as const) {
     if (!text.trim()) continue;

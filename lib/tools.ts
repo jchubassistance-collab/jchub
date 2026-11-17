@@ -641,17 +641,17 @@ export const tools: Tool[] = [
   {
     slug: 'generateur-de-qr-code',
     name: 'Générateur de QR code',
-    description: 'Crée et télécharge des QR codes à partir de texte ou d’une URL.',
+    description: 'Crée un QR code à partir d’un texte ou d’une URL, ou une affiche de paiement Mobile Money à imprimer.',
     category: 'Productivité',
     icon: '📱',
-    tags: ['qr code', 'qrcode', 'url'],
+    tags: ['qr code', 'qrcode', 'url', 'mobile money', 'paiement'],
     component: 'QrCodeGenerator',
     translations: {
       en: {
         slug: 'qr-code-generator',
         name: 'QR code generator',
-        description: 'Create and download QR codes from text or a URL.',
-        tags: ['qr code', 'qrcode', 'url'],
+        description: 'Create a QR code from text or a URL, or a mobile money payment poster to print.',
+        tags: ['qr code', 'qrcode', 'url', 'mobile money', 'payment'],
         seo: {
           title: 'Free QR code generator — JcHub',
           description: 'Create a QR code from text or a URL and download it in one click. Free, no sign-up, right in your browser.',
@@ -662,8 +662,8 @@ export const tools: Tool[] = [
     status: 'published',
     seo: {
       title: 'Générateur de QR code gratuit — JcHub',
-      description: 'Crée un QR code à partir d’un texte ou d’une URL et télécharge-le en un clic. Gratuit, sans inscription, directement dans ton navigateur.',
-      keywords: ['générateur qr code', 'qrcode gratuit', 'qr url'],
+      description: 'Crée un QR code à partir d’un texte ou d’une URL, ou une affiche « Payez par Mobile Money » (MTN MoMo, Airtel Money, Orange Money, Wave) pour ton comptoir. Gratuit, sans inscription.',
+      keywords: ['générateur qr code', 'qrcode gratuit', 'qr url', 'qr code mobile money', 'affiche paiement mobile money'],
     },
   },
   {
@@ -782,10 +782,10 @@ export const tools: Tool[] = [
   {
     slug: 'generateur-facture',
     name: 'Générateur de factures et de devis',
-    description: 'Rédige une facture ou un devis en quelques minutes : logo, TVA par taux, euros ou francs CFA, calculs automatiques et export en PDF.',
+    description: 'Rédige une facture ou un devis en quelques minutes : logo, RCCM et NIU, TVA du pays, francs CFA, montant en toutes lettres et export en PDF.',
     category: 'Productivité',
     icon: '🧾',
-    tags: ['facture', 'devis', 'pdf', 'freelance', 'tva', 'auto-entrepreneur'],
+    tags: ['facture', 'devis', 'pdf', 'freelance', 'tva', 'auto-entrepreneur', 'fcfa', 'ohada', 'rccm'],
     component: 'InvoiceGenerator',
     translations: {
       en: {
@@ -804,8 +804,8 @@ export const tools: Tool[] = [
     publishAt: '2026-11-05T00:00:00+01:00',
     seo: {
       title: 'Générateur de factures et de devis gratuit en PDF | JcHub',
-      description: 'Crée tes factures et devis avec ton logo, la TVA et des totaux calculés, en euros ou en francs CFA, puis télécharge-les en PDF. Sans inscription.',
-      keywords: ['générateur de facture', 'faire une facture gratuite', 'facture pdf', 'modèle de devis'],
+      description: 'Crée tes factures et devis en francs CFA ou en euros : RCCM, NIU, TVA de ton pays (Gabon, Congo, Cameroun, Côte d’Ivoire…), montant en toutes lettres et PDF. Sans inscription.',
+      keywords: ['générateur de facture', 'faire une facture gratuite', 'facture pdf', 'modèle de devis', 'facture fcfa', 'modèle de facture ohada', 'facture montant en lettres'],
     },
   },
   {
@@ -863,6 +863,64 @@ export const tools: Tool[] = [
       title: 'Générateur de signature e-mail gratuit (HTML) | JcHub',
       description: 'Crée une signature e-mail professionnelle en quelques minutes : trois modèles, tes couleurs, photo ou logo et réseaux sociaux. À coller dans Gmail ou Outlook.',
       keywords: ['générateur signature email', 'signature mail gratuite', 'signature email html', 'signature gmail', 'signature outlook'],
+    },
+  },
+  {
+    slug: 'calculateur-tva',
+    name: 'Calculateur de TVA',
+    description: 'Passe du HT au TTC et inversement avec le taux de TVA de ton pays (Gabon, Congo, Cameroun, Côte d’Ivoire, Sénégal…), en francs CFA, avec le montant en lettres.',
+    category: 'Productivité',
+    icon: '🧮',
+    tags: ['tva', 'ht', 'ttc', 'fcfa', 'calcul', 'gabon', 'congo', 'cameroun'],
+    component: 'VatCalculator',
+    translations: {
+      en: {
+        slug: 'vat-calculator',
+        name: 'VAT calculator',
+        description: 'Go from net to gross and back with the VAT rate of your country, in CFA francs or any currency, with the amount in words.',
+        tags: ['vat', 'net', 'gross', 'tax', 'calculator', 'cfa franc'],
+        seo: {
+          title: 'VAT calculator: net, gross and VAT by country | JcHub',
+          description: 'Compute VAT from a net or a gross amount with the standard rate of Gabon, Congo, Cameroon, Côte d’Ivoire, Senegal, France and more. Free, in your browser.',
+          keywords: ['vat calculator', 'net to gross', 'gross to net', 'vat rate by country'],
+        },
+      },
+    },
+    status: 'published',
+    publishAt: '2026-11-17T00:00:00+01:00',
+    seo: {
+      title: 'Calculateur de TVA HT / TTC par pays (FCFA) | JcHub',
+      description: 'Calcule la TVA, le HT et le TTC avec le taux de ton pays : Gabon 18 %, Congo, Cameroun 19,25 %, Côte d’Ivoire, Sénégal… En francs CFA, avec le montant en lettres. Gratuit.',
+      keywords: ['calcul tva', 'calculateur tva', 'ht ttc', 'tva gabon', 'tva cameroun', 'tva congo', 'tva côte d’ivoire', 'tva sénégal'],
+    },
+  },
+  {
+    slug: 'generateur-recu-paiement',
+    name: 'Générateur de reçu de paiement',
+    description: 'Crée un reçu pour un paiement Mobile Money, en espèces ou par virement : montant en lettres, ID de transaction, reste à payer et PDF à envoyer au client.',
+    category: 'Document',
+    icon: '🧾',
+    tags: ['reçu', 'recu de paiement', 'mobile money', 'acompte', 'fcfa', 'pdf'],
+    component: 'ReceiptGenerator',
+    translations: {
+      en: {
+        slug: 'payment-receipt-generator',
+        name: 'Payment receipt generator',
+        description: 'Create a receipt for a mobile money, cash or bank payment: amount in words, transaction ID, balance due and a PDF to send to your customer.',
+        tags: ['receipt', 'payment receipt', 'mobile money', 'deposit', 'pdf'],
+        seo: {
+          title: 'Free payment receipt generator (PDF) | JcHub',
+          description: 'Make a payment receipt in a minute: mobile money or cash, amount in words, transaction ID and balance due, then download the PDF. No sign-up.',
+          keywords: ['receipt generator', 'payment receipt', 'mobile money receipt', 'receipt pdf'],
+        },
+      },
+    },
+    status: 'published',
+    publishAt: '2026-11-17T00:00:00+01:00',
+    seo: {
+      title: 'Générateur de reçu de paiement gratuit (Mobile Money, PDF) | JcHub',
+      description: 'Fais un reçu de paiement en une minute : MTN MoMo, Airtel Money, Orange Money ou espèces, montant en toutes lettres, ID de transaction, reste à payer, PDF. Sans inscription.',
+      keywords: ['reçu de paiement', 'modèle de reçu', 'reçu mobile money', 'reçu acompte', 'reçu pdf gratuit', 'reçu fcfa'],
     },
   },
 ];

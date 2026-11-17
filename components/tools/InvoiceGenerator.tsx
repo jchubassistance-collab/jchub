@@ -5,7 +5,9 @@ import { ArrowDown, ArrowUp, Download, Eraser, ImagePlus, Plus, Trash2 } from 'l
 import { useLocale } from 'next-intl';
 import { bilingual } from '@/i18n/copy';
 import { downloadName } from '@/lib/download-name';
-import { CURRENCIES, EMPTY_ITEM, INVOICE_ACCENTS, computeTotals, emptyInvoice, formatMoney, formatNumber, type InvoiceData, type InvoiceItem, type InvoiceLabels, type InvoiceParty } from '@/lib/invoice';
+import { amountInWords } from '@/lib/amount-words';
+import { VAT_COUNTRIES, vatCountry } from '@/lib/vat-rates';
+import { CURRENCIES, EMPTY_ITEM, INVOICE_ACCENTS, completeInvoice, computeTotals, emptyInvoice, formatMoney, formatNumber, type InvoiceData, type InvoiceItem, type InvoiceLabels, type InvoiceParty } from '@/lib/invoice';
 import { layoutInvoice } from '@/lib/invoice-layout';
 import { DocumentPreview, Field, FormSection, TextArea, forgetDraft, imageToDataUrl, readDraft, savePdf, useDraftSaving, useIsClient, usePdfKit } from '@/components/tools/DocumentPreview';
 
@@ -14,9 +16,10 @@ const DRAFT_KEY = 'jchub-invoice-v1';
 const copy = bilingual({
   document: (vat: boolean): InvoiceLabels => ({
     invoice: 'Facture', quote: 'Devis', number: 'N°', date: 'Date', due: 'Échéance', validUntil: 'Valable jusqu’au',
-    billedTo: 'Facturé à', quoteFor: 'Devis pour', taxId: 'N° fiscal :', description: 'Description', quantity: 'Qté',
+    billedTo: 'Facturé à', quoteFor: 'Devis pour', taxId: 'N° fiscal :', registry: 'RCCM :', description: 'Description', quantity: 'Qté',
     unitPrice: 'Prix unitaire', vat: 'TVA', amount: vat ? 'Montant HT' : 'Montant', subtotal: 'Total HT',
     vatRate: (rate) => `TVA ${rate} %`, total: vat ? 'Total TTC' : 'Total', terms: 'Conditions de paiement', payment: 'Coordonnées de paiement',
+    inWords: (kind) => (kind === 'quote' ? 'Arrêté le présent devis à la somme de' : 'Arrêtée la présente facture à la somme de'),
   }),
   fileName: { invoice: 'facture', quote: 'devis' },
   kind: 'Document',
@@ -42,7 +45,11 @@ const copy = bilingual({
   address: 'Adresse',
   email: 'E-mail',
   phone: 'Téléphone',
-  taxId: 'Identifiant fiscal (SIRET, NIU, RCCM…)',
+  taxId: 'Identifiant fiscal (NIU, NIF, SIRET…)',
+  registry: 'RCCM ou n° d’immatriculation',
+  country: 'Pays (taux de TVA)',
+  noCountry: 'Autre pays : taux à saisir',
+  inWords: 'Montant en toutes lettres',
   items: 'Prestations et produits',
   description: 'Description',
   quantity: 'Quantité',
@@ -73,9 +80,10 @@ const copy = bilingual({
 }, {
   document: (vat: boolean): InvoiceLabels => ({
     invoice: 'Invoice', quote: 'Quote', number: 'No.', date: 'Date', due: 'Due date', validUntil: 'Valid until',
-    billedTo: 'Bill to', quoteFor: 'Quote for', taxId: 'Tax ID:', description: 'Description', quantity: 'Qty',
+    billedTo: 'Bill to', quoteFor: 'Quote for', taxId: 'Tax ID:', registry: 'Reg. no.:', description: 'Description', quantity: 'Qty',
     unitPrice: 'Unit price', vat: 'VAT', amount: vat ? 'Amount excl. VAT' : 'Amount', subtotal: 'Subtotal',
     vatRate: (rate) => `VAT ${rate}%`, total: 'Total', terms: 'Payment terms', payment: 'Payment details',
+    inWords: () => 'Amount in words:',
   }),
   fileName: { invoice: 'invoice', quote: 'quote' },
   kind: 'Document',
@@ -102,6 +110,10 @@ const copy = bilingual({
   email: 'Email',
   phone: 'Phone',
   taxId: 'Tax ID (VAT number, EIN…)',
+  registry: 'Company registration no.',
+  country: 'Country (VAT rate)',
+  noCountry: 'Other country: enter the rate',
+  inWords: 'Amount in words',
   items: 'Services and products',
   description: 'Description',
   quantity: 'Quantity',
@@ -138,12 +150,14 @@ function sampleInvoice(locale: string): InvoiceData {
     ...emptyInvoice(),
     currency: fr ? 'XAF' : 'USD',
     vat: true,
-    seller: { name: 'Studio Kimpa', address: fr ? '12 avenue de la Paix\nBrazzaville, Congo' : '12 Peace Avenue\nBrazzaville, Congo', email: 'contact@kimpa.cg', phone: '+242 06 555 12 34', taxId: fr ? 'RCCM CG-BZV-01-2024-B12' : '' },
-    client: { name: 'Atelier Mbemba', address: fr ? '5 rue Loango\nPointe-Noire, Congo' : '5 Loango Street\nPointe-Noire, Congo', email: 'compta@mbemba.cg', phone: '', taxId: '' },
+    country: fr ? 'CG' : '',
+    inWords: fr,
+    seller: { name: 'Studio Kimpa', address: fr ? '12 avenue de la Paix\nBrazzaville, Congo' : '12 Peace Avenue\nBrazzaville, Congo', email: 'contact@kimpa.cg', phone: '+242 06 555 12 34', taxId: '', registry: fr ? 'CG-BZV-01-2024-B12' : '' },
+    client: { name: 'Atelier Mbemba', address: fr ? '5 rue Loango\nPointe-Noire, Congo' : '5 Loango Street\nPointe-Noire, Congo', email: 'compta@mbemba.cg', phone: '', taxId: '', registry: '' },
     items: fr
       ? [
-        { description: 'Création du site vitrine (maquettes, intégration, mise en ligne)', quantity: '1', unitPrice: '450 000', vatRate: '18' },
-        { description: 'Formation à la gestion des contenus (demi-journée)', quantity: '2', unitPrice: '35 000', vatRate: '18' },
+        { description: 'Création du site vitrine (maquettes, intégration, mise en ligne)', quantity: '1', unitPrice: '450 000', vatRate: '18.9' },
+        { description: 'Formation à la gestion des contenus (demi-journée)', quantity: '2', unitPrice: '35 000', vatRate: '18.9' },
       ]
       : [
         { description: 'Showcase website (design, development, launch)', quantity: '1', unitPrice: '1,200', vatRate: '18' },
@@ -165,7 +179,7 @@ export function InvoiceGenerator() {
   // The draft lives in this browser: the server renders a placeholder.
   if (!isClient) return <div className="h-[32rem] animate-pulse rounded-xl bg-slate-100" />;
   const draft = readDraft(DRAFT_KEY, isInvoiceData);
-  return <InvoiceEditor initial={draft ? { ...emptyInvoice(), ...draft } : sampleInvoice(locale)} />;
+  return <InvoiceEditor initial={draft ? completeInvoice(draft) : sampleInvoice(locale)} />;
 }
 
 type PartyKey = 'seller' | 'client';
@@ -194,7 +208,14 @@ function InvoiceEditor({ initial }: { initial: InvoiceData }) {
     return { ...current, items };
   });
   const removeItem = (index: number) => setInvoice((current) => ({ ...current, items: current.items.filter((_, position) => position !== index) }));
-  const addItem = () => setInvoice((current) => ({ ...current, items: [...current.items, { ...EMPTY_ITEM, vatRate: current.items.at(-1)?.vatRate ?? EMPTY_ITEM.vatRate }] }));
+  const addItem = () => setInvoice((current) => ({ ...current, items: [...current.items, { ...EMPTY_ITEM, vatRate: current.items.at(-1)?.vatRate ?? String(vatCountry(current.country)?.rate ?? EMPTY_ITEM.vatRate) }] }));
+  // A country sets its currency and its standard VAT rate on every line; each line stays editable.
+  const chooseCountry = (code: string) => setInvoice((current) => {
+    const country = vatCountry(code);
+    if (!country) return { ...current, country: '' };
+    return { ...current, country: code, currency: country.currency, vat: true, items: current.items.map((item) => ({ ...item, vatRate: String(country.rate) })) };
+  });
+  const country = vatCountry(invoice.country);
 
   const chooseLogo = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -212,7 +233,7 @@ function InvoiceEditor({ initial }: { initial: InvoiceData }) {
   const clearAll = () => {
     if (!window.confirm(t.confirmClear)) return;
     forgetDraft(DRAFT_KEY);
-    setInvoice({ ...emptyInvoice(), currency: invoice.currency, vat: invoice.vat });
+    setInvoice({ ...emptyInvoice(), currency: invoice.currency, vat: invoice.vat, country: invoice.country, inWords: invoice.inWords, items: [{ ...EMPTY_ITEM, vatRate: String(country?.rate ?? EMPTY_ITEM.vatRate) }] });
   };
 
   const download = () => {
@@ -231,7 +252,10 @@ function InvoiceEditor({ initial }: { initial: InvoiceData }) {
       <Field label={t.email} type="email" value={invoice[party].email} onChange={(event) => setParty(party, 'email', event.target.value)} />
       <Field label={t.phone} type="tel" value={invoice[party].phone} onChange={(event) => setParty(party, 'phone', event.target.value)} />
     </div>
-    <Field label={t.taxId} value={invoice[party].taxId} onChange={(event) => setParty(party, 'taxId', event.target.value)} />
+    <div className="grid gap-3 sm:grid-cols-2">
+      <Field label={t.taxId} value={invoice[party].taxId} onChange={(event) => setParty(party, 'taxId', event.target.value)} />
+      <Field label={t.registry} value={invoice[party].registry} onChange={(event) => setParty(party, 'registry', event.target.value)} />
+    </div>
   </>;
 
   return <div className="space-y-5 text-slate-700">
@@ -254,6 +278,13 @@ function InvoiceEditor({ initial }: { initial: InvoiceData }) {
             <Field label={t.issueDate} type="date" value={invoice.issueDate} onChange={(event) => set('issueDate', event.target.value)} />
             <Field label={invoice.kind === 'quote' ? t.validUntil : t.dueDate} type="date" value={invoice.dueDate} onChange={(event) => set('dueDate', event.target.value)} />
           </div>
+          <label className="block text-xs font-semibold text-slate-600">{t.country}
+            <select value={invoice.country} onChange={(event) => chooseCountry(event.target.value)} className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900">
+              <option value="">{t.noCountry}</option>
+              {VAT_COUNTRIES.map((item) => <option key={item.code} value={item.code}>{`${item[locale === 'en' ? 'en' : 'fr']} — ${formatNumber(item.rate, locale)}${locale === 'en' ? '%' : ' %'}`}</option>)}
+            </select>
+          </label>
+          {country?.note && <p className="text-xs text-slate-500">{country.note[locale === 'en' ? 'en' : 'fr']}</p>}
           <div className="flex flex-wrap items-end gap-4">
             <label className="block text-xs font-semibold text-slate-600">{t.currency}
               <select value={invoice.currency} onChange={(event) => set('currency', event.target.value)} className="mt-1 block rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900">
@@ -263,6 +294,10 @@ function InvoiceEditor({ initial }: { initial: InvoiceData }) {
             <label className="flex items-center gap-2 pb-2 text-sm font-semibold text-slate-700">
               <input type="checkbox" checked={invoice.vat} onChange={(event) => set('vat', event.target.checked)} className="h-4 w-4 accent-blue-600" />
               {t.applyVat}
+            </label>
+            <label className="flex items-center gap-2 pb-2 text-sm font-semibold text-slate-700">
+              <input type="checkbox" checked={invoice.inWords} onChange={(event) => set('inWords', event.target.checked)} className="h-4 w-4 accent-blue-600" />
+              {t.inWords}
             </label>
           </div>
         </FormSection>
@@ -304,6 +339,7 @@ function InvoiceEditor({ initial }: { initial: InvoiceData }) {
             {totals.taxes.map((tax) => <div key={tax.rate} className="flex justify-between gap-4"><dt>{t.document(true).vatRate(formatNumber(tax.rate, locale))}</dt><dd>{money(tax.amount)}</dd></div>)}
             <div className="flex justify-between gap-4 border-t border-slate-200 pt-1 text-base font-bold text-slate-900"><dt>{t.total}</dt><dd>{money(totals.total)}</dd></div>
           </dl>
+          {invoice.inWords && totals.total > 0 && <p className="text-right text-xs italic text-slate-500">{amountInWords(totals.total, invoice.currency, locale)}</p>}
         </FormSection>
 
         <FormSection title={t.notes}>
