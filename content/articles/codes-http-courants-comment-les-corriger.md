@@ -21,9 +21,10 @@ author: Jessy Ngnambongo
 image: >-
   /api/article-cover?title=Les+codes+HTTP+les+plus+courants+et+comment+les+corriger&category=D%C3%A9veloppement
 readTime: 4 min
-status: scheduled
+status: published
+publishedAt: '2026-11-17T09:10:59.881Z'
 scheduledFor: '2026-11-17T07:00:00.000Z'
-updatedAt: '2026-11-04T14:17:50.068Z'
+updatedAt: '2026-11-17T09:10:59.881Z'
 ---
 Ton application affiche « Erreur 403 », ton API renvoie un 422 que personne ne comprend, ou ton site tombe sur un 502 au pire moment. Chaque code HTTP est un indice : il dit **qui** s’est trompé, le client ou le serveur, et souvent **pourquoi**. Voici les codes que tu croiseras le plus, et ce qu’il faut vérifier pour chacun.
 
