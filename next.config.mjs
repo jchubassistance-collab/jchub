@@ -75,8 +75,8 @@ const nextConfig = {
         ],
       },
       {
-        // The social cards and the public tool catalog set their own CDN cache headers.
-        source: '/api/:path((?!article-cover$|tool-assistant$|kit-image/).*)',
+        // The social cards, the public tool catalog and the public API (/api/public) set their own CDN cache headers.
+        source: '/api/:path((?!article-cover$|tool-assistant$|kit-image/|public/).*)',
         headers: [
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
           { key: 'CDN-Cache-Control', value: 'no-store' },

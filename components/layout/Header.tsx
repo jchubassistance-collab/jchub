@@ -37,7 +37,7 @@ const copy = bilingual({
 
 /** Pages with the light header. `pathname` is the French internal address of the page. */
 export function isLightPage(pathname: string) {
-  return pathname === '/' || pathname === '/a-propos' || pathname === '/outils' || pathname.startsWith('/outils/') || pathname.startsWith('/tools/') || pathname === '/aide' || pathname === '/contact' || pathname === '/services' || pathname === '/kit-entrepreneur' || pathname === '/ressources' || pathname.startsWith('/ressources/') || pathname === '/blog' || pathname.startsWith('/blog/') || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(pathname);
+  return pathname === '/' || pathname === '/a-propos' || pathname === '/outils' || pathname.startsWith('/outils/') || pathname.startsWith('/tools/') || pathname === '/aide' || pathname === '/integrer' || pathname === '/contact' || pathname === '/services' || pathname === '/kit-entrepreneur' || pathname === '/ressources' || pathname.startsWith('/ressources/') || pathname === '/blog' || pathname.startsWith('/blog/') || ['/cgu', '/cgv', '/confidentialite', '/mentions-legales'].includes(pathname);
 }
 
 export function Header() {

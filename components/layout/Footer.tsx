@@ -11,7 +11,7 @@ import type { StaticPathname } from '@/i18n/routing';
 
 const copy = bilingual({
   groups: [
-    { title: 'Plateforme', links: [['Outils', '/outils'], ['Kit entrepreneur', '/kit-entrepreneur'], ['Ressources', '/ressources'], ['Centre d’aide', '/aide']] },
+    { title: 'Plateforme', links: [['Outils', '/outils'], ['Kit entrepreneur', '/kit-entrepreneur'], ['Ressources', '/ressources'], ['Centre d’aide', '/aide'], ['Intégrer JcHub', '/integrer']] },
     { title: 'JcHub', links: [['À propos', '/a-propos'], ['Services', '/services'], ['Contact', '/contact'], ['Blog', '/blog']] },
     { title: 'Légal', links: [['Conditions d’utilisation', '/cgu'], ['Conditions de vente', '/cgv'], ['Confidentialité', '/confidentialite'], ['Mentions légales', '/mentions-legales']] },
   ] as { title: string; links: [string, StaticPathname][] }[],
@@ -32,7 +32,7 @@ const copy = bilingual({
   createdBy: 'Créé par Jessy Ngnambongo.',
 }, {
   groups: [
-    { title: 'Platform', links: [['Tools', '/outils'], ['Business kit', '/kit-entrepreneur'], ['Resources', '/ressources'], ['Help center', '/aide']] },
+    { title: 'Platform', links: [['Tools', '/outils'], ['Business kit', '/kit-entrepreneur'], ['Resources', '/ressources'], ['Help center', '/aide'], ['Embed JcHub', '/integrer']] },
     { title: 'JcHub', links: [['About', '/a-propos'], ['Services', '/services'], ['Contact', '/contact'], ['Blog', '/blog']] },
     { title: 'Legal', links: [['Terms of use', '/cgu'], ['Terms of sale', '/cgv'], ['Privacy', '/confidentialite'], ['Legal notice', '/mentions-legales']] },
   ],

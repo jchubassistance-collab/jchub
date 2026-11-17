@@ -25,6 +25,7 @@ export const routing = defineRouting({
     '/blog/categorie/[category]': { fr: '/blog/categorie/[category]', en: '/blog/category/[category]' },
     '/cgu': { fr: '/cgu', en: '/terms' },
     '/cgv': { fr: '/cgv', en: '/terms-of-sale' },
+    '/integrer': { fr: '/integrer', en: '/embed' },
     '/compte': { fr: '/compte', en: '/account' },
     '/compte/dashboard': { fr: '/compte/dashboard', en: '/account/dashboard' },
     '/compte/favoris': { fr: '/compte/favoris', en: '/account/favorites' },
