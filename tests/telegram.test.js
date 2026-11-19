@@ -71,3 +71,60 @@ test('visites venant de Telegram reconnues', () => {
   assert.equal(classifySource('https://t.me/', undefined, 'jchub.dev'), 'telegram');
   assert.equal(classifySource('https://web.telegram.org/k/', undefined, 'jchub.dev'), 'telegram');
 });
+
+import { botLocale, categoryKeyboard, isWebhookAuthorized, linkKeyboard, mainMenu, parseUpdate, webhookSecret } from '../lib/telegram-bot.ts';
+
+const message = (text, extra = {}) => ({ update_id: 1, message: { message_id: 5, chat: { id: 42, type: 'private' }, from: { id: 42, first_name: 'Ama', language_code: 'fr' }, text, ...extra } });
+const press = (data, type = 'private') => ({ update_id: 2, callback_query: { id: 'q', from: { id: 42 }, message: { message_id: 9, chat: { id: 42, type } }, data } });
+const plain = { awaitingSupport: false, isAdmin: false };
+
+test('bot : secret du webhook vérifié en temps constant', () => {
+  const secret = webhookSecret(TOKEN);
+  assert.match(secret, /^[a-f0-9]{64}$/);
+  assert.equal(isWebhookAuthorized(secret, TOKEN), true);
+  assert.equal(isWebhookAuthorized(secret.slice(1), TOKEN), false);
+  assert.equal(isWebhookAuthorized(null, TOKEN), false);
+  assert.equal(isWebhookAuthorized(secret, undefined), false);
+  assert.notEqual(webhookSecret(`${TOKEN}x`), secret);
+});
+
+test('bot : commandes, boutons et texte libre', () => {
+  assert.deepEqual(parseUpdate(message('/start'), plain), { type: 'start' });
+  assert.deepEqual(parseUpdate(message('/start@jchub_bot'), plain), { type: 'start' });
+  assert.deepEqual(parseUpdate(message('/outils'), plain), { type: 'tools' });
+  assert.deepEqual(parseUpdate(message('/recherche compresser pdf'), plain), { type: 'search', query: 'compresser pdf' });
+  assert.deepEqual(parseUpdate(message('/aide'), plain), { type: 'support-prompt' });
+  assert.deepEqual(parseUpdate(message('/aide le site plante sur mobile'), plain), { type: 'support', text: 'le site plante sur mobile' });
+  assert.deepEqual(parseUpdate(message('calculer la TVA'), plain), { type: 'search', query: 'calculer la TVA' });
+  assert.deepEqual(parseUpdate(message('Le bouton ne marche pas'), { ...plain, awaitingSupport: true }), { type: 'support', text: 'Le bouton ne marche pas' });
+  assert.deepEqual(parseUpdate(message('/stats'), plain), { type: 'menu' });
+  assert.deepEqual(parseUpdate(message('/stats'), { ...plain, isAdmin: true }), { type: 'stats' });
+  assert.deepEqual(parseUpdate(message(undefined), plain), { type: 'unsupported' });
+  assert.deepEqual(parseUpdate(press('cat:3'), plain), { type: 'category', index: 3 });
+  assert.deepEqual(parseUpdate(press('support'), plain), { type: 'support-prompt' });
+  assert.deepEqual(parseUpdate(press('inconnu'), plain), { type: 'ignore' });
+});
+
+test('bot : groupes ignorés et réponses de l’équipe réservées aux admins', () => {
+  assert.deepEqual(parseUpdate({ message: { ...message('salut').message, chat: { id: -5, type: 'group' } } }, plain), { type: 'ignore' });
+  assert.deepEqual(parseUpdate(press('menu', 'channel'), plain), { type: 'ignore' });
+  const reply = message('Merci, c’est corrigé', { reply_to_message: { text: '📩 Nouveau message\n#ticket-AbC123xyz', from: { is_bot: true } } });
+  assert.deepEqual(parseUpdate(reply, { ...plain, isAdmin: true }), { type: 'admin-reply', ticket: 'AbC123xyz', text: 'Merci, c’est corrigé' });
+  assert.deepEqual(parseUpdate(reply, plain), { type: 'search', query: 'Merci, c’est corrigé' });
+});
+
+test('bot : menus et langue', () => {
+  assert.equal(botLocale('en-GB'), 'en');
+  assert.equal(botLocale('fr'), 'fr');
+  assert.equal(botLocale(undefined), 'fr');
+  const menu = mainMenu('fr', 'https://jchub.dev', 'https://t.me/JcHubOfficiel');
+  assert.deepEqual(menu.flat().map((button) => button.text), ['🛠️ Nos outils', '📰 Notre blog', '🔎 Rechercher', '💬 Assistance', '📢 Notre chaîne', '🌐 Site JcHub']);
+  assert.equal(menu[2][1].url, 'https://jchub.dev/fr');
+  const categories = categoryKeyboard(['PDF', 'Images', 'Sécurité'], 'en', 'https://jchub.dev/en/tools');
+  assert.deepEqual(categories[0].map((button) => button.callback_data), ['cat:0', 'cat:1']);
+  assert.deepEqual(categories[1].map((button) => button.callback_data), ['cat:2']);
+  assert.equal(categories.at(-1)[0].callback_data, 'menu');
+  for (const button of [...menu.flat(), ...categories.flat()]) if ('callback_data' in button) assert.ok(Buffer.byteLength(button.callback_data) <= 64);
+  const links = linkKeyboard([{ text: 'x'.repeat(100), url: 'https://jchub.dev/a' }], 'fr');
+  assert.equal(links[0][0].text.length, 64);
+});

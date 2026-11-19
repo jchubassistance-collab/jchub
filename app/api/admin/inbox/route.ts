@@ -5,6 +5,7 @@ import { requireAdmin } from '@/lib/admin-auth';
 import { getAdminDb, hasFirebaseAdminConfig } from '@/lib/firebase-admin';
 import { reportUserError } from '@/lib/user-error';
 import { testimonialAvatarUrl } from '@/lib/testimonials';
+import { replyToTelegramMessage } from '@/lib/telegram-bot-server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -56,6 +57,16 @@ export async function POST(request: NextRequest) {
     const snapshot = await reference.get();
     if (!snapshot.exists) return NextResponse.json({ error: 'Ce message est introuvable.' }, { status: 404 });
     const contact = snapshot.data()!;
+    // A message sent to the Telegram bot is answered in Telegram.
+    if (contact.telegramChatId) {
+      try {
+        await replyToTelegramMessage(parsed.data.messageId, parsed.data.body, admin.email || '');
+        return NextResponse.json({ success: true });
+      } catch (error) {
+        reportUserError(error, { request, details: { fournisseur: 'Telegram' } });
+        return NextResponse.json({ error: 'Telegram n’a pas pu transmettre la réponse (la personne a peut-être bloqué le bot).' }, { status: 502 });
+      }
+    }
     const email = String(contact.email || '');
     const name = String(contact.name || '');
     const senderEmail = process.env.BREVO_SENDER_EMAIL?.trim();
