@@ -18,9 +18,10 @@ author: JcHub
 image: >-
   /blog/covers/du-monde-physique-au-numerique-simplifiez-vos-echanges-qr-code.jpg
 readTime: 5 min
-status: scheduled
+status: published
+publishedAt: '2026-11-13T09:11:00.048Z'
 scheduledFor: '2026-11-12T21:08:00.000Z'
-updatedAt: '2026-11-04T14:18:01.398Z'
+updatedAt: '2026-11-13T09:11:00.048Z'
 ---
 # Du monde physique au numérique : simplifiez vos échanges grâce au QR Code
 
