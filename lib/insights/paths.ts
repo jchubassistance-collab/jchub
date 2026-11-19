@@ -3,7 +3,7 @@
  * dependency, so the tracker stays light. Only relative imports: tested with plain Node.
  */
 
-export type TrafficSource = 'google' | 'facebook' | 'instagram' | 'linkedin' | 'whatsapp' | 'x' | 'youtube' | 'bing' | 'autre-moteur' | 'direct' | 'site-referent' | 'interne';
+export type TrafficSource = 'google' | 'facebook' | 'instagram' | 'linkedin' | 'whatsapp' | 'telegram' | 'x' | 'youtube' | 'bing' | 'autre-moteur' | 'direct' | 'site-referent' | 'interne';
 
 /**
  * Where a visit comes from, read from utm_source first, then the referrer's host.
@@ -16,6 +16,7 @@ export function classifySource(referrer: string | undefined, utm: string | undef
     if (/^(ig|instagram)/.test(tag)) return 'instagram';
     if (/^(li|linkedin|lnkd)/.test(tag)) return 'linkedin';
     if (/^(wa|whatsapp)/.test(tag)) return 'whatsapp';
+    if (/^(tg|telegram)/.test(tag)) return 'telegram';
     if (/^google/.test(tag)) return 'google';
   }
   if (!referrer) return 'direct';
@@ -27,6 +28,7 @@ export function classifySource(referrer: string | undefined, utm: string | undef
   if (/(^|\.)instagram\.com$/.test(host) || host === 'l.instagram.com') return 'instagram';
   if (/(^|\.)(linkedin\.com|lnkd\.in)$/.test(host)) return 'linkedin';
   if (/(^|\.)(whatsapp\.com|wa\.me)$/.test(host)) return 'whatsapp';
+  if (/(^|\.)(t\.me|telegram\.me|telegram\.org)$/.test(host)) return 'telegram';
   if (/(^|\.)(t\.co|x\.com|twitter\.com)$/.test(host)) return 'x';
   if (/(^|\.)(youtube\.com|youtu\.be)$/.test(host)) return 'youtube';
   if (/(^|\.)bing\.com$/.test(host)) return 'bing';
