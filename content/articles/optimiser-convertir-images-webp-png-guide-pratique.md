@@ -21,9 +21,10 @@ tags:
 author: JcHub
 image: /blog/covers/optimiser-convertir-images-webp-png-guide-pratique.jpg
 readTime: 5 min
-status: scheduled
+status: published
+publishedAt: '2026-11-20T09:11:00.205Z'
 scheduledFor: '2026-11-19T21:08:00.000Z'
-updatedAt: '2026-11-04T14:18:02.093Z'
+updatedAt: '2026-11-20T09:11:00.205Z'
 ---
 # Comment optimiser ses images WebP et PNG pour accélérer un site web sans perte de qualité
 
