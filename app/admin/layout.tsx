@@ -1,5 +1,10 @@
 import type { Metadata } from 'next';
 import { connection } from 'next/server';
+import { cookies, headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { ADMIN_SESSION_COOKIE } from '@/lib/admin-auth';
+import { getAdminAuth } from '@/lib/firebase-admin';
+import { ADMIN_PATH_HEADER, PUBLIC_ADMIN_PATHS } from '@/lib/admin-path';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { NextIntlClientProvider } from 'next-intl';
@@ -23,6 +28,19 @@ export const metadata: Metadata = {
  */
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await connection();
+
+  // Without a valid session, no admin page is sent, not even its menu: only the sign-in page.
+  // The session cookie is created only for admin, CM and writer accounts; each /api/admin route
+  // still checks the role and revocation before giving out data.
+  const requestHeaders = await headers();
+  const path = requestHeaders.get(ADMIN_PATH_HEADER) || '';
+  if (!PUBLIC_ADMIN_PATHS.includes(path)) {
+    const sessionCookie = (await cookies()).get(ADMIN_SESSION_COOKIE)?.value;
+    const signedIn = sessionCookie
+      ? await getAdminAuth().verifySessionCookie(sessionCookie).then(() => true, () => false)
+      : false;
+    if (!signedIn) redirect('/admin/login');
+  }
   const isVercelProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL === '1';
 
   return (

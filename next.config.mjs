@@ -4,6 +4,10 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
+// Same defaults as proxy.ts.
+const ADMIN_HOST = (process.env.ADMIN_HOST || 'admin.jchub.dev').toLowerCase();
+const PUBLIC_HOST = (process.env.PUBLIC_HOST || 'jchub.dev').toLowerCase();
+
 const facebookRedirectUri = process.env.FACEBOOK_REDIRECT_URI || process.env.META_REDIRECT_URI;
 let facebookOAuthHost;
 try {
@@ -45,6 +49,15 @@ const nextConfig = {
       // proxy, so no function runs (proxy.ts still covers the other unprefixed addresses).
       // Limited to the public host: admin.jchub.dev/ is handled by proxy.ts.
       { source: '/', has: [{ type: 'host', value: 'jchub\\.dev' }], destination: '/fr', permanent: true },
+      // The admin host served a full copy of the public site, crawled by Google as duplicate
+      // pages. Its public addresses now lead to the public host; /admin, the API, Next.js assets
+      // and files (robots.txt, images…) stay on it. / is handled by proxy.ts.
+      {
+        source: '/:path((?!admin(?:/|$)|api/|_next/|.*[.][^/]+$).+)',
+        has: [{ type: 'host', value: ADMIN_HOST.replaceAll('.', '\\.') }],
+        destination: `https://${PUBLIC_HOST}/:path`,
+        permanent: true,
+      },
       { source: '/about', destination: '/fr/a-propos', permanent: true },
       { source: '/pricing', destination: '/fr/outils', permanent: true },
       { source: '/checkout', destination: '/fr/outils', permanent: true },
