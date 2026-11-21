@@ -21,7 +21,7 @@ export const TILE = 'F1F5F9';
 const PREVIOUS = '94A3B8';
 export const PALETTE = ['2563EB', '16A34A', 'F59E0B', '9333EA', 'EF4444', '06B6D4', 'EC4899', '64748B', '84CC16', '0EA5E9'];
 const SOURCE_LABELS: Record<string, string> = {
-  google: 'Google', facebook: 'Facebook', instagram: 'Instagram', linkedin: 'LinkedIn', whatsapp: 'WhatsApp', x: 'X (Twitter)', youtube: 'YouTube', bing: 'Bing', 'autre-moteur': 'Autres moteurs', direct: 'Accès direct', 'site-referent': 'Sites référents',
+  google: 'Google', facebook: 'Facebook', instagram: 'Instagram', linkedin: 'LinkedIn', whatsapp: 'WhatsApp', telegram: 'Telegram', x: 'X (Twitter)', youtube: 'YouTube', bing: 'Bing', 'autre-moteur': 'Autres moteurs', direct: 'Accès direct', 'site-referent': 'Sites référents',
 };
 
 export const argb = (hex: string) => `FF${hex}`;

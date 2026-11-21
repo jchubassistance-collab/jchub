@@ -21,6 +21,7 @@ const schema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('create'), email, displayName, role }).strict(),
   z.object({ action: z.literal('grant-role'), email, displayName: displayName.optional(), role }).strict(),
   z.object({ action: z.literal('rename'), uid, displayName }).strict(),
+  z.object({ action: z.literal('change-email'), uid, email }).strict(),
   z.object({ action: z.literal('disable'), uid }).strict(),
   z.object({ action: z.literal('enable'), uid }).strict(),
   z.object({ action: z.literal('revoke'), uid }).strict(),
@@ -145,6 +146,17 @@ export async function POST(request: NextRequest) {
         if (online.length) after(() => syncArticleFiles(online).then(() => undefined, logSyncError));
       }
     }
+    if (input.action === 'change-email') {
+      try {
+        await auth.updateUser(input.uid, { email: input.email, emailVerified: false });
+      } catch (error) {
+        if ((error as { code?: string } | null)?.code === 'auth/email-already-exists') {
+          return NextResponse.json({ error: 'Un autre compte utilise déjà cette adresse.' }, { status: 409 });
+        }
+        throw error;
+      }
+      await users.doc(input.uid).set({ email: input.email }, { merge: true });
+    }
     if (input.action === 'disable') await auth.updateUser(input.uid, { disabled: true });
     if (input.action === 'enable') await auth.updateUser(input.uid, { disabled: false });
     if (input.action === 'remove-role') {
@@ -153,7 +165,8 @@ export async function POST(request: NextRequest) {
       await users.doc(input.uid).set({ role: 'user' }, { merge: true });
     }
     // Open sessions end at once: the session cookie is checked against revoked tokens.
-    if (input.action === 'revoke' || input.action === 'disable' || input.action === 'remove-role') await auth.revokeRefreshTokens(input.uid);
+    // After an address change, the account signs in again with its new address.
+    if (input.action === 'revoke' || input.action === 'disable' || input.action === 'remove-role' || input.action === 'change-email') await auth.revokeRefreshTokens(input.uid);
     return NextResponse.json({ updated: true });
   } catch (error) {
     return errorResponse(error);

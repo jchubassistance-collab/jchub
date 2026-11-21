@@ -247,6 +247,7 @@ const CRON_LABELS: Record<string, string> = {
   'publish-scheduled': 'publication des contenus programmés',
   'publish-tool-devto': 'publication d’un outil sur DEV',
   'publish-social': 'publication sur les réseaux sociaux',
+  'publish-telegram': 'publication sur la chaîne Telegram',
   'cm-weekly-insights': 'bilan hebdomadaire de l’espace CM',
   'cleanup-conversion-blobs': 'nettoyage des fichiers temporaires',
   'cleanup-reports': 'nettoyage des rapports',

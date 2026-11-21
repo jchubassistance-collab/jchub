@@ -4,6 +4,7 @@ import createIntlMiddleware from 'next-intl/middleware';
 import { routing } from '@/i18n/routing';
 import { legacyFrenchPath } from '@/i18n/legacy-paths';
 import { REQUEST_ID_HEADER, startRequestReport, writeRequestReport } from '@/lib/reports/proxy';
+import { ADMIN_PATH_HEADER } from '@/lib/admin-path';
 
 const handleLocale = createIntlMiddleware(routing);
 
@@ -87,6 +88,10 @@ function routeRequest(request: NextRequest, requestId: string) {
 
   if (nonce) requestHeaders.set('Content-Security-Policy', contentSecurityPolicy);
   else requestHeaders.delete('Content-Security-Policy');
+  // The admin layout reads the page's path here to let /admin/login through without a session.
+  // Only the proxy sets it: a value sent by the visitor is dropped.
+  if (isAdminPath) requestHeaders.set(ADMIN_PATH_HEADER, pathname);
+  else requestHeaders.delete(ADMIN_PATH_HEADER);
   // Only the proxy names the entry: a value sent by the visitor is dropped.
   if (requestId) requestHeaders.set(REQUEST_ID_HEADER, requestId);
   else requestHeaders.delete(REQUEST_ID_HEADER);

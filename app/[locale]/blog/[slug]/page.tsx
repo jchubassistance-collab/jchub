@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { BlogInteractions } from '@/components/blog/BlogInteractions';
 import { ArticleComments } from '@/components/blog/ArticleComments';
+import { TelegramJoinCard } from '@/components/TelegramJoin';
 import { articleCoverPath } from '@/lib/article-cover';
 import { getPublishedArticles, getPublishedArticleBySlug, getPublishedArticleSlugs, type BlogArticle } from '@/lib/blog';
 import { unsplashHomeUrl } from '@/lib/photos';
@@ -174,6 +175,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
               <span key={tag} className="rounded-md bg-blue-50 px-3 py-1.5 text-xs font-semibold text-slate-600">#{tag}</span>
             ))}
           </div>
+          <TelegramJoinCard locale={locale} />
         </article>
 
         <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">

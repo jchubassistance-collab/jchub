@@ -170,8 +170,8 @@ export function CandleChart({ candles, height = 300 }: { candles: Candle[]; heig
 }
 
 export const SOURCE_LABELS: Record<string, string> = {
-  google: 'Google', facebook: 'Facebook', instagram: 'Instagram', linkedin: 'LinkedIn', whatsapp: 'WhatsApp', x: 'X (Twitter)', youtube: 'YouTube', bing: 'Bing', 'autre-moteur': 'Autres moteurs', direct: 'Accès direct', 'site-referent': 'Sites référents',
+  google: 'Google', facebook: 'Facebook', instagram: 'Instagram', linkedin: 'LinkedIn', whatsapp: 'WhatsApp', telegram: 'Telegram', x: 'X (Twitter)', youtube: 'YouTube', bing: 'Bing', 'autre-moteur': 'Autres moteurs', direct: 'Accès direct', 'site-referent': 'Sites référents',
 };
 export const SOURCE_COLORS: Record<string, string> = {
-  google: '#2563eb', facebook: '#1877f2', instagram: '#e1306c', linkedin: '#0a66c2', whatsapp: '#25d366', x: '#0f172a', youtube: '#ff0000', bing: '#06b6d4', 'autre-moteur': '#84cc16', direct: '#94a3b8', 'site-referent': '#f59e0b',
+  google: '#2563eb', facebook: '#1877f2', instagram: '#e1306c', linkedin: '#0a66c2', whatsapp: '#25d366', telegram: '#26a5e4', x: '#0f172a', youtube: '#ff0000', bing: '#06b6d4', 'autre-moteur': '#84cc16', direct: '#94a3b8', 'site-referent': '#f59e0b',
 };

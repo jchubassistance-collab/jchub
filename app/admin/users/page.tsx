@@ -46,6 +46,7 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState('all');
   const [adding, setAdding] = useState(false);
   const [renaming, setRenaming] = useState<User | null>(null);
+  const [changingEmail, setChangingEmail] = useState<User | null>(null);
   const [menuId, setMenuId] = useState<string | null>(null);
   const [working, setWorking] = useState<string | null>(null);
   const load = useCallback(async () => { setLoading(true); setError(''); try { setUsers((await fetchJson<{ users?: User[] }>(USERS_URL)).users || []); setLoaded(true); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Chargement impossible.'); } finally { setLoading(false); } }, []);
@@ -79,6 +80,7 @@ export default function AdminUsersPage() {
       <td className="p-4 text-slate-600">{user.createdAt ? new Date(user.createdAt).toLocaleDateString('fr-FR') : '-'}</td>
       <td className="p-4 text-right">{isManaged(user.role) && <div className="relative inline-block"><button aria-label={`Actions pour ${user.displayName || user.email}`} aria-expanded={menuId === user.uid} disabled={working === user.uid} onClick={() => setMenuId(menuId === user.uid ? null : user.uid)} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-200 text-slate-600 hover:border-blue-300 disabled:opacity-50">{working === user.uid ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreVertical className="h-4 w-4" />}</button>{menuId === user.uid && <div className="absolute right-0 z-20 mt-1 w-52 rounded-xl border border-slate-200 bg-white p-1.5 text-left shadow-xl">
         <MenuButton onClick={() => { setMenuId(null); setRenaming(user); }}>Renommer</MenuButton>
+        <MenuButton onClick={() => { setMenuId(null); setChangingEmail(user); }}>Modifier l’e-mail</MenuButton>
         <MenuButton onClick={() => void act(user, 'revoke')}>Déconnecter partout</MenuButton>
         {user.disabled ? <MenuButton onClick={() => void act(user, 'enable')}>Réactiver le compte</MenuButton> : <MenuButton tone="amber" onClick={() => void act(user, 'disable')}>Désactiver le compte</MenuButton>}
         <MenuButton tone="red" onClick={() => void act(user, 'remove-role')}>Retirer la fonction</MenuButton>
@@ -86,7 +88,26 @@ export default function AdminUsersPage() {
     </tr>)}</tbody></table>{loaded && !visible.length && <p className="p-8 text-center text-sm text-slate-500">{users.length ? 'Aucun résultat pour cette recherche.' : 'Aucun utilisateur.'}</p>}</div>}
     {adding && <AddUserDialog onClose={() => setAdding(false)} onSaved={() => void load()} />}
     {renaming && <RenameDialog user={renaming} onClose={() => setRenaming(null)} onSaved={(name) => { setRenaming(null); setNotice(renaming.role === 'writer' ? `Nom changé en « ${name} ». Il s’applique à sa prochaine connexion ; ses articles publiés sont re-signés dans quelques minutes.` : `Nom changé en « ${name} ».`); void load(); }} />}
+    {changingEmail && <EmailDialog user={changingEmail} onClose={() => setChangingEmail(null)} onSaved={(email) => { setChangingEmail(null); setNotice(`${changingEmail.displayName || email} : adresse changée en ${email}. Le compte est déconnecté et se reconnecte avec cette adresse et le même mot de passe.`); void load(); }} />}
   </AdminSection>;
+}
+
+function EmailDialog({ user, onClose, onSaved }: { user: User; onClose: () => void; onSaved: (email: string) => void }) {
+  const [email, setEmail] = useState(user.email);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); setBusy(true); setError('');
+    const next = email.trim().toLowerCase();
+    try { await postUsers({ action: 'change-email', uid: user.uid, email: next }); onSaved(next); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : 'Opération impossible.'); setBusy(false); }
+  };
+  return <Dialog title="Modifier l’adresse e-mail" onClose={onClose}><form onSubmit={submit} className="space-y-4">
+    <p className="text-sm text-slate-600">Mets une adresse où {user.displayName || 'cette personne'} reçoit vraiment ses e-mails : elle sert à se connecter et à recevoir les liens de mot de passe. Le mot de passe ne change pas ; le compte est déconnecté de ses appareils.</p>
+    <label className="block text-xs font-semibold text-slate-600">Nouvelle adresse e-mail<input required type="email" autoComplete="off" maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} placeholder="prenom@exemple.com" className="mt-1.5 h-10 w-full rounded-lg border border-slate-200 px-3 text-sm text-slate-900 outline-none focus:border-blue-400" /></label>
+    {error && <Notice text={error} />}
+    <div className="flex justify-end gap-2"><button type="button" onClick={onClose} className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-600">Annuler</button><button disabled={busy || email.trim().toLowerCase() === user.email} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-bold text-white disabled:opacity-60">{busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}Enregistrer</button></div>
+  </form></Dialog>;
 }
 
 function AddUserDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {

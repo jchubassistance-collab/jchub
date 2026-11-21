@@ -7,6 +7,8 @@ import { OPEN_CONSENT_EVENT } from '@/components/AnalyticsConsent';
 import { isLightPage as isLightHeaderPage } from '@/components/layout/Header';
 import { Link, usePathname } from '@/i18n/navigation';
 import { bilingual } from '@/i18n/copy';
+import { TelegramMark } from '@/components/TelegramJoin';
+import { TELEGRAM_CHANNEL_URL } from '@/lib/telegram-links';
 import type { StaticPathname } from '@/i18n/routing';
 
 const copy = bilingual({
@@ -27,6 +29,7 @@ const copy = bilingual({
   onFacebook: 'JcHub sur Facebook',
   onInstagram: 'JcHub sur Instagram',
   onLinkedIn: 'JcHub sur LinkedIn',
+  onTelegram: 'Chaîne Telegram JcHub',
   rights: 'Tous droits réservés.',
   cookies: 'Gérer les cookies',
   createdBy: 'Créé par Jessy Ngnambongo.',
@@ -48,6 +51,7 @@ const copy = bilingual({
   onFacebook: 'JcHub on Facebook',
   onInstagram: 'JcHub on Instagram',
   onLinkedIn: 'JcHub on LinkedIn',
+  onTelegram: 'JcHub Telegram channel',
   rights: 'All rights reserved.',
   cookies: 'Manage cookies',
   createdBy: 'Created by Jessy Ngnambongo.',
@@ -113,6 +117,7 @@ export function Footer() {
                 <a href="https://www.facebook.com/1393952223791842" target="_blank" rel="noopener noreferrer" aria-label={t.onFacebook} title="Facebook" className="group relative inline-flex h-9 w-9 items-center justify-center text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-500"><span aria-hidden="true" className="absolute h-6 w-6 rounded-full bg-gradient-to-br from-[#1686ff] via-[#1877f2] to-[#3834b8] shadow-[0_4px_10px_rgba(24,80,220,.24)] transition-transform duration-300 group-hover:scale-105 sm:h-8 sm:w-8" /><FacebookBrandMark className="relative z-10 h-4 w-4 sm:h-5 sm:w-5" /></a>
                 <a href="https://www.instagram.com/jchub.tech/" target="_blank" rel="noopener noreferrer" aria-label={t.onInstagram} title="Instagram" className="group relative inline-flex h-9 w-9 items-center justify-center text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-pink-500"><span aria-hidden="true" className="absolute h-6 w-6 rounded-full bg-gradient-to-tr from-[#7438ef] via-[#f83387] to-[#ffd43b] shadow-[0_4px_10px_rgba(225,48,108,.22)] transition-transform duration-300 group-hover:scale-105 sm:h-8 sm:w-8" /><InstagramBrandMark className="relative z-10 h-5 w-5 sm:h-6 sm:w-6" /></a>
                 <a href="https://www.linkedin.com/in/jessy-ngnambongo-904b50401/" target="_blank" rel="noopener noreferrer" aria-label={t.onLinkedIn} title="LinkedIn" className="group relative inline-flex h-9 w-9 items-center justify-center text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-500"><span aria-hidden="true" className="absolute h-6 w-6 rounded-full bg-[#0a66c2] shadow-[0_4px_10px_rgba(10,102,194,.24)] transition-transform duration-300 group-hover:scale-105 sm:h-8 sm:w-8" /><Linkedin className="relative z-10 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" /></a>
+                <a href={TELEGRAM_CHANNEL_URL} target="_blank" rel="noopener noreferrer" aria-label={t.onTelegram} title="Telegram" className="group relative inline-flex h-9 w-9 items-center justify-center text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-500"><span aria-hidden="true" className="absolute h-6 w-6 rounded-full bg-[#229ed9] shadow-[0_4px_10px_rgba(34,158,217,.24)] transition-transform duration-300 group-hover:scale-105 sm:h-8 sm:w-8" /><TelegramMark className="relative z-10 h-4 w-4 -translate-x-px sm:h-5 sm:w-5" /></a>
               </nav>
             </section>
           </div>
@@ -151,6 +156,7 @@ export function Footer() {
                   <a href="https://www.facebook.com/1393952223791842" target="_blank" rel="noopener noreferrer" aria-label={t.onFacebook} title="Facebook" className="group relative inline-flex h-10 w-10 items-center justify-center text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-500"><span aria-hidden="true" className="absolute h-7 w-7 rounded-full bg-gradient-to-br from-[#1686ff] via-[#1877f2] to-[#3834b8] shadow-[0_3px_9px_rgba(24,80,220,.22)] transition-transform duration-300 group-hover:scale-105" /><FacebookBrandMark className="relative z-10 h-[1.1rem] w-[1.1rem]" /></a>
                   <a href="https://www.instagram.com/jchub.tech/" target="_blank" rel="noopener noreferrer" aria-label={t.onInstagram} title="Instagram" className="group relative inline-flex h-10 w-10 items-center justify-center text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-pink-500"><span aria-hidden="true" className="absolute h-7 w-7 rounded-full bg-gradient-to-tr from-[#7438ef] via-[#f83387] to-[#ffd43b] shadow-[0_3px_9px_rgba(225,48,108,.2)] transition-transform duration-300 group-hover:scale-105" /><InstagramBrandMark className="relative z-10 h-5 w-5" /></a>
                   <a href="https://www.linkedin.com/in/jessy-ngnambongo-904b50401/" target="_blank" rel="noopener noreferrer" aria-label={t.onLinkedIn} title="LinkedIn" className="group relative inline-flex h-10 w-10 items-center justify-center text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-500"><span aria-hidden="true" className="absolute h-7 w-7 rounded-full bg-[#0a66c2] shadow-[0_3px_9px_rgba(10,102,194,.22)] transition-transform duration-300 group-hover:scale-105" /><Linkedin className="relative z-10 h-[1.1rem] w-[1.1rem]" aria-hidden="true" /></a>
+                  <a href={TELEGRAM_CHANNEL_URL} target="_blank" rel="noopener noreferrer" aria-label={t.onTelegram} title="Telegram" className="group relative inline-flex h-10 w-10 items-center justify-center text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-500"><span aria-hidden="true" className="absolute h-7 w-7 rounded-full bg-[#229ed9] shadow-[0_3px_9px_rgba(34,158,217,.22)] transition-transform duration-300 group-hover:scale-105" /><TelegramMark className="relative z-10 h-[1.05rem] w-[1.05rem] -translate-x-px" /></a>
                 </nav>
               )}
             </div>
