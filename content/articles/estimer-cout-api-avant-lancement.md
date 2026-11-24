@@ -19,9 +19,10 @@ author: Jessy Ngnambongo
 image: >-
   /api/article-cover?title=Comment+estimer+le+co%C3%BBt+d%E2%80%99une+API+avant+de+la+lancer&category=D%C3%A9veloppement
 readTime: 4 min
-status: scheduled
+status: published
+publishedAt: '2026-11-24T09:11:01.848Z'
 scheduledFor: '2026-11-24T07:00:00.000Z'
-updatedAt: '2026-11-04T14:17:50.610Z'
+updatedAt: '2026-11-24T09:11:01.848Z'
 ---
 Une API payée à la requête paraît toujours bon marché : un demi-centime par appel, qui s’en soucierait ? Puis l’application trouve ses utilisateurs, chaque écran déclenche trois appels, chaque erreur réseau en ajoute un, et la facture du mois arrive. Estimer le coût **avant** le lancement prend dix minutes et évite ce genre de surprise. Voici la méthode, avec un exemple chiffré.
 
