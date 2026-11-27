@@ -21,9 +21,10 @@ tags:
 author: JcHub
 image: /blog/covers/pourquoi-vos-pdf-sont-trop-lourds-et-comment-les-compresser.jpg
 readTime: 5 min
-status: scheduled
+status: published
+publishedAt: '2026-11-27T09:11:00.599Z'
 scheduledFor: '2026-11-26T21:08:00.000Z'
-updatedAt: '2026-11-04T14:18:02.734Z'
+updatedAt: '2026-11-27T09:11:00.599Z'
 ---
 Chaque jour, des milliers d'utilisateurs se heurtent au même message d'erreur : « Votre fichier dépasse la taille maximale autorisée de 2 Mo ». Que ce soit lors du dépôt d'un dossier de candidature sur une plateforme de recrutement, de la transmission de pièces justificatives sur un portail administratif public, ou simplement lors de l'envoi d'une facture par messagerie électronique, la gestion du poids des fichiers PDF reste un point de friction récurrent.
 
